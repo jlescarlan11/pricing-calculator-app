@@ -23,13 +23,19 @@ describe('OverheadCalculator', () => {
   });
 
   it('updates when batch size changes', () => {
-    render(<OverheadCalculator onApply={mockOnApply} initialBatchSize={50} />);
+    const { rerender } = render(<OverheadCalculator onApply={mockOnApply} initialBatchSize={50} />);
     
     fireEvent.change(screen.getByLabelText(/Packaging per Unit/i), { target: { value: '10' } });
-    fireEvent.change(screen.getByLabelText(/Current Batch Size/i), { target: { value: '100' } });
+    
+    // Packaging = 10 * 50 = 500
+    // Total = 500 (since monthly costs are 0)
+    expect(screen.getAllByText(/₱500.00/i).length).toBeGreaterThan(0);
+
+    // Change prop to 100
+    rerender(<OverheadCalculator onApply={mockOnApply} initialBatchSize={100} />);
     
     // Packaging = 10 * 100 = 1000
-    expect(screen.getByText(/₱1,000.00/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/₱1,000.00/i).length).toBeGreaterThan(0);
   });
 
   it('calls onApply when apply button is clicked', () => {

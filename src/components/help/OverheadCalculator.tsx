@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Info } from 'lucide-react';
-import { Input, Button } from '../shared';
+import { Info, HelpCircle } from 'lucide-react';
+import { Input, Button, Tooltip } from '../shared';
 
 interface OverheadCalculatorProps {
   onApply: (total: number) => void;
@@ -21,7 +21,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
   const [maintenance, setMaintenance] = useState<string>('');
   const [batchesPerMonth, setBatchesPerMonth] = useState<string>('');
   const [packagingPerUnit, setPackagingPerUnit] = useState<string>('');
-  const [batchSize, setBatchSize] = useState<string>(initialBatchSize.toString());
 
   const calculation = useMemo(() => {
     const r = parseFloat(rent) || 0;
@@ -30,7 +29,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
     const mt = parseFloat(maintenance) || 0;
     const bpm = Math.max(parseFloat(batchesPerMonth) || 1, 1);
     const ppu = parseFloat(packagingPerUnit) || 0;
-    const bs = parseFloat(batchSize) || 0;
+    const bs = initialBatchSize;
 
     const fixedTotal = r + u + m + mt;
     const fixedPerBatch = fixedTotal / bpm;
@@ -42,7 +41,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
       packagingTotal,
       total,
     };
-  }, [rent, utilities, marketing, maintenance, batchesPerMonth, packagingPerUnit, batchSize]);
+  }, [rent, utilities, marketing, maintenance, batchesPerMonth, packagingPerUnit, initialBatchSize]);
 
   return (
     <div className="space-y-xl p-xl">
@@ -63,7 +62,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+      <div className="flex flex-col gap-xl">
         <div className="space-y-lg">
           <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Monthly Costs</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
@@ -112,23 +111,26 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
 
         <div className="space-y-lg">
           <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Packaging Costs</p>
-          <Input
-            label="Packaging per Unit"
-            type="number"
-            value={packagingPerUnit}
-            onChange={(e) => setPackagingPerUnit(e.target.value)}
-            currency
-            placeholder="0.00"
-            helperText="Cost of packaging for each item"
-          />
-          <Input
-            label="Current Batch Size"
-            type="number"
-            value={batchSize}
-            onChange={(e) => setBatchSize(e.target.value)}
-            placeholder="e.g. 50"
-            helperText="Units being produced in this batch"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
+            <Input
+              label="Packaging per Unit"
+              type="number"
+              value={packagingPerUnit}
+              onChange={(e) => setPackagingPerUnit(e.target.value)}
+              currency
+              placeholder="0.00"
+              helperText="Cost of packaging for each item"
+            />
+            <Input
+              label="Current Batch Size"
+              type="number"
+              value={initialBatchSize}
+              onChange={() => {}}
+              disabled
+              placeholder="e.g. 50"
+              helperText="Synchronized with Product Details batch size."
+            />
+          </div>
         </div>
       </div>
 
@@ -140,7 +142,14 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
             <span className="font-mono text-ink-900">₱{calculation.fixedPerBatch.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm font-medium">
-            <span className="text-ink-500">Total Packaging Cost</span>
+            <div className="flex items-center gap-xs">
+              <span className="text-ink-500">Total Packaging Cost</span>
+              <Tooltip content={`Calculated as Packaging per Unit (₱${parseFloat(packagingPerUnit) || 0}) × Batch Size (${initialBatchSize})`}>
+                <button type="button" className="text-ink-500 hover:text-clay cursor-help transition-colors">
+                  <HelpCircle className="w-3.5 h-3.5" />
+                </button>
+              </Tooltip>
+            </div>
             <span className="font-mono text-ink-900">₱{calculation.packagingTotal.toFixed(2)}</span>
           </div>
           <div className="pt-md mt-sm border-t border-border-subtle flex justify-between items-end">
@@ -158,8 +167,9 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         onClick={() => onApply(calculation.total)}
         disabled={calculation.total <= 0}
       >
-        Apply
+        Apply to Overhead Cost
       </Button>
     </div>
   );
 };
+
