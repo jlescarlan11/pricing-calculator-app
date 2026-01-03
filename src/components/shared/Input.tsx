@@ -40,7 +40,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   };
 
   return (
-    <div className={`flex flex-col gap-xs w-full ${className}`}>
+    <div className={`flex flex-col gap-xs w-full max-w-[500px] ${className}`}>
       <label 
         htmlFor={id} 
         className="text-sm font-medium text-ink-700 flex items-center justify-between"
@@ -53,7 +53,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
 
       <div className="relative">
         {currency && (
-          <div className="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <span className="text-ink-500 sm:text-sm">₱</span>
           </div>
         )}
@@ -73,11 +73,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           min={type === 'number' ? 0 : undefined}
           className={`
             block w-full rounded-sm border
-            py-2 sm:text-sm transition-all duration-200
+            py-4 sm:text-sm transition-all duration-200
             disabled:bg-surface-hover disabled:text-ink-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden
-            ${currency ? 'pl-10' : 'pl-3'}
-            ${suffix || error ? 'pr-10' : 'pr-3'}
+            ${currency ? 'pl-10' : 'pl-4'}
+            ${suffix || error ? 'pr-10' : 'pr-4'}
             ${error 
               ? 'border-rust/50 text-rust placeholder-rust/30 focus:border-rust focus:ring-rust/20' 
               : 'border-border-base bg-bg-main focus:border-clay focus:ring-clay/20'

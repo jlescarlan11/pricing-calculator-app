@@ -75,7 +75,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 
   return (
     <div 
-      className="flex flex-col sm:flex-row gap-md items-start sm:items-center p-lg bg-surface rounded-md border border-border-subtle transition-all duration-300 hover:border-border-base group/row"
+      className="flex flex-col sm:flex-row gap-lg items-start sm:items-center p-lg bg-surface rounded-md border border-border-subtle transition-all duration-300 hover:border-border-base group/row"
       onKeyDown={handleKeyDown}
     >
       <div className="flex-1 w-full sm:w-auto">
@@ -90,7 +90,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
         />
       </div>
 
-      <div className="flex gap-md w-full sm:w-auto">
+      <div className="flex gap-lg w-full sm:w-auto">
         <div className="flex-1 sm:w-32">
           <Input
             label="Amount"

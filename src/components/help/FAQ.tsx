@@ -30,7 +30,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle })
           isOpen ? 'max-h-96 opacity-100 mb-lg' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-sm text-ink-700 leading-relaxed font-medium text-sm">
+        <div className="px-sm text-ink-700 leading-relaxed font-medium text-sm max-w-[700px]">
           {answer}
         </div>
       </div>

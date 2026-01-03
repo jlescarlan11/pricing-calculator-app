@@ -62,7 +62,7 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
             <div className="flex items-center gap-sm mb-sm">
               <Badge variant="info" className="text-[10px] uppercase tracking-widest px-sm">Definition</Badge>
             </div>
-            <p className="text-ink-700 leading-relaxed font-medium">
+            <p className="text-ink-700 leading-relaxed font-medium max-w-[700px]">
               Markup is the percentage <strong>added to the cost price</strong> of a product to determine its selling price. It focuses on ensuring each item sold earns a specific profit above its production cost.
             </p>
           </section>
@@ -138,7 +138,7 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
             <div className="flex items-center gap-sm mb-sm">
               <Badge variant="success" className="text-[10px] uppercase tracking-widest px-sm">Definition</Badge>
             </div>
-            <p className="text-ink-700 leading-relaxed font-medium">
+            <p className="text-ink-700 leading-relaxed font-medium max-w-[700px]">
               Profit Margin is the percentage of the <strong>final selling price</strong> that is profit. It tells you how much out of every peso you earn is actually kept by the business after costs.
             </p>
           </section>
