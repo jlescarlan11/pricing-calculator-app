@@ -54,15 +54,17 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
   }
 
   return (
-    <Card title={<span className="text-ink-900">Price Comparison</span>} className={className}>
-      <div className="space-y-xl">
+    <div className={`space-y-xl ${className}`}>
+      <h3 className="text-xl font-serif text-ink-900">Market Context</h3>
+      
+      <div className="space-y-lg">
         {/* Visual Comparison */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-lg bg-surface rounded-lg border border-border-subtle">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-xl bg-surface rounded-lg border border-border-subtle">
           <div className="text-center sm:text-left flex-1">
-            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">
+            <p className="text-xs font-medium text-ink-500 uppercase tracking-widest mb-xs">
               Current Price
             </p>
-            <p className="text-3xl font-bold text-ink-900 tracking-tight">
+            <p className="text-3xl font-bold text-ink-900 tracking-tight tabular-nums">
               {formatCurrency(currentPrice)}
             </p>
           </div>
@@ -72,52 +74,46 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
           </div>
           
           <div className="text-center sm:text-right flex-1">
-            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">
+            <p className="text-xs font-medium text-ink-500 uppercase tracking-widest mb-xs">
               Recommended
             </p>
-            <p className="text-3xl font-bold text-clay tracking-tight">
+            <p className="text-3xl font-bold text-clay tracking-tight tabular-nums">
               {formatCurrency(recommendedPrice)}
             </p>
           </div>
         </div>
 
         {/* Opportunity Cost Message */}
-        <div className={`p-lg rounded-lg border flex items-start sm:items-center gap-md transition-all duration-500 ${statusColor}`}>
+        <div className={`p-lg rounded-lg flex items-center gap-md transition-all duration-500 ${statusColor.replace('border', 'no-border')}`}>
           <div className="p-sm bg-white/50 rounded-sm shadow-level-1">
             {statusIcon}
           </div>
-          <span className="font-bold text-sm sm:text-lg tracking-tight">
+          <span className="font-bold text-sm sm:text-base tracking-tight">
             {statusMessage}
           </span>
         </div>
 
         {/* Profitability at Current Price */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
-          <div className="p-lg rounded-lg bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
-            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-xl">
+          <div className="flex justify-between items-center py-sm">
+            <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
               Current Profit / Unit
             </p>
-            <p className={`text-2xl font-bold tracking-tight ${currentProfitPerUnit >= 0 ? 'text-moss' : 'text-rust'}`}>
+            <p className={`text-xl font-bold tabular-nums ${currentProfitPerUnit >= 0 ? 'text-moss' : 'text-rust'}`}>
               {formatCurrency(currentProfitPerUnit)}
-            </p>
-            <p className="text-xs text-ink-500 mt-sm font-medium">
-              Earnings at your current price
             </p>
           </div>
 
-          <div className="p-lg rounded-lg bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
-            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-sm">
+          <div className="flex justify-between items-center py-sm">
+            <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
               Current Profit / Batch
             </p>
-            <p className={`text-2xl font-bold tracking-tight ${currentProfitPerBatch >= 0 ? 'text-moss' : 'text-rust'}`}>
+            <p className={`text-xl font-bold tabular-nums ${currentProfitPerBatch >= 0 ? 'text-moss' : 'text-rust'}`}>
               {formatCurrency(currentProfitPerBatch)}
-            </p>
-            <p className="text-xs text-ink-500 mt-sm font-medium">
-              Total batch earnings
             </p>
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };

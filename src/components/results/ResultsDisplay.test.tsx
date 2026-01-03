@@ -62,9 +62,9 @@ describe('ResultsDisplay', () => {
     expect(screen.getByText(/Calculation Results/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Test Product/i).length).toBeGreaterThan(0);
     // Check if sub-components are rendered (by checking for their specific text)
-    expect(screen.getByText(/Pricing Recommendation/i)).toBeInTheDocument();
-    expect(screen.getByText(/Price Comparison/i)).toBeInTheDocument();
-    expect(screen.getByText(/Cost Breakdown/i)).toBeInTheDocument();
+    expect(screen.getByText(/Recommended Selling Price/i)).toBeInTheDocument();
+    expect(screen.getByText(/Market Context/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cost Analysis/i)).toBeInTheDocument();
   });
 
   it('renders business name and date in print header', () => {

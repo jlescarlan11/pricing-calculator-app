@@ -47,9 +47,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   }
 
   return (
-    <div className="space-y-2xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
+    <div className="space-y-4xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
       {/* Print-only Header */}
-      <div className="hidden print:block border-b border-ink-900 pb-xl mb-2xl">
+      <div className="hidden print:block border-b border-ink-900 pb-xl mb-3xl">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl text-ink-900 mb-sm">
@@ -65,9 +65,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       </div>
 
       {/* Action Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg border-b border-border-subtle pb-xl print:hidden">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg print:hidden">
         <div>
-          <h2 className="text-2xl text-ink-900">Calculation Results</h2>
+          <h2 className="text-3xl font-serif text-ink-900">Calculation Results</h2>
           <p className="text-sm text-ink-500 mt-xs font-medium">
             Analysis for <span className="text-ink-900">{input.productName || 'Unnamed Product'}</span>
           </p>
@@ -87,7 +87,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2xl max-w-4xl mx-auto">
+      <div className="flex flex-col gap-4xl max-w-4xl mx-auto">
         {/* Priority 1: Recommended Price & Profit Scenarios */}
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
           <PricingRecommendations results={results} />
