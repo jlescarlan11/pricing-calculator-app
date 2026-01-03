@@ -60,36 +60,34 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
           {/* Markup Definition */}
           <section>
             <div className="flex items-center gap-sm mb-sm">
-              <Badge variant="info" className="text-[10px] uppercase tracking-widest px-sm">Definition</Badge>
+              <Badge variant="info" className="text-[10px] uppercase tracking-widest px-sm">How it works</Badge>
             </div>
             <p className="text-ink-700 leading-relaxed font-medium max-w-[700px]">
-              Markup is the percentage <strong>added to the cost price</strong> of a product to determine its selling price. It focuses on ensuring each item sold earns a specific profit above its production cost.
+              Markup is when you <strong>add a set amount of profit on top of your cost</strong>. It is the easiest way to make sure you earn a specific amount for every item you sell.
             </p>
           </section>
 
           {/* Markup Visual Example */}
           <section className="bg-surface border border-border-subtle rounded-lg p-lg">
-            <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Visual Example (50% Markup)</h4>
+            <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Example: 50% Markup</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
               <div className="text-center p-md bg-bg-main rounded-md border border-border-subtle">
-                <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">Cost</p>
-                <p className="text-xl font-bold text-ink-900 tracking-tight">{formatCurrency(cost)}</p>
+                <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">It costs you</p>
+                <p className="text-xl font-bold text-ink-900 tracking-tight">₱100.00</p>
               </div>
-              <div className="flex justify-center">
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-[10px] font-bold text-clay uppercase mb-xs">+ 50% Profit</p>
                 <ArrowRight className="h-6 w-6 text-border-base rotate-90 md:rotate-0" />
               </div>
               <div className="text-center p-md bg-clay rounded-md shadow-level-1 border border-clay/10">
-                <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">Selling Price</p>
-                <p className="text-xl font-bold text-white tracking-tight">{formatCurrency(markupPrice)}</p>
+                <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">You sell for</p>
+                <p className="text-xl font-bold text-white tracking-tight">₱150.00</p>
               </div>
             </div>
             <div className="mt-lg pt-lg border-t border-border-subtle flex justify-between items-center">
-              <span className="text-sm text-ink-700 font-bold">Profit Earned:</span>
-              <span className="text-base font-bold text-moss">{formatCurrency(markupProfit)}</span>
+              <span className="text-sm text-ink-700 font-bold">Your Take-Home Profit:</span>
+              <span className="text-base font-bold text-moss">₱50.00</span>
             </div>
-            <p className="mt-sm text-[10px] text-ink-400 text-center font-mono">
-              Formula: {formatCurrency(cost)} × (1 + 0.50) = {formatCurrency(markupPrice)}
-            </p>
           </section>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
@@ -97,35 +95,35 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
             <section>
               <h4 className="font-bold text-ink-900 mb-md flex items-center gap-sm tracking-tight">
                 <Info className="h-4 w-4 text-clay" />
-                When to use
+                Use this when:
               </h4>
               <ul className="space-y-sm text-sm text-ink-700 font-medium">
                 <li className="flex gap-sm">
                   <div className="h-1.5 w-1.5 rounded-round bg-clay/40 mt-2 shrink-0" />
-                  Simple cost-plus pricing
+                  You are just starting out
                 </li>
                 <li className="flex gap-sm">
                   <div className="h-1.5 w-1.5 rounded-round bg-clay/40 mt-2 shrink-0" />
-                  Handmade or custom goods
+                  You make handmade or custom goods
                 </li>
                 <li className="flex gap-sm">
                   <div className="h-1.5 w-1.5 rounded-round bg-clay/40 mt-2 shrink-0" />
-                  Ensuring item costs are covered
+                  You want a simple way to price items
                 </li>
               </ul>
             </section>
 
             {/* Pros & Cons */}
             <section>
-              <h4 className="font-bold text-ink-900 mb-md tracking-tight">Considerations</h4>
+              <h4 className="font-bold text-ink-900 mb-md tracking-tight">Good to know</h4>
               <div className="space-y-md">
                 <div className="flex gap-sm text-sm font-medium">
                   <Check className="h-4 w-4 text-moss shrink-0 mt-0.5" />
-                  <span className="text-ink-700 leading-snug">Very easy to calculate manually</span>
+                  <span className="text-ink-700 leading-snug">Very simple math that anyone can do</span>
                 </div>
                 <div className="flex gap-sm text-sm font-medium">
                   <X className="h-4 w-4 text-rust shrink-0 mt-0.5" />
-                  <span className="text-ink-700 leading-snug">Ignores market demand and competitors</span>
+                  <span className="text-ink-700 leading-snug">Does not look at what others are charging</span>
                 </div>
               </div>
             </section>
@@ -136,36 +134,34 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
           {/* Margin Definition */}
           <section>
             <div className="flex items-center gap-sm mb-sm">
-              <Badge variant="success" className="text-[10px] uppercase tracking-widest px-sm">Definition</Badge>
+              <Badge variant="success" className="text-[10px] uppercase tracking-widest px-sm">How it works</Badge>
             </div>
             <p className="text-ink-700 leading-relaxed font-medium max-w-[700px]">
-              Profit Margin is the percentage of the <strong>final selling price</strong> that is profit. It tells you how much out of every peso you earn is actually kept by the business after costs.
+              Profit Margin is <strong>how much of the final price you get to keep</strong>. It helps you see how much of every peso you earn is actual profit versus cost.
             </p>
           </section>
 
           {/* Margin Visual Example */}
           <section className="bg-surface border border-border-subtle rounded-lg p-lg">
-            <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Visual Example (50% Margin)</h4>
+            <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Example: 50% Margin</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
               <div className="text-center p-md bg-bg-main rounded-md border border-border-subtle">
-                <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">Cost</p>
-                <p className="text-xl font-bold text-ink-900 tracking-tight">{formatCurrency(cost)}</p>
+                <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">It costs you</p>
+                <p className="text-xl font-bold text-ink-900 tracking-tight">₱100.00</p>
               </div>
-              <div className="flex justify-center">
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-[10px] font-bold text-moss uppercase mb-xs">Keep 50% of Price</p>
                 <ArrowRight className="h-6 w-6 text-border-base rotate-90 md:rotate-0" />
               </div>
               <div className="text-center p-md bg-moss rounded-md shadow-level-1 border border-moss/10">
-                <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">Selling Price</p>
-                <p className="text-xl font-bold text-white tracking-tight">{formatCurrency(marginPrice)}</p>
+                <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">You sell for</p>
+                <p className="text-xl font-bold text-white tracking-tight">₱200.00</p>
               </div>
             </div>
             <div className="mt-lg pt-lg border-t border-border-subtle flex justify-between items-center">
-              <span className="text-sm text-ink-700 font-bold">Profit Earned:</span>
-              <span className="text-base font-bold text-moss">{formatCurrency(marginProfit)}</span>
+              <span className="text-sm text-ink-700 font-bold">Your Take-Home Profit:</span>
+              <span className="text-base font-bold text-moss">₱100.00</span>
             </div>
-            <p className="mt-sm text-[10px] text-ink-400 text-center font-mono">
-              Formula: {formatCurrency(cost)} ÷ (1 - 0.50) = {formatCurrency(marginPrice)}
-            </p>
           </section>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
@@ -173,35 +169,35 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
             <section>
               <h4 className="font-bold text-ink-900 mb-md flex items-center gap-sm tracking-tight">
                 <Info className="h-4 w-4 text-moss" />
-                When to use
+                Use this when:
               </h4>
               <ul className="space-y-sm text-sm text-ink-700 font-medium">
                 <li className="flex gap-sm">
                   <div className="h-1.5 w-1.5 rounded-round bg-moss/40 mt-2 shrink-0" />
-                  Retail and wholesale businesses
+                  You want to know your total business health
                 </li>
                 <li className="flex gap-sm">
                   <div className="h-1.5 w-1.5 rounded-round bg-moss/40 mt-2 shrink-0" />
-                  Tracking overall business health
+                  You are selling to stores or wholesalers
                 </li>
                 <li className="flex gap-sm">
                   <div className="h-1.5 w-1.5 rounded-round bg-moss/40 mt-2 shrink-0" />
-                  Comparing profit to total revenue
+                  You want to compare profit to total sales
                 </li>
               </ul>
             </section>
 
             {/* Pros & Cons */}
             <section>
-              <h4 className="font-bold text-ink-900 mb-md tracking-tight">Considerations</h4>
+              <h4 className="font-bold text-ink-900 mb-md tracking-tight">Good to know</h4>
               <div className="space-y-md">
                 <div className="flex gap-sm text-sm font-medium">
                   <Check className="h-4 w-4 text-moss shrink-0 mt-0.5" />
-                  <span className="text-ink-700 leading-snug">Directly shows business profitability</span>
+                  <span className="text-ink-700 leading-snug">Shows exactly how much money you keep</span>
                 </div>
                 <div className="flex gap-sm text-sm font-medium">
                   <X className="h-4 w-4 text-rust shrink-0 mt-0.5" />
-                  <span className="text-ink-700 leading-snug">Slightly more complex math</span>
+                  <span className="text-ink-700 leading-snug">The math is a bit more difficult</span>
                 </div>
               </div>
             </section>
@@ -223,19 +219,19 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
             </thead>
             <tbody className="divide-y divide-border-subtle font-medium">
               <tr>
-                <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Base Value</td>
-                <td className="px-lg py-md text-ink-700">Cost Price</td>
-                <td className="px-lg py-md text-ink-700">Selling Price</td>
+                <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Starts with</td>
+                <td className="px-lg py-md text-ink-700">Your total cost</td>
+                <td className="px-lg py-md text-ink-700">Final selling price</td>
               </tr>
               <tr>
                 <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Calculation</td>
-                <td className="px-lg py-md text-clay font-mono text-xs">Cost + (Cost × %)</td>
-                <td className="px-lg py-md text-clay font-mono text-xs">Cost ÷ (1 - %)</td>
+                <td className="px-lg py-md text-clay font-mono text-xs">Cost + Extra Profit</td>
+                <td className="px-lg py-md text-clay font-mono text-xs">Keep % of Sale</td>
               </tr>
               <tr>
-                <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Perspective</td>
-                <td className="px-lg py-md text-ink-700">Production</td>
-                <td className="px-lg py-md text-ink-700">Sales/Business</td>
+                <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Best for</td>
+                <td className="px-lg py-md text-ink-700">New businesses</td>
+                <td className="px-lg py-md text-ink-700">Shops & Wholesalers</td>
               </tr>
             </tbody>
           </table>

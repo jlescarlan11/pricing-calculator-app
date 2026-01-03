@@ -41,23 +41,23 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle })
 const FAQS = [
   {
     question: "What’s a good profit margin for food products?",
-    answer: "A healthy profit margin for most food businesses is typically between 25% and 35%. However, this can vary depending on your niche, overhead costs, and volume of sales. Always ensure your margin covers all your fixed costs and provides a sustainable profit."
+    answer: "Aim for a profit margin of 30% or more to stay healthy. For example, if a snack costs ₱70 to make and you sell it for ₱100, you keep ₱30 as profit. This 30% helps pay for your bills and allows you to save for your business's future."
   },
   {
-    question: "How often should I recalculate prices?",
-    answer: "It is recommended to review your prices monthly or whenever your ingredient/supply costs change by more than 10%. Keeping your pricing updated ensures you don't accidentally lose money as market prices fluctuate."
+    question: "How often should I change my prices?",
+    answer: "Check your costs every month. If the price of main ingredients like flour or sugar goes up by ₱10 or more, update your selling price. This ensures you are always making money and not losing it to rising market prices."
   },
   {
-    question: "Should I include my time as a cost?",
-    answer: "Yes, always! Many small business owners forget to pay themselves. Labor cost should be calculated based on the time you spend producing the product, multiplied by a fair hourly rate. This ensures your business is truly profitable and scalable."
+    question: "Should I pay myself for my time?",
+    answer: "Yes, always include your own labor in the cost. If you spend 2 hours making a batch, pay yourself at least ₱120 (based on ₱60 per hour). If you don't pay yourself, your business isn't truly earning a profit."
   },
   {
-    question: "What if my overhead changes every month?",
-    answer: "If your overhead (like utilities or rent) fluctuates, use a 12-month average to stabilize your pricing. Alternatively, you can update your overhead calculations monthly if you prefer high precision, but an average is usually sufficient for consistent pricing."
+    question: "What if my electricity bill changes every month?",
+    answer: "Use your highest monthly bill from the past year to be safe. If your bills range from ₱1,500 to ₱2,000, use ₱2,000 in your calculations. This way, you are always covered even during the most expensive months."
   },
   {
-    question: "How do I compete with lower prices?",
-    answer: "Instead of a race to the bottom on price, focus on value, quality, and marketing. Highlight your unique ingredients, artisan process, or superior taste. Customers are often willing to pay more for quality and a brand they trust."
+    question: "How do I deal with cheaper competitors?",
+    answer: "Focus on better quality rather than the lowest price. Many customers will gladly pay ₱20 more for a product that tastes better, uses cleaner ingredients, or has nicer packaging. Don't lower your price if it means you stop earning a fair profit."
   }
 ];
 

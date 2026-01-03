@@ -41,15 +41,15 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
   return (
     <div className={`space-y-3xl ${className}`}>
       {/* Recommended Selling Price - Primary Focus */}
-      <div className="flex flex-col items-center sm:items-start px-2xl py-2xl bg-surface rounded-lg border border-border-subtle relative overflow-hidden group">
-        <div className="relative z-10 w-full text-center sm:text-left">
+      <div className="flex flex-col items-center px-2xl py-2xl bg-surface rounded-lg border border-border-subtle relative overflow-hidden group">
+        <div className="relative z-10 w-full text-center">
           <p className="text-xs font-semibold text-ink-700 mb-xs">
             Recommended Selling Price
           </p>
           <p className="font-serif text-5xl sm:text-6xl text-ink-900 tracking-tight transition-transform duration-700 group-hover:scale-105">
             {formatCurrency(recommendedPrice)}
           </p>
-          <div className="flex justify-center sm:justify-start mt-lg">
+          <div className="flex justify-center mt-lg">
             <Badge variant={badgeDetails.variant} className="py-1 px-3">
               {badgeDetails.label}
             </Badge>

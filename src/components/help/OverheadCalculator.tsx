@@ -50,12 +50,14 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         <div className="flex gap-md">
           <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
           <div className="text-sm text-ink-700">
-            <p className="font-bold text-ink-900 mb-sm tracking-tight">Calculation guide:</p>
-            <p className="opacity-90 leading-relaxed font-medium">
-              Formula: <code className="bg-bg-main px-sm py-[2px] rounded-sm border border-border-subtle font-mono text-[11px] text-clay">((Fixed Costs) / Batches) + (Packaging × Batch Size)</code>
-            </p>
+            <p className="font-bold text-ink-900 mb-sm tracking-tight">How to calculate your overhead:</p>
+            <ol className="space-y-sm list-decimal list-inside opacity-90 leading-relaxed font-medium">
+              <li><strong>List Monthly Bills:</strong> Add up rent (₱3,000–₱10,000), electricity (₱1,500), and internet (₱1,200).</li>
+              <li><strong>Count Your Batches:</strong> Estimate how many batches you make in a month (e.g., 20 batches of Ube Halaya).</li>
+              <li><strong>Add Packaging:</strong> Enter the cost of one box or pouch (e.g., ₱5.00 per item).</li>
+            </ol>
             <p className="mt-sm opacity-70 text-xs font-medium italic">
-              Fixed costs (Rent, Utilities, Marketing, Maintenance) are distributed across your monthly production volume. Direct packaging costs are added for this specific batch size.
+              The calculator divides your big monthly bills across your batches and adds the exact cost of your packaging.
             </p>
           </div>
         </div>
