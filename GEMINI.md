@@ -79,6 +79,12 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 ## 6. Progress Tracking
 
+### Hooks
+- [x] **usePresets**: Custom hook for managing an array of saved calculation presets in sessionStorage. Supports adding, updating, deleting, and retrieving presets with automatic ID generation and timestamping. (Added 2026-01-03)
+  - File: `src/hooks/use-presets.ts`
+  - Tests: `src/hooks/use-presets.test.ts`
+  - Exported from `src/hooks/index.ts`
+
 ### Components
 - [x] **Badge**: Reusable status indicator with success, warning, error, and info variants. (Added 2026-01-03)
   - File: `src/components/shared/Badge.tsx`
@@ -110,6 +116,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/results/PriceComparison.tsx`
   - Tests: `src/components/results/PriceComparison.test.tsx`
   - Exported from `src/components/results/index.ts`
+- [x] **PresetsList**: Component that displays a searchable, filterable list of saved presets with grid/list view toggles. Sorts by newest first and integrates with usePresets. (Added 2026-01-03)
+  - File: `src/components/presets/PresetsList.tsx`
+  - Tests: `src/components/presets/PresetsList.test.tsx`
+  - Exported from `src/components/presets/index.ts`
 - [x] **ResultsDisplay**: Orchestrator component for displaying all calculation results, including recommendations, cost breakdown, and price comparison. (Added 2026-01-03)
   - File: `src/components/results/ResultsDisplay.tsx`
   - Exported from `src/components/results/index.ts`
@@ -117,6 +127,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/results/CostBreakdown.tsx`
   - Tests: `src/components/results/CostBreakdown.test.tsx`
   - Exported from `src/components/results/index.ts`
+- [x] **SavePresetModal**: Modal dialog for saving calculations as presets with name validation, data preview, and success feedback. (Added 2026-01-03)
+  - File: `src/components/presets/SavePresetModal.tsx`
+  - Tests: `src/components/presets/SavePresetModal.test.tsx`
+  - Exported from `src/components/presets/index.ts`
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 
