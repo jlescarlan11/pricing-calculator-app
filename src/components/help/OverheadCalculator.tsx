@@ -51,12 +51,12 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
           <div className="text-sm text-ink-700">
             <p className="font-bold text-ink-900 mb-sm tracking-tight">How to calculate your overhead:</p>
             <ol className="space-y-sm list-decimal list-inside opacity-90 leading-relaxed font-medium">
-              <li><strong>List Monthly Bills:</strong> Add up rent (₱3,000–₱10,000), electricity (₱1,500), and internet (₱1,200).</li>
-              <li><strong>Count Your Batches:</strong> Estimate how many batches you make in a month (e.g., 20 batches of Ube Halaya).</li>
-              <li><strong>Add Packaging:</strong> Enter the cost of one box or pouch (e.g., ₱5.00 per item).</li>
+              <li><strong>Sum Monthly Expenses:</strong> Combine your fixed costs like rent, utilities, marketing, and maintenance.</li>
+              <li><strong>Estimate Monthly Volume:</strong> Determine how many batches you typically produce in a month to distribute these fixed costs fairly.</li>
+              <li><strong>Identify Packaging per Item:</strong> Enter the cost of individual packaging (boxes, jars, labels) for a single unit.</li>
             </ol>
             <p className="mt-sm opacity-70 text-xs font-medium italic">
-              The calculator divides your big monthly bills across your batches and adds the exact cost of your packaging.
+              This helper automatically allocates a portion of your monthly bills to this specific batch and adds the exact cost of your packaging.
             </p>
           </div>
         </div>
@@ -73,6 +73,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setRent(e.target.value)}
               currency
               placeholder="0"
+              tooltip="Space rental for kitchen, storage, or storefront. If working from home, you can allocate a portion of your rent/mortgage."
             />
             <Input
               label="Monthly Utilities"
@@ -81,6 +82,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setUtilities(e.target.value)}
               currency
               placeholder="0"
+              tooltip="Electricity (ovens, fridges), water, gas, and internet/phone bills used for the business."
             />
             <Input
               label="Marketing"
@@ -89,6 +91,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setMarketing(e.target.value)}
               currency
               placeholder="0"
+              tooltip="Social media ads, printed flyers, packaging stickers, or website hosting fees."
             />
             <Input
               label="Maintenance"
@@ -97,6 +100,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setMaintenance(e.target.value)}
               currency
               placeholder="0"
+              tooltip="Equipment repairs, pest control, cleaning supplies, or tool replacements."
             />
           </div>
           <Input
@@ -138,7 +142,14 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         <p className="text-xs font-bold text-ink-500 uppercase tracking-widest font-sans">Breakdown (per Batch)</p>
         <div className="space-y-sm">
           <div className="flex justify-between text-sm font-medium">
-            <span className="text-ink-500">Allocated Fixed Costs</span>
+            <div className="flex items-center gap-xs">
+              <span className="text-ink-500">Allocated Fixed Costs</span>
+              <Tooltip content={`Calculated as (Rent + Utilities + Marketing + Maintenance) ÷ Batches per Month (${batchesPerMonth || 1})`}>
+                <button type="button" className="text-ink-500 hover:text-clay cursor-help transition-colors">
+                  <HelpCircle className="w-3.5 h-3.5" />
+                </button>
+              </Tooltip>
+            </div>
             <span className="font-mono text-ink-900">₱{calculation.fixedPerBatch.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm font-medium">

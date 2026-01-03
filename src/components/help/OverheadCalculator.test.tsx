@@ -9,11 +9,11 @@ describe('OverheadCalculator', () => {
     render(<OverheadCalculator onApply={mockOnApply} initialBatchSize={50} />);
     
     // Rent: 10000 / 20 = 500
-    fireEvent.change(screen.getByLabelText(/Monthly Rent/i), { target: { value: '10000' } });
-    fireEvent.change(screen.getByLabelText(/Batches per Month/i), { target: { value: '20' } });
+    fireEvent.change(screen.getByLabelText(/Monthly Rent/i, { selector: 'input' }), { target: { value: '10000' } });
+    fireEvent.change(screen.getByLabelText(/Batches per Month/i, { selector: 'input' }), { target: { value: '20' } });
     
     // Utilities: 2000 / 20 = 100
-    fireEvent.change(screen.getByLabelText(/Monthly Utilities/i), { target: { value: '2000' } });
+    fireEvent.change(screen.getByLabelText(/Monthly Utilities/i, { selector: 'input' }), { target: { value: '2000' } });
     
     // Packaging: 5 * 50 = 250
     fireEvent.change(screen.getByLabelText(/Packaging per Unit/i), { target: { value: '5' } });
@@ -41,8 +41,8 @@ describe('OverheadCalculator', () => {
   it('calls onApply when apply button is clicked', () => {
     render(<OverheadCalculator onApply={mockOnApply} initialBatchSize={10} />);
     
-    fireEvent.change(screen.getByLabelText(/Monthly Rent/i), { target: { value: '1000' } });
-    fireEvent.change(screen.getByLabelText(/Batches per Month/i), { target: { value: '1' } });
+    fireEvent.change(screen.getByLabelText(/Monthly Rent/i, { selector: 'input' }), { target: { value: '1000' } });
+    fireEvent.change(screen.getByLabelText(/Batches per Month/i, { selector: 'input' }), { target: { value: '1' } });
     
     const applyBtn = screen.getByRole('button', { name: /Apply to Overhead Cost/i });
     fireEvent.click(applyBtn);
