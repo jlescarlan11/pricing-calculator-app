@@ -138,8 +138,108 @@ describe('CalculatorForm', () => {
     const clearBtn = screen.getByRole('button', { name: /Clear/i });
     fireEvent.click(clearBtn);
     
-    expect(confirmSpy).toHaveBeenCalled();
-    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('');
-    expect(window.sessionStorage.getItem('pricing_calculator_draft')).toBeNull();
-  });
-});
+        expect(confirmSpy).toHaveBeenCalled();
+    
+        expect(screen.getByLabelText(/Product Name/i)).toHaveValue('');
+    
+        expect(window.sessionStorage.getItem('pricing_calculator_draft')).toBeNull();
+    
+      });
+    
+    
+    
+        it('populates state when initialInput and initialConfig props are provided', () => {
+    
+    
+    
+          const input = {
+    
+    
+    
+            productName: 'Initial Product',
+    
+    
+    
+            batchSize: 100,
+    
+    
+    
+            ingredients: [{ id: 'ext-1', name: 'Ext Ing', amount: 50, cost: 10 }],
+    
+    
+    
+            laborCost: 100,
+    
+    
+    
+            overhead: 50
+    
+    
+    
+          };
+    
+    
+    
+          const config = { strategy: 'markup', value: 20 } as const;
+    
+    
+    
+          
+    
+    
+    
+          render(
+    
+    
+    
+            <CalculatorForm 
+    
+    
+    
+              onCalculate={mockOnCalculate} 
+    
+    
+    
+              initialInput={input} 
+    
+    
+    
+              initialConfig={config} 
+    
+    
+    
+            />
+    
+    
+    
+          );
+    
+    
+    
+          
+    
+    
+    
+          expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Initial Product');
+    
+    
+    
+          expect(screen.getByLabelText(/Batch Size/i)).toHaveValue(100);
+    
+    
+    
+          expect(screen.getByLabelText(/Ingredient Name/i)).toHaveValue('Ext Ing');
+    
+    
+    
+        });
+    
+    
+    
+      });
+    
+    
+    
+      
+    
+    

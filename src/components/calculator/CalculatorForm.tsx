@@ -43,11 +43,15 @@ const initialConfig: PricingConfig = {
 interface CalculatorFormProps {
   onCalculate: (result: CalculationResult, input: CalculationInput, config: PricingConfig) => void;
   onReset?: () => void;
+  initialInput?: CalculationInput;
+  initialConfig?: PricingConfig;
 }
 
 export const CalculatorForm: React.FC<CalculatorFormProps> = ({ 
   onCalculate,
-  onReset
+  onReset,
+  initialInput: propInitialInput,
+  initialConfig: propInitialConfig
 }) => {
   // Persistence using sessionStorage
   const [draft, setDraft] = useSessionStorage<{
@@ -58,8 +62,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     config: initialConfig,
   });
 
-  const [input, setInput] = useState<CalculationInput>(draft.input);
-  const [config, setConfig] = useState<PricingConfig>(draft.config);
+  // Use props if provided, otherwise draft (sessionStorage)
+  const [input, setInput] = useState<CalculationInput>(propInitialInput || draft.input);
+  const [config, setConfig] = useState<PricingConfig>(propInitialConfig || draft.config);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isCalculating, setIsCalculating] = useState(false);
 

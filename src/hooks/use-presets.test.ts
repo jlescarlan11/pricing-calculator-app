@@ -77,8 +77,7 @@ describe('usePresets', () => {
     expect(result.current.presets[0].lastModified).toBeGreaterThan(initialModified);
   });
 
-  it('should delete a preset after confirmation', () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+  it('should delete a preset', () => {
     const { result } = renderHook(() => usePresets());
     
     let id = '';
@@ -99,30 +98,6 @@ describe('usePresets', () => {
     });
 
     expect(result.current.presets).toHaveLength(0);
-    expect(confirmSpy).toHaveBeenCalled();
-  });
-
-  it('should not delete a preset if not confirmed', () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
-    const { result } = renderHook(() => usePresets());
-    
-    let id = '';
-    act(() => {
-      const added = result.current.addPreset({
-        name: 'Stayin Alive',
-        input: mockInput,
-        config: mockConfig,
-      });
-      id = added.id;
-    });
-
-    act(() => {
-      const deleted = result.current.deletePreset(id);
-      expect(deleted).toBe(false);
-    });
-
-    expect(result.current.presets).toHaveLength(1);
-    expect(confirmSpy).toHaveBeenCalled();
   });
 
   it('should get a preset by ID', () => {

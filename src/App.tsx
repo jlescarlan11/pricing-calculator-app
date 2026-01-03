@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { ChefHat, Info } from 'lucide-react';
-import { CalculatorForm } from './components/calculator';
+import { CalculatorForm, SampleDemo } from './components/calculator';
 import { ResultsDisplay } from './components/results';
+import { FAQ } from './components/help';
+import { COOKIE_SAMPLE } from './constants';
 import type { CalculationResult, CalculationInput, PricingConfig } from './types/calculator';
 
 function App() {
@@ -9,6 +11,8 @@ function App() {
   const [lastInput, setLastInput] = useState<CalculationInput | null>(null);
   const [lastConfig, setLastConfig] = useState<PricingConfig | null>(null);
   const [view, setView] = useState<'form' | 'results'>('form');
+  const [sampleData, setSampleData] = useState<{ input: CalculationInput; config: PricingConfig } | null>(null);
+  const [resetKey, setResetKey] = useState(0);
 
   const handleCalculate = (result: CalculationResult, input: CalculationInput, config: PricingConfig) => {
     setResults(result);
@@ -27,8 +31,16 @@ function App() {
     setResults(null);
     setLastInput(null);
     setLastConfig(null);
+    setSampleData(null);
+    setResetKey(prev => prev + 1);
     setView('form');
   };
+
+  const handleLoadSample = useCallback(() => {
+    setSampleData(COOKIE_SAMPLE);
+    setResetKey(prev => prev + 1);
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
@@ -57,20 +69,30 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Intro Section (only on form view) */}
         {view === 'form' && (
-          <div className="mb-8 p-4 bg-blue-50 rounded-xl border border-blue-100 flex gap-4 items-start">
-            <Info className="w-6 h-6 text-blue-500 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-blue-900 font-semibold mb-1">Welcome to your profit partner!</p>
-              <p className="text-blue-800 text-sm leading-relaxed">
-                Fill in your costs below. We&apos;ll help you find the perfect price to ensure your business grows sustainably. 
-                Don&apos;t forget to include your labor—your time is valuable!
-              </p>
+          <div className="space-y-6 mb-8">
+            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 flex gap-4 items-start">
+              <Info className="w-6 h-6 text-blue-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-blue-900 font-semibold mb-1">Welcome to your profit partner!</p>
+                <p className="text-blue-800 text-sm leading-relaxed">
+                  Fill in your costs below. We&apos;ll help you find the perfect price to ensure your business grows sustainably. 
+                  Don&apos;t forget to include your labor—your time is valuable!
+                </p>
+              </div>
             </div>
+
+            <SampleDemo onLoadSample={handleLoadSample} />
           </div>
         )}
 
         {view === 'form' ? (
-          <CalculatorForm onCalculate={handleCalculate} onReset={handleReset} />
+          <CalculatorForm 
+            key={`calc-${resetKey}`}
+            onCalculate={handleCalculate} 
+            onReset={handleReset} 
+            initialInput={sampleData?.input}
+            initialConfig={sampleData?.config}
+          />
         ) : (
           results && lastInput && lastConfig && (
             <ResultsDisplay 
@@ -81,6 +103,10 @@ function App() {
             />
           )
         )}
+
+        <div className="mt-12">
+          <FAQ />
+        </div>
       </main>
 
       {/* Footer */}

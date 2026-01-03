@@ -123,14 +123,12 @@ describe('PricingStrategy', () => {
       />
     );
     
-    expect(screen.queryByText(/Understanding Pricing Strategies/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Pricing Strategies Explained/i)).not.toBeInTheDocument();
     
     const helpBtn = screen.getByLabelText(/Help with pricing strategies/i);
     fireEvent.click(helpBtn);
     
-    expect(screen.getByText(/Understanding Pricing Strategies/i)).toBeInTheDocument();
-    expect(screen.getByText(/What is Markup?/i)).toBeInTheDocument();
-    expect(screen.getByText(/What is Profit Margin?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Pricing Strategies Explained/i)).toBeInTheDocument();
   });
 
   it('calculates real-time example correctly', () => {

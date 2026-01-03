@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { Card } from '../shared/Card';
 import { Input } from '../shared/Input';
-import { Modal } from '../shared/Modal';
-import { Button } from '../shared/Button';
+import { PricingExplainerModal } from '../help';
 import { formatCurrency } from '../../utils/formatters';
 import { calculateRecommendedPrice } from '../../utils/calculations';
 import type { PricingStrategy as StrategyType } from '../../types/calculator';
@@ -166,51 +165,11 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         </div>
       </div>
 
-      {/* Help Modal */}
-      <Modal
+      <PricingExplainerModal
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
-        title="Understanding Pricing Strategies"
-      >
-        <div className="space-y-6">
-          <section>
-            <h4 className="font-bold text-gray-900 mb-2">What is Markup?</h4>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Markup is the percentage added to the cost price to determine the selling price. 
-              It&apos;s the most common way small businesses think about profit.
-            </p>
-            <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100">
-              <p className="text-xs text-gray-500 italic">
-                Formula: Selling Price = Cost × (1 + Markup %)
-              </p>
-            </div>
-          </section>
-
-          <section>
-            <h4 className="font-bold text-gray-900 mb-2">What is Profit Margin?</h4>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Profit Margin is the percentage of the <strong>selling price</strong> that is profit. 
-              Retailers often use this to understand how much of their total revenue is actually theirs to keep.
-            </p>
-            <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-100">
-              <p className="text-xs text-gray-500 italic">
-                Formula: Selling Price = Cost ÷ (1 - Margin %)
-              </p>
-            </div>
-          </section>
-
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h4 className="text-sm font-bold text-blue-900 mb-2">Important Distinction</h4>
-            <p className="text-sm text-blue-800">
-              A 25% Markup is NOT the same as a 25% Margin. To get a 25% Margin, you actually need a 33.3% Markup!
-            </p>
-          </div>
-          
-          <Button onClick={() => setIsHelpOpen(false)} className="w-full">
-            I Understand
-          </Button>
-        </div>
-      </Modal>
+        initialTab={strategy}
+      />
     </Card>
   );
 };

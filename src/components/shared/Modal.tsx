@@ -8,6 +8,8 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  maxWidth?: string;
+  className?: string;
 }
 
 const ANIMATION_DURATION = 300;
@@ -18,6 +20,8 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   children,
   footer,
+  maxWidth = 'md:max-w-lg',
+  className = '',
 }) => {
   const [shouldRender, setShouldRender] = useState(isOpen);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -128,7 +132,8 @@ export const Modal: React.FC<ModalProps> = ({
         className={`
           relative z-10 flex w-full h-full flex-col bg-white shadow-xl
           transition-all duration-300 ease-in-out
-          md:h-auto md:max-h-[90vh] md:w-full md:max-w-lg md:rounded-lg
+          md:h-auto md:max-h-[90vh] md:w-full md:rounded-lg
+          ${maxWidth} ${className}
           ${isOpen ? 'translate-y-0 scale-100' : 'translate-y-4 scale-95'}
         `}
         tabIndex={-1}

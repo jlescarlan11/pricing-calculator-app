@@ -91,6 +91,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - Exported from `src/constants/index.ts`
 
 ### Components
+- [x] **HelpIcon**: Reusable component that displays a question mark icon with support for tooltips (on hover) and modals (on click). Fully accessible with keyboard support and consistent styling. (Added 2026-01-03)
+  - File: `src/components/help/HelpIcon.tsx`
+  - Tests: `src/components/help/HelpIcon.test.tsx`
+  - Exported from `src/components/help/index.ts`
 - [x] **Badge**: Reusable status indicator with success, warning, error, and info variants. (Added 2026-01-03)
   - File: `src/components/shared/Badge.tsx`
   - Tests: `src/components/shared/Badge.test.tsx`
@@ -136,6 +140,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/results/CostBreakdown.tsx`
   - Tests: `src/components/results/CostBreakdown.test.tsx`
   - Exported from `src/components/results/index.ts`
+- [x] **FAQ**: FAQ component with an accordion layout for common questions, search functionality, and accessibility features. (Added 2026-01-03)
+  - File: `src/components/help/FAQ.tsx`
+  - Tests: `src/components/help/FAQ.test.tsx`
+  - Exported from `src/components/help/index.ts`
 - [x] **OverheadCalculator**: Guided helper component for calculating overhead costs based on monthly expenses and packaging requirements. (Added 2026-01-03)
   - File: `src/components/help/OverheadCalculator.tsx`
   - Tests: `src/components/help/OverheadCalculator.test.tsx`
@@ -144,6 +152,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/presets/SavePresetModal.tsx`
   - Tests: `src/components/presets/SavePresetModal.test.tsx`
   - Exported from `src/components/presets/index.ts`
+- [x] **PricingExplainerModal**: Tabbed educational modal explaining Markup and Margin strategies with visual examples, pros/cons, and a comparison table. (Added 2026-01-03)
+  - File: `src/components/help/PricingExplainerModal.tsx`
+  - Tests: `src/components/help/PricingExplainerModal.test.tsx`
+  - Exported from `src/components/help/index.ts`
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 
