@@ -19,10 +19,10 @@ export const Badge: React.FC<BadgeProps> = ({
   const baseStyles = 'inline-flex items-center rounded-sm px-sm py-xs text-xs font-semibold transition-colors';
 
   const variants = {
-    success: 'bg-moss text-bg-main',
-    warning: 'bg-sakura text-ink-900',
-    error: 'bg-rust text-bg-main',
-    info: 'bg-clay text-bg-main',
+    success: 'bg-moss/10 text-moss border border-moss/20',
+    warning: 'bg-sakura/20 text-ink-700 border border-sakura/30',
+    error: 'bg-rust/10 text-rust border border-rust/20',
+    info: 'bg-clay/10 text-clay border border-clay/20',
   };
 
   const variantStyles = variants[variant];

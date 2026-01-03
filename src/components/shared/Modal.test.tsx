@@ -102,9 +102,9 @@ describe('Modal', () => {
       </Modal>
     );
 
-    // Wait for animation delay (300ms)
+    // Wait for animation delay (400ms)
     act(() => {
-      vi.advanceTimersByTime(310);
+      vi.advanceTimersByTime(410);
     });
     
     // Check after unmount
@@ -136,7 +136,7 @@ describe('Modal', () => {
 
     // Advance past animation
     act(() => {
-      vi.advanceTimersByTime(200); // Total 350
+      vi.advanceTimersByTime(300); // Total 450
     });
     
     // Check it's gone

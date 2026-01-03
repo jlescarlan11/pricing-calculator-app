@@ -99,6 +99,7 @@ describe('CalculatorForm', () => {
   });
 
   it('adds and removes ingredients', () => {
+    vi.useFakeTimers();
     render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     const addButton = screen.getByText(/Add Ingredient/i);
@@ -109,7 +110,12 @@ describe('CalculatorForm', () => {
     const removeButtons = screen.getAllByTitle(/Remove ingredient/i);
     fireEvent.click(removeButtons[1]);
     
+    act(() => {
+      vi.advanceTimersByTime(310);
+    });
+
     expect(screen.getAllByLabelText(/Ingredient Name/i)).toHaveLength(1);
+    vi.useRealTimers();
   });
 
   it('triggers validation on calculate click', async () => {

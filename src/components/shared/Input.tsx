@@ -40,7 +40,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   };
 
   return (
-    <div className={`flex flex-col w-full max-w-[500px] ${className}`}>
+    <div className={`flex flex-col w-full ${className}`}>
       <label 
         htmlFor={id} 
         className="text-sm font-medium text-ink-700 flex items-center justify-between tracking-[0.01em] mb-2"

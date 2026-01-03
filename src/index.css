@@ -2,87 +2,87 @@
 
 @theme {
   /* Background & Surface */
-  --color-bg-main: #FAFAF9;
-  --color-surface: #F8F7F5;
-  --color-surface-hover: #F0EFED;
-  
+  --color-bg-main: #fafaf9;
+  --color-surface: #f8f7f5;
+  --color-surface-hover: #f0efed;
+
   /* Text Colors */
-  --color-ink-900: #3A3632; /* Soft Black */
-  --color-ink-700: #6B6761; /* Warm Gray */
-  --color-ink-500: #8B8680; /* Lighter Gray */
-  
+  --color-ink-900: #3a3632; /* Soft Black */
+  --color-ink-700: #6b6761; /* Warm Gray */
+  --color-ink-500: #8b8680; /* Lighter Gray */
+
   /* Accents */
-  --color-clay: #A67B5B;      /* Primary Accent */
-  --color-moss: #7A8B73;      /* Success */
-  --color-sakura: #E8C5C0;    /* Warning / Soft Pink */
-  --color-rust: #B85C38;      /* Error / Autumn Rust */
-  
+  --color-clay: #a67b5b; /* Primary Accent */
+  --color-moss: #7a8b73; /* Success */
+  --color-sakura: #e8c5c0; /* Warning / Soft Pink */
+  --color-rust: #b85c38; /* Error / Autumn Rust */
+
   /* Borders & Dividers */
-  --color-border-base: #D4D2CF;
-  --color-border-subtle: #E6E4E1; /* Divider */
+  --color-border-base: #d4d2cf;
+  --color-border-subtle: #e6e4e1; /* Divider */
 
   /* Spacing Scale (8px base) */
-  --spacing-xs: 0.25rem;   /* 4px */
-  --spacing-sm: 0.5rem;    /* 8px */
-  --spacing-md: 1rem;      /* 16px */
-  --spacing-lg: 1.5rem;    /* 24px */
-  --spacing-xl: 2rem;      /* 32px */
-  --spacing-2xl: 3rem;     /* 48px */
-  --spacing-3xl: 4rem;     /* 64px */
-  --spacing-4xl: 6rem;     /* 96px */
-  --spacing-5xl: 8rem;     /* 128px */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 1rem; /* 16px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-xl: 2rem; /* 32px */
+  --spacing-2xl: 3rem; /* 48px */
+  --spacing-3xl: 4rem; /* 64px */
+  --spacing-4xl: 6rem; /* 96px */
+  --spacing-5xl: 8rem; /* 128px */
 
   /* Max-Width overrides to prevent conflicts with the new spacing scale names.
      Tailwind 4 maps max-w-* utilities to these --max-width-* variables. */
-  --max-width-xs: 20rem;    /* 320px */
-  --max-width-sm: 24rem;    /* 384px */
-  --max-width-md: 28rem;    /* 448px */
-  --max-width-lg: 32rem;    /* 512px */
-  --max-width-xl: 36rem;    /* 576px */
-  --max-width-2xl: 42rem;   /* 672px */
-  --max-width-3xl: 48rem;   /* 768px */
-  --max-width-4xl: 56rem;   /* 896px */
-  --max-width-5xl: 64rem;   /* 1024px */
-  --max-width-6xl: 72rem;   /* 1152px */
-  --max-width-7xl: 80rem;   /* 1280px */
+  --max-width-xs: 20rem; /* 320px */
+  --max-width-sm: 24rem; /* 384px */
+  --max-width-md: 28rem; /* 448px */
+  --max-width-lg: 32rem; /* 512px */
+  --max-width-xl: 36rem; /* 576px */
+  --max-width-2xl: 42rem; /* 672px */
+  --max-width-3xl: 48rem; /* 768px */
+  --max-width-4xl: 56rem; /* 896px */
+  --max-width-5xl: 64rem; /* 1024px */
+  --max-width-6xl: 72rem; /* 1152px */
+  --max-width-7xl: 80rem; /* 1280px */
 
   /* Font Definitions */
-  --font-serif: "Crimson Text", serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: 'Crimson Text', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 
   /* Type Scale (1.25 ratio) starting from 16px */
-  --font-size-xs: 0.875rem;    /* 14px - Small */
-  --font-size-base: 1rem;      /* 16px - Body */
-  --font-size-lg: 1.25rem;     /* 20px - H6 */
-  --font-size-xl: 1.5625rem;   /* 25px - H5 */
-  --font-size-2xl: 1.953rem;   /* 31.25px - H4 */
-  --font-size-3xl: 2.441rem;   /* 39.06px - H3 */
-  --font-size-4xl: 3.052rem;   /* 48.83px - H2 */
-  --font-size-5xl: 3.815rem;   /* 61.04px - H1 */
-  --font-size-display: 4rem;   /* 64px */
+  --font-size-xs: 0.875rem; /* 14px - Small */
+  --font-size-base: 1rem; /* 16px - Body */
+  --font-size-lg: 1.25rem; /* 20px - H6 */
+  --font-size-xl: 1.5625rem; /* 25px - H5 */
+  --font-size-2xl: 1.953rem; /* 31.25px - H4 */
+  --font-size-3xl: 2.441rem; /* 39.06px - H3 */
+  --font-size-4xl: 3.052rem; /* 48.83px - H2 */
+  --font-size-5xl: 3.815rem; /* 61.04px - H1 */
+  --font-size-display: 4rem; /* 64px */
 
   /* Line Heights */
-  --leading-heading: 1.25;     /* 1.2–1.3 for headings */
-  --leading-body: 1.65;        /* 1.6–1.7 for body text */
-  --leading-ui: 1.5;           /* 1.5 for UI elements */
+  --leading-heading: 1.25; /* 1.2–1.3 for headings */
+  --leading-body: 1.65; /* 1.6–1.7 for body text */
+  --leading-ui: 1.5; /* 1.5 for UI elements */
 
   /* Letter Spacing */
   --tracking-heading: 0.035em; /* 0.02em–0.05em for headings */
-  --tracking-body: 0.005em;    /* 0em–0.01em for body text */
+  --tracking-body: 0.005em; /* 0em–0.01em for body text */
 
   /* Elevation & Shadows */
   --shadow-level-0: none;
   --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-level-2: 0 4px 16px rgba(0, 0, 0, 0.06);
   --shadow-level-3: 0 8px 32px rgba(0, 0, 0, 0.08);
-  --shadow-level-4: 0 12px 48px rgba(0, 0, 0, 0.10);
+  --shadow-level-4: 0 12px 48px rgba(0, 0, 0, 0.1);
 
   /* Border Radius */
   --radius-none: 0px;
   --radius-xs: 0.125rem; /* 2px */
-  --radius-sm: 0.25rem;  /* 4px */
-  --radius-md: 0.5rem;   /* 8px */
-  --radius-lg: 0.75rem;  /* 12px */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.5rem; /* 8px */
+  --radius-lg: 0.75rem; /* 12px */
   --radius-round: 50%;
 }
 
@@ -99,29 +99,50 @@
 @layer base {
   body {
     @apply bg-bg-main text-ink-900 antialiased font-sans text-base leading-body tracking-body;
-    font-feature-settings: "tnum", "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: 'tnum', 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-serif text-ink-900 leading-heading tracking-heading;
   }
 
-  h1 { @apply text-5xl font-semibold; }
-  h2 { @apply text-4xl font-semibold; }
-  h3 { @apply text-3xl font-semibold; }
-  h4 { @apply text-2xl font-semibold; }
-  h5 { @apply text-xl font-semibold; }
-  h6 { @apply text-lg font-semibold; }
+  h1 {
+    @apply text-5xl font-semibold;
+  }
+  h2 {
+    @apply text-4xl font-semibold;
+  }
+  h3 {
+    @apply text-3xl font-semibold;
+  }
+  h4 {
+    @apply text-2xl font-semibold;
+  }
+  h5 {
+    @apply text-xl font-semibold;
+  }
+  h6 {
+    @apply text-lg font-semibold;
+  }
 
   /* UI elements use UI leading */
-  button, input, select, textarea, label {
+  button,
+  input,
+  select,
+  textarea,
+  label {
     @apply leading-ui transition-all duration-300 ease-out;
   }
 
   /* Global Scrollbar styling to match aesthetic */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
   }
   ::-webkit-scrollbar-track {
     @apply bg-transparent;
@@ -132,10 +153,10 @@
 
   @media print {
     /* ... existing print styles ... */
-    button, 
+    button,
     .print\:hidden,
-    [role="tooltip"],
-    [role="button"],
+    [role='tooltip'],
+    [role='button'],
     .no-print {
       display: none !important;
     }
@@ -157,7 +178,12 @@
       print-color-adjust: exact !important;
     }
 
-    .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+    .shadow-sm,
+    .shadow,
+    .shadow-md,
+    .shadow-lg,
+    .shadow-xl,
+    .shadow-2xl {
       box-shadow: none !important;
     }
 
@@ -168,10 +194,12 @@
       break-inside: avoid !important;
     }
 
-    .bg-white, .rounded-xl, .rounded-2xl {
+    .bg-white,
+    .rounded-xl,
+    .rounded-2xl {
       border: 1px solid #e5e7eb !important;
     }
-    
+
     .hidden.print\:block {
       display: block !important;
     }
