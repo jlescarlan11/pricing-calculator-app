@@ -62,7 +62,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
     >
       {React.cloneElement(children as React.ReactElement, {
         'aria-describedby': tooltipId,
-      } as any)}
+      } as Record<string, unknown>)}
       
       <div
         id={tooltipId}

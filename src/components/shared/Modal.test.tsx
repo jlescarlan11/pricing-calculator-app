@@ -1,7 +1,6 @@
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { Modal } from './Modal';
-import React from 'react';
 
 describe('Modal', () => {
   afterEach(() => {

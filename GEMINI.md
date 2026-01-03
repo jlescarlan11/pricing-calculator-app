@@ -84,6 +84,21 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/shared/Badge.tsx`
   - Tests: `src/components/shared/Badge.test.tsx`
   - Exported from `src/components/shared/index.ts`
+- [x] **IngredientRow**: Form row for ingredient input (Name, Amount, Cost) with validation, auto-focus, and delete confirmation. (Added 2026-01-03)
+  - File: `src/components/calculator/IngredientRow.tsx`
+  - Tests: `src/components/calculator/IngredientRow.test.tsx`
+  - Exported from `src/components/calculator/index.ts`
+- [x] **OverheadCost**: Component for overhead cost input with an expandable helper for detailed breakdown (Rent, Utilities, Packaging, Marketing). (Added 2026-01-03)
+  - File: `src/components/calculator/OverheadCost.tsx`
+  - Exported from `src/components/calculator/index.ts`
+- [x] **PricingStrategy**: Component for choosing between Markup and Margin strategies with real-time visual examples, percentage slider/input, and a help modal. (Added 2026-01-03)
+  - File: `src/components/calculator/PricingStrategy.tsx`
+  - Tests: `src/components/calculator/PricingStrategy.test.tsx`
+  - Exported from `src/components/calculator/index.ts`
+- [x] **CalculatorForm**: Orchestrator component that manages full state for product info, ingredients, labor, and overhead. Features debounced auto-save to session storage, real-time preview, and explicit calculation with validation. (Added 2026-01-03)
+  - File: `src/components/calculator/CalculatorForm.tsx`
+  - Tests: `src/components/calculator/CalculatorForm.test.tsx`
+  - Exported from `src/components/calculator/index.ts`
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 

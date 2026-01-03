@@ -1,0 +1,132 @@
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { CalculatorForm } from './CalculatorForm';
+
+describe('CalculatorForm', () => {
+  const mockOnCalculate = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.sessionStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders all sub-components', () => {
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    
+    expect(screen.getByText('Product Details')).toBeInTheDocument();
+    expect(screen.getByText('Ingredients')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Labor Cost/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Overhead Cost/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Pricing Strategy/i })).toBeInTheDocument();
+  });
+
+  it('updates product name and saves to session storage', async () => {
+    vi.useFakeTimers();
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    
+    const input = screen.getByLabelText(/Product Name/i);
+    fireEvent.change(input, { target: { value: 'New Product' } });
+    
+    expect(input).toHaveValue('New Product');
+    
+    // Fast-forward for the auto-save effect
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    
+    // Check session storage
+    const storedStr = window.sessionStorage.getItem('pricing_calculator_draft');
+    expect(storedStr).not.toBeNull();
+    const stored = JSON.parse(storedStr!);
+    expect(stored.input.productName).toBe('New Product');
+    vi.useRealTimers();
+  });
+
+  it('adds and removes ingredients', () => {
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    
+    const addButton = screen.getByText(/Add Ingredient/i);
+    fireEvent.click(addButton);
+    
+    expect(screen.getAllByLabelText(/Ingredient Name/i)).toHaveLength(2);
+    
+    const removeButtons = screen.getAllByTitle(/Remove ingredient/i);
+    fireEvent.click(removeButtons[1]);
+    
+    expect(screen.getAllByLabelText(/Ingredient Name/i)).toHaveLength(1);
+  });
+
+  it('triggers validation on calculate click', async () => {
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    
+    const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
+    fireEvent.click(calculateBtns[0]);
+    
+    expect(await screen.findByText(/Product name is required/i)).toBeInTheDocument();
+    expect(mockOnCalculate).not.toHaveBeenCalled();
+  });
+
+  it('performs calculation when form is valid', async () => {
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    
+    fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'Valid Product' } });
+    fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
+    
+    const nameInputs = screen.getAllByLabelText(/Ingredient Name/i);
+    const amountInputs = screen.getAllByLabelText(/Amount/i);
+    const costInputs = screen.getAllByLabelText(/Cost/i);
+    
+    fireEvent.change(nameInputs[0], { target: { value: 'Flour' } });
+    fireEvent.change(amountInputs[0], { target: { value: '1000' } });
+    fireEvent.change(costInputs[0], { target: { value: '50' } });
+    
+    const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
+    fireEvent.click(calculateBtns[0]);
+    
+    await waitFor(() => {
+      expect(mockOnCalculate).toHaveBeenCalled();
+    }, { timeout: 3000 });
+
+    const result = mockOnCalculate.mock.calls[0][0];
+    expect(result.totalCost).toBeGreaterThan(0);
+    expect(result.recommendedPrice).toBeGreaterThan(0);
+  });
+
+  it('restores draft from session storage', () => {
+    const draft = {
+      input: {
+        productName: 'Saved Draft',
+        batchSize: 24,
+        ingredients: [{ id: '1', name: 'Saved Ing', amount: 100, cost: 20 }],
+        laborCost: 10,
+        overhead: 5
+      },
+      config: { strategy: 'margin', value: 30 }
+    };
+    window.sessionStorage.setItem('pricing_calculator_draft', JSON.stringify(draft));
+    
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    
+    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Saved Draft');
+    expect(screen.getByLabelText(/Batch Size/i)).toHaveValue(24);
+    expect(screen.getByLabelText(/Ingredient Name/i)).toHaveValue('Saved Ing');
+  });
+
+  it('clears form when reset is clicked', () => {
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'To Be Cleared' } });
+    
+    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true);
+    
+    const clearBtn = screen.getByRole('button', { name: /Clear/i });
+    fireEvent.click(clearBtn);
+    
+    expect(confirmSpy).toHaveBeenCalled();
+    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('');
+    expect(window.sessionStorage.getItem('pricing_calculator_draft')).toBeNull();
+  });
+});

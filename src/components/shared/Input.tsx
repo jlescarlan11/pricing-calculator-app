@@ -8,9 +8,10 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   error?: string;
   helperText?: string;
   currency?: boolean;
+  suffix?: string;
 }
 
-export const Input: React.FC<InputProps> = ({
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   label,
   value,
   onChange,
@@ -21,9 +22,10 @@ export const Input: React.FC<InputProps> = ({
   placeholder,
   disabled = false,
   currency = false,
+  suffix,
   className = '',
   ...props
-}) => {
+}, ref) => {
   const id = useId();
   const errorId = `${id}-error`;
   const helperId = `${id}-helper`;
@@ -35,8 +37,6 @@ export const Input: React.FC<InputProps> = ({
     if (type === 'number' && e.key === '-') {
       e.preventDefault();
     }
-    // Optional: Prevent 'e' for scientific notation if desired, 
-    // but usually just preventing '-' is enough for "non-negative" requirement.
   };
 
   return (
@@ -59,6 +59,7 @@ export const Input: React.FC<InputProps> = ({
         )}
         
         <input
+          ref={ref}
           id={id}
           type={type}
           value={value}
@@ -76,6 +77,7 @@ export const Input: React.FC<InputProps> = ({
             disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden
             ${currency ? 'pl-7' : 'pl-3'}
+            ${suffix ? 'pr-8' : 'pr-3'}
             ${error 
               ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' 
               : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
@@ -83,6 +85,12 @@ export const Input: React.FC<InputProps> = ({
           `}
           {...props}
         />
+
+        {suffix && !error && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span className="text-gray-500 sm:text-sm">{suffix}</span>
+          </div>
+        )}
 
         {error && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -102,4 +110,6 @@ export const Input: React.FC<InputProps> = ({
       ) : null}
     </div>
   );
-};
+});
+
+Input.displayName = 'Input';

@@ -127,3 +127,44 @@ export const calculateProfitMargin = (costPerUnit: number, sellingPrice: number)
   const margin = ((sellingPrice - costPerUnit) / sellingPrice) * 100;
   return round(margin);
 };
+
+/**
+ * Performs a complete calculation based on all inputs and configuration.
+ * 
+ * @param input - The calculation inputs (ingredients, labor, overhead, batch size)
+ * @param config - The pricing strategy configuration
+ * @returns A complete CalculationResult object
+ */
+export const performFullCalculation = (
+  input: import('../types/calculator').CalculationInput,
+  config: import('../types/calculator').PricingConfig
+): import('../types/calculator').CalculationResult => {
+  const ingredientCost = calculateTotalIngredientCost(input.ingredients);
+  const totalCost = round(ingredientCost + input.laborCost + input.overhead);
+  const costPerUnit = calculateCostPerUnit(totalCost, input.batchSize);
+  
+  const recommendedPrice = calculateRecommendedPrice(
+    costPerUnit,
+    config.strategy,
+    config.value
+  );
+
+  const profitPerUnit = round(recommendedPrice - costPerUnit);
+  const profitPerBatch = round(profitPerUnit * input.batchSize);
+  const profitMarginPercent = calculateProfitMargin(costPerUnit, recommendedPrice);
+
+  return {
+    totalCost,
+    costPerUnit,
+    breakEvenPrice: costPerUnit, // At 0% profit, price equals cost per unit
+    recommendedPrice,
+    profitPerBatch,
+    profitPerUnit,
+    profitMarginPercent,
+    breakdown: {
+      ingredients: ingredientCost,
+      labor: input.laborCost,
+      overhead: input.overhead,
+    },
+  };
+};

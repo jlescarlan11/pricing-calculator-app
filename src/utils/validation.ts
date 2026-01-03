@@ -30,6 +30,16 @@ export const validateBatchSize = (value: number): ValidationError | null => {
   return null;
 };
 
+export const validateProductName = (name: string): ValidationError | null => {
+  if (!name || name.trim() === '') {
+    return { field: 'productName', message: 'Product name is required.' };
+  }
+  if (name.trim().length < 2) {
+    return { field: 'productName', message: 'Product name must be at least 2 characters.' };
+  }
+  return null;
+};
+
 export const validatePercentage = (
   value: number,
   min: number,

@@ -19,18 +19,20 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   footer,
 }) => {
-  const [shouldRender, setShouldRender] = useState(false);
+  const [shouldRender, setShouldRender] = useState(isOpen);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Handle mounting/unmounting with delay for animation
+  // Sync shouldRender with isOpen immediately when opening
+  if (isOpen && !shouldRender) {
+    setShouldRender(true);
+  }
+
+  // Handle unmounting with delay for animation
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    if (isOpen && !shouldRender) {
-      setShouldRender(true);
-    } else if (!isOpen && shouldRender) {
-      timeoutId = setTimeout(() => setShouldRender(false), ANIMATION_DURATION);
+    if (!isOpen && shouldRender) {
+      const timeoutId = setTimeout(() => setShouldRender(false), ANIMATION_DURATION);
+      return () => clearTimeout(timeoutId);
     }
-    return () => clearTimeout(timeoutId);
   }, [isOpen, shouldRender]);
 
   // Lock body scroll
