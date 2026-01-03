@@ -88,8 +88,17 @@ describe('CalculatorForm', () => {
     fireEvent.click(calculateBtns[0]);
     
     await waitFor(() => {
-      expect(mockOnCalculate).toHaveBeenCalled();
-    }, { timeout: 3000 });
+      expect(mockOnCalculate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          totalCost: expect.any(Number),
+          recommendedPrice: expect.any(Number),
+        }),
+        expect.objectContaining({
+          productName: 'Valid Product',
+          batchSize: 10,
+        })
+      );
+    });
 
     const result = mockOnCalculate.mock.calls[0][0];
     expect(result.totalCost).toBeGreaterThan(0);

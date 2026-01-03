@@ -99,6 +99,24 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/calculator/CalculatorForm.tsx`
   - Tests: `src/components/calculator/CalculatorForm.test.tsx`
   - Exported from `src/components/calculator/index.ts`
+- [x] **ResultsDisplay**: Composed results container that displays recommendations, cost breakdown, and price comparison. Includes a "No calculation" placeholder, print/copy functionality, and smooth entry animations. (Added 2026-01-03)
+  - File: `src/components/results/ResultsDisplay.tsx`
+  - Tests: `src/components/results/ResultsDisplay.test.tsx`
+  - Exported from `src/components/results/index.ts`
+- [x] **CostBreakdown**: Updated to show both batch total and per-unit costs with a visual breakdown bar and detailed legend. (Updated 2026-01-03)
+  - File: `src/components/results/CostBreakdown.tsx`
+  - Tests: `src/components/results/CostBreakdown.test.tsx`
+- [x] **PriceComparison**: Component that compares the current selling price with the recommended price, displaying opportunity cost and profit at current price. (Added 2026-01-03)
+  - File: `src/components/results/PriceComparison.tsx`
+  - Tests: `src/components/results/PriceComparison.test.tsx`
+  - Exported from `src/components/results/index.ts`
+- [x] **ResultsDisplay**: Orchestrator component for displaying all calculation results, including recommendations, cost breakdown, and price comparison. (Added 2026-01-03)
+  - File: `src/components/results/ResultsDisplay.tsx`
+  - Exported from `src/components/results/index.ts`
+- [x] **CostBreakdown**: Component that displays total cost per unit with a categorical breakdown (Ingredients, Labor, Overhead) using percentages and a visual bar chart. (Added 2026-01-03)
+  - File: `src/components/results/CostBreakdown.tsx`
+  - Tests: `src/components/results/CostBreakdown.test.tsx`
+  - Exported from `src/components/results/index.ts`
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 

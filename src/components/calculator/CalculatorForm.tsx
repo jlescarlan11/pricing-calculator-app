@@ -40,7 +40,7 @@ const initialConfig: PricingConfig = {
 };
 
 interface CalculatorFormProps {
-  onCalculate: (result: CalculationResult) => void;
+  onCalculate: (result: CalculationResult, input: CalculationInput) => void;
   onReset?: () => void;
 }
 
@@ -199,7 +199,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     }
 
     const result = performFullCalculation(input, config);
-    onCalculate(result);
+    onCalculate(result, input);
     setIsCalculating(false);
     
     // Smooth scroll to top or results area? 
