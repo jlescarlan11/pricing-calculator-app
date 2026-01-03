@@ -87,51 +87,37 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2xl">
-        {/* Main Content Column */}
-        <div className="lg:col-span-8 space-y-2xl">
-          <div className="print:break-inside-avoid">
-            <PricingRecommendations results={results} />
-          </div>
-          
-          <div className="print:break-inside-avoid">
-            <PriceComparison 
-              currentPrice={input.currentSellingPrice}
-              recommendedPrice={results.recommendedPrice}
-              costPerUnit={results.costPerUnit}
-              batchSize={input.batchSize}
-            />
-          </div>
-
-          <div className="flex justify-center pt-lg print:hidden">
-            <Button onClick={onEdit} variant="secondary" className="px-2xl gap-sm">
-              <Edit2 className="w-4 h-4" />
-              Adjust Inputs
-            </Button>
-          </div>
+      <div className="flex flex-col gap-2xl max-w-4xl mx-auto">
+        {/* Priority 1: Recommended Price & Profit Scenarios */}
+        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+          <PricingRecommendations results={results} />
         </div>
 
-        {/* Sidebar Column */}
-        <div className="lg:col-span-4 space-y-2xl">
-          <div className="print:break-inside-avoid">
-            <CostBreakdown 
-              results={results}
-            />
-          </div>
+        {/* Priority 2: Cost Breakdown */}
+        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+          <CostBreakdown results={results} />
+        </div>
           
-          {/* Pro Tip Card */}
-          <div className="p-xl bg-surface rounded-lg border border-border-base print:hidden relative overflow-hidden group">
-            <div className="relative z-10">
-              <h4 className="mb-md flex items-center gap-sm text-lg text-ink-900">
-                <Share2 className="w-5 h-5 text-clay" />
-                Pro Tip
-              </h4>
-              <p className="text-ink-700 text-sm leading-relaxed font-medium">
-                Small adjustments to your batch size or ingredient sourcing can have a huge impact on your final profit margin. Try experimenting with different batch sizes to find your &quot;sweet spot&quot;.
-              </p>
-            </div>
-            {/* Decorative background element */}
-            <div className="absolute -bottom-xl -right-xl w-32 h-32 bg-clay/5 rounded-round transition-transform group-hover:scale-110 duration-700" />
+        {/* Priority 3: Price Comparison (Context) */}
+        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+          <PriceComparison 
+            currentPrice={input.currentSellingPrice}
+            recommendedPrice={results.recommendedPrice}
+            costPerUnit={results.costPerUnit}
+            batchSize={input.batchSize}
+          />
+        </div>
+
+        {/* Pro Tip - Low visual weight */}
+        <div className="p-xl bg-surface/50 rounded-lg border border-border-subtle print:hidden flex items-start gap-md">
+          <div className="p-sm bg-clay/10 rounded-full text-clay shrink-0">
+            <Share2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-ink-900 mb-xs">Pro Tip: Optimize your Batch Size</h4>
+            <p className="text-ink-500 text-sm leading-relaxed">
+              Small adjustments to your batch size or ingredient sourcing can have a huge impact on your final profit margin. Try experimenting with different batch sizes to find your &quot;sweet spot&quot;.
+            </p>
           </div>
         </div>
       </div>

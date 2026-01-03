@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Info, Package } from 'lucide-react';
 import { CalculatorForm, SampleDemo } from '../components/calculator';
 import { ResultsDisplay } from '../components/results';
@@ -25,26 +25,29 @@ export const CalculatorPage: React.FC = () => {
     loadPreset,
   } = useCalculatorState();
 
-  const [view, setView] = useState<'form' | 'results'>('form');
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const showResults = !!results;
 
   const handleCalculate = async () => {
     const res = await calculate();
     if (res) {
-      setView('results');
+      // Scroll to results at the top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const handleEdit = () => {
-    setView('form');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleScrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleReset = () => {
     if (confirm('Are you sure you want to clear the form? This will remove all your progress.')) {
       reset();
-      setView('form');
+      // Scroll to top to see fresh form
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -58,30 +61,27 @@ export const CalculatorPage: React.FC = () => {
     });
     
     // Smooth scroll to form area
-    const formElement = document.getElementById('calculator-form');
-    if (formElement) {
-      formElement.scrollIntoView({ behavior: 'smooth' });
-    }
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [loadPreset]);
 
   const handleLoadPreset = useCallback((preset: SavedPreset) => {
     loadPreset(preset);
     setIsPresetsModalOpen(false);
-    setView('results');
+    // Scroll to results
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [loadPreset]);
 
   const handleEditPreset = useCallback((preset: SavedPreset) => {
     loadPreset(preset);
     setIsPresetsModalOpen(false);
-    setView('form');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to form
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [loadPreset]);
 
   return (
-    <div className="animate-in fade-in duration-700 relative">
-      {/* Intro Section (only on form view) */}
-      {view === 'form' && (
+    <div className="animate-in fade-in duration-700 relative pb-2xl">
+      {/* Intro Section (only when no results) */}
+      {!showResults && (
         <div className="space-y-lg mb-2xl">
           <div className="p-lg md:p-xl bg-surface rounded-lg border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
             <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
@@ -98,35 +98,39 @@ export const CalculatorPage: React.FC = () => {
         </div>
       )}
 
-      <div id="calculator-form" className="min-h-[600px]">
-        {view === 'form' ? (
-          <CalculatorForm 
-            input={input}
+      {/* Results Section (Top Priority) */}
+      {showResults && (
+        <div ref={resultsRef} className="mb-4xl animate-in fade-in slide-in-from-top-8 duration-700">
+          <ResultsDisplay 
+            results={results} 
+            input={input} 
             config={config}
-            errors={errors}
-            isCalculating={isCalculating}
-            onUpdateInput={updateInput}
-            onUpdateIngredient={updateIngredient}
-            onAddIngredient={addIngredient}
-            onRemoveIngredient={removeIngredient}
-            onUpdateConfig={updateConfig}
-            onCalculate={handleCalculate}
-            onReset={handleReset}
+            onEdit={handleScrollToForm} 
           />
-        ) : (
-          results && (
-            <ResultsDisplay 
-              results={results} 
-              input={input} 
-              config={config}
-              onEdit={handleEdit} 
-            />
-          )
-        )}
+          
+          <div className="h-px bg-border-subtle my-3xl" role="separator" />
+        </div>
+      )}
+
+      {/* Input Form Section (Secondary Priority) */}
+      <div ref={formRef} id="calculator-form" className="min-h-[600px]">
+        <CalculatorForm 
+          input={input}
+          config={config}
+          errors={errors}
+          isCalculating={isCalculating}
+          onUpdateInput={updateInput}
+          onUpdateIngredient={updateIngredient}
+          onAddIngredient={addIngredient}
+          onRemoveIngredient={removeIngredient}
+          onUpdateConfig={updateConfig}
+          onCalculate={handleCalculate}
+          onReset={handleReset}
+        />
       </div>
 
-      {/* Floating Action Button for Presets */}
-      <div className="fixed bottom-lg right-lg z-40">
+      {/* Floating Action Button for Presets (Tertiary) */}
+      <div className="fixed bottom-lg right-lg z-40 print:hidden">
         <Tooltip content="Your Saved Products" position="left">
           <button
             onClick={() => setIsPresetsModalOpen(true)}
