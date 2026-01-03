@@ -1,4 +1,4 @@
-import { Ingredient } from '../types';
+import type { Ingredient } from '../types';
 
 export interface ValidationError {
   field: string;

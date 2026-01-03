@@ -1,4 +1,4 @@
-import { Ingredient, PricingStrategy } from '../types/calculator';
+import type { Ingredient, PricingStrategy } from '../types/calculator';
 
 /**
  * Rounds a number to a specified number of decimal places.

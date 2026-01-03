@@ -7,7 +7,7 @@ import {
   calculateRecommendedPrice,
   calculateProfitMargin,
 } from './calculations';
-import { Ingredient } from '../types/calculator';
+import type { Ingredient } from '../types/calculator';
 
 describe('Calculation Utils', () => {
   describe('calculateTotalIngredientCost', () => {
