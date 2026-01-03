@@ -85,6 +85,11 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - Tests: `src/hooks/use-presets.test.ts`
   - Exported from `src/hooks/index.ts`
 
+### Constants
+- [x] **TOOLTIPS**: A library of concise, user-friendly tooltip descriptions for all calculator input fields. (Added 2026-01-03)
+  - File: `src/constants/tooltips.ts`
+  - Exported from `src/constants/index.ts`
+
 ### Components
 - [x] **Badge**: Reusable status indicator with success, warning, error, and info variants. (Added 2026-01-03)
   - File: `src/components/shared/Badge.tsx`
@@ -131,6 +136,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/results/CostBreakdown.tsx`
   - Tests: `src/components/results/CostBreakdown.test.tsx`
   - Exported from `src/components/results/index.ts`
+- [x] **OverheadCalculator**: Guided helper component for calculating overhead costs based on monthly expenses and packaging requirements. (Added 2026-01-03)
+  - File: `src/components/help/OverheadCalculator.tsx`
+  - Tests: `src/components/help/OverheadCalculator.test.tsx`
+  - Exported from `src/components/help/index.ts`
 - [x] **SavePresetModal**: Modal dialog for saving calculations as presets with name validation, data preview, and success feedback. (Added 2026-01-03)
   - File: `src/components/presets/SavePresetModal.tsx`
   - Tests: `src/components/presets/SavePresetModal.test.tsx`

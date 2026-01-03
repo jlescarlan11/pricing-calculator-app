@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calculator, ChevronDown, ChevronUp, HelpCircle, AlertCircle } from 'lucide-react';
 import { Input, Button, Tooltip, Card, Badge } from '../shared';
+import { OverheadCalculator } from '../help';
 
 interface OverheadCostProps {
   value: number;
@@ -17,22 +18,9 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
 }) => {
   const [isHelperOpen, setIsHelperOpen] = useState(false);
 
-  // Helper states
-  const [monthlyRent, setMonthlyRent] = useState<string>('');
-  const [batchesPerMonth, setBatchesPerMonth] = useState<string>('');
-  const [monthlyUtilities, setMonthlyUtilities] = useState<string>('');
-  const [packagingPerUnit, setPackagingPerUnit] = useState<string>('');
-  const [marketingAllocation, setMarketingAllocation] = useState<string>('');
-
-  const rentPerBatch = (parseFloat(monthlyRent) || 0) / (parseFloat(batchesPerMonth) || 1);
-  const utilitiesPerBatch = (parseFloat(monthlyUtilities) || 0) / (parseFloat(batchesPerMonth) || 1);
-  const packagingTotal = (parseFloat(packagingPerUnit) || 0) * batchSize;
-  const marketingTotal = parseFloat(marketingAllocation) || 0;
-
-  const calculatedTotal = rentPerBatch + utilitiesPerBatch + packagingTotal + marketingTotal;
-
-  const applyCalculated = () => {
+  const handleApplyOverhead = (calculatedTotal: number) => {
     onChange(calculatedTotal);
+    setIsHelperOpen(false);
   };
 
   return (
@@ -95,83 +83,11 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
       </div>
 
       {isHelperOpen && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-6 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Rent & Utilities Section */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 border-b pb-1">Facility Costs</h4>
-              <Input
-                label="Monthly Rent"
-                type="number"
-                value={monthlyRent}
-                onChange={(e) => setMonthlyRent(e.target.value)}
-                currency
-                placeholder="0.00"
-              />
-              <Input
-                label="Monthly Utilities"
-                type="number"
-                value={monthlyUtilities}
-                onChange={(e) => setMonthlyUtilities(e.target.value)}
-                currency
-                placeholder="0.00"
-              />
-              <Input
-                label="Batches per Month"
-                type="number"
-                value={batchesPerMonth}
-                onChange={(e) => setBatchesPerMonth(e.target.value)}
-                placeholder="e.g. 20"
-              />
-              <div className="text-[11px] text-gray-500 italic">
-                Allocated Rent + Utilities: ₱{(rentPerBatch + utilitiesPerBatch).toFixed(2)}
-              </div>
-            </div>
-
-            {/* Packaging & Marketing Section */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 border-b pb-1">Variable & Other</h4>
-              <Input
-                label="Packaging per Unit"
-                type="number"
-                value={packagingPerUnit}
-                onChange={(e) => setPackagingPerUnit(e.target.value)}
-                currency
-                placeholder="0.00"
-              />
-              <div className="text-[11px] text-gray-500 px-1">
-                Batch Size: {batchSize} units
-              </div>
-              <Input
-                label="Marketing Allocation"
-                type="number"
-                value={marketingAllocation}
-                onChange={(e) => setMarketingAllocation(e.target.value)}
-                currency
-                placeholder="0.00"
-                helperText="Ads, flyers, promos per batch"
-              />
-              <div className="pt-2 text-[11px] text-gray-500 italic">
-                Allocated Packaging + Marketing: ₱{(packagingTotal + marketingTotal).toFixed(2)}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Total Calculated: </span>
-              <span className="font-bold text-gray-900 dark:text-white text-lg">
-                ₱{calculatedTotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-            </div>
-            <Button
-              variant="primary"
-              onClick={applyCalculated}
-              type="button"
-            >
-              Apply to Overhead
-            </Button>
-          </div>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2 duration-200">
+          <OverheadCalculator 
+            onApply={handleApplyOverhead}
+            initialBatchSize={batchSize}
+          />
         </div>
       )}
     </Card>

@@ -34,7 +34,7 @@ describe('OverheadCost', () => {
     expect(screen.getByLabelText(/Monthly Utilities/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Batches per Month/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Packaging per Unit/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Marketing Allocation/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Current Batch Size/i)).toBeInTheDocument();
     
     const hideBtn = screen.getByRole('button', { name: /Hide Helper/i });
     fireEvent.click(hideBtn);
@@ -57,11 +57,8 @@ describe('OverheadCost', () => {
     // Packaging: 5 * 50 = 250
     fireEvent.change(screen.getByLabelText(/Packaging per Unit/i), { target: { value: '5' } });
     
-    // Marketing: 150
-    fireEvent.change(screen.getByLabelText(/Marketing Allocation/i), { target: { value: '150' } });
-    
-    // Total = 500 + 100 + 250 + 150 = 1000
-    expect(screen.getByText(/₱1,000.00/i)).toBeInTheDocument();
+    // Total = 500 + 100 + 250 = 850
+    expect(screen.getByText(/₱850.00/i)).toBeInTheDocument();
   });
 
   it('applies calculated value to overhead', () => {
@@ -69,9 +66,10 @@ describe('OverheadCost', () => {
     
     fireEvent.click(screen.getByRole('button', { name: /Overhead Helper/i }));
     
-    fireEvent.change(screen.getByLabelText(/Marketing Allocation/i), { target: { value: '200' } });
+    fireEvent.change(screen.getByLabelText(/Monthly Rent/i), { target: { value: '200' } });
+    fireEvent.change(screen.getByLabelText(/Batches per Month/i), { target: { value: '1' } });
     
-    const applyBtn = screen.getByRole('button', { name: /Apply to Overhead/i });
+    const applyBtn = screen.getByRole('button', { name: /Apply to Overhead Cost/i });
     fireEvent.click(applyBtn);
     
     expect(mockOnChange).toHaveBeenCalledWith(200);
