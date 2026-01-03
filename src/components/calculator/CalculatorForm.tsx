@@ -73,13 +73,36 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     input.ingredients.length > 0 && 
     input.ingredients.every(ing => ing.name.trim() !== '' && ing.cost > 0);
 
+  const getValidationFeedback = () => {
+    if (isFormValid) return { message: 'Ready to calculate', color: 'text-moss' };
+    
+    const hasName = input.productName.trim().length >= 3;
+    const hasIngredients = input.ingredients.length > 0;
+    const ingredientsComplete = hasIngredients && input.ingredients.every(ing => ing.name.trim() !== '' && ing.cost > 0);
+    const hasBatchSize = input.batchSize >= 1;
+
+    if (hasName && hasIngredients && !ingredientsComplete) return { message: 'Almost there! Complete your ingredients', color: 'text-clay' };
+    if (hasName && !hasIngredients) return { message: 'Looking good! Add some ingredients', color: 'text-clay' };
+    if (!hasName) return { message: 'Start by naming your product', color: 'text-ink-500' };
+    if (!hasBatchSize) return { message: 'Set your batch size', color: 'text-clay' };
+    
+    return { message: 'Almost there...', color: 'text-ink-500' };
+  };
+
+  const feedback = getValidationFeedback();
+
   return (
     <div className="flex flex-col gap-3xl w-full pb-4xl">
       {/* Header with Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg px-lg sm:px-0">
         <div>
           <h2 className="text-2xl text-ink-900">Calculator</h2>
-          <p className="text-sm text-ink-500 font-medium">Define your production costs with intention.</p>
+          <div className="flex items-center gap-sm mt-xs">
+            <div className={`w-2 h-2 rounded-full ${isFormValid ? 'bg-moss' : 'bg-border-base'} transition-colors duration-500`} />
+            <p className={`text-sm font-medium transition-colors duration-500 ${feedback.color}`}>
+              {feedback.message}
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-sm w-full sm:w-auto">
           <SavePresetButton 

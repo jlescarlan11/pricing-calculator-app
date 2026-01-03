@@ -8,10 +8,10 @@ export interface ValidationError {
 
 export const validatePositiveNumber = (value: number, fieldName: string): ValidationError | null => {
   if (value === null || value === undefined || isNaN(value)) {
-    return { field: fieldName, message: `Oops, ${fieldName} needs to be a valid number.` };
+    return { field: fieldName, message: `Please enter a valid amount for ${fieldName.toLowerCase()}.` };
   }
   if (value <= 0) {
-    return { field: fieldName, message: `Oops, ${fieldName} should be more than zero.` };
+    return { field: fieldName, message: `${fieldName} should be greater than zero.` };
   }
   return null;
 };
@@ -19,23 +19,23 @@ export const validatePositiveNumber = (value: number, fieldName: string): Valida
 export const validateBatchSize = (value: number): ValidationError | null => {
   const fieldName = 'Batch size';
   if (value === null || value === undefined || isNaN(value)) {
-    return { field: 'batchSize', message: `Oops, ${fieldName} needs to be a valid number.` };
+    return { field: 'batchSize', message: 'Please enter a valid batch size.' };
   }
   if (!Number.isInteger(value)) {
-    return { field: 'batchSize', message: `Oops, ${fieldName} should be a whole number.` };
+    return { field: 'batchSize', message: 'Batch size should be a whole number.' };
   }
   if (value < 1 || value > MAX_BATCH_SIZE) {
-    return { field: 'batchSize', message: `Oops, batch size must be at least 1.` };
+    return { field: 'batchSize', message: `Batch size should be between 1 and ${MAX_BATCH_SIZE}.` };
   }
   return null;
 };
 
 export const validateProductName = (name: string): ValidationError | null => {
   if (!name || name.trim() === '') {
-    return { field: 'productName', message: 'Please name your product to continue.' };
+    return { field: 'productName', message: 'Please provide a name for your product.' };
   }
   if (name.trim().length < 2) {
-    return { field: 'productName', message: 'Try a slightly longer name for your product.' };
+    return { field: 'productName', message: 'A slightly longer name would be more descriptive.' };
   }
   return null;
 };
@@ -47,10 +47,10 @@ export const validatePercentage = (
   fieldName: string
 ): ValidationError | null => {
   if (value === null || value === undefined || isNaN(value)) {
-    return { field: fieldName, message: `Oops, ${fieldName} needs to be a valid number.` };
+    return { field: fieldName, message: `Please enter a valid percentage for ${fieldName.toLowerCase()}.` };
   }
   if (value < min || value > max) {
-    return { field: fieldName, message: `Oops, ${fieldName} should be between ${min}% and ${max}%.` };
+    return { field: fieldName, message: `${fieldName} is usually between ${min}% and ${max}%.` };
   }
   return null;
 };
@@ -59,7 +59,7 @@ export const validateIngredients = (ingredients: Ingredient[]): ValidationError[
   const errors: ValidationError[] = [];
 
   if (!ingredients || ingredients.length === 0) {
-    errors.push({ field: 'ingredients', message: 'Try adding at least one ingredient to start.' });
+    errors.push({ field: 'ingredients', message: 'Add at least one ingredient to begin the calculation.' });
     return errors;
   }
 
@@ -74,7 +74,7 @@ export const validateIngredients = (ingredients: Ingredient[]): ValidationError[
     if (ing.cost === null || ing.cost === undefined || isNaN(ing.cost) || ing.cost <= 0) {
       errors.push({
         field: `ingredients[${index}].cost`,
-        message: `Oops, ingredient #${index + 1} needs a cost.`,
+        message: `Please provide a cost for ingredient #${index + 1}.`,
       });
     }
   });

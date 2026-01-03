@@ -3,12 +3,13 @@ import { Info, Package } from 'lucide-react';
 import { CalculatorForm, SampleDemo } from '../components/calculator';
 import { ResultsDisplay } from '../components/results';
 import { PresetsList } from '../components/presets';
-import { Modal, Tooltip } from '../components/shared';
+import { Modal, Tooltip, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
 import type { SavedPreset } from '../types';
 
 export const CalculatorPage: React.FC = () => {
+  const { addToast } = useToast();
   const {
     input,
     config,
@@ -34,6 +35,7 @@ export const CalculatorPage: React.FC = () => {
   const handleCalculate = async () => {
     const res = await calculate();
     if (res) {
+      addToast('✓ Calculation complete', 'success');
       // Scroll to results at the top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

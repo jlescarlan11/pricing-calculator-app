@@ -46,7 +46,10 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
           <p className="text-xs font-semibold text-ink-700 mb-xs">
             Recommended Selling Price
           </p>
-          <p className="font-serif text-5xl sm:text-6xl text-ink-900 tracking-tight transition-transform duration-700 group-hover:scale-105">
+          <p 
+            key={recommendedPrice}
+            className="font-serif text-5xl sm:text-6xl text-ink-900 tracking-tight transition-transform duration-700 group-hover:scale-105 animate-pulse-once"
+          >
             {formatCurrency(recommendedPrice)}
           </p>
           <div className="flex justify-center mt-lg">

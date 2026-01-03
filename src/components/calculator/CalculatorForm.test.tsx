@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CalculatorForm } from './CalculatorForm';
+import { ToastProvider } from '../shared/Toast';
 import { useCalculatorState } from '../../hooks/useCalculatorState';
 import type { CalculationInput, PricingConfig, CalculationResult } from '../../types/calculator';
 
@@ -15,23 +16,25 @@ const TestWrapper = ({
 }) => {
   const state = useCalculatorState({ input: initialInput, config: initialConfig });
   return (
-    <CalculatorForm 
-      {...state} 
-      onUpdateInput={state.updateInput}
-      onUpdateIngredient={state.updateIngredient}
-      onAddIngredient={state.addIngredient}
-      onRemoveIngredient={state.removeIngredient}
-      onUpdateConfig={state.updateConfig}
-      onCalculate={async () => {
-        const res = await state.calculate();
-        if (res && onCalculate) onCalculate(res, state.input, state.config);
-      }}
-      onReset={() => {
-        if (window.confirm('Are you sure you want to clear the form? This will remove all your progress.')) {
-          state.reset();
-        }
-      }}
-    />
+    <ToastProvider>
+      <CalculatorForm 
+        {...state} 
+        onUpdateInput={state.updateInput}
+        onUpdateIngredient={state.updateIngredient}
+        onAddIngredient={state.addIngredient}
+        onRemoveIngredient={state.removeIngredient}
+        onUpdateConfig={state.updateConfig}
+        onCalculate={async () => {
+          const res = await state.calculate();
+          if (res && onCalculate) onCalculate(res, state.input, state.config);
+        }}
+        onReset={() => {
+          if (window.confirm('Are you sure you want to clear the form? This will remove all your progress.')) {
+            state.reset();
+          }
+        }}
+      />
+    </ToastProvider>
   );
 };
 
@@ -102,7 +105,7 @@ describe('CalculatorForm', () => {
     vi.useFakeTimers();
     render(<TestWrapper onCalculate={mockOnCalculate} />);
     
-    const addButton = screen.getByText(/Add Ingredient/i);
+    const addButton = screen.getByText(/Add Item/i);
     fireEvent.click(addButton);
     
     expect(screen.getAllByLabelText(/Ingredient Name/i)).toHaveLength(2);
@@ -124,7 +127,7 @@ describe('CalculatorForm', () => {
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
     
-    expect(await screen.findByText(/Product name is required/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Please provide a name for your product/i)).toBeInTheDocument();
     expect(mockOnCalculate).not.toHaveBeenCalled();
   });
 
@@ -136,11 +139,13 @@ describe('CalculatorForm', () => {
     
     const nameInputs = screen.getAllByLabelText(/Ingredient Name/i);
     const amountInputs = screen.getAllByLabelText(/Amount/i);
-    const costInputs = screen.getAllByLabelText(/Cost/i);
+    // Cost label has an asterisk since it's required
+    const costInputs = screen.getAllByLabelText(/Cost/);
+    const costInput = costInputs.find(input => input.tagName === 'INPUT');
     
     fireEvent.change(nameInputs[0], { target: { value: 'Flour' } });
     fireEvent.change(amountInputs[0], { target: { value: '1000' } });
-    fireEvent.change(costInputs[0], { target: { value: '50' } });
+    fireEvent.change(costInput!, { target: { value: '50' } });
     
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
@@ -188,17 +193,38 @@ describe('CalculatorForm', () => {
   });
 
   it('clears form when reset is clicked', () => {
+    const confirmSpy = vi.fn(() => true);
+    vi.stubGlobal('confirm', confirmSpy);
+    
     render(<TestWrapper onCalculate={mockOnCalculate} />);
     fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'To Be Cleared' } });
     
-    const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true);
-    
-    const clearBtn = screen.getByRole('button', { name: /Clear/i });
-    fireEvent.click(clearBtn);
+    const resetBtns = screen.getAllByRole('button', { name: /^Reset$/ });
+    fireEvent.click(resetBtns[0]);
     
     expect(confirmSpy).toHaveBeenCalled();
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('');
     expect(window.sessionStorage.getItem('pricing_calculator_draft')).toBeNull();
+    
+    vi.unstubAllGlobals();
+  });
+
+  it('displays real-time validation feedback', () => {
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
+    
+    expect(screen.getByText(/Start by naming your product/i)).toBeInTheDocument();
+    
+    fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'New Product' } });
+    // Since it starts with one empty ingredient, it should say "Almost there"
+    expect(screen.getByText(/Almost there! Complete your ingredients/i)).toBeInTheDocument();
+    
+    fireEvent.change(screen.getByLabelText(/Ingredient Name/i), { target: { value: 'Flour' } });
+    
+    const costInputs = screen.getAllByLabelText(/Cost/);
+    const costInput = costInputs.find(input => input.tagName === 'INPUT');
+    fireEvent.change(costInput!, { target: { value: '50' } });
+    
+    expect(screen.getByText(/Ready to calculate/i)).toBeInTheDocument();
   });
 
   it('populates state when initialInput and initialConfig props are provided', () => {

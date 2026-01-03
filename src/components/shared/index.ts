@@ -5,3 +5,4 @@ export * from './Card';
 export * from './Tooltip';
 export * from './Badge';
 export * from './Modal';
+export * from './Toast';

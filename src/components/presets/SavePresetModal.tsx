@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import { Modal, Input, Button } from '../shared';
+import { Modal, Input, Button, useToast } from '../shared';
 import { usePresets } from '../../hooks/use-presets';
 import { performFullCalculation } from '../../utils/calculations';
 import { formatCurrency } from '../../utils/formatters';
@@ -23,6 +23,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
   input,
   config,
 }) => {
+  const { addToast } = useToast();
   const { addPreset, presets } = usePresets();
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -75,6 +76,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
         config,
       });
       
+      addToast('✓ Preset saved', 'success');
       setIsSuccess(true);
       // Auto close after showing success message
       setTimeout(() => {

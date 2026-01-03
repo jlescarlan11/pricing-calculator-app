@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SavePresetModal } from './SavePresetModal';
+import { ToastProvider } from '../shared/Toast';
 import * as usePresetsHook from '../../hooks/use-presets';
 import type { CalculationInput, PricingConfig } from '../../types/calculator';
 
@@ -40,15 +41,17 @@ describe('SavePresetModal', () => {
 
   it('renders correctly when open', () => {
     render(
-      <SavePresetModal
-        isOpen={true}
-        onClose={mockOnClose}
-        input={mockInput}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          input={mockInput}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
-    expect(screen.getByText(/Save to Presets/i)).toBeInTheDocument();
+    expect(screen.getByText(/Save calculation/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Test Product');
     expect(screen.getByText(/Calculation Summary/i)).toBeInTheDocument();
     
@@ -61,41 +64,45 @@ describe('SavePresetModal', () => {
 
   it('validates name length (too short)', async () => {
     render(
-      <SavePresetModal
-        isOpen={true}
-        onClose={mockOnClose}
-        input={{ ...mockInput, productName: '' }}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          input={{ ...mockInput, productName: '' }}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
     const input = screen.getByLabelText(/Product Name/i);
     fireEvent.change(input, { target: { value: 'Ab' } });
 
-    const saveBtn = screen.getByText(/Save Product/i);
+    const saveBtn = screen.getByText(/^Save$/);
     fireEvent.click(saveBtn);
 
-    expect(await screen.findByText(/Name must be at least 3 characters/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Try a slightly longer name/i)).toBeInTheDocument();
     expect(mockAddPreset).not.toHaveBeenCalled();
   });
 
   it('validates name length (too long)', async () => {
     render(
-      <SavePresetModal
-        isOpen={true}
-        onClose={mockOnClose}
-        input={{ ...mockInput, productName: '' }}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          input={{ ...mockInput, productName: '' }}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
     const input = screen.getByLabelText(/Product Name/i);
     fireEvent.change(input, { target: { value: 'a'.repeat(51) } });
 
-    const saveBtn = screen.getByText(/Save Product/i);
+    const saveBtn = screen.getByText(/^Save$/);
     fireEvent.click(saveBtn);
 
-    expect(await screen.findByText(/Name must be less than 50 characters/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Try a shorter name/i)).toBeInTheDocument();
     expect(mockAddPreset).not.toHaveBeenCalled();
   });
 
@@ -110,33 +117,37 @@ describe('SavePresetModal', () => {
     });
 
     render(
-      <SavePresetModal
-        isOpen={true}
-        onClose={mockOnClose}
-        input={{ ...mockInput, productName: 'Existing Product' }}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          input={{ ...mockInput, productName: 'Existing Product' }}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
-    const saveBtn = screen.getByText(/Save Product/i);
+    const saveBtn = screen.getByText(/^Save$/);
     fireEvent.click(saveBtn);
 
-    expect(await screen.findByText(/already exists in your presets/i)).toBeInTheDocument();
+    expect(await screen.findByText(/already have a product with this name/i)).toBeInTheDocument();
     expect(mockAddPreset).not.toHaveBeenCalled();
   });
 
   it('saves successfully and shows success message', async () => {
     vi.useFakeTimers();
     render(
-      <SavePresetModal
-        isOpen={true}
-        onClose={mockOnClose}
-        input={mockInput}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          input={mockInput}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
-    const saveBtn = screen.getByText(/Save Product/i);
+    const saveBtn = screen.getByText(/^Save$/);
     
     // We need to wrap the click and the advancement of timers in act
     await act(async () => {
@@ -148,7 +159,8 @@ describe('SavePresetModal', () => {
       vi.advanceTimersByTime(100);
     });
 
-    expect(screen.getByText(/Saved Successfully/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Saved$/)).toBeInTheDocument();
+    expect(screen.getByText(/Preset saved/i)).toBeInTheDocument();
 
     expect(mockAddPreset).toHaveBeenCalledWith({
       name: 'Test Product',
@@ -165,39 +177,45 @@ describe('SavePresetModal', () => {
     vi.useRealTimers();
   });
 
-  it('calls onClose when Cancel is clicked', () => {
+  it('calls onClose when Back is clicked', () => {
     render(
-      <SavePresetModal
-        isOpen={true}
-        onClose={mockOnClose}
-        input={mockInput}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          input={mockInput}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
-    const cancelBtn = screen.getByText(/Cancel/i);
-    fireEvent.click(cancelBtn);
+    const backBtn = screen.getByText(/Back/i);
+    fireEvent.click(backBtn);
 
     expect(mockOnClose).toHaveBeenCalled();
   });
 
   it('resets state when reopened', async () => {
     const { rerender } = render(
-      <SavePresetModal
-        isOpen={false}
-        onClose={mockOnClose}
-        input={mockInput}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={false}
+          onClose={mockOnClose}
+          input={mockInput}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
     rerender(
-      <SavePresetModal
-        isOpen={true}
-        onClose={mockOnClose}
-        input={{ ...mockInput, productName: 'New Name' }}
-        config={mockConfig}
-      />
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          input={{ ...mockInput, productName: 'New Name' }}
+          config={mockConfig}
+        />
+      </ToastProvider>
     );
 
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('New Name');
