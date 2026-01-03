@@ -53,11 +53,14 @@ describe('App Integration', () => {
     
     expect(await screen.findByText(/Calculation Results/i)).toBeInTheDocument();
     
-    const editBtn = screen.getByText(/Adjust Inputs/i);
-    fireEvent.click(editBtn);
-    
+    // Form is visible below results, so we can access inputs directly
     expect(screen.getByText(/Cost Calculator/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Chocolate Chip Cookies');
+    
+    const nameInput = screen.getByLabelText(/Product Name/i);
+    expect(nameInput).toHaveValue('Chocolate Chip Cookies');
+    
+    fireEvent.change(nameInput, { target: { value: 'Updated Cookie' } });
+    expect(nameInput).toHaveValue('Updated Cookie');
   });
 
   it('loads sample data correctly', () => {

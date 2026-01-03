@@ -85,14 +85,6 @@ describe('ResultsDisplay', () => {
     expect(onEdit).toHaveBeenCalled();
   });
 
-  it('calls onEdit when clicking Adjust Inputs', () => {
-    const onEdit = vi.fn();
-    render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} onEdit={onEdit} />);
-    
-    fireEvent.click(screen.getByText(/Adjust Inputs/i));
-    expect(onEdit).toHaveBeenCalled();
-  });
-
   it('copies summary to clipboard when Copy Summary is clicked in Share menu', async () => {
     render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} />);
     

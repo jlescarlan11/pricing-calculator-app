@@ -40,10 +40,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   };
 
   return (
-    <div className={`flex flex-col gap-xs w-full max-w-[500px] ${className}`}>
+    <div className={`flex flex-col w-full max-w-[500px] ${className}`}>
       <label 
         htmlFor={id} 
-        className="text-sm font-medium text-ink-700 flex items-center justify-between"
+        className="text-sm font-medium text-ink-700 flex items-center justify-between tracking-[0.01em] mb-2"
       >
         <span>
           {label}
@@ -72,15 +72,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           onKeyDown={handleKeyDown}
           min={type === 'number' ? 0 : undefined}
           className={`
-            block w-full rounded-sm border
-            py-4 sm:text-sm transition-all duration-200
+            block w-full rounded-sm border tabular-nums
+            py-[14px] sm:text-sm transition-all duration-200
             disabled:bg-surface-hover disabled:text-ink-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden
+            placeholder:text-ink-500 placeholder:italic
             ${currency ? 'pl-10' : 'pl-4'}
             ${suffix || error ? 'pr-10' : 'pr-4'}
             ${error 
-              ? 'border-rust/50 text-rust placeholder-rust/30 focus:border-rust focus:ring-rust/20' 
-              : 'border-border-base bg-bg-main focus:border-clay focus:ring-clay/20'
+              ? 'border-rust text-rust placeholder-rust/30 focus:border-rust focus:ring-rust/20' 
+              : 'border-border-subtle bg-bg-main focus:border-clay focus:ring-clay/20'
             }
           `}
           {...props}
@@ -100,11 +101,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
       </div>
 
       {error ? (
-        <p className="mt-xs text-sm text-rust flex items-center gap-xs" id={errorId} role="alert">
+        <p className="mt-xs text-[12px] text-rust flex items-center gap-xs" id={errorId} role="alert">
           {error}
         </p>
       ) : helperText ? (
-        <p className="mt-xs text-sm text-ink-500" id={helperId}>
+        <p className="mt-xs text-[12px] text-ink-500" id={helperId}>
           {helperText}
         </p>
       ) : null}
