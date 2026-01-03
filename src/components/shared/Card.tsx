@@ -6,6 +6,8 @@ export interface CardProps {
   className?: string;
   footer?: React.ReactNode;
   noPadding?: boolean;
+  interactive?: boolean;
+  texture?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -14,24 +16,53 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   footer,
   noPadding = false,
+  interactive = false,
+  texture = false,
 }) => {
+  const baseClasses = 'bg-surface rounded-lg border border-border-subtle shadow-level-1 overflow-hidden relative transition-all duration-[400ms] ease-in-out';
+  const interactiveClasses = interactive ? 'hover:shadow-level-2 hover:-translate-y-0.5 cursor-pointer' : '';
+  
   return (
-    <div className={`bg-surface rounded-md border border-border-base shadow-level-1 overflow-hidden ${className}`}>
-      {title && (
-        <div className="px-xl py-xl border-b border-border-subtle">
-          {typeof title === 'string' ? (
-            <h3 className="text-lg text-ink-900">{title}</h3>
-          ) : (
-            title
+    <div className={`${baseClasses} ${interactiveClasses} ${className}`}>
+      {texture && <div className="paper-texture absolute inset-0 opacity-30 pointer-events-none" />}
+      
+      {noPadding ? (
+        <>
+          {title && (
+            <div className="p-lg md:p-xl pb-0">
+               {typeof title === 'string' ? (
+                <h3 className="font-serif text-xl font-semibold text-ink-900 mb-lg">{title}</h3>
+              ) : (
+                title
+              )}
+            </div>
           )}
-        </div>
-      )}
-      <div className={noPadding ? '' : 'px-xl py-xl'}>
-        {children}
-      </div>
-      {footer && (
-        <div className="px-xl py-xl bg-bg-main border-t border-border-subtle">
-          {footer}
+          {children}
+          {footer && (
+             <div className="border-t border-border-subtle bg-bg-main/50 p-lg md:p-xl">
+               {footer}
+             </div>
+          )}
+        </>
+      ) : (
+        <div className="p-lg md:p-xl">
+          {title && (
+            <div className="mb-lg">
+              {typeof title === 'string' ? (
+                <h3 className="font-serif text-xl font-semibold text-ink-900">{title}</h3>
+              ) : (
+                title
+              )}
+            </div>
+          )}
+          
+          {children}
+          
+          {footer && (
+            <div className="mt-lg pt-lg border-t border-border-subtle">
+              {footer}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -192,6 +192,9 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - Exported from `src/components/help/index.ts`
 - [x] **Background Texture**: Implemented a subtle paper/linen texture overlay using an SVG noise filter (2.5% opacity) applied to the main background. Includes a persistent toggle in the footer. (Added 2026-01-03)
   - File: `src/index.css` (styles), `src/components/layout/AppLayout.tsx` (implementation)
+- [x] **Card**: Redesigned with refined aesthetics (12px radius, subtle border/shadows), responsive padding (24px/32px), and new `interactive` and `texture` props. Updated headers to use Crimson Text. (Updated 2026-01-03)
+  - File: `src/components/shared/Card.tsx`
+  - Tests: `src/components/shared/Card.test.tsx`
 
 ### Typography System (Added 2026-01-03)
 - [x] **Font Installation**: Integrated Google Fonts (Inter and Crimson Text) with specific weights (400, 500, 600).
