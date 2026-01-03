@@ -30,6 +30,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   autoFocus = false,
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -42,13 +43,20 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
     if (isOnlyRow) {
       setShowDeleteModal(true);
     } else {
-      onRemove(ingredient.id);
+      setIsDeleting(true);
+      // Wait for animation to finish before removing
+      setTimeout(() => {
+        onRemove(ingredient.id);
+      }, 300);
     }
   };
 
   const confirmDelete = () => {
-    onRemove(ingredient.id);
+    setIsDeleting(true);
     setShowDeleteModal(false);
+    setTimeout(() => {
+      onRemove(ingredient.id);
+    }, 300);
   };
 
   const handleChange = (field: keyof Ingredient, value: string) => {
@@ -75,10 +83,14 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 
   return (
     <div 
-      className="flex flex-col sm:flex-row gap-lg items-start sm:items-center p-lg bg-surface rounded-md border border-border-subtle transition-all duration-300 hover:border-border-base group/row"
+      className={`
+        grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_auto] gap-md items-start md:items-center py-md
+        animate-in fade-in duration-400
+        ${isDeleting ? 'opacity-0 -translate-y-4 transition-all duration-300 ease-in-out' : ''}
+      `}
       onKeyDown={handleKeyDown}
     >
-      <div className="flex-1 w-full sm:w-auto">
+      <div className="w-full">
         <Input
           ref={nameInputRef}
           label="Ingredient Name"
@@ -90,47 +102,45 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
         />
       </div>
 
-      <div className="flex gap-lg w-full sm:w-auto">
-        <div className="flex-1 sm:w-32">
-          <Input
-            label="Amount"
-            type="number"
-            value={ingredient.amount || ''}
-            onChange={(e) => handleChange('amount', e.target.value)}
-            placeholder="0"
-            error={errors?.amount}
-            required
-            min={0}
-            step="any"
-          />
-        </div>
-
-        <div className="flex-1 sm:w-32">
-          <Input
-            label="Cost"
-            type="number"
-            value={ingredient.cost || ''}
-            onChange={(e) => handleChange('cost', e.target.value)}
-            placeholder="0.00"
-            currency
-            error={errors?.cost}
-            required
-            min={0}
-            step="0.01"
-          />
-        </div>
+      <div className="w-full">
+        <Input
+          label="Amount"
+          type="number"
+          value={ingredient.amount || ''}
+          onChange={(e) => handleChange('amount', e.target.value)}
+          placeholder="0"
+          error={errors?.amount}
+          required
+          min={0}
+          step="any"
+        />
       </div>
 
-      <div className="pt-0 sm:pt-lg self-end sm:self-center opacity-0 group-hover/row:opacity-100 transition-opacity duration-300">
-        <Button
-          variant="ghost"
-          className="text-ink-500 hover:text-rust hover:bg-rust/10 p-sm h-auto rounded-sm"
+      <div className="w-full">
+        <Input
+          label="Cost"
+          type="number"
+          value={ingredient.cost || ''}
+          onChange={(e) => handleChange('cost', e.target.value)}
+          placeholder="0.00"
+          currency
+          error={errors?.cost}
+          required
+          min={0}
+          step="0.01"
+        />
+      </div>
+
+      <div className="flex justify-end md:justify-center md:pt-6">
+        <button
+          type="button"
+          className="w-[36px] h-[36px] rounded-[50%] flex items-center justify-center text-[#8B8680] hover:text-[#B85C38] hover:bg-[rgba(184,92,56,0.05)] transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[#B85C38] focus-visible:ring-offset-2 cursor-pointer"
           onClick={handleDeleteClick}
           aria-label={`Remove ${ingredient.name || 'ingredient'}`}
           title="Remove ingredient (Shift+Delete)"
         >
           <Trash2 className="w-5 h-5" />
-        </Button>
+        </button>
       </div>
 
       <Modal

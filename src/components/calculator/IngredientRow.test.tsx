@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { IngredientRow } from './IngredientRow';
 
@@ -43,28 +43,47 @@ describe('IngredientRow', () => {
     renderComponent();
 
     const nameInput = screen.getByLabelText(/Ingredient Name/i);
-    fireEvent.change(nameInput, { target: { value: 'New Name' } });
+    act(() => {
+      fireEvent.change(nameInput, { target: { value: 'New Name' } });
+    });
     expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'name', 'New Name');
 
     const amountInput = screen.getByLabelText(/^Amount/i);
-    fireEvent.change(amountInput, { target: { value: '200' } });
+    act(() => {
+      fireEvent.change(amountInput, { target: { value: '200' } });
+    });
     expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'amount', '200');
   });
 
-  it('calls onRemove directly when not the only row', () => {
+  it('calls onRemove after animation when not the only row', () => {
+    vi.useFakeTimers();
     renderComponent({ isOnlyRow: false });
 
     const deleteBtn = screen.getByRole('button', { name: /Remove Test Ingredient/i });
-    fireEvent.click(deleteBtn);
+    act(() => {
+      fireEvent.click(deleteBtn);
+    });
+
+    // Should not be called immediately
+    expect(mockHandlers.onRemove).not.toHaveBeenCalled();
+
+    // Advance timers
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
 
     expect(mockHandlers.onRemove).toHaveBeenCalledWith('123');
+    vi.useRealTimers();
   });
 
   it('shows confirmation modal when removing the only row', async () => {
+    vi.useFakeTimers();
     renderComponent({ isOnlyRow: true });
 
     const deleteBtn = screen.getByRole('button', { name: /Remove Test Ingredient/i });
-    fireEvent.click(deleteBtn);
+    act(() => {
+      fireEvent.click(deleteBtn);
+    });
 
     // Mock should not be called yet
     expect(mockHandlers.onRemove).not.toHaveBeenCalled();
@@ -74,30 +93,52 @@ describe('IngredientRow', () => {
 
     // Click confirm
     const confirmBtn = screen.getByRole('button', { name: 'Remove' });
-    fireEvent.click(confirmBtn);
+    act(() => {
+      fireEvent.click(confirmBtn);
+    });
+
+    // Still not called immediately (wait for exit animation)
+    expect(mockHandlers.onRemove).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
 
     expect(mockHandlers.onRemove).toHaveBeenCalledWith('123');
+    vi.useRealTimers();
   });
 
   it('handles Enter key to add new row', () => {
     renderComponent();
 
     const nameInput = screen.getByLabelText(/Ingredient Name/i);
-    fireEvent.keyDown(nameInput, { key: 'Enter', code: 'Enter', charCode: 13 });
+    act(() => {
+      fireEvent.keyDown(nameInput, { key: 'Enter', code: 'Enter', charCode: 13 });
+    });
 
     expect(mockHandlers.onAdd).toHaveBeenCalled();
   });
 
-  it('handles Shift+Delete to remove row', () => {
+  it('handles Shift+Delete to remove row after animation', () => {
+    vi.useFakeTimers();
     renderComponent({ isOnlyRow: false });
 
     // We can fire the event on the row container or an input.
     // The handler is on the main div, which bubbles.
     const nameInput = screen.getByLabelText(/Ingredient Name/i);
     
-    fireEvent.keyDown(nameInput, { key: 'Delete', shiftKey: true });
+    act(() => {
+      fireEvent.keyDown(nameInput, { key: 'Delete', shiftKey: true });
+    });
+
+    expect(mockHandlers.onRemove).not.toHaveBeenCalled();
+    
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
 
     expect(mockHandlers.onRemove).toHaveBeenCalledWith('123');
+    vi.useRealTimers();
   });
 
   it('auto-focuses name input when autoFocus is true', () => {

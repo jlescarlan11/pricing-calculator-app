@@ -178,61 +178,127 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
                         
 
-                        <div className="space-y-md">
+                                                <div className="flex flex-col divide-y divide-[#E6E4E1]">
 
-                          {input.ingredients.map((ing, index) => (
+                        
 
-                            <IngredientRow
+                                                  {input.ingredients.map((ing, index) => (
 
-                              key={ing.id}
+                        
 
-                              ingredient={ing}
+                                                    <IngredientRow
 
-                              index={index}
+                        
 
-                              isOnlyRow={input.ingredients.length === 1}
+                                                      key={ing.id}
 
-                              onUpdate={onUpdateIngredient}
+                        
 
-                              onRemove={onRemoveIngredient}
+                                                      ingredient={ing}
 
-                              onAdd={onAddIngredient}
+                        
 
-                              autoFocus={index === input.ingredients.length - 1 && index > 0}
+                                                      index={index}
 
-                              errors={{
+                        
 
-                                name: errors[`ingredients.${ing.id}.name`],
+                                                      isOnlyRow={input.ingredients.length === 1}
 
-                                amount: errors[`ingredients.${ing.id}.amount`],
+                        
 
-                                cost: errors[`ingredients.${ing.id}.cost`],
+                                                      onUpdate={onUpdateIngredient}
 
-                              }}
+                        
 
-                            />
+                                                      onRemove={onRemoveIngredient}
 
-                          ))}
+                        
 
-                        </div>
+                                                      onAdd={onAddIngredient}
 
-            
+                        
 
-                        <Button
+                                                      autoFocus={index === input.ingredients.length - 1 && index > 0}
 
-                          variant="secondary"
+                        
 
-                          onClick={onAddIngredient}
+                                                      errors={{
 
-                          className="w-full mt-lg border-dashed border-2 py-lg flex items-center justify-center gap-sm border-border-base text-ink-700 hover:border-clay hover:text-clay bg-transparent hover:bg-clay/5 transition-all duration-300 rounded-sm"
+                        
 
-                        >
+                                                        name: errors[`ingredients.${ing.id}.name`],
 
-                          <Plus className="w-5 h-5" />
+                        
 
-                          Add Ingredient
+                                                        amount: errors[`ingredients.${ing.id}.amount`],
 
-                        </Button>
+                        
+
+                                                        cost: errors[`ingredients.${ing.id}.cost`],
+
+                        
+
+                                                      }}
+
+                        
+
+                                                    />
+
+                        
+
+                                                  ))}
+
+                        
+
+                                                </div>
+
+                        
+
+                                    
+
+                        
+
+                                                <div className="pt-lg">
+
+                        
+
+                                                  <Button
+
+                        
+
+                                                    variant="ghost"
+
+                        
+
+                                                    onClick={onAddIngredient}
+
+                        
+
+                                                    className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 transition-all duration-300"
+
+                        
+
+                                                  >
+
+                        
+
+                                                    <Plus className="w-5 h-5" />
+
+                        
+
+                                                    Add Ingredient
+
+                        
+
+                                                  </Button>
+
+                        
+
+                                                </div>
+
+                        
+
+                        
 
                       </div>
 

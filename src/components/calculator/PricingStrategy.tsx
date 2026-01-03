@@ -141,7 +141,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
               step="1"
               value={value}
               onChange={handleSliderChange}
-              className="w-full h-1.5 bg-border-subtle rounded-round appearance-none cursor-pointer accent-clay"
+              className="w-full h-1.5 bg-border-subtle rounded-xs appearance-none cursor-pointer accent-clay"
             />
             <div className="flex justify-between text-[10px] text-ink-500 font-bold uppercase tracking-widest">
               <span>0%</span>
