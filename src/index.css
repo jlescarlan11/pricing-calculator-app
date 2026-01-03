@@ -1,1 +1,57 @@
 @import 'tailwindcss';
+
+@layer base {
+  @media print {
+    /* Hide all buttons and interactive elements */
+    button, 
+    .print\:hidden,
+    [role="tooltip"],
+    [role="button"],
+    .no-print {
+      display: none !important;
+    }
+
+    /* Reset background and colors for printing */
+    body {
+      background-color: white !important;
+      color: black !important;
+      font-size: 11pt;
+      line-height: 1.5;
+    }
+
+    /* Optimize layout for paper */
+    @page {
+      margin: 1.5cm;
+      size: auto;
+    }
+
+    /* Ensure text colors and backgrounds are preserved */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Remove shadows and borders that don't print well */
+    .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+      box-shadow: none !important;
+    }
+
+    /* Force elements to avoid breaking across pages */
+    .print\:break-inside-avoid,
+    tr,
+    img,
+    svg {
+      break-inside: avoid !important;
+    }
+
+    /* Ensure cards have a subtle border instead of shadow */
+    .bg-white, .rounded-xl, .rounded-2xl {
+      border: 1px solid #e5e7eb !important;
+    }
+    
+    /* Reveal hidden print elements */
+    .hidden.print\:block {
+      display: block !important;
+    }
+  }
+}

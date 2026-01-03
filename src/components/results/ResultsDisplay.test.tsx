@@ -54,11 +54,21 @@ describe('ResultsDisplay', () => {
     render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} onEdit={() => {}} />);
     
     expect(screen.getByText(/Calculation Results/i)).toBeInTheDocument();
-    expect(screen.getByText(/Test Product/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Test Product/i).length).toBeGreaterThan(0);
     // Check if sub-components are rendered (by checking for their specific text)
     expect(screen.getByText(/Pricing Recommendation/i)).toBeInTheDocument();
     expect(screen.getByText(/Price Comparison/i)).toBeInTheDocument();
     expect(screen.getByText(/Cost Breakdown/i)).toBeInTheDocument();
+  });
+
+  it('renders business name and date in print header', () => {
+    const inputWithBusiness = { ...mockInput, businessName: 'Maria\'s Bakery' };
+    render(<ResultsDisplay results={mockResults} input={inputWithBusiness} config={mockConfig} />);
+    
+    const businessHeading = screen.getByRole('heading', { name: /Maria's Bakery/i });
+    expect(businessHeading).toBeInTheDocument();
+    expect(businessHeading.closest('.print\\:block')).toHaveClass('print:block');
+    expect(screen.getByText(/Product Pricing Report/i)).toBeInTheDocument();
   });
 
   it('calls onEdit when clicking Start Calculation in placeholder', () => {

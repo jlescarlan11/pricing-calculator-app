@@ -6,6 +6,7 @@ export interface Ingredient {
 }
 
 export interface CalculationInput {
+  businessName?: string;
   productName: string;
   batchSize: number;
   ingredients: Ingredient[];

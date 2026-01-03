@@ -81,7 +81,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   const debouncedConfig = useDebounce(config, 500);
 
   // Handlers for Input
-  const handleProductInfoChange = (field: 'productName' | 'batchSize', value: string | number) => {
+  const handleProductInfoChange = (field: 'productName' | 'batchSize' | 'businessName', value: string | number) => {
     setInput(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       const newErrors = { ...errors };
@@ -268,10 +268,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
         <div className="lg:col-span-2 space-y-8">
           {/* Section 1: Product Info */}
           <ProductInfo 
+            businessName={input.businessName}
             productName={input.productName}
             batchSize={input.batchSize}
             onChange={handleProductInfoChange}
             errors={{
+              businessName: errors.businessName,
               productName: errors.productName,
               batchSize: errors.batchSize,
             }}

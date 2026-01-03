@@ -4,16 +4,19 @@ import { Input } from '../shared/Input';
 import { MESSAGES } from '../../constants/app';
 
 interface ProductInfoProps {
+  businessName?: string;
   productName: string;
   batchSize: number;
-  onChange: (field: 'productName' | 'batchSize', value: string | number) => void;
+  onChange: (field: 'productName' | 'batchSize' | 'businessName', value: string | number) => void;
   errors?: {
     productName?: string;
     batchSize?: string;
+    businessName?: string;
   };
 }
 
 export const ProductInfo: React.FC<ProductInfoProps> = ({
+  businessName = '',
   productName,
   batchSize,
   onChange,
@@ -21,7 +24,15 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 }) => {
   return (
     <Card title="Product Details" className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Input
+          label="Business Name (Optional)"
+          value={businessName}
+          onChange={(e) => onChange('businessName', e.target.value)}
+          placeholder="e.g. Maria's Bakery"
+          error={errors.businessName}
+          helperText="Your business name will appear on the printed report."
+        />
         <Input
           label="Product Name"
           value={productName}

@@ -46,6 +46,25 @@ describe('CalculatorForm', () => {
     vi.useRealTimers();
   });
 
+  it('updates business name and saves to session storage', async () => {
+    vi.useFakeTimers();
+    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    
+    const input = screen.getByLabelText(/Business Name/i);
+    fireEvent.change(input, { target: { value: 'My Bakery' } });
+    
+    expect(input).toHaveValue('My Bakery');
+    
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    
+    const storedStr = window.sessionStorage.getItem('pricing_calculator_draft');
+    const stored = JSON.parse(storedStr!);
+    expect(stored.input.businessName).toBe('My Bakery');
+    vi.useRealTimers();
+  });
+
   it('adds and removes ingredients', () => {
     render(<CalculatorForm onCalculate={mockOnCalculate} />);
     
