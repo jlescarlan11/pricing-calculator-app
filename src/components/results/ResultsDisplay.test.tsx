@@ -36,11 +36,17 @@ describe('ResultsDisplay', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock clipboard API
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: vi.fn().mockImplementation(() => Promise.resolve()),
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: vi.fn().mockResolvedValue(undefined),
       },
+      configurable: true,
+      writable: true
     });
+    // Mock isSecureContext
+    vi.stubGlobal('isSecureContext', true);
+    // Mock execCommand for fallback
+    document.execCommand = vi.fn().mockReturnValue(true);
   });
 
   it('renders placeholder when results are null', () => {
