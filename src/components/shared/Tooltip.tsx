@@ -1,4 +1,5 @@
-import React, { useState, useId } from 'react';
+import React, { useState, useId, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 interface TooltipProps {
   content: React.ReactNode;
@@ -7,80 +8,271 @@ interface TooltipProps {
   delay?: number;
 }
 
+interface Coords {
+  top: number;
+  left: number;
+  position: 'top' | 'right' | 'bottom' | 'left';
+}
+
 export const Tooltip: React.FC<TooltipProps> = ({
   content,
   children,
-  position = 'top',
+  position: preferredPosition = 'top',
   delay = 200,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [isTouch, setIsTouch] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [coords, setCoords] = useState<Coords | null>(null);
   const tooltipId = useId();
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const calculatePosition = useCallback((pos: 'top' | 'right' | 'bottom' | 'left'): Coords => {
+    if (!triggerRef.current) return { top: 0, left: 0, position: pos };
+    
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    
+    // We need to know the tooltip dimensions to adjust positioning
+    // Since it might not be rendered yet, we use a placeholder or wait for render
+    // For now, we'll calculate based on trigger and use CSS for centering
+    
+    let top = 0;
+    let left = 0;
+
+    switch (pos) {
+      case 'top':
+        top = triggerRect.top + scrollY;
+        left = triggerRect.left + scrollX + triggerRect.width / 2;
+        break;
+      case 'bottom':
+        top = triggerRect.bottom + scrollY;
+        left = triggerRect.left + scrollX + triggerRect.width / 2;
+        break;
+      case 'left':
+        top = triggerRect.top + scrollY + triggerRect.height / 2;
+        left = triggerRect.left + scrollX;
+        break;
+      case 'right':
+        top = triggerRect.top + scrollY + triggerRect.height / 2;
+        left = triggerRect.right + scrollX;
+        break;
+    }
+
+    return { top, left, position: pos };
+  }, []);
+
+  const updatePosition = useCallback(() => {
+    if (!triggerRef.current || !isVisible) return;
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let finalPos = preferredPosition;
+
+    // Basic boundary detection and flipping
+    if (preferredPosition === 'top' && triggerRect.top < 100) {
+      finalPos = 'bottom';
+    } else if (preferredPosition === 'bottom' && viewportHeight - triggerRect.bottom < 100) {
+      finalPos = 'top';
+    } else if (preferredPosition === 'left' && triggerRect.left < 150) {
+      finalPos = 'right';
+    } else if (preferredPosition === 'right' && viewportWidth - triggerRect.right < 150) {
+      finalPos = 'left';
+    }
+
+    setCoords(calculatePosition(finalPos));
+  }, [calculatePosition, isVisible, preferredPosition]);
 
   const showTooltip = () => {
-    timeoutRef.current = setTimeout(() => setIsVisible(true), delay);
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setIsVisible(true);
+      setIsAnimating(true);
+      
+      // Force position update immediately
+      if (triggerRef.current) {
+        const triggerRect = triggerRef.current.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        let finalPos = preferredPosition;
+
+        // Basic boundary detection and flipping
+        if (preferredPosition === 'top' && triggerRect.top < 100) {
+          finalPos = 'bottom';
+        } else if (preferredPosition === 'bottom' && viewportHeight - triggerRect.bottom < 100) {
+          finalPos = 'top';
+        } else if (preferredPosition === 'left' && triggerRect.left < 150) {
+          finalPos = 'right';
+        } else if (preferredPosition === 'right' && viewportWidth - triggerRect.right < 150) {
+          finalPos = 'left';
+        }
+
+        setCoords(calculatePosition(finalPos));
+      }
+    }, delay);
   };
 
   const hideTooltip = () => {
     clearTimeout(timeoutRef.current);
-    setIsVisible(false);
+    setIsAnimating(false);
+    timeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setCoords(null);
+    }, 150); // Match fade-out duration
   };
 
-  const toggleTooltip = () => {
-    if (isTouch) {
-      setIsVisible(!isVisible);
+  useEffect(() => {
+    if (isVisible) {
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+    }
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isVisible, updatePosition]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node) &&
+        tooltipRef.current &&
+        !tooltipRef.current.contains(event.target as Node)
+      ) {
+        hideTooltip();
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isVisible]);
+
+  const handleTriggerClick = () => {
+    if (isVisible) {
+      hideTooltip();
+    } else {
+      showTooltip();
     }
   };
 
-  const positionClasses = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-sm',
-    right: 'left-full top-1/2 -translate-y-1/2 ml-sm',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-sm',
-    left: 'right-full top-1/2 -translate-y-1/2 mr-sm',
+  const getTooltipStyles = () => {
+    if (!coords) return { opacity: 0 };
+    
+    const baseStyles: React.CSSProperties = {
+      position: 'absolute',
+      top: `${coords.top}px`,
+      left: `${coords.left}px`,
+      transform: '',
+      transition: isAnimating 
+        ? 'opacity 200ms ease-in-out, transform 200ms ease-in-out' 
+        : 'opacity 150ms ease-in-out, transform 150ms ease-in-out',
+      opacity: isAnimating ? 1 : 0,
+    };
+
+    switch (coords.position) {
+      case 'top':
+        baseStyles.transform = `translate(-50%, calc(-100% - 10px)) ${isAnimating ? 'scale(1)' : 'scale(0.95)'}`;
+        break;
+      case 'bottom':
+        baseStyles.transform = `translate(-50%, 10px) ${isAnimating ? 'scale(1)' : 'scale(0.95)'}`;
+        break;
+      case 'left':
+        baseStyles.transform = `translate(calc(-100% - 10px), -50%) ${isAnimating ? 'scale(1)' : 'scale(0.95)'}`;
+        break;
+      case 'right':
+        baseStyles.transform = `translate(10px, -50%) ${isAnimating ? 'scale(1)' : 'scale(0.95)'}`;
+        break;
+    }
+
+    return baseStyles;
   };
 
-  const arrowClasses = {
-    top: 'top-full left-1/2 -translate-x-1/2 border-t-gray-800 border-l-transparent border-r-transparent border-b-transparent',
-    right: 'right-full top-1/2 -translate-y-1/2 border-r-gray-800 border-t-transparent border-b-transparent border-l-transparent',
-    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-gray-800 border-l-transparent border-r-transparent border-t-transparent',
-    left: 'left-full top-1/2 -translate-y-1/2 border-l-gray-800 border-t-transparent border-b-transparent border-r-transparent',
+  const getArrowStyles = () => {
+    if (!coords) return {};
+    
+    const arrowSize = 6;
+    const styles: React.CSSProperties = {
+      position: 'absolute',
+      width: 0,
+      height: 0,
+      borderStyle: 'solid',
+    };
+
+    switch (coords.position) {
+      case 'top':
+        styles.bottom = `-${arrowSize}px`;
+        styles.left = '50%';
+        styles.transform = 'translateX(-50%)';
+        styles.borderWidth = `${arrowSize}px ${arrowSize}px 0 ${arrowSize}px`;
+        styles.borderColor = '#3A3632 transparent transparent transparent';
+        break;
+      case 'bottom':
+        styles.top = `-${arrowSize}px`;
+        styles.left = '50%';
+        styles.transform = 'translateX(-50%)';
+        styles.borderWidth = `0 ${arrowSize}px ${arrowSize}px ${arrowSize}px`;
+        styles.borderColor = 'transparent transparent #3A3632 transparent';
+        break;
+      case 'left':
+        styles.right = `-${arrowSize}px`;
+        styles.top = '50%';
+        styles.transform = 'translateY(-50%)';
+        styles.borderWidth = `${arrowSize}px 0 ${arrowSize}px ${arrowSize}px`;
+        styles.borderColor = 'transparent transparent transparent #3A3632';
+        break;
+      case 'right':
+        styles.left = `-${arrowSize}px`;
+        styles.top = '50%';
+        styles.transform = 'translateY(-50%)';
+        styles.borderWidth = `${arrowSize}px ${arrowSize}px ${arrowSize}px 0`;
+        styles.borderColor = 'transparent #3A3632 transparent transparent';
+        break;
+    }
+
+    return styles;
   };
 
   return (
-    <div
-      className="relative inline-block"
-      onMouseEnter={() => {
-        setIsTouch(false);
-        showTooltip();
-      }}
-      onMouseLeave={hideTooltip}
-      onTouchStart={() => setIsTouch(true)}
-      onClick={toggleTooltip}
-      onFocus={showTooltip}
-      onBlur={hideTooltip}
-    >
-      {React.cloneElement(children as React.ReactElement, {
-        'aria-describedby': tooltipId,
-      } as Record<string, unknown>)}
-      
+    <>
       <div
-        id={tooltipId}
-        role="tooltip"
-        className={`absolute z-50 whitespace-nowrap rounded-sm bg-gray-800 px-sm py-xs text-xs text-white shadow-level-4 transition-all duration-200 ease-in-out ${
-          positionClasses[position]
-        } ${
-          isVisible
-            ? 'visible opacity-100 scale-100'
-            : 'invisible opacity-0 scale-95'
-        }`}
+        ref={triggerRef}
+        className="inline-block"
+        onMouseEnter={showTooltip}
+        onMouseLeave={hideTooltip}
+        onClick={handleTriggerClick}
+        onFocus={showTooltip}
+        onBlur={hideTooltip}
       >
-        {content}
-        {/* Arrow */}
-        <div
-          className={`absolute border-4 ${arrowClasses[position]}`}
-        ></div>
+        {React.cloneElement(children as React.ReactElement, {
+          'aria-describedby': isVisible ? tooltipId : undefined,
+        } as Record<string, unknown>)}
       </div>
-    </div>
+
+      {isVisible && createPortal(
+        <div
+          ref={tooltipRef}
+          id={tooltipId}
+          role="tooltip"
+          className="pointer-events-none z-[9999] w-max max-w-[280px] whitespace-normal break-words rounded-[6px] bg-[#3A3632] px-[12px] py-[8px] text-[13px] font-sans leading-[1.4] text-[#FAFAF9] shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+          style={getTooltipStyles()}
+        >
+          {content}
+          <div style={getArrowStyles()} aria-hidden="true" />
+        </div>,
+        document.body
+      )}
+    </>
   );
 };

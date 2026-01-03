@@ -216,6 +216,8 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Floating Action Button (FAB)**: Added a "Package" icon FAB in the bottom-right for quick access to saved products.
 - [x] **Minimalist Layout**: Simplified `AppLayout` and `Header` by removing sidebar-specific logic and UI elements, maximizing workspace "Ma" (Negative Space).
 - [x] **Test Suite Update**: Refactored `AppLayout.test.tsx` and `Header.test.tsx` to reflect the new layout structure.
+- [x] **Tooltip Redesign**: Overhauled the Tooltip component using React Portals, custom animations, and viewport boundary detection for a more robust and visually polished experience. (Added 2026-01-03)
+- [x] **Artisanal UI Touches**: Added a dashed ("chopped") border to the "Add Ingredient" button to match the handmade/artisanal theme. (Added 2026-01-03)
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 
@@ -223,5 +225,6 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - **Tooltip Component**:
   - Replaced `NodeJS.Timeout` with `ReturnType<typeof setTimeout>` to avoid namespace issues in browser environments.
   - Cast props in `React.cloneElement` to `any` (e.g., `{ 'aria-describedby': tooltipId } as any`) to resolve strict type checking errors with `aria-describedby` on generic `ReactElement`.
+  - Implemented Portal-based rendering and manual position calculation to resolve clipping issues at card boundaries. (Updated 2026-01-03)
 - **Modal Component Test**:
   - Fixed a timeout issue in `Modal.test.tsx` ("restores body scroll when closed") by removing `waitFor` (which conflicts with `vi.useFakeTimers` in this context) and using direct assertions after manually advancing timers with `vi.advanceTimersByTime`.

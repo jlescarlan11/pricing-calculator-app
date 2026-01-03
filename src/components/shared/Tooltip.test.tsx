@@ -5,10 +5,23 @@ import { Tooltip } from './Tooltip';
 describe('Tooltip', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    // Mock getBoundingClientRect
+    Element.prototype.getBoundingClientRect = vi.fn(() => ({
+      width: 100,
+      height: 40,
+      top: 100,
+      left: 100,
+      bottom: 140,
+      right: 200,
+      x: 100,
+      y: 100,
+      toJSON: () => {},
+    }));
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.clearAllMocks();
   });
 
   it('renders children correctly', () => {
@@ -20,7 +33,7 @@ describe('Tooltip', () => {
     expect(screen.getByRole('button', { name: /trigger/i })).toBeInTheDocument();
   });
 
-  it('shows tooltip on hover after delay', () => {
+  it('shows tooltip on hover after delay', async () => {
     render(
       <Tooltip content="Tooltip text" delay={200}>
         <button>Trigger</button>
@@ -29,9 +42,8 @@ describe('Tooltip', () => {
 
     const trigger = screen.getByRole('button', { name: /trigger/i });
     
-    // Initial state: hidden
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
-    expect(tooltip).toHaveClass('invisible');
+    // Initial state: not in document (conditional rendering)
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
     // Hover
     fireEvent.mouseEnter(trigger);
@@ -40,14 +52,18 @@ describe('Tooltip', () => {
     act(() => {
         vi.advanceTimersByTime(100);
     });
-    expect(tooltip).toHaveClass('invisible');
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
     // After delay
     act(() => {
         vi.advanceTimersByTime(100);
     });
-    expect(tooltip).toHaveClass('visible');
+    
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toBeInTheDocument();
     expect(tooltip).toHaveTextContent('Tooltip text');
+    // Check for opacity 1 (isAnimating true)
+    expect(tooltip.style.opacity).toBe('1');
   });
 
   it('hides tooltip on mouse leave', () => {
@@ -58,16 +74,24 @@ describe('Tooltip', () => {
     );
 
     const trigger = screen.getByRole('button', { name: /trigger/i });
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
-
+    
     fireEvent.mouseEnter(trigger);
     act(() => {
         vi.runAllTimers();
     });
-    expect(tooltip).toHaveClass('visible');
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
 
     fireEvent.mouseLeave(trigger);
-    expect(tooltip).toHaveClass('invisible');
+    
+    // Immediately after mouseLeave, isAnimating should be false but still in DOM
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip.style.opacity).toBe('0');
+
+    // After fade-out duration
+    act(() => {
+        vi.advanceTimersByTime(150);
+    });
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
   it('shows tooltip on focus and hides on blur', () => {
@@ -78,85 +102,82 @@ describe('Tooltip', () => {
     );
 
     const trigger = screen.getByRole('button', { name: /trigger/i });
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
 
     fireEvent.focus(trigger);
     act(() => {
         vi.runAllTimers();
     });
-    expect(tooltip).toHaveClass('visible');
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
 
     fireEvent.blur(trigger);
-    expect(tooltip).toHaveClass('invisible');
+    act(() => {
+        vi.advanceTimersByTime(150);
+    });
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
-  it('has correct accessibility attributes', () => {
+  it('has correct accessibility attributes when visible', () => {
     render(
-      <Tooltip content="Tooltip text">
-        <button>Trigger</button>
-      </Tooltip>
-    );
-
-    const trigger = screen.getByRole('button', { name: /trigger/i });
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
-    
-    expect(trigger).toHaveAttribute('aria-describedby', tooltip.id);
-  });
-
-  it('applies correct position classes', () => {
-    const { rerender } = render(
-      <Tooltip content="Tooltip text" position="top">
-        <button>Trigger</button>
-      </Tooltip>
-    );
-    
-    let tooltip = screen.getByRole('tooltip', { hidden: true });
-    expect(tooltip.className).toContain('bottom-full');
-
-    rerender(
-      <Tooltip content="Tooltip text" position="right">
-        <button>Trigger</button>
-      </Tooltip>
-    );
-    tooltip = screen.getByRole('tooltip', { hidden: true });
-    expect(tooltip.className).toContain('left-full');
-
-    rerender(
-      <Tooltip content="Tooltip text" position="bottom">
-        <button>Trigger</button>
-      </Tooltip>
-    );
-    tooltip = screen.getByRole('tooltip', { hidden: true });
-    expect(tooltip.className).toContain('top-full');
-
-    rerender(
-      <Tooltip content="Tooltip text" position="left">
-        <button>Trigger</button>
-      </Tooltip>
-    );
-    tooltip = screen.getByRole('tooltip', { hidden: true });
-    expect(tooltip.className).toContain('right-full');
-  });
-  
-  it('toggles on click (simulating touch)', () => {
-      render(
       <Tooltip content="Tooltip text" delay={0}>
         <button>Trigger</button>
       </Tooltip>
     );
 
     const trigger = screen.getByRole('button', { name: /trigger/i });
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
-
-    // Simulate touch start to set isTouch flag
-    fireEvent.touchStart(trigger);
     
+    fireEvent.focus(trigger);
+    act(() => {
+        vi.runAllTimers();
+    });
+    
+    const tooltip = screen.getByRole('tooltip');
+    expect(trigger).toHaveAttribute('aria-describedby', tooltip.id);
+  });
+
+  it('toggles on click', () => {
+    render(
+      <Tooltip content="Tooltip text" delay={0}>
+        <button>Trigger</button>
+      </Tooltip>
+    );
+
+    const trigger = screen.getByRole('button', { name: /trigger/i });
+
     // First click shows it
     fireEvent.click(trigger);
-    expect(tooltip).toHaveClass('visible');
+    act(() => {
+        vi.runAllTimers();
+    });
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
     
     // Second click hides it
     fireEvent.click(trigger);
-    expect(tooltip).toHaveClass('invisible');
+    act(() => {
+        vi.advanceTimersByTime(150);
+    });
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+
+  it('hides on click outside', () => {
+    render(
+      <Tooltip content="Tooltip text" delay={0}>
+        <button>Trigger</button>
+      </Tooltip>
+    );
+
+    const trigger = screen.getByRole('button', { name: /trigger/i });
+
+    fireEvent.click(trigger);
+    act(() => {
+        vi.runAllTimers();
+    });
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
+
+    // Click elsewhere in document
+    fireEvent.mouseDown(document.body);
+    act(() => {
+        vi.advanceTimersByTime(150);
+    });
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 });

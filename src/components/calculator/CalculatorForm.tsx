@@ -262,35 +262,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
                         
 
-                                                  <Button
-
-                        
-
-                                                    variant="ghost"
-
-                        
-
-                                                    onClick={onAddIngredient}
-
-                        
-
-                                                    className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 transition-all duration-300"
-
-                        
-
-                                                  >
-
-                        
-
-                                                    <Plus className="w-5 h-5" />
-
-                        
-
-                                                    Add Ingredient
-
-                        
-
-                                                  </Button>
+                          <Button
+                            variant="ghost"
+                            onClick={onAddIngredient}
+                            className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 border-2 border-dashed border-border-base transition-all duration-300"
+                          >
+                            <Plus className="w-5 h-5" />
+                            Add Ingredient
+                          </Button>
 
                         
 
