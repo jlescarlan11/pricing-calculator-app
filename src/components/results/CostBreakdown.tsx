@@ -52,13 +52,13 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ results, className
         </div>
 
         {/* Visual Bar Chart */}
-        <div className="h-4 w-full flex rounded-round overflow-hidden bg-surface border border-border-subtle p-[2px]">
+        <div className="h-4 w-full flex rounded-md overflow-hidden bg-surface border border-border-subtle p-[2px]">
           {categories.map((category) => {
             const percentage = totalCost > 0 ? (category.value / totalCost) * 100 : 0;
             return (
               <div
                 key={category.label}
-                className={`h-full ${category.color} transition-all duration-1000 ease-out first:rounded-l-round last:rounded-r-round`}
+                className={`h-full ${category.color} transition-all duration-1000 ease-out first:rounded-l-sm last:rounded-r-sm`}
                 style={{ width: `${percentage}%` }}
                 title={`${category.label}: ${formatPercent(percentage)}`}
               />
