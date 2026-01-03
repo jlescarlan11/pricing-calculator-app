@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Plus, Calculator, Trash2, RefreshCcw } from 'lucide-react';
 import { 
   ProductInfo, 
@@ -10,216 +10,61 @@ import {
 } from './index';
 import { SavePresetButton } from '../presets/SavePresetButton';
 import { Button, Card } from '../shared';
-import { useSessionStorage, useDebounce } from '../../hooks';
 import { performFullCalculation } from '../../utils/calculations';
-import { 
-  validateProductName, 
-  validateBatchSize, 
-  validateIngredients, 
-  validatePositiveNumber,
-} from '../../utils/validation';
 import type { 
   CalculationInput, 
   PricingConfig, 
-  CalculationResult, 
   Ingredient 
 } from '../../types/calculator';
 
-const SESSION_STORAGE_KEY = 'pricing_calculator_draft';
-
-const initialInput: CalculationInput = {
-  productName: '',
-  batchSize: 1,
-  ingredients: [{ id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }],
-  laborCost: 0,
-  overhead: 0,
-};
-
-const initialConfig: PricingConfig = {
-  strategy: 'markup',
-  value: 50,
-};
-
 interface CalculatorFormProps {
-  onCalculate: (result: CalculationResult, input: CalculationInput, config: PricingConfig) => void;
-  onReset?: () => void;
-  initialInput?: CalculationInput;
-  initialConfig?: PricingConfig;
+  input: CalculationInput;
+  config: PricingConfig;
+  errors: Record<string, string>;
+  isCalculating: boolean;
+  onUpdateInput: (updates: Partial<CalculationInput>) => void;
+  onUpdateIngredient: (id: string, field: keyof Ingredient, value: string | number) => void;
+  onAddIngredient: () => void;
+  onRemoveIngredient: (id: string) => void;
+  onUpdateConfig: (updates: Partial<PricingConfig>) => void;
+  onCalculate: () => void;
+  onReset: () => void;
 }
 
 export const CalculatorForm: React.FC<CalculatorFormProps> = ({ 
+  input,
+  config,
+  errors,
+  isCalculating,
+  onUpdateInput,
+  onUpdateIngredient,
+  onAddIngredient,
+  onRemoveIngredient,
+  onUpdateConfig,
   onCalculate,
   onReset,
-  initialInput: propInitialInput,
-  initialConfig: propInitialConfig
 }) => {
-  // Persistence using sessionStorage
-  const [draft, setDraft] = useSessionStorage<{
-    input: CalculationInput;
-    config: PricingConfig;
-  }>(SESSION_STORAGE_KEY, {
-    input: initialInput,
-    config: initialConfig,
-  });
+  // Local state for UI only (like which ingredient is being focused, or hover states)
+  // But business logic state is now passed as props.
 
-  // Use props if provided, otherwise draft (sessionStorage)
-  const [input, setInput] = useState<CalculationInput>(propInitialInput || draft.input);
-  const [config, setConfig] = useState<PricingConfig>(propInitialConfig || draft.config);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isCalculating, setIsCalculating] = useState(false);
-
-  // Auto-save to sessionStorage with a small delay to avoid loops
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setDraft({ input, config });
-    }, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [input, config, setDraft]);
-
-  // Debounced input for real-time background calculations (if we wanted to show previews)
-  const debouncedInput = useDebounce(input, 500);
-  const debouncedConfig = useDebounce(config, 500);
-
-  // Handlers for Input
   const handleProductInfoChange = (field: 'productName' | 'batchSize' | 'businessName', value: string | number) => {
-    setInput(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      const newErrors = { ...errors };
-      delete newErrors[field];
-      setErrors(newErrors);
-    }
-  };
-
-  const handleIngredientUpdate = (id: string, field: keyof Ingredient, value: string | number) => {
-    setInput(prev => ({
-      ...prev,
-      ingredients: prev.ingredients.map(ing => 
-        ing.id === id ? { ...ing, [field]: value } : ing
-      )
-    }));
-    // Clear related error
-    const errorKey = `ingredients.${id}.${field}`;
-    if (errors[errorKey] || errors['ingredients']) {
-      const newErrors = { ...errors };
-      delete newErrors[errorKey];
-      delete newErrors['ingredients'];
-      setErrors(newErrors);
-    }
-  };
-
-  const handleAddIngredient = () => {
-    setInput(prev => ({
-      ...prev,
-      ingredients: [
-        ...prev.ingredients,
-        { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }
-      ]
-    }));
-  };
-
-  const handleRemoveIngredient = (id: string) => {
-    setInput(prev => ({
-      ...prev,
-      ingredients: prev.ingredients.filter(ing => ing.id !== id)
-    }));
+    onUpdateInput({ [field]: value });
   };
 
   const handleLaborChange = (value: number) => {
-    setInput(prev => ({ ...prev, laborCost: value }));
-    if (errors['laborCost']) {
-      const newErrors = { ...errors };
-      delete newErrors['laborCost'];
-      setErrors(newErrors);
-    }
+    onUpdateInput({ laborCost: value });
   };
 
   const handleOverheadChange = (value: number) => {
-    setInput(prev => ({ ...prev, overhead: value }));
-    if (errors['overhead']) {
-      const newErrors = { ...errors };
-      delete newErrors['overhead'];
-      setErrors(newErrors);
-    }
+    onUpdateInput({ overhead: value });
   };
 
   const handlePricingChange = (strategy: PricingConfig['strategy'], value: number) => {
-    setConfig({ strategy, value });
+    onUpdateConfig({ strategy, value });
   };
 
   const handleCurrentPriceChange = (value?: number) => {
-    setInput(prev => ({ ...prev, currentSellingPrice: value }));
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    const nameErr = validateProductName(input.productName);
-    if (nameErr) newErrors.productName = nameErr.message;
-
-    const batchErr = validateBatchSize(input.batchSize);
-    if (batchErr) newErrors.batchSize = batchErr.message;
-
-    const ingErrs = validateIngredients(input.ingredients);
-    ingErrs.forEach(err => {
-      // Mapping field like "ingredients[0].name" to our local state keys
-      // Extract index and field from "ingredients[index].field"
-      const match = err.field.match(/ingredients\[(\d+)\]\.(\w+)/);
-      if (match) {
-        const index = parseInt(match[1]);
-        const field = match[2];
-        const id = input.ingredients[index].id;
-        newErrors[`ingredients.${id}.${field}`] = err.message;
-      } else {
-        newErrors[err.field] = err.message;
-      }
-    });
-
-    validatePositiveNumber(input.laborCost, 'Labor cost');
-    // Note: Labor can be 0 if the owner doesn't pay themselves (though we advise against it)
-    // The utility validatePositiveNumber checks > 0. If 0 is allowed, we'd need another utility.
-    // For MVP, let's allow 0 but maybe warn. The utility currently returns error for 0.
-    // Let's only validate if it's less than 0 or NaN.
-    if (input.laborCost < 0 || isNaN(input.laborCost)) {
-      newErrors.laborCost = 'Labor cost must be a valid number.';
-    }
-
-    if (input.overhead < 0 || isNaN(input.overhead)) {
-      newErrors.overhead = 'Overhead must be a valid number.';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleCalculate = async () => {
-    if (!validateForm()) {
-      // Scroll to first error? For now just stop.
-      return;
-    }
-
-    setIsCalculating(true);
-    
-    // Skip artificial delay in test environment
-    if (import.meta.env.MODE !== 'test') {
-      await new Promise(resolve => setTimeout(resolve, 600));
-    }
-
-    const result = performFullCalculation(input, config);
-    onCalculate(result, input, config);
-    setIsCalculating(false);
-    
-    // Smooth scroll to top or results area? 
-    // Parent will handle showing results.
-  };
-
-  const handleReset = () => {
-    if (confirm('Are you sure you want to clear the form? This will remove all your progress.')) {
-      setInput(initialInput);
-      setConfig(initialConfig);
-      setErrors({});
-      window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
-      if (onReset) onReset();
-    }
+    onUpdateInput({ currentSellingPrice: value });
   };
 
   const isFormValid = 
@@ -245,7 +90,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           />
           <Button 
             variant="secondary" 
-            onClick={handleReset} 
+            onClick={onReset} 
             className="flex-1 sm:flex-none flex items-center gap-2"
           >
             <RefreshCcw className="w-4 h-4" />
@@ -253,7 +98,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           </Button>
           <Button 
             variant="primary" 
-            onClick={handleCalculate} 
+            onClick={onCalculate} 
             isLoading={isCalculating}
             className="flex-1 sm:flex-none flex items-center gap-2 shadow-lg shadow-blue-200"
           >
@@ -305,9 +150,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                     ingredient={ing}
                     index={index}
                     isOnlyRow={input.ingredients.length === 1}
-                    onUpdate={handleIngredientUpdate}
-                    onRemove={handleRemoveIngredient}
-                    onAdd={handleAddIngredient}
+                    onUpdate={onUpdateIngredient}
+                    onRemove={onRemoveIngredient}
+                    onAdd={onAddIngredient}
                     autoFocus={index === input.ingredients.length - 1 && index > 0}
                     errors={{
                       name: errors[`ingredients.${ing.id}.name`],
@@ -320,7 +165,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
               <Button
                 variant="secondary"
-                onClick={handleAddIngredient}
+                onClick={onAddIngredient}
                 className="w-full mt-4 border-dashed border-2 py-4 flex items-center justify-center gap-2 hover:border-blue-400 hover:text-blue-600 transition-all"
               >
                 <Plus className="w-5 h-5" />
@@ -353,7 +198,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             value={config.value}
             costPerUnit={
               // Background calculation for preview
-              performFullCalculation(debouncedInput, debouncedConfig).costPerUnit
+              performFullCalculation(input, config).costPerUnit
             }
             onChange={handlePricingChange}
           />
@@ -368,7 +213,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           <div className="fixed bottom-6 right-6 lg:hidden z-30">
             <Button
               variant="primary"
-              onClick={handleCalculate}
+              onClick={onCalculate}
               isLoading={isCalculating}
               className="rounded-full w-16 h-16 shadow-2xl flex items-center justify-center p-0"
               aria-label="Calculate Results"

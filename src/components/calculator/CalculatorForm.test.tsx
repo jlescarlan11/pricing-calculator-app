@@ -1,6 +1,39 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CalculatorForm } from './CalculatorForm';
+import { useCalculatorState } from '../../hooks/useCalculatorState';
+import type { CalculationInput, PricingConfig } from '../../types/calculator';
+
+const TestWrapper = ({ 
+  onCalculate, 
+  initialInput, 
+  initialConfig 
+}: { 
+  onCalculate?: any; 
+  initialInput?: CalculationInput;
+  initialConfig?: PricingConfig;
+}) => {
+  const state = useCalculatorState({ input: initialInput, config: initialConfig });
+  return (
+    <CalculatorForm 
+      {...state} 
+      onUpdateInput={state.updateInput}
+      onUpdateIngredient={state.updateIngredient}
+      onAddIngredient={state.addIngredient}
+      onRemoveIngredient={state.removeIngredient}
+      onUpdateConfig={state.updateConfig}
+      onCalculate={async () => {
+        const res = await state.calculate();
+        if (res && onCalculate) onCalculate(res, state.input, state.config);
+      }}
+      onReset={() => {
+        if (window.confirm('Are you sure you want to clear the form? This will remove all your progress.')) {
+          state.reset();
+        }
+      }}
+    />
+  );
+};
 
 describe('CalculatorForm', () => {
   const mockOnCalculate = vi.fn();
@@ -15,7 +48,7 @@ describe('CalculatorForm', () => {
   });
 
   it('renders all sub-components', () => {
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     expect(screen.getByText('Product Details')).toBeInTheDocument();
     expect(screen.getByText('Ingredients')).toBeInTheDocument();
@@ -26,7 +59,7 @@ describe('CalculatorForm', () => {
 
   it('updates product name and saves to session storage', async () => {
     vi.useFakeTimers();
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     const input = screen.getByLabelText(/Product Name/i);
     fireEvent.change(input, { target: { value: 'New Product' } });
@@ -48,7 +81,7 @@ describe('CalculatorForm', () => {
 
   it('updates business name and saves to session storage', async () => {
     vi.useFakeTimers();
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     const input = screen.getByLabelText(/Business Name/i);
     fireEvent.change(input, { target: { value: 'My Bakery' } });
@@ -66,7 +99,7 @@ describe('CalculatorForm', () => {
   });
 
   it('adds and removes ingredients', () => {
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     const addButton = screen.getByText(/Add Ingredient/i);
     fireEvent.click(addButton);
@@ -80,7 +113,7 @@ describe('CalculatorForm', () => {
   });
 
   it('triggers validation on calculate click', async () => {
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
@@ -90,7 +123,7 @@ describe('CalculatorForm', () => {
   });
 
   it('performs calculation when form is valid', async () => {
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'Valid Product' } });
     fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
@@ -141,7 +174,7 @@ describe('CalculatorForm', () => {
     };
     window.sessionStorage.setItem('pricing_calculator_draft', JSON.stringify(draft));
     
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Saved Draft');
     expect(screen.getByLabelText(/Batch Size/i)).toHaveValue(24);
@@ -149,7 +182,7 @@ describe('CalculatorForm', () => {
   });
 
   it('clears form when reset is clicked', () => {
-    render(<CalculatorForm onCalculate={mockOnCalculate} />);
+    render(<TestWrapper onCalculate={mockOnCalculate} />);
     fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'To Be Cleared' } });
     
     const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true);
@@ -157,108 +190,31 @@ describe('CalculatorForm', () => {
     const clearBtn = screen.getByRole('button', { name: /Clear/i });
     fireEvent.click(clearBtn);
     
-        expect(confirmSpy).toHaveBeenCalled();
-    
-        expect(screen.getByLabelText(/Product Name/i)).toHaveValue('');
-    
-        expect(window.sessionStorage.getItem('pricing_calculator_draft')).toBeNull();
-    
-      });
-    
-    
-    
-        it('populates state when initialInput and initialConfig props are provided', () => {
-    
-    
-    
-          const input = {
-    
-    
-    
-            productName: 'Initial Product',
-    
-    
-    
-            batchSize: 100,
-    
-    
-    
-            ingredients: [{ id: 'ext-1', name: 'Ext Ing', amount: 50, cost: 10 }],
-    
-    
-    
-            laborCost: 100,
-    
-    
-    
-            overhead: 50
-    
-    
-    
-          };
-    
-    
-    
-          const config = { strategy: 'markup', value: 20 } as const;
-    
-    
-    
-          
-    
-    
-    
-          render(
-    
-    
-    
-            <CalculatorForm 
-    
-    
-    
-              onCalculate={mockOnCalculate} 
-    
-    
-    
-              initialInput={input} 
-    
-    
-    
-              initialConfig={config} 
-    
-    
-    
-            />
-    
-    
-    
-          );
-    
-    
-    
-          
-    
-    
-    
-          expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Initial Product');
-    
-    
-    
-          expect(screen.getByLabelText(/Batch Size/i)).toHaveValue(100);
-    
-    
-    
-          expect(screen.getByLabelText(/Ingredient Name/i)).toHaveValue('Ext Ing');
-    
-    
-    
-        });
-    
-    
-    
-      });
-    
-    
-    
-      
-    
-    
+    expect(confirmSpy).toHaveBeenCalled();
+    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('');
+    expect(window.sessionStorage.getItem('pricing_calculator_draft')).toBeNull();
+  });
+
+  it('populates state when initialInput and initialConfig props are provided', () => {
+    const input = {
+      productName: 'Initial Product',
+      batchSize: 100,
+      ingredients: [{ id: 'ext-1', name: 'Ext Ing', amount: 50, cost: 10 }],
+      laborCost: 100,
+      overhead: 50
+    };
+    const config = { strategy: 'markup', value: 20 } as const;
+    
+    render(
+      <TestWrapper 
+        onCalculate={mockOnCalculate} 
+        initialInput={input} 
+        initialConfig={config} 
+      />
+    );
+    
+    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Initial Product');
+    expect(screen.getByLabelText(/Batch Size/i)).toHaveValue(100);
+    expect(screen.getByLabelText(/Ingredient Name/i)).toHaveValue('Ext Ing');
+  });
+});

@@ -79,11 +79,15 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 ## 6. Progress Tracking
 
-### Hooks
-- [x] **usePresets**: Custom hook for managing an array of saved calculation presets in sessionStorage. Supports adding, updating, deleting, and retrieving presets with automatic ID generation and timestamping. (Added 2026-01-03)
-  - File: `src/hooks/use-presets.ts`
-  - Tests: `src/hooks/use-presets.test.ts`
-  - Exported from `src/hooks/index.ts`
+### Routing & Pages (Added 2026-01-03)
+- [x] **Client-side Routing**: Configured `react-router-dom` with `BrowserRouter` and defined routes for `/`, `/help`, and `/faq`.
+- [x] **CalculatorPage**: Main route containing the pricing calculator logic and state management.
+- [x] **HelpPage**: Educational route explaining pricing strategies (Markup vs Margin) using the `PricingGuide` component.
+- [x] **FAQPage**: Information route for common pricing questions and tips.
+
+### Components
+- [x] **PricingGuide**: Extracted from `PricingExplainerModal` to be reused in both the modal and the standalone Help page. (Added 2026-01-03)
+
 
 ### Constants
 - [x] **TOOLTIPS**: A library of concise, user-friendly tooltip descriptions for all calculator input fields. (Added 2026-01-03)
@@ -156,6 +160,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/presets/SavePresetModal.tsx`
   - Tests: `src/components/presets/SavePresetModal.test.tsx`
   - Exported from `src/components/presets/index.ts`
+- [x] **AppLayout**: Responsive application layout with a sticky header, toggleable sidebar for desktop/mobile, main content area, and versioned footer. (Added 2026-01-03)
+  - File: `src/components/layout/AppLayout.tsx`
+  - Tests: `src/components/layout/AppLayout.test.tsx`
+  - Exported from `src/components/layout/index.ts`
 - [x] **PricingExplainerModal**: Tabbed educational modal explaining Markup and Margin strategies with visual examples, pros/cons, and a comparison table. (Added 2026-01-03)
   - File: `src/components/help/PricingExplainerModal.tsx`
   - Tests: `src/components/help/PricingExplainerModal.test.tsx`
