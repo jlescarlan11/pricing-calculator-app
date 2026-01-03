@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Check, X, Info, TrendingUp, BarChart3, ArrowRight } from 'lucide-react';
 import { Button } from '../shared/Button';
 import { Badge } from '../shared/Badge';
-import { formatCurrency } from '../../utils/formatters';
 
 interface PricingGuideProps {
   onAction?: () => void;
@@ -16,16 +15,6 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
   initialTab = 'markup',
 }) => {
   const [activeTab, setActiveTab] = useState<'markup' | 'margin'>(initialTab);
-
-  const cost = 100;
-  const markupPercent = 50;
-  const marginPercent = 50;
-
-  const markupPrice = cost * (1 + markupPercent / 100);
-  const markupProfit = markupPrice - cost;
-
-  const marginPrice = cost / (1 - marginPercent / 100);
-  const marginProfit = marginPrice - cost;
 
   return (
     <div className="space-y-xl">

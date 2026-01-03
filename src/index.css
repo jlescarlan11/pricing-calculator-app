@@ -90,12 +90,12 @@
     50% { transform: scale(1.05); opacity: 0.9; }
     100% { transform: scale(1); opacity: 1; }
   }
-  .animate-pulse-once {
-    animation: pulse-once 0.8s cubic-bezier(0.4, 0, 0.6, 1);
-  }
 }
 
 @layer components {
+  .animate-pulse-once {
+    animation: pulse-once 0.8s cubic-bezier(0.4, 0, 0.6, 1);
+  }
   /* Subtle paper/linen texture overlay */
   .paper-texture {
     @apply fixed inset-0 pointer-events-none z-0;

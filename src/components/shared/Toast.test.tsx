@@ -1,5 +1,5 @@
 import { render, screen, act, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ToastProvider, useToast } from './Toast';
 
 const TestComponent = ({ message, type }: { message: string; type?: any }) => {

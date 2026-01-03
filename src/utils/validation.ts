@@ -17,7 +17,6 @@ export const validatePositiveNumber = (value: number, fieldName: string): Valida
 };
 
 export const validateBatchSize = (value: number): ValidationError | null => {
-  const fieldName = 'Batch size';
   if (value === null || value === undefined || isNaN(value)) {
     return { field: 'batchSize', message: 'Please enter a valid batch size.' };
   }
@@ -88,7 +87,6 @@ export const validatePresetName = (name: string, existingNames: string[]): Valid
   }
   
   const trimmedName = name.trim();
-  const fieldName = 'Preset name';
 
   if (trimmedName.length < 3 || trimmedName.length > 50) {
     return { field: 'name', message: `Try a name between 3 and 50 characters.` };

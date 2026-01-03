@@ -1,7 +1,6 @@
 import React from 'react';
-import { Card } from '../shared/Card';
 import type { CalculationResult } from '../../types/calculator';
-import { formatCurrency, formatPercent } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 interface CostBreakdownProps {
   results: CalculationResult;

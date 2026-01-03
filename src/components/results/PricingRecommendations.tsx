@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '../shared/Card';
 import { Badge } from '../shared/Badge';
 import type { BadgeVariant } from '../shared/Badge';
 import type { CalculationResult } from '../../types/calculator';

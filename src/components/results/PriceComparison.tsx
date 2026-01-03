@@ -1,6 +1,5 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, CheckCircle, ArrowRight } from 'lucide-react';
-import { Card } from '../shared/Card';
 import { formatCurrency } from '../../utils/formatters';
 
 interface PriceComparisonProps {
