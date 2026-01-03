@@ -14,22 +14,22 @@ export const DataWarningBanner: React.FC = () => {
 
   return (
     <div 
-      className="bg-amber-50 border-b border-amber-200"
+      className="bg-sakura/10 border-b border-sakura/20"
       role="alert"
       aria-live="polite"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="shrink-0">
-              <AlertTriangle className="h-5 w-5 text-amber-600" aria-hidden="true" />
+      <div className="max-w-7xl mx-auto px-lg sm:px-xl lg:px-2xl py-md">
+        <div className="flex items-center justify-between gap-lg">
+          <div className="flex items-center gap-md">
+            <div className="shrink-0 p-xs bg-sakura/20 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-ink-700" aria-hidden="true" />
             </div>
-            <p className="text-sm font-medium text-amber-800">
+            <p className="text-sm font-medium text-ink-900 leading-relaxed">
               <span className="md:hidden">
-                Data is session-only. It will be lost on tab close or clear.
+                Session data only. Saved until tab close.
               </span>
               <span className="hidden md:inline">
-                Your data is only saved in this browser session. It will be lost if you close this tab or clear your browser.
+                Your progress is temporary. Data will be cleared when you close this tab.
               </span>
             </p>
           </div>
@@ -37,7 +37,7 @@ export const DataWarningBanner: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsVisible(false)}
-              className="p-1.5 rounded-md text-amber-500 hover:text-amber-600 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
+              className="p-sm rounded-lg text-ink-500 hover:text-ink-900 hover:bg-sakura/20 focus:outline-none transition-all duration-300"
               aria-label="Dismiss warning"
             >
               <X className="h-4 w-4" />

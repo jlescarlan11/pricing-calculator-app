@@ -68,7 +68,7 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
           size={size}
           onClick={handleOpenModal}
           disabled={disabled}
-          className={`flex items-center gap-2 ${className}`}
+          className={`flex items-center gap-sm ${className}`}
           type="button"
           aria-label="Save current calculation as preset"
         >

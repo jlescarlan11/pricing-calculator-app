@@ -72,7 +72,7 @@ describe('ShareResults', () => {
     });
 
     expect(navigator.clipboard.writeText).toHaveBeenCalled();
-    expect(screen.getByText(/Copied to Clipboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Copied/i)).toBeInTheDocument();
   });
 
   it('triggers window.print when Print Results is clicked', () => {

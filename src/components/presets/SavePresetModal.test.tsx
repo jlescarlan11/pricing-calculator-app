@@ -48,7 +48,7 @@ describe('SavePresetModal', () => {
       />
     );
 
-    expect(screen.getByText(/Save as Preset/i)).toBeInTheDocument();
+    expect(screen.getByText(/Save to Presets/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Test Product');
     expect(screen.getByText(/Calculation Summary/i)).toBeInTheDocument();
     
@@ -148,7 +148,7 @@ describe('SavePresetModal', () => {
       vi.advanceTimersByTime(100);
     });
 
-    expect(screen.getByText(/Saved Successfully!/i)).toBeInTheDocument();
+    expect(screen.getByText(/Saved Successfully/i)).toBeInTheDocument();
 
     expect(mockAddPreset).toHaveBeenCalledWith({
       name: 'Test Product',

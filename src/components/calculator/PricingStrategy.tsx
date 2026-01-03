@@ -53,29 +53,29 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
     <Card 
       title={
         <div className="flex items-center justify-between w-full">
-          <h3 className="text-lg font-bold text-gray-900">Pricing Strategy</h3>
+          <h3 className="text-lg text-ink-900">Pricing Strategy</h3>
           <button
             type="button"
             onClick={() => setIsHelpOpen(true)}
-            className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm font-medium transition-colors"
+            className="text-clay hover:text-clay/80 flex items-center gap-sm text-sm font-medium transition-colors group"
             aria-label="Help with pricing strategies"
           >
-            <HelpCircle className="h-4 w-4" />
-            <span>How to choose?</span>
+            <HelpCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
+            <span>Understanding Pricing</span>
           </button>
         </div>
       }
     >
-      <div className="space-y-6">
-        {/* Strategy Selection - Tabs/Radio style */}
-        <div className="flex p-1 bg-gray-100 rounded-lg">
+      <div className="space-y-xl">
+        {/* Strategy Selection - Tabs style */}
+        <div className="flex p-xs bg-surface rounded-xl border border-border-subtle">
           <button
             type="button"
             onClick={() => handleStrategyChange('markup')}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all cursor-pointer ${
+            className={`flex-1 py-sm text-sm font-medium rounded-lg transition-all cursor-pointer ${
               strategy === 'markup' 
-                ? 'bg-white text-blue-600 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-clay text-white shadow-sm' 
+                : 'text-ink-500 hover:text-ink-900'
             }`}
           >
             Markup
@@ -83,10 +83,10 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
           <button
             type="button"
             onClick={() => handleStrategyChange('margin')}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all cursor-pointer ${
+            className={`flex-1 py-sm text-sm font-medium rounded-lg transition-all cursor-pointer ${
               strategy === 'margin' 
-                ? 'bg-white text-blue-600 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-clay text-white shadow-sm' 
+                : 'text-ink-500 hover:text-ink-900'
             }`}
           >
             Profit Margin
@@ -94,34 +94,34 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         </div>
 
         {/* Visual Explanation */}
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+        <div className="bg-surface border border-border-subtle rounded-xl p-lg transition-all duration-500">
           {strategy === 'markup' ? (
-            <div className="space-y-2">
-              <p className="text-sm text-blue-800 font-medium">
-                Add <span className="text-blue-600">{value}%</span> to your cost
+            <div className="space-y-sm">
+              <p className="text-sm text-ink-900 font-medium">
+                Add <span className="text-clay font-bold">{value}%</span> to your total cost.
               </p>
-              <p className="text-xs text-blue-600/80">
-                Example: If your cost is {formatCurrency(exampleCost)}, 
+              <p className="text-xs text-ink-500 leading-relaxed">
+                If your cost is {formatCurrency(exampleCost)}, 
                 adding {value}% markup results in a price of {formatCurrency(examplePrice)} 
-                ({formatCurrency(exampleProfit)} profit).
+                (<span className="text-moss font-semibold">{formatCurrency(exampleProfit)} profit</span>).
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
-              <p className="text-sm text-blue-800 font-medium">
-                Keep <span className="text-blue-600">{value}%</span> of sale price as profit
+            <div className="space-y-sm">
+              <p className="text-sm text-ink-900 font-medium">
+                Keep <span className="text-clay font-bold">{value}%</span> of the final sale price as profit.
               </p>
-              <p className="text-xs text-blue-600/80">
-                Example: To earn a {value}% margin on a {formatCurrency(exampleCost)} cost, 
+              <p className="text-xs text-ink-500 leading-relaxed">
+                To earn a {value}% margin on a {formatCurrency(exampleCost)} cost, 
                 your price should be {formatCurrency(examplePrice)} 
-                ({formatCurrency(exampleProfit)} profit).
+                (<span className="text-moss font-semibold">{formatCurrency(exampleProfit)} profit</span>).
               </p>
             </div>
           )}
         </div>
 
         {/* Value Inputs */}
-        <div className="space-y-4">
+        <div className="space-y-lg">
           <Input
             label={`${strategy === 'markup' ? 'Markup' : 'Margin'} Percentage`}
             type="number"
@@ -133,7 +133,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
             step="0.1"
           />
 
-          <div className="space-y-2">
+          <div className="space-y-sm px-xs">
             <input
               type="range"
               min="0"
@@ -141,9 +141,9 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
               step="1"
               value={value}
               onChange={handleSliderChange}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-1.5 bg-border-subtle rounded-full appearance-none cursor-pointer accent-clay"
             />
-            <div className="flex justify-between text-xs text-gray-400 font-medium">
+            <div className="flex justify-between text-[10px] text-ink-500 font-bold uppercase tracking-widest">
               <span>0%</span>
               <span>{strategy === 'margin' ? '95%' : '300%'}</span>
             </div>
@@ -151,15 +151,15 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         </div>
 
         {/* Real-time Result */}
-        <div className="pt-4 border-t border-gray-100">
+        <div className="pt-lg border-t border-border-subtle">
           <div className="flex justify-between items-end">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Recommended Price</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(recommendedPrice)}</p>
+              <p className="text-[10px] text-ink-500 uppercase tracking-widest font-bold mb-xs">Recommended Price</p>
+              <p className="text-3xl font-bold text-ink-900 tracking-tight">{formatCurrency(recommendedPrice)}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500 font-medium">Profit per Unit</p>
-              <p className="text-sm font-bold text-green-600">+{formatCurrency(profit)}</p>
+              <p className="text-xs text-ink-500 font-medium mb-xs">Profit per Unit</p>
+              <p className="text-lg font-bold text-moss">+{formatCurrency(profit)}</p>
             </div>
           </div>
         </div>

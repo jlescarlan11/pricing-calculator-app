@@ -90,7 +90,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
   const results = performFullCalculation(input, config);
 
   const footer = (
-    <div className="flex gap-3 justify-end">
+    <div className="flex gap-sm justify-end">
       {!isSuccess && (
         <>
           <Button 
@@ -116,22 +116,22 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Save as Preset"
+      title={<span className="text-ink-900">Save to Presets</span>}
       footer={footer}
     >
       {isSuccess ? (
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <div className="rounded-full bg-green-100 p-3 mb-4 animate-bounce">
-            <CheckCircle2 className="w-12 h-12 text-green-600" />
+        <div className="flex flex-col items-center justify-center py-2xl text-center animate-in fade-in zoom-in-95 duration-500">
+          <div className="rounded-full bg-moss/10 p-lg mb-lg animate-bounce border border-moss/20">
+            <CheckCircle2 className="w-12 h-12 text-moss" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900">Saved Successfully!</h3>
-          <p className="text-gray-500 mt-2">
-            &quot;{name}&quot; has been added to your saved products.
+          <h3 className="text-2xl font-bold text-ink-900 tracking-tight">Saved Successfully</h3>
+          <p className="text-ink-500 mt-sm font-medium">
+            &quot;{name}&quot; is now available in your saved products.
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          <p className="text-sm text-gray-500">
+        <div className="space-y-xl">
+          <p className="text-sm text-ink-500 leading-relaxed font-medium">
             Give this calculation a name to save it to your presets. You can load it later to update costs or prices.
           </p>
 
@@ -148,28 +148,28 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
             disabled={isSaving}
           />
 
-          <div className="bg-blue-50/50 rounded-lg p-4 border border-blue-100">
-            <h4 className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-3">
+          <div className="bg-surface rounded-2xl p-lg border border-border-subtle">
+            <h4 className="text-[10px] font-bold text-clay uppercase tracking-[0.2em] mb-md">
               Calculation Summary
             </h4>
-            <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+            <div className="grid grid-cols-2 gap-y-lg gap-x-md">
               <div>
-                <p className="text-[10px] text-gray-500 uppercase font-semibold">Total Cost</p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">Total Cost</p>
+                <p className="text-base font-bold text-ink-900">
                   {formatCurrency(results.totalCost)}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 uppercase font-semibold">Batch Size</p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">Batch Size</p>
+                <p className="text-base font-bold text-ink-900">
                   {input.batchSize} {input.batchSize === 1 ? 'unit' : 'units'}
                 </p>
               </div>
-              <div className="col-span-2 pt-2 border-t border-blue-100">
-                <p className="text-[10px] text-gray-500 uppercase font-semibold">Recommended Price</p>
-                <p className="text-lg font-bold text-blue-700">
+              <div className="col-span-2 pt-md border-t border-border-subtle">
+                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">Recommended Price</p>
+                <p className="text-2xl font-bold text-clay tracking-tight">
                   {formatCurrency(results.recommendedPrice)}
-                  <span className="text-xs font-normal text-blue-500 ml-1">
+                  <span className="text-xs font-medium text-ink-500 ml-sm tracking-normal uppercase">
                     per unit
                   </span>
                 </p>

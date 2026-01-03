@@ -6,13 +6,13 @@ describe('DataWarningBanner', () => {
   it('renders the warning message', () => {
     render(<DataWarningBanner />);
     
-    expect(screen.getByText(/Your data is only saved in this browser session/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your progress is temporary/i)).toBeInTheDocument();
   });
 
   it('is dismissible', () => {
     render(<DataWarningBanner />);
     
-    const bannerText = screen.getByText(/Your data is only saved in this browser session/i);
+    const bannerText = screen.getByText(/Your progress is temporary/i);
     expect(bannerText).toBeInTheDocument();
     
     const dismissButton = screen.getByRole('button', { name: /Dismiss warning/i });

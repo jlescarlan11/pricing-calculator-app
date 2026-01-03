@@ -34,10 +34,10 @@ export const Tooltip: React.FC<TooltipProps> = ({
   };
 
   const positionClasses = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
+    top: 'bottom-full left-1/2 -translate-x-1/2 mb-sm',
+    right: 'left-full top-1/2 -translate-y-1/2 ml-sm',
+    bottom: 'top-full left-1/2 -translate-x-1/2 mt-sm',
+    left: 'right-full top-1/2 -translate-y-1/2 mr-sm',
   };
 
   const arrowClasses = {
@@ -67,7 +67,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       <div
         id={tooltipId}
         role="tooltip"
-        className={`absolute z-50 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white shadow-lg transition-all duration-200 ease-in-out ${
+        className={`absolute z-50 whitespace-nowrap rounded bg-gray-800 px-sm py-xs text-xs text-white shadow-lg transition-all duration-200 ease-in-out ${
           positionClasses[position]
         } ${
           isVisible

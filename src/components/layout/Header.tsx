@@ -21,30 +21,30 @@ export const Header: React.FC<HeaderProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+    `flex items-center gap-sm px-md py-sm rounded-lg text-sm font-medium transition-all duration-300 ${
       isActive
-        ? 'bg-blue-50 text-blue-600'
-        : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+        ? 'bg-clay/10 text-clay'
+        : 'text-ink-700 hover:text-clay hover:bg-surface-hover'
     }`;
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <header className="sticky top-0 z-40 w-full bg-bg-main/80 backdrop-blur-md border-b border-border-subtle">
+        <div className="max-w-7xl mx-auto px-lg sm:px-xl lg:px-2xl">
+          <div className="flex justify-between items-center h-20">
             {/* Logo and Title */}
-            <Link to="/" className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-lg text-white">
+            <Link to="/" className="flex items-center gap-md group">
+              <div className="p-sm bg-clay rounded-xl text-white shadow-sm transition-transform group-hover:scale-105 duration-300">
                 <Calculator size={24} />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900 leading-none">Pricing Calculator</h1>
-                <p className="text-xs text-gray-500 font-medium mt-1">For Food Entrepreneurs.</p>
+                <h1 className="text-xl text-ink-900 leading-none">PriceCraft</h1>
+                <p className="text-xs text-ink-500 font-medium mt-xs uppercase tracking-wider">Mindful Pricing</p>
               </div>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-sm">
               <NavLink to="/" className={navLinkClass}>
                 <Calculator size={18} />
                 <span>Calculator</span>
@@ -57,16 +57,16 @@ export const Header: React.FC<HeaderProps> = ({
                 <Lightbulb size={18} />
                 <span>Pricing Tips</span>
               </NavLink>
-              <div className="h-6 w-px bg-gray-200 mx-2" />
-              <span className="text-sm text-gray-400 font-medium">v0.1.0-alpha</span>
+              <div className="h-6 w-px bg-border-subtle mx-md" />
+              <span className="text-xs text-ink-500 font-medium">v0.1.0</span>
             </div>
 
             {/* Mobile Actions */}
-            <div className="flex md:hidden items-center gap-2">
+            <div className="flex md:hidden items-center gap-sm">
               {showSidebarButton && (
                 <button
                   type="button"
-                  className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="p-sm rounded-lg text-ink-700 hover:text-clay hover:bg-surface-hover transition-colors"
                   onClick={onToggleSidebar}
                   aria-expanded={isSidebarOpen}
                 >
@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
               
               <button
                 type="button"
-                className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="p-sm rounded-lg text-ink-700 hover:text-clay hover:bg-surface-hover transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-expanded={isMobileMenuOpen}
               >
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white py-4 px-4 space-y-2 animate-in fade-in slide-in-from-top-2">
+          <div className="md:hidden border-t border-border-subtle bg-bg-main py-lg px-lg space-y-sm animate-in fade-in slide-in-from-top-4 duration-500">
             <NavLink 
               to="/" 
               className={navLinkClass}
@@ -115,9 +115,9 @@ export const Header: React.FC<HeaderProps> = ({
               <Lightbulb size={18} />
               Pricing Tips
             </NavLink>
-            <div className="pt-2 flex items-center justify-between text-xs text-gray-500 px-2 border-t border-gray-50 mt-2">
-              <span>Version 0.1.0-alpha</span>
-              <span>Made for PH Food Businesses</span>
+            <div className="pt-md flex items-center justify-between text-[10px] text-ink-500 px-md border-t border-border-subtle mt-md uppercase tracking-widest">
+              <span>Version 0.1.0</span>
+              <span>Made with intention</span>
             </div>
           </div>
         )}

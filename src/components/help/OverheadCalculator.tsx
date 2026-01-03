@@ -42,25 +42,25 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
   }, [rent, utilities, batchesPerMonth, packagingPerUnit, batchSize]);
 
   return (
-    <div className="space-y-6">
-      <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800 animate-in fade-in duration-500">
-        <div className="flex gap-2">
-          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-800 dark:text-blue-200">
-            <p className="font-semibold mb-1">How it&apos;s calculated:</p>
-            <p className="opacity-90">
-              Formula: <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded font-mono text-xs">( (Rent + Utilities) / Batches ) + (Packaging × Batch Size)</code>
+    <div className="space-y-xl p-sm">
+      <div className="bg-surface p-lg rounded-2xl border border-border-subtle animate-in fade-in duration-700">
+        <div className="flex gap-md">
+          <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
+          <div className="text-sm text-ink-700">
+            <p className="font-bold text-ink-900 mb-sm tracking-tight">How it&apos;s calculated:</p>
+            <p className="opacity-90 leading-relaxed font-medium">
+              Formula: <code className="bg-bg-main px-sm py-[2px] rounded border border-border-subtle font-mono text-[11px] text-clay">((Rent + Utilities) / Batches) + (Packaging × Batch Size)</code>
             </p>
-            <p className="mt-1 opacity-90 text-xs">
+            <p className="mt-sm opacity-70 text-xs font-medium italic">
               This distributes your monthly fixed costs across your production volume and adds the direct packaging costs for this batch.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fixed Monthly Costs</h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+        <div className="space-y-lg">
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Fixed Monthly Costs</p>
           <Input
             label="Monthly Rent"
             type="number"
@@ -89,8 +89,8 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
           />
         </div>
 
-        <div className="space-y-4">
-          <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Batch Variable Costs</h4>
+        <div className="space-y-lg">
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Batch Variable Costs</p>
           <Input
             label="Packaging per Unit"
             type="number"
@@ -111,24 +111,24 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         </div>
       </div>
 
-      <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-800 space-y-3">
-        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Overhead Breakdown (per Batch)</h4>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Allocated Rent</span>
-            <span className="font-mono font-medium">₱{calculation.rentPerBatch.toFixed(2)}</span>
+      <div className="bg-surface rounded-2xl p-lg border border-border-subtle space-y-md">
+        <p className="text-xs font-bold text-ink-500 uppercase tracking-widest font-sans">Overhead Breakdown (per Batch)</p>
+        <div className="space-y-sm">
+          <div className="flex justify-between text-sm font-medium">
+            <span className="text-ink-500">Allocated Rent</span>
+            <span className="font-mono text-ink-900">₱{calculation.rentPerBatch.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Allocated Utilities</span>
-            <span className="font-mono font-medium">₱{calculation.utilitiesPerBatch.toFixed(2)}</span>
+          <div className="flex justify-between text-sm font-medium">
+            <span className="text-ink-500">Allocated Utilities</span>
+            <span className="font-mono text-ink-900">₱{calculation.utilitiesPerBatch.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Total Packaging</span>
-            <span className="font-mono font-medium">₱{calculation.packagingTotal.toFixed(2)}</span>
+          <div className="flex justify-between text-sm font-medium">
+            <span className="text-ink-500">Total Packaging</span>
+            <span className="font-mono text-ink-900">₱{calculation.packagingTotal.toFixed(2)}</span>
           </div>
-          <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700 flex justify-between items-end">
-            <span className="text-sm font-bold text-gray-900 dark:text-white">Estimated Total Overhead</span>
-            <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+          <div className="pt-md mt-sm border-t border-border-subtle flex justify-between items-end">
+            <span className="text-sm font-bold text-ink-900">Estimated Total Overhead</span>
+            <span className="text-2xl font-bold text-clay">
               ₱{calculation.total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
@@ -136,7 +136,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
       </div>
 
       <Button
-        className="w-full"
+        className="w-full py-lg rounded-xl font-bold tracking-tight"
         variant="primary"
         onClick={() => onApply(calculation.total)}
         disabled={calculation.total <= 0}

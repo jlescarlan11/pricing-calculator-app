@@ -60,7 +60,7 @@ describe('PricingExplainerModal', () => {
       <PricingExplainerModal isOpen={true} onClose={mockOnClose} />
     );
     
-    const closeBtn = screen.getByRole('button', { name: /Got it, thanks!/i });
+    const closeBtn = screen.getByRole('button', { name: /Mindfulness Gained/i });
     fireEvent.click(closeBtn);
     
     expect(mockOnClose).toHaveBeenCalled();

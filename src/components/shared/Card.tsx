@@ -14,21 +14,21 @@ export const Card: React.FC<CardProps> = ({
   footer,
 }) => {
   return (
-    <div className={`bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden ${className}`}>
+    <div className={`bg-surface rounded-xl border border-border-base overflow-hidden ${className}`}>
       {title && (
-        <div className="px-6 py-4 border-b border-gray-100">
+        <div className="px-lg py-md border-b border-border-subtle">
           {typeof title === 'string' ? (
-            <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+            <h3 className="text-lg text-ink-900">{title}</h3>
           ) : (
             title
           )}
         </div>
       )}
-      <div className="px-6 py-4">
+      <div className="px-lg py-md">
         {children}
       </div>
       {footer && (
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+        <div className="px-lg py-md bg-bg-main border-t border-border-subtle">
           {footer}
         </div>
       )}

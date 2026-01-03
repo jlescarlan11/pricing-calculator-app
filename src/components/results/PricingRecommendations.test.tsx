@@ -37,22 +37,28 @@ describe('PricingRecommendations', () => {
     render(<PricingRecommendations results={mockResults} />);
     const badge = screen.getByText('Healthy profit margin');
     expect(badge).toBeDefined();
-    expect(badge.className).toContain('bg-green-100');
+    expect(badge.className).toContain('bg-moss/10');
   });
 
   it('shows modest but workable badge for 15-25%', () => {
-    const modestResults = { ...mockResults, profitMarginPercent: 20 };
-    render(<PricingRecommendations results={modestResults} />);
+    const lowMarginResults = {
+      ...mockResults,
+      profitMarginPercent: 20,
+    };
+    render(<PricingRecommendations results={lowMarginResults} />);
     const badge = screen.getByText('Modest but workable');
     expect(badge).toBeDefined();
-    expect(badge.className).toContain('bg-amber-100');
+    expect(badge.className).toContain('bg-sakura/20');
   });
 
   it('shows risky badge for < 15%', () => {
-    const riskyResults = { ...mockResults, profitMarginPercent: 10 };
+    const riskyResults = {
+      ...mockResults,
+      profitMarginPercent: 10,
+    };
     render(<PricingRecommendations results={riskyResults} />);
     const badge = screen.getByText('Very tight margins - risky');
     expect(badge).toBeDefined();
-    expect(badge.className).toContain('bg-red-100');
+    expect(badge.className).toContain('bg-rust/10');
   });
 });

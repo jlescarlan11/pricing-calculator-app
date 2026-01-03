@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
   maxWidth?: string;
@@ -139,13 +139,13 @@ export const Modal: React.FC<ModalProps> = ({
         tabIndex={-1}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3 md:px-6 md:py-4">
-          <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
+        <div className="flex items-center justify-between border-b px-md py-sm md:px-lg md:py-md">
+          <h2 id="modal-title" className="text-lg text-gray-900">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="rounded-full p-xs text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             aria-label="Close modal"
           >
             <X className="h-5 w-5" />
@@ -153,13 +153,13 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
+        <div className="flex-1 overflow-y-auto px-md py-md md:px-lg md:py-lg">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="border-t bg-gray-50 px-4 py-3 md:rounded-b-lg md:px-6">
+          <div className="border-t bg-gray-50 px-md py-sm md:rounded-b-lg md:px-lg md:py-md">
             {footer}
           </div>
         )}

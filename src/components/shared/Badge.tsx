@@ -16,13 +16,13 @@ export const Badge: React.FC<BadgeProps> = ({
   variant = 'info',
   className = '',
 }) => {
-  const baseStyles = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border transition-colors';
+  const baseStyles = 'inline-flex items-center rounded-full px-sm py-xs text-xs font-semibold border transition-colors';
 
   const variants = {
-    success: 'bg-green-100 text-green-800 border-green-200',
-    warning: 'bg-amber-100 text-amber-800 border-amber-200',
-    error: 'bg-red-100 text-red-800 border-red-200',
-    info: 'bg-blue-100 text-blue-800 border-blue-200',
+    success: 'bg-moss/10 text-moss border-moss/20',
+    warning: 'bg-sakura/20 text-ink-700 border-sakura/30',
+    error: 'bg-rust/10 text-rust border-rust/20',
+    info: 'bg-clay/10 text-clay border-clay/20',
   };
 
   const variantStyles = variants[variant];

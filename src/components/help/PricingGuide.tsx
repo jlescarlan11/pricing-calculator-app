@@ -28,15 +28,15 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
   const marginProfit = marginPrice - cost;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-xl">
       {/* Tabs */}
-      <div className="flex p-1 bg-gray-100 rounded-lg">
+      <div className="flex p-xs bg-surface rounded-xl border border-border-subtle">
         <button
           onClick={() => setActiveTab('markup')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-md transition-all ${
+          className={`flex-1 flex items-center justify-center gap-sm py-md text-sm font-bold rounded-lg transition-all duration-300 ${
             activeTab === 'markup'
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-clay text-white shadow-sm'
+              : 'text-ink-500 hover:text-ink-900'
           }`}
         >
           <TrendingUp className="h-4 w-4" />
@@ -44,10 +44,10 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
         </button>
         <button
           onClick={() => setActiveTab('margin')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-md transition-all ${
+          className={`flex-1 flex items-center justify-center gap-sm py-md text-sm font-bold rounded-lg transition-all duration-300 ${
             activeTab === 'margin'
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-clay text-white shadow-sm'
+              : 'text-ink-500 hover:text-ink-900'
           }`}
         >
           <BarChart3 className="h-4 w-4" />
@@ -56,136 +56,136 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
       </div>
 
       {activeTab === 'markup' ? (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="space-y-xl animate-in fade-in slide-in-from-bottom-xs duration-500">
           {/* Markup Definition */}
           <section>
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant="info">Definition</Badge>
+            <div className="flex items-center gap-sm mb-sm">
+              <Badge variant="info" className="text-[10px] uppercase tracking-widest px-sm">Definition</Badge>
             </div>
-            <p className="text-gray-600 leading-relaxed">
-              Markup is the percentage <strong>added to the cost price</strong> of a product to determine its selling price. It focus on ensuring each item sold earns a specific profit above its production cost.
+            <p className="text-ink-700 leading-relaxed font-medium">
+              Markup is the percentage <strong>added to the cost price</strong> of a product to determine its selling price. It focuses on ensuring each item sold earns a specific profit above its production cost.
             </p>
           </section>
 
           {/* Markup Visual Example */}
-          <section className="bg-blue-50 border border-blue-100 rounded-xl p-5">
-            <h4 className="text-sm font-bold text-blue-900 mb-4 uppercase tracking-wider">Visual Example (50% Markup)</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <div className="text-center p-3 bg-white rounded-lg shadow-sm border border-blue-200">
-                <p className="text-xs text-gray-500 font-medium mb-1">Cost</p>
-                <p className="text-lg font-bold text-gray-900">{formatCurrency(cost)}</p>
+          <section className="bg-surface border border-border-subtle rounded-2xl p-lg">
+            <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Visual Example (50% Markup)</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
+              <div className="text-center p-md bg-bg-main rounded-xl border border-border-subtle">
+                <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">Cost</p>
+                <p className="text-xl font-bold text-ink-900 tracking-tight">{formatCurrency(cost)}</p>
               </div>
               <div className="flex justify-center">
-                <ArrowRight className="h-5 w-5 text-blue-400 rotate-90 md:rotate-0" />
+                <ArrowRight className="h-6 w-6 text-border-base rotate-90 md:rotate-0" />
               </div>
-              <div className="text-center p-3 bg-blue-600 rounded-lg shadow-md border border-blue-700">
-                <p className="text-xs text-blue-100 font-medium mb-1">Selling Price</p>
-                <p className="text-lg font-bold text-white">{formatCurrency(markupPrice)}</p>
+              <div className="text-center p-md bg-clay rounded-xl shadow-sm border border-clay/10">
+                <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">Selling Price</p>
+                <p className="text-xl font-bold text-white tracking-tight">{formatCurrency(markupPrice)}</p>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-blue-200 flex justify-between items-center">
-              <span className="text-sm text-blue-800 font-medium">Profit Earned:</span>
-              <span className="text-sm font-bold text-blue-900">{formatCurrency(markupProfit)}</span>
+            <div className="mt-lg pt-lg border-t border-border-subtle flex justify-between items-center">
+              <span className="text-sm text-ink-700 font-bold">Profit Earned:</span>
+              <span className="text-base font-bold text-moss">{formatCurrency(markupProfit)}</span>
             </div>
-            <p className="mt-2 text-[10px] text-blue-600/70 text-center italic">
+            <p className="mt-sm text-[10px] text-ink-400 text-center font-mono">
               Formula: {formatCurrency(cost)} × (1 + 0.50) = {formatCurrency(markupPrice)}
             </p>
           </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
             {/* When to use */}
             <section>
-              <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Info className="h-4 w-4 text-blue-500" />
+              <h4 className="font-bold text-ink-900 mb-md flex items-center gap-sm tracking-tight">
+                <Info className="h-4 w-4 text-clay" />
                 When to use
               </h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+              <ul className="space-y-sm text-sm text-ink-700 font-medium">
+                <li className="flex gap-sm">
+                  <div className="h-1.5 w-1.5 rounded-full bg-clay/40 mt-2 shrink-0" />
                   Simple cost-plus pricing
                 </li>
-                <li className="flex gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+                <li className="flex gap-sm">
+                  <div className="h-1.5 w-1.5 rounded-full bg-clay/40 mt-2 shrink-0" />
                   Handmade or custom goods
                 </li>
-                <li className="flex gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
-                  Ensuring individual item costs are covered
+                <li className="flex gap-sm">
+                  <div className="h-1.5 w-1.5 rounded-full bg-clay/40 mt-2 shrink-0" />
+                  Ensuring item costs are covered
                 </li>
               </ul>
             </section>
 
             {/* Pros & Cons */}
             <section>
-              <h4 className="font-bold text-gray-900 mb-3">Pros & Cons</h4>
-              <div className="space-y-3">
-                <div className="flex gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Very easy to calculate manually</span>
+              <h4 className="font-bold text-ink-900 mb-md tracking-tight">Considerations</h4>
+              <div className="space-y-md">
+                <div className="flex gap-sm text-sm font-medium">
+                  <Check className="h-4 w-4 text-moss shrink-0 mt-0.5" />
+                  <span className="text-ink-700 leading-snug">Very easy to calculate manually</span>
                 </div>
-                <div className="flex gap-2 text-sm">
-                  <X className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Ignores market demand and competitors</span>
+                <div className="flex gap-sm text-sm font-medium">
+                  <X className="h-4 w-4 text-rust shrink-0 mt-0.5" />
+                  <span className="text-ink-700 leading-snug">Ignores market demand and competitors</span>
                 </div>
               </div>
             </section>
           </div>
         </div>
       ) : (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="space-y-xl animate-in fade-in slide-in-from-bottom-xs duration-500">
           {/* Margin Definition */}
           <section>
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant="success">Definition</Badge>
+            <div className="flex items-center gap-sm mb-sm">
+              <Badge variant="success" className="text-[10px] uppercase tracking-widest px-sm">Definition</Badge>
             </div>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-ink-700 leading-relaxed font-medium">
               Profit Margin is the percentage of the <strong>final selling price</strong> that is profit. It tells you how much out of every peso you earn is actually kept by the business after costs.
             </p>
           </section>
 
           {/* Margin Visual Example */}
-          <section className="bg-green-50 border border-green-100 rounded-xl p-5">
-            <h4 className="text-sm font-bold text-green-900 mb-4 uppercase tracking-wider">Visual Example (50% Margin)</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <div className="text-center p-3 bg-white rounded-lg shadow-sm border border-green-200">
-                <p className="text-xs text-gray-500 font-medium mb-1">Cost</p>
-                <p className="text-lg font-bold text-gray-900">{formatCurrency(cost)}</p>
+          <section className="bg-surface border border-border-subtle rounded-2xl p-lg">
+            <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Visual Example (50% Margin)</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
+              <div className="text-center p-md bg-bg-main rounded-xl border border-border-subtle">
+                <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">Cost</p>
+                <p className="text-xl font-bold text-ink-900 tracking-tight">{formatCurrency(cost)}</p>
               </div>
               <div className="flex justify-center">
-                <ArrowRight className="h-5 w-5 text-green-400 rotate-90 md:rotate-0" />
+                <ArrowRight className="h-6 w-6 text-border-base rotate-90 md:rotate-0" />
               </div>
-              <div className="text-center p-3 bg-green-600 rounded-lg shadow-md border border-green-700">
-                <p className="text-xs text-green-100 font-medium mb-1">Selling Price</p>
-                <p className="text-lg font-bold text-white">{formatCurrency(marginPrice)}</p>
+              <div className="text-center p-md bg-moss rounded-xl shadow-sm border border-moss/10">
+                <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">Selling Price</p>
+                <p className="text-xl font-bold text-white tracking-tight">{formatCurrency(marginPrice)}</p>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-green-200 flex justify-between items-center">
-              <span className="text-sm text-green-800 font-medium">Profit Earned:</span>
-              <span className="text-sm font-bold text-green-900">{formatCurrency(marginProfit)}</span>
+            <div className="mt-lg pt-lg border-t border-border-subtle flex justify-between items-center">
+              <span className="text-sm text-ink-700 font-bold">Profit Earned:</span>
+              <span className="text-base font-bold text-moss">{formatCurrency(marginProfit)}</span>
             </div>
-            <p className="mt-2 text-[10px] text-green-600/70 text-center italic">
+            <p className="mt-sm text-[10px] text-ink-400 text-center font-mono">
               Formula: {formatCurrency(cost)} ÷ (1 - 0.50) = {formatCurrency(marginPrice)}
             </p>
           </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
             {/* When to use */}
             <section>
-              <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Info className="h-4 w-4 text-green-500" />
+              <h4 className="font-bold text-ink-900 mb-md flex items-center gap-sm tracking-tight">
+                <Info className="h-4 w-4 text-moss" />
                 When to use
               </h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-400 mt-1.5 shrink-0" />
+              <ul className="space-y-sm text-sm text-ink-700 font-medium">
+                <li className="flex gap-sm">
+                  <div className="h-1.5 w-1.5 rounded-full bg-moss/40 mt-2 shrink-0" />
                   Retail and wholesale businesses
                 </li>
-                <li className="flex gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-400 mt-1.5 shrink-0" />
+                <li className="flex gap-sm">
+                  <div className="h-1.5 w-1.5 rounded-full bg-moss/40 mt-2 shrink-0" />
                   Tracking overall business health
                 </li>
-                <li className="flex gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-400 mt-1.5 shrink-0" />
+                <li className="flex gap-sm">
+                  <div className="h-1.5 w-1.5 rounded-full bg-moss/40 mt-2 shrink-0" />
                   Comparing profit to total revenue
                 </li>
               </ul>
@@ -193,15 +193,15 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
 
             {/* Pros & Cons */}
             <section>
-              <h4 className="font-bold text-gray-900 mb-3">Pros & Cons</h4>
-              <div className="space-y-3">
-                <div className="flex gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Directly shows business profitability</span>
+              <h4 className="font-bold text-ink-900 mb-md tracking-tight">Considerations</h4>
+              <div className="space-y-md">
+                <div className="flex gap-sm text-sm font-medium">
+                  <Check className="h-4 w-4 text-moss shrink-0 mt-0.5" />
+                  <span className="text-ink-700 leading-snug">Directly shows business profitability</span>
                 </div>
-                <div className="flex gap-2 text-sm">
-                  <X className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
-                  <span className="text-gray-600">Slightly more complex math</span>
+                <div className="flex gap-sm text-sm font-medium">
+                  <X className="h-4 w-4 text-rust shrink-0 mt-0.5" />
+                  <span className="text-ink-700 leading-snug">Slightly more complex math</span>
                 </div>
               </div>
             </section>
@@ -210,32 +210,32 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
       )}
 
       {/* Comparison Table */}
-      <section className="pt-6 border-t border-gray-100">
-        <h4 className="font-bold text-gray-900 mb-4">Quick Comparison</h4>
-        <div className="overflow-hidden rounded-lg border border-gray-200">
+      <section className="pt-xl border-t border-border-subtle">
+        <h4 className="font-bold text-ink-900 mb-lg tracking-tight">Quick Comparison</h4>
+        <div className="overflow-hidden rounded-2xl border border-border-subtle shadow-sm bg-bg-main">
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 text-gray-500 font-medium">
+            <thead className="bg-surface text-ink-500 font-bold text-[10px] uppercase tracking-widest">
               <tr>
-                <th className="px-4 py-3 border-b border-gray-200">Feature</th>
-                <th className="px-4 py-3 border-b border-gray-200">Markup</th>
-                <th className="px-4 py-3 border-b border-gray-200">Margin</th>
+                <th className="px-lg py-md border-b border-border-subtle">Feature</th>
+                <th className="px-lg py-md border-b border-border-subtle">Markup</th>
+                <th className="px-lg py-md border-b border-border-subtle">Margin</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border-subtle font-medium">
               <tr>
-                <td className="px-4 py-3 font-medium text-gray-900 bg-gray-50/50">Base Value</td>
-                <td className="px-4 py-3 text-gray-600">Cost Price</td>
-                <td className="px-4 py-3 text-gray-600">Selling Price</td>
+                <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Base Value</td>
+                <td className="px-lg py-md text-ink-700">Cost Price</td>
+                <td className="px-lg py-md text-ink-700">Selling Price</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-medium text-gray-900 bg-gray-50/50">Calculation</td>
-                <td className="px-4 py-3 text-gray-600 font-mono text-xs">Cost + (Cost × %)</td>
-                <td className="px-4 py-3 text-gray-600 font-mono text-xs">Cost ÷ (1 - %)</td>
+                <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Calculation</td>
+                <td className="px-lg py-md text-clay font-mono text-xs">Cost + (Cost × %)</td>
+                <td className="px-lg py-md text-clay font-mono text-xs">Cost ÷ (1 - %)</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-medium text-gray-900 bg-gray-50/50">Perspective</td>
-                <td className="px-4 py-3 text-gray-600">Production</td>
-                <td className="px-4 py-3 text-gray-600">Sales/Business</td>
+                <td className="px-lg py-md font-bold text-ink-900 bg-surface/30">Perspective</td>
+                <td className="px-lg py-md text-ink-700">Production</td>
+                <td className="px-lg py-md text-ink-700">Sales/Business</td>
               </tr>
             </tbody>
           </table>
@@ -243,9 +243,9 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
       </section>
 
       {showActionButton && onAction && (
-        <div className="flex justify-center pt-2">
-          <Button onClick={onAction} variant="secondary" className="px-8">
-            Got it, thanks!
+        <div className="flex justify-center pt-md">
+          <Button onClick={onAction} variant="secondary" className="px-2xl py-md font-bold tracking-tight rounded-xl">
+            Mindfulness Gained
           </Button>
         </div>
       )}

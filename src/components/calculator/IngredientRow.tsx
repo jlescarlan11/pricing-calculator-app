@@ -75,7 +75,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 
   return (
     <div 
-      className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
+      className="flex flex-col sm:flex-row gap-md items-start sm:items-center p-lg bg-surface rounded-xl border border-border-subtle transition-all duration-300 hover:border-border-base group/row"
       onKeyDown={handleKeyDown}
     >
       <div className="flex-1 w-full sm:w-auto">
@@ -90,7 +90,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
         />
       </div>
 
-      <div className="flex gap-4 w-full sm:w-auto">
+      <div className="flex gap-md w-full sm:w-auto">
         <div className="flex-1 sm:w-32">
           <Input
             label="Amount"
@@ -121,10 +121,10 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
         </div>
       </div>
 
-      <div className="pt-0 sm:pt-6 self-end sm:self-center">
+      <div className="pt-0 sm:pt-lg self-end sm:self-center opacity-0 group-hover/row:opacity-100 transition-opacity duration-300">
         <Button
           variant="ghost"
-          className="text-gray-500 hover:text-red-600 hover:bg-red-50 p-2 h-auto"
+          className="text-ink-500 hover:text-rust hover:bg-rust/10 p-sm h-auto rounded-lg"
           onClick={handleDeleteClick}
           aria-label={`Remove ${ingredient.name || 'ingredient'}`}
           title="Remove ingredient (Shift+Delete)"
@@ -138,7 +138,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
         onClose={() => setShowDeleteModal(false)}
         title="Remove Last Ingredient?"
         footer={
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-sm">
             <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
               Cancel
             </Button>
@@ -148,7 +148,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
           </div>
         }
       >
-        <p className="text-gray-600">
+        <p className="text-ink-700">
           This is the last ingredient in your list. Are you sure you want to remove it?
         </p>
       </Modal>

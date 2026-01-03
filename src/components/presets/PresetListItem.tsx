@@ -24,43 +24,43 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
   const { productName, batchSize, ingredients } = input;
 
   return (
-    <Card className="group transition-all duration-200 hover:shadow-md hover:border-blue-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <Card className="group transition-all duration-500 hover:border-clay/50 bg-bg-main hover:bg-surface border-border-subtle shadow-none">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-lg">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h4 className="text-lg font-bold text-gray-900 truncate" title={name}>
+          <div className="flex items-center gap-sm mb-sm">
+            <h4 className="text-lg font-bold text-ink-900 truncate tracking-tight" title={name}>
               {name}
             </h4>
-            <Badge variant="info" className="hidden sm:inline-flex">
-              Preset
+            <Badge variant="info" className="hidden sm:inline-flex text-[10px] uppercase tracking-widest py-xs px-sm">
+              Saved
             </Badge>
           </div>
           
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-            <div className="flex items-center gap-1">
-              <Package className="w-3.5 h-3.5" />
-              <span className="truncate max-w-[150px]" title={productName || 'Unnamed Product'}>
+          <div className="flex flex-wrap items-center gap-x-lg gap-y-sm text-sm text-ink-500 font-medium">
+            <div className="flex items-center gap-sm">
+              <Package className="w-4 h-4 text-clay/60" />
+              <span className="truncate max-w-[150px] text-ink-700" title={productName || 'Unnamed Product'}>
                 {productName || 'Unnamed Product'}
               </span>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="font-medium text-gray-700">{batchSize}</span>
+            <div className="flex items-center gap-sm">
+              <span className="font-bold text-ink-900">{batchSize}</span>
               <span>unit{batchSize !== 1 ? 's' : ''} / batch</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-sm">
+              <Calendar className="w-4 h-4 text-ink-300" />
               <span>{formatDate(lastModified)}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:ml-4">
+        <div className="flex items-center gap-sm sm:ml-lg">
           <Tooltip content="Load this preset into calculator">
             <Button
               variant="primary"
               size="sm"
               onClick={() => onLoad(preset)}
-              className="flex-1 sm:flex-none flex items-center gap-1.5"
+              className="flex-1 sm:flex-none flex items-center gap-sm px-lg"
             >
               <Play className="w-4 h-4 fill-current" />
               Load
@@ -72,7 +72,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
               variant="secondary"
               size="sm"
               onClick={() => onEdit(preset)}
-              className="p-2 sm:w-10 h-10 flex items-center justify-center"
+              className="p-sm sm:w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-300 hover:text-clay hover:border-clay/30"
               aria-label="Edit preset name"
             >
               <FileEdit className="w-4 h-4" />
@@ -88,7 +88,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
                   onDelete(preset);
                 }
               }}
-              className="p-2 sm:w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100"
+              className="p-sm sm:w-11 h-11 flex items-center justify-center text-ink-300 hover:text-rust hover:bg-rust/5 hover:border-rust/20 rounded-xl transition-all duration-300"
               aria-label="Delete preset"
             >
               <Trash2 className="w-4 h-4" />
@@ -98,14 +98,14 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
       </div>
 
       {/* Secondary Preview Info */}
-      <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+      <div className="mt-lg pt-lg border-t border-border-subtle grid grid-cols-2 sm:grid-cols-4 gap-lg text-[10px] uppercase tracking-widest font-bold">
         <div>
-          <span className="block text-gray-400 uppercase tracking-wider mb-0.5">Ingredients</span>
-          <span className="font-semibold text-gray-700">{ingredients.length} item{ingredients.length !== 1 ? 's' : ''}</span>
+          <span className="block text-ink-500 mb-xs opacity-70">Ingredients</span>
+          <span className="text-ink-900">{ingredients.length} item{ingredients.length !== 1 ? 's' : ''}</span>
         </div>
         <div>
-          <span className="block text-gray-400 uppercase tracking-wider mb-0.5">Strategy</span>
-          <span className="font-semibold text-gray-700 capitalize">
+          <span className="block text-ink-500 mb-xs opacity-70">Strategy</span>
+          <span className="text-ink-900">
             {config.strategy} ({config.value}%)
           </span>
         </div>

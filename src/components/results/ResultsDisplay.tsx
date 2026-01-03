@@ -30,15 +30,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Placeholder for when no results are available
   if (!results) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 animate-in fade-in duration-700">
-        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm ring-1 ring-gray-100">
-          <Calculator className="w-8 h-8 text-gray-400" />
+      <div className="flex flex-col items-center justify-center p-3xl text-center bg-surface rounded-2xl border-2 border-dashed border-border-base animate-in fade-in duration-1000">
+        <div className="w-20 h-20 bg-bg-main rounded-full flex items-center justify-center mb-xl shadow-sm border border-border-subtle">
+          <Calculator className="w-10 h-10 text-ink-500" />
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to calculate?</h3>
-        <p className="text-gray-500 max-w-xs mx-auto mb-8 leading-relaxed">
+        <h3 className="text-2xl text-ink-900 mb-sm">Ready to calculate?</h3>
+        <p className="text-ink-500 max-w-sm mx-auto mb-2xl leading-relaxed font-medium">
           Input your ingredients, labor, and overhead costs to see your recommended selling price and profit analysis.
         </p>
-        <Button onClick={onEdit} variant="primary" className="gap-2">
+        <Button onClick={onEdit} variant="primary" className="gap-sm px-xl py-md">
           <Edit2 className="w-4 h-4" />
           Start Calculation
         </Button>
@@ -47,38 +47,38 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+    <div className="space-y-2xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
       {/* Print-only Header */}
-      <div className="hidden print:block border-b-2 border-gray-900 pb-6 mb-8">
+      <div className="hidden print:block border-b border-ink-900 pb-xl mb-2xl">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-1">
+            <h1 className="text-3xl text-ink-900 mb-sm">
               {getPrintTitle(input)}
             </h1>
-            <h2 className="text-xl font-semibold text-gray-700">Product Pricing Report</h2>
+            <h2 className="text-xl font-medium text-ink-700">Product Pricing Report</h2>
           </div>
           <div className="text-right">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Date Generated</p>
-            <p className="text-lg font-bold text-gray-900">{getPrintDate()}</p>
+            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">Date Generated</p>
+            <p className="text-xl font-bold text-ink-900 tracking-tight">{getPrintDate()}</p>
           </div>
         </div>
       </div>
 
       {/* Action Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-6 print:hidden">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg border-b border-border-subtle pb-xl print:hidden">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Calculation Results</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Analysis for <span className="font-semibold text-gray-800">{input.productName || 'Unnamed Product'}</span>
+          <h2 className="text-2xl text-ink-900">Calculation Results</h2>
+          <p className="text-sm text-ink-500 mt-xs font-medium">
+            Analysis for <span className="text-ink-900">{input.productName || 'Unnamed Product'}</span>
           </p>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex items-center gap-sm w-full sm:w-auto">
           <SavePresetButton 
             input={input}
             config={config}
             variant="primary"
             size="sm"
-            className="flex-1 sm:flex-none shadow-lg shadow-blue-100"
+            className="flex-1 sm:flex-none"
           />
           <ShareResults 
             results={results} 
@@ -87,9 +87,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2xl">
         {/* Main Content Column */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-2xl">
           <div className="print:break-inside-avoid">
             <PricingRecommendations results={results} />
           </div>
@@ -103,8 +103,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             />
           </div>
 
-          <div className="flex justify-center pt-4 print:hidden">
-            <Button onClick={onEdit} variant="secondary" className="px-8 gap-2">
+          <div className="flex justify-center pt-lg print:hidden">
+            <Button onClick={onEdit} variant="secondary" className="px-2xl gap-sm">
               <Edit2 className="w-4 h-4" />
               Adjust Inputs
             </Button>
@@ -112,7 +112,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
 
         {/* Sidebar Column */}
-        <div className="lg:col-span-4 space-y-8">
+        <div className="lg:col-span-4 space-y-2xl">
           <div className="print:break-inside-avoid">
             <CostBreakdown 
               results={results}
@@ -120,26 +120,26 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </div>
           
           {/* Pro Tip Card */}
-          <div className="p-6 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl text-white shadow-xl shadow-blue-100 print:hidden overflow-hidden relative">
+          <div className="p-xl bg-surface rounded-2xl border border-border-base print:hidden relative overflow-hidden group">
             <div className="relative z-10">
-              <h4 className="font-bold mb-3 flex items-center gap-2 text-lg">
-                <Share2 className="w-5 h-5 text-blue-200" />
+              <h4 className="mb-md flex items-center gap-sm text-lg text-ink-900">
+                <Share2 className="w-5 h-5 text-clay" />
                 Pro Tip
               </h4>
-              <p className="text-blue-50 text-sm leading-relaxed opacity-90">
+              <p className="text-ink-700 text-sm leading-relaxed font-medium">
                 Small adjustments to your batch size or ingredient sourcing can have a huge impact on your final profit margin. Try experimenting with different batch sizes to find your &quot;sweet spot&quot;.
               </p>
             </div>
             {/* Decorative background element */}
-            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500 rounded-full opacity-20 blur-2xl" />
+            <div className="absolute -bottom-xl -right-xl w-32 h-32 bg-clay/5 rounded-full transition-transform group-hover:scale-110 duration-700" />
           </div>
         </div>
       </div>
 
       {/* Print Footer */}
-      <div className="hidden print:block mt-12 pt-8 border-t border-gray-200 text-center text-gray-400 text-xs">
-        <p>This pricing report was generated using the Pricing Calculator App.</p>
-        <p className="mt-1">Values are estimates based on user-provided costs and selected pricing strategies.</p>
+      <div className="hidden print:block mt-2xl pt-xl border-t border-border-subtle text-center text-ink-500 text-xs font-medium">
+        <p>This pricing report was generated using PriceCraft.</p>
+        <p className="mt-xs">Values are estimates based on user-provided costs and selected pricing strategies.</p>
       </div>
     </div>
   );

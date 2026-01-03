@@ -24,15 +24,15 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
   };
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-lg space-y-lg">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Overhead Cost</h3>
+        <div className="flex items-center gap-sm">
+          <h3 className="text-lg font-bold text-ink-900">Overhead Cost</h3>
           <Tooltip content={
-            <div className="space-y-2">
-              <p>Overhead includes all indirect costs of running your business.</p>
-              <p className="text-xs font-medium">Examples:</p>
-              <ul className="text-xs list-disc pl-4 space-y-1">
+            <div className="space-y-sm p-xs">
+              <p className="font-medium text-ink-900">Overhead includes all indirect costs of running your business.</p>
+              <p className="text-xs font-semibold text-ink-700 uppercase tracking-wider">Examples:</p>
+              <ul className="text-xs list-disc pl-md space-y-xs text-ink-600">
                 <li>Rent and Utilities (divided by batches)</li>
                 <li>Packaging (pouches, jars, labels)</li>
                 <li>Marketing (ads, flyers)</li>
@@ -42,7 +42,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
           }>
             <button
               type="button"
-              className="text-gray-400 hover:text-gray-500 cursor-help"
+              className="text-ink-500 hover:text-clay cursor-help transition-colors"
               aria-label="More info about overhead cost"
             >
               <HelpCircle className="w-4 h-4" />
@@ -52,15 +52,15 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
         <Button
           variant="ghost"
           onClick={() => setIsHelperOpen(!isHelperOpen)}
-          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 py-1 px-3 text-xs"
+          className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-lg"
         >
-          <Calculator className="w-4 h-4 mr-2" />
+          <Calculator className="w-4 h-4 mr-sm" />
           {isHelperOpen ? 'Hide Helper' : 'Overhead Helper'}
-          {isHelperOpen ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
+          {isHelperOpen ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
         </Button>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-sm">
         <Input
           label="Total Overhead Cost per Batch"
           type="number"
@@ -73,9 +73,9 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
           step="0.01"
         />
         {value === 0 && (
-          <div className="flex items-center gap-2 mt-1">
-            <Badge variant="warning" className="flex items-center gap-1 text-[10px] py-0">
-              <AlertCircle className="w-3 h-3" />
+          <div className="flex items-center gap-sm mt-sm">
+            <Badge variant="warning" className="flex items-center gap-xs text-[10px] py-xs px-sm uppercase tracking-wide">
+              <AlertCircle className="w-3.5 h-3.5" />
               Overhead is zero. Are you sure?
             </Badge>
           </div>
@@ -83,7 +83,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
       </div>
 
       {isHelperOpen && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="bg-bg-main rounded-xl p-sm border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500 overflow-hidden">
           <OverheadCalculator 
             onApply={handleApplyOverhead}
             initialBatchSize={batchSize}

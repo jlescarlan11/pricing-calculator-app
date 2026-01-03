@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { AppLayout } from './AppLayout';
 
@@ -15,20 +15,20 @@ describe('AppLayout', () => {
       </AppLayout>
     );
 
-    expect(screen.getByText('Pricing Calculator')).toBeInTheDocument();
+    expect(screen.getByText('PriceCraft')).toBeInTheDocument();
     expect(screen.getByTestId('test-child')).toBeInTheDocument();
   });
 
   it('renders the DataWarningBanner', () => {
     renderWithRouter(<AppLayout>Content</AppLayout>);
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText(/Your data is only saved in this browser session/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your progress is temporary/i)).toBeInTheDocument();
   });
 
   it('renders version information in the footer', () => {
     renderWithRouter(<AppLayout>Content</AppLayout>);
     
-    expect(screen.getByText(/Version 0\.1\.0-alpha/i)).toBeInTheDocument();
+    expect(screen.getByText(/v0\.1\.0/i)).toBeInTheDocument();
   });
 
   it('shows the sidebar toggle on mobile when sidebar prop is provided', () => {

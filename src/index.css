@@ -1,8 +1,98 @@
 @import 'tailwindcss';
 
+@theme {
+  /* Background & Surface */
+  --color-bg-main: #FAFAF9;
+  --color-surface: #F8F7F5;
+  --color-surface-hover: #F0EFED;
+  
+  /* Text Colors */
+  --color-ink-900: #3A3632; /* Soft Black */
+  --color-ink-700: #6B6761; /* Warm Gray */
+  --color-ink-500: #8B8680; /* Lighter Gray */
+  
+  /* Accents */
+  --color-clay: #A67B5B;      /* Primary Accent */
+  --color-moss: #7A8B73;      /* Success */
+  --color-sakura: #E8C5C0;    /* Warning / Soft Pink */
+  --color-rust: #B85C38;      /* Error / Autumn Rust */
+  
+  /* Borders & Dividers */
+  --color-border-base: #D4D2CF;
+  --color-border-subtle: #E6E4E1; /* Divider */
+
+  /* Spacing Scale (8px base) */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  --spacing-4xl: 6rem;     /* 96px */
+  --spacing-5xl: 8rem;     /* 128px */
+
+  /* Font Definitions */
+  --font-serif: "Crimson Text", serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Type Scale (1.25 ratio) starting from 16px */
+  --font-size-xs: 0.875rem;    /* 14px - Small */
+  --font-size-base: 1rem;      /* 16px - Body */
+  --font-size-lg: 1.25rem;     /* 20px - H6 */
+  --font-size-xl: 1.5625rem;   /* 25px - H5 */
+  --font-size-2xl: 1.953rem;   /* 31.25px - H4 */
+  --font-size-3xl: 2.441rem;   /* 39.06px - H3 */
+  --font-size-4xl: 3.052rem;   /* 48.83px - H2 */
+  --font-size-5xl: 3.815rem;   /* 61.04px - H1 */
+  --font-size-display: 4rem;   /* 64px */
+
+  /* Line Heights */
+  --leading-heading: 1.25;     /* 1.2–1.3 for headings */
+  --leading-body: 1.65;        /* 1.6–1.7 for body text */
+  --leading-ui: 1.5;           /* 1.5 for UI elements */
+
+  /* Letter Spacing */
+  --tracking-heading: 0.035em; /* 0.02em–0.05em for headings */
+  --tracking-body: 0.005em;    /* 0em–0.01em for body text */
+}
+
 @layer base {
+  body {
+    @apply bg-bg-main text-ink-900 antialiased font-sans text-base leading-body tracking-body;
+    font-feature-settings: "tnum", "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif text-ink-900 leading-heading tracking-heading;
+  }
+
+  h1 { @apply text-5xl font-semibold; }
+  h2 { @apply text-4xl font-semibold; }
+  h3 { @apply text-3xl font-semibold; }
+  h4 { @apply text-2xl font-semibold; }
+  h5 { @apply text-xl font-semibold; }
+  h6 { @apply text-lg font-semibold; }
+
+  /* UI elements use UI leading */
+  button, input, select, textarea, label {
+    @apply leading-ui transition-all duration-300 ease-out;
+  }
+
+  /* Global Scrollbar styling to match aesthetic */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-base rounded-full hover:bg-ink-500;
+  }
+
   @media print {
-    /* Hide all buttons and interactive elements */
+    /* ... existing print styles ... */
     button, 
     .print\:hidden,
     [role="tooltip"],
@@ -11,7 +101,6 @@
       display: none !important;
     }
 
-    /* Reset background and colors for printing */
     body {
       background-color: white !important;
       color: black !important;
@@ -19,24 +108,20 @@
       line-height: 1.5;
     }
 
-    /* Optimize layout for paper */
     @page {
       margin: 1.5cm;
       size: auto;
     }
 
-    /* Ensure text colors and backgrounds are preserved */
     * {
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
 
-    /* Remove shadows and borders that don't print well */
     .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
       box-shadow: none !important;
     }
 
-    /* Force elements to avoid breaking across pages */
     .print\:break-inside-avoid,
     tr,
     img,
@@ -44,12 +129,10 @@
       break-inside: avoid !important;
     }
 
-    /* Ensure cards have a subtle border instead of shadow */
     .bg-white, .rounded-xl, .rounded-2xl {
       border: 1px solid #e5e7eb !important;
     }
     
-    /* Reveal hidden print elements */
     .hidden.print\:block {
       display: block !important;
     }

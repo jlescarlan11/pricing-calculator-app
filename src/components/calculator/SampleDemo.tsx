@@ -13,60 +13,60 @@ export const SampleDemo: React.FC<SampleDemoProps> = ({ onLoadSample }) => {
   const sampleResults = performFullCalculation(COOKIE_SAMPLE.input, COOKIE_SAMPLE.config);
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 overflow-hidden relative">
-      <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-        <PieChart className="w-24 h-24 text-blue-900" />
+    <Card className="bg-surface border-border-subtle overflow-hidden relative shadow-none">
+      <div className="absolute top-0 right-0 p-lg opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-1000">
+        <PieChart className="w-32 h-32 text-clay" />
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+      <div className="flex flex-col lg:flex-row gap-2xl items-start lg:items-center p-sm">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-              Sample Demo
+          <div className="flex items-center gap-sm mb-sm">
+            <span className="bg-clay text-white text-[9px] font-bold px-sm py-[2px] rounded-full uppercase tracking-[0.2em]">
+              Interactive Example
             </span>
-            <h3 className="text-lg font-bold text-blue-900">Chocolate Chip Cookies Example</h3>
+            <h3 className="text-xl font-bold text-ink-900 tracking-tight">Artisan Cookie Case Study</h3>
           </div>
-          <p className="text-blue-800 text-sm mb-4 leading-relaxed">
-            Discover how to price your products for profit. This example shows a batch of 50 cookies 
-            with a 30% profit margin.
+          <p className="text-ink-700 text-sm mb-lg leading-relaxed font-medium">
+            Discover how to price your products with intention. This example shows a batch of 50 cookies 
+            with a sustainable 30% profit margin.
           </p>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-white/50 p-2 rounded-lg border border-blue-100/50">
-              <p className="text-[10px] uppercase text-blue-500 font-bold mb-0.5">Total Cost</p>
-              <p className="text-sm font-bold text-blue-900">{formatCurrency(sampleResults.totalCost)}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-lg">
+            <div className="bg-bg-main p-sm rounded-xl border border-border-subtle shadow-sm">
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Total Cost</p>
+              <p className="text-base font-bold text-ink-900">{formatCurrency(sampleResults.totalCost)}</p>
             </div>
-            <div className="bg-white/50 p-2 rounded-lg border border-blue-100/50">
-              <p className="text-[10px] uppercase text-blue-500 font-bold mb-0.5">Cost/Unit</p>
-              <p className="text-sm font-bold text-blue-900">{formatCurrency(sampleResults.costPerUnit)}</p>
+            <div className="bg-bg-main p-sm rounded-xl border border-border-subtle shadow-sm">
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Cost/Unit</p>
+              <p className="text-base font-bold text-ink-900">{formatCurrency(sampleResults.costPerUnit)}</p>
             </div>
-            <div className="bg-white/50 p-2 rounded-lg border border-blue-100/50">
-              <p className="text-[10px] uppercase text-blue-500 font-bold mb-0.5">Target Price</p>
-              <p className="text-sm font-bold text-blue-900">{formatCurrency(sampleResults.recommendedPrice)}</p>
+            <div className="bg-bg-main p-sm rounded-xl border border-border-subtle shadow-sm">
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Target Price</p>
+              <p className="text-base font-bold text-clay">{formatCurrency(sampleResults.recommendedPrice)}</p>
             </div>
-            <div className="bg-white/50 p-2 rounded-lg border border-blue-100/50">
-              <p className="text-[10px] uppercase text-blue-500 font-bold mb-0.5">Profit/Batch</p>
-              <p className="text-sm font-bold text-green-600">{formatCurrency(sampleResults.profitPerBatch)}</p>
+            <div className="bg-bg-main p-sm rounded-xl border border-border-subtle shadow-sm">
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Profit/Batch</p>
+              <p className="text-base font-bold text-moss">{formatCurrency(sampleResults.profitPerBatch)}</p>
             </div>
           </div>
         </div>
 
-        <div className="shrink-0 w-full lg:w-auto flex flex-col gap-3">
+        <div className="shrink-0 w-full lg:w-auto flex flex-col gap-md">
           <Button 
             onClick={onLoadSample}
             variant="primary"
-            className="w-full flex items-center justify-center gap-2 shadow-md bg-blue-600 hover:bg-blue-700 h-12 px-6"
+            className="w-full flex items-center justify-center gap-sm h-14 px-xl font-bold tracking-tight rounded-xl"
           >
             <PlayCircle className="w-5 h-5" />
-            Try It Yourself
-            <ArrowRight className="w-4 h-4 ml-1" />
+            Explore Sample
+            <ArrowRight className="w-4 h-4 ml-xs" />
           </Button>
-          <div className="flex items-center justify-center gap-1.5 text-xs text-blue-600 font-medium">
-            <Info className="w-3.5 h-3.5" />
-            Loads {COOKIE_SAMPLE.input.ingredients.length} ingredients into the form
+          <div className="flex items-center justify-center gap-sm text-xs text-ink-500 font-bold uppercase tracking-widest">
+            <Info className="w-3.5 h-3.5 opacity-50" />
+            Populate form instantly
           </div>
         </div>
       </div>
-    </Card>
-  );
-};
+        </Card>
+      );
+    };

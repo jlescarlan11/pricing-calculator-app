@@ -33,11 +33,11 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
 
   if (presets.length === 0) {
     return (
-      <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+      <div className="text-center py-3xl bg-surface rounded-2xl border-2 border-dashed border-border-base">
         <div className="max-w-xs mx-auto">
-          <p className="text-gray-600 font-medium mb-1">No saved presets yet</p>
-          <p className="text-sm text-gray-400">
-            Save your calculations to quickly access them later.
+          <p className="text-ink-900 font-bold mb-sm tracking-tight">No saved products yet</p>
+          <p className="text-sm text-ink-500 font-medium leading-relaxed">
+            Save your calculations to quickly access them later with intention.
           </p>
         </div>
       </div>
@@ -45,31 +45,29 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-end justify-between">
+    <div className="space-y-xl">
+      <div className="flex flex-col sm:flex-row gap-lg items-end justify-between">
         <div className="w-full sm:max-w-md">
           <Input
-            label="Search Presets"
+            label="Search Products"
             placeholder="Search by name or product..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full"
-            // Use suffix-like icon positioning with absolute Search icon if Input supported it, 
-            // but since it doesn't have a prefix prop, we'll use it as is or wrap it.
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-1">
-            View
+        <div className="flex items-center gap-sm">
+          <span className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] mr-xs">
+            View Mode
           </span>
-          <div className="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
+          <div className="flex items-center bg-surface p-xs rounded-xl border border-border-subtle">
             <Button
               variant="secondary"
               size="sm"
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 min-w-0 border-0 shadow-none hover:bg-white/50 ${
-                viewMode === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'bg-transparent text-gray-500'
+              className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-lg transition-all duration-300 ${
+                viewMode === 'grid' ? 'bg-bg-main shadow-sm text-clay' : 'bg-transparent text-ink-500'
               }`}
               title="Grid view"
             >
@@ -79,8 +77,8 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
               variant="secondary"
               size="sm"
               onClick={() => setViewMode('list')}
-              className={`p-1.5 min-w-0 border-0 shadow-none hover:bg-white/50 ${
-                viewMode === 'list' ? 'bg-white shadow-sm text-blue-600' : 'bg-transparent text-gray-500'
+              className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-lg transition-all duration-300 ${
+                viewMode === 'list' ? 'bg-bg-main shadow-sm text-clay' : 'bg-transparent text-ink-500'
               }`}
               title="List view"
             >
@@ -91,14 +89,14 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
       </div>
 
       {filteredPresets.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-100 shadow-xs">
-          <Search className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-          <p className="text-gray-500">No presets match your search &quot;{searchQuery}&quot;</p>
+        <div className="text-center py-3xl bg-surface rounded-2xl border border-border-subtle animate-in fade-in duration-500">
+          <Search className="w-12 h-12 text-ink-300 mx-auto mb-md opacity-50" />
+          <p className="text-ink-500 font-medium">No results match your search &quot;{searchQuery}&quot;</p>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => setSearchQuery('')}
-            className="mt-2 text-blue-600"
+            className="mt-md text-clay"
           >
             Clear search
           </Button>
@@ -107,8 +105,8 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 lg:grid-cols-2 gap-4'
-              : 'flex flex-col gap-4'
+              ? 'grid grid-cols-1 lg:grid-cols-2 gap-md'
+              : 'flex flex-col gap-md'
           }
         >
           {filteredPresets.map((preset) => (

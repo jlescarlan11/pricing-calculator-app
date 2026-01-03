@@ -41,14 +41,14 @@ describe('PresetsList', () => {
     vi.stubGlobal('confirm', vi.fn(() => true));
   });
 
-  it('renders "No saved presets yet" when list is empty', () => {
+  it('renders "No saved products yet" when list is empty', () => {
     (usePresets as Mock).mockReturnValue({
       presets: [],
       deletePreset: mockDeletePreset,
     });
 
     render(<PresetsList onLoad={mockOnLoad} onEdit={mockOnEdit} />);
-    expect(screen.getByText(/no saved presets yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/no saved products yet/i)).toBeInTheDocument();
   });
 
   it('renders presets sorted by newest first', () => {
@@ -76,7 +76,7 @@ describe('PresetsList', () => {
     const searchInput = screen.getByPlaceholderText(/search by name or product/i);
     fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
 
-    expect(screen.getByText(/no presets match your search/i)).toBeInTheDocument();
+    expect(screen.getByText(/no results match your search/i)).toBeInTheDocument();
     
     const clearBtn = screen.getByRole('button', { name: /clear search/i });
     fireEvent.click(clearBtn);

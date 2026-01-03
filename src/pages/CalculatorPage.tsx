@@ -82,10 +82,10 @@ export const CalculatorPage: React.FC<CalculatorPageProps> = ({ setSidebar }) =>
   // Update sidebar on mount
   useEffect(() => {
     setSidebar(
-      <div className="p-4 space-y-6">
-        <div className="flex items-center gap-2 px-2">
-          <Package className="text-blue-600 w-5 h-5" />
-          <h3 className="font-bold text-gray-900">Saved Products</h3>
+      <div className="p-md space-y-lg">
+        <div className="flex items-center gap-sm px-sm">
+          <Package className="text-clay w-5 h-5" />
+          <h3 className="text-ink-900">Saved Products</h3>
         </div>
         <PresetsList 
           onLoad={handleLoadPreset}
@@ -97,17 +97,17 @@ export const CalculatorPage: React.FC<CalculatorPageProps> = ({ setSidebar }) =>
   }, [setSidebar, handleLoadPreset, handleEditPreset]);
 
   return (
-    <div className="animate-in fade-in duration-500">
+    <div className="animate-in fade-in duration-700">
       {/* Intro Section (only on form view) */}
       {view === 'form' && (
-        <div className="space-y-6 mb-8">
-          <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 flex gap-4 items-start animate-in fade-in slide-in-from-top-4 duration-500">
-            <Info className="w-6 h-6 text-blue-500 shrink-0 mt-0.5" />
+        <div className="space-y-lg mb-2xl">
+          <div className="p-lg md:p-xl bg-surface rounded-2xl border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
+            <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
             <div>
-              <p className="text-blue-900 font-semibold mb-1">Welcome to your profit partner!</p>
-              <p className="text-blue-800 text-sm leading-relaxed">
+              <p className="text-ink-900 font-medium mb-xs">Welcome to your profit partner.</p>
+              <p className="text-ink-700 text-sm leading-relaxed">
                 Fill in your costs below. We&apos;ll help you find the perfect price to ensure your business grows sustainably. 
-                Don&apos;t forget to include your labor—your time is valuable!
+                Don&apos;t forget to include your labor—your time is valuable.
               </p>
             </div>
           </div>
@@ -143,7 +143,11 @@ export const CalculatorPage: React.FC<CalculatorPageProps> = ({ setSidebar }) =>
         )}
       </div>
 
-      <div className="mt-12 border-t border-gray-100 pt-12">
+      <div className="mt-3xl border-t border-border-subtle pt-3xl">
+        <div className="text-center mb-2xl">
+          <h3 className="text-xl text-ink-900">Mindful Pricing Knowledge</h3>
+          <p className="text-sm text-ink-500 font-medium mt-xs">Foundational concepts for your business journey.</p>
+        </div>
         <FAQ />
       </div>
     </div>

@@ -8,7 +8,7 @@ describe('CurrentPrice', () => {
   it('is hidden by default when value is undefined', () => {
     render(<CurrentPrice value={undefined} onChange={mockOnChange} />);
     expect(screen.queryByLabelText(/Current Selling Price/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/Compare with Current Price/i)).toBeInTheDocument();
+    expect(screen.getByText(/Compare Current/i)).toBeInTheDocument();
   });
 
   it('is visible when value is provided and greater than 0', () => {
@@ -20,7 +20,7 @@ describe('CurrentPrice', () => {
   it('toggles visibility when button is clicked', () => {
     render(<CurrentPrice value={undefined} onChange={mockOnChange} />);
     
-    const toggleBtn = screen.getByRole('button', { name: /Compare with Current Price/i });
+    const toggleBtn = screen.getByRole('button', { name: /Compare Current/i });
     fireEvent.click(toggleBtn);
     
     expect(screen.getByLabelText(/Current Selling Price/i)).toBeInTheDocument();
@@ -44,7 +44,7 @@ describe('CurrentPrice', () => {
 
   it('displays helper text when visible', () => {
     render(<CurrentPrice value={100} onChange={mockOnChange} />);
-    expect(screen.getByText(/Enter what you currently charge/i)).toBeInTheDocument();
+    expect(screen.getByText(/Compare what you currently charge/i)).toBeInTheDocument();
   });
 
   it('handles invalid input by calling onChange with undefined', () => {

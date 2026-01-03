@@ -15,16 +15,14 @@ describe('PricingStrategy', () => {
       />
     );
     
-    expect(screen.getByText(/Markup/i, { selector: 'button' })).toHaveClass('bg-white');
+    expect(screen.getByText(/Markup/i, { selector: 'button' })).toHaveClass('bg-clay');
     expect(screen.getByLabelText(/Markup Percentage/i)).toHaveValue(25);
     
-    // Using a function matcher to handle text split by span
     expect(screen.getByText((_, element) => {
-      return element?.textContent === "Add 25% to your cost";
+      return element?.textContent?.includes("Add 25% to your total cost") ?? false;
     }, { selector: 'p' })).toBeInTheDocument();
 
-    // Be specific about which price we are checking
-    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-2xl');
+    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-3xl');
     expect(priceDisplay).toHaveTextContent('₱125.00');
   });
 
@@ -38,14 +36,14 @@ describe('PricingStrategy', () => {
       />
     );
     
-    expect(screen.getByText(/Profit Margin/i, { selector: 'button' })).toHaveClass('bg-white');
+    expect(screen.getByText(/Profit Margin/i, { selector: 'button' })).toHaveClass('bg-clay');
     expect(screen.getByLabelText(/Margin Percentage/i)).toHaveValue(20);
     
     expect(screen.getByText((_, element) => {
-      return element?.textContent === "Keep 20% of sale price as profit";
+      return element?.textContent?.includes("Keep 20% of the final sale price as profit") ?? false;
     }, { selector: 'p' })).toBeInTheDocument();
 
-    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-2xl');
+    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-3xl');
     expect(priceDisplay).toHaveTextContent('₱125.00');
   });
 
@@ -142,11 +140,11 @@ describe('PricingStrategy', () => {
     );
     
     // Recommended Price: 100 + 10% = 110
-    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-2xl');
+    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-3xl');
     expect(priceDisplay).toHaveTextContent('₱110.00');
     
     // Profit per unit: 10
-    const profitDisplay = screen.getByText(/Profit per Unit/i).parentElement?.querySelector('.text-green-600');
+    const profitDisplay = screen.getByText(/Profit per Unit/i).parentElement?.querySelector('.text-moss');
     expect(profitDisplay).toHaveTextContent('+₱10.00');
   });
 });

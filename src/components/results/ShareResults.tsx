@@ -66,7 +66,7 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
         size="sm"
         disabled={isDisabled}
         onClick={() => setIsOpen(!isOpen)}
-        className="gap-2 shadow-sm min-w-[100px]"
+        className="gap-sm shadow-sm min-w-[100px]"
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
@@ -80,59 +80,67 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
 
       {isOpen && (
         <div 
-          className="absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in-95 duration-100 overflow-hidden"
+          className="absolute right-0 mt-sm w-64 origin-top-right bg-bg-main border border-border-base rounded-2xl shadow-xl z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="share-menu-button"
         >
-          <div className="py-1">
+          <div className="py-sm">
             <button
               onClick={handleCopy}
-              className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left gap-3"
+              className="flex items-center w-full px-lg py-md text-sm text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md group"
               role="menuitem"
             >
-              {copied ? (
-                <Check className="w-4 h-4 text-emerald-500" />
-              ) : (
-                <Copy className="w-4 h-4 text-gray-400" />
-              )}
-              <span className="flex-1 font-medium">{copied ? 'Copied to Clipboard' : 'Copy Summary'}</span>
+              <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center group-hover:bg-bg-main transition-colors">
+                {copied ? (
+                  <Check className="w-4 h-4 text-moss" />
+                ) : (
+                  <Copy className="w-4 h-4 text-ink-500 group-hover:text-clay" />
+                )}
+              </div>
+              <span className="flex-1 font-bold tracking-tight">{copied ? 'Copied' : 'Copy Summary'}</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left gap-3"
+              className="flex items-center w-full px-lg py-md text-sm text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md group"
               role="menuitem"
             >
-              <Printer className="w-4 h-4 text-gray-400" />
-              <span className="flex-1 font-medium">Print Results</span>
+              <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center group-hover:bg-bg-main transition-colors">
+                <Printer className="w-4 h-4 text-ink-500 group-hover:text-clay" />
+              </div>
+              <span className="flex-1 font-bold tracking-tight">Print Results</span>
             </button>
 
-            <div className="border-t border-gray-100 my-1" />
+            <div className="border-t border-border-subtle my-sm" />
 
             {/* Placeholder: Email */}
             <button
               disabled
-              className="flex items-center w-full px-4 py-2.5 text-sm text-gray-400 cursor-not-allowed text-left gap-3 group"
+              className="flex items-center w-full px-lg py-md text-sm text-ink-500 cursor-not-allowed text-left gap-md opacity-60"
               role="menuitem"
             >
-              <Mail className="w-4 h-4 text-gray-300" />
+              <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center">
+                <Mail className="w-4 h-4 text-ink-300" />
+              </div>
               <div className="flex flex-col">
-                <span className="font-medium">Email Report</span>
-                <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Coming Soon</span>
+                <span className="font-bold tracking-tight">Email Report</span>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-ink-400">Coming Soon</span>
               </div>
             </button>
 
             {/* Placeholder: PDF */}
             <button
               disabled
-              className="flex items-center w-full px-4 py-2.5 text-sm text-gray-400 cursor-not-allowed text-left gap-3"
+              className="flex items-center w-full px-lg py-md text-sm text-ink-500 cursor-not-allowed text-left gap-md opacity-60"
               role="menuitem"
             >
-              <FileText className="w-4 h-4 text-gray-300" />
+              <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center">
+                <FileText className="w-4 h-4 text-ink-300" />
+              </div>
               <div className="flex flex-col">
-                <span className="font-medium">Export PDF</span>
-                <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Coming Soon</span>
+                <span className="font-bold tracking-tight">Export PDF</span>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-ink-400">Coming Soon</span>
               </div>
             </button>
           </div>

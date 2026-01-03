@@ -57,6 +57,6 @@ describe('PriceComparison', () => {
     // In PHP locale, negative might be -₱2.00
     const profitUnit = screen.getByText(/2\.00/);
     expect(profitUnit).toBeDefined();
-    expect(profitUnit.className).toContain('text-rose-600');
+    expect(profitUnit.className).toContain('text-rust');
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { formatCalculationSummary, copyToClipboard } from './copy-to-clipboard';
 import type { CalculationInput, CalculationResult } from '../types/calculator';
 
@@ -94,7 +94,7 @@ describe('copy-to-clipboard utility', () => {
     });
 
     it('should fall back to execCommand when clipboard API fails', async () => {
-      (navigator.clipboard.writeText as any).mockRejectedValue(new Error('Failed'));
+      (navigator.clipboard.writeText as Mock).mockRejectedValue(new Error('Failed'));
       const success = await copyToClipboard('test text');
       expect(document.execCommand).toHaveBeenCalledWith('copy');
       expect(success).toBe(true);

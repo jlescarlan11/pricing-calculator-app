@@ -41,8 +41,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, sidebar }) => {
             `}
           >
             <div className="h-full flex flex-col">
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between md:hidden">
-                <div className="flex items-center gap-2">
+              <div className="p-md border-b border-gray-200 flex items-center justify-between md:hidden">
+                <div className="flex items-center gap-sm">
                   <Package className="text-blue-600" size={20} />
                   <span className="font-semibold">Saved Products</span>
                 </div>
@@ -59,8 +59,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, sidebar }) => {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto focus:outline-none">
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-xl md:py-2xl">
+            <div className="max-w-7xl mx-auto px-md sm:px-lg lg:px-xl">
               {children}
             </div>
           </div>
@@ -68,15 +68,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, sidebar }) => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="bg-white border-t border-gray-200 py-xl md:py-2xl">
+        <div className="max-w-7xl mx-auto px-md sm:px-lg lg:px-xl">
           <div className="md:flex md:items-center md:justify-between">
-            <div className="flex justify-center space-x-6 md:order-2">
+            <div className="flex justify-center space-x-lg md:order-2">
               <p className="text-center text-sm text-gray-400">
                 Designed for small food businesses in the Philippines.
               </p>
             </div>
-            <div className="mt-8 md:mt-0 md:order-1 text-center md:text-left">
+            <div className="mt-xl md:mt-0 md:order-1 text-center md:text-left">
               <p className="text-sm text-gray-500">
                 &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0-alpha
               </p>

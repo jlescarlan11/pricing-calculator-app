@@ -74,14 +74,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     input.ingredients.every(ing => ing.name.trim() !== '' && ing.cost > 0);
 
   return (
-    <div className="flex flex-col gap-8 w-full max-w-5xl mx-auto pb-20">
+    <div className="flex flex-col gap-2xl w-full max-w-5xl mx-auto pb-4xl">
       {/* Header with Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 sm:px-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg px-lg sm:px-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Cost Calculator</h2>
-          <p className="text-sm text-gray-500">Enter your production details below to calculate profitability.</p>
+          <h2 className="text-2xl text-ink-900">Cost Calculator</h2>
+          <p className="text-sm text-ink-500 font-medium">Define your production costs with intention.</p>
         </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-sm w-full sm:w-auto">
           <SavePresetButton 
             input={input}
             config={config}
@@ -91,7 +91,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           <Button 
             variant="secondary" 
             onClick={onReset} 
-            className="flex-1 sm:flex-none flex items-center gap-2"
+            className="flex-1 sm:flex-none flex items-center gap-sm"
           >
             <RefreshCcw className="w-4 h-4" />
             Clear
@@ -100,7 +100,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             variant="primary" 
             onClick={onCalculate} 
             isLoading={isCalculating}
-            className="flex-1 sm:flex-none flex items-center gap-2 shadow-lg shadow-blue-200"
+            className="flex-1 sm:flex-none flex items-center gap-sm"
           >
             <Calculator className="w-4 h-4" />
             Calculate
@@ -108,9 +108,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2xl">
         {/* Main Form Area */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 space-y-2xl">
           {/* Section 1: Product Info */}
           <ProductInfo 
             businessName={input.businessName}
@@ -128,22 +128,22 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           <Card 
             title={
               <div className="flex items-center justify-between w-full">
-                <h3 className="text-lg font-bold text-gray-900">Ingredients</h3>
-                <span className="text-sm font-normal text-gray-500">
-                  {input.ingredients.length} item(s)
+                <h3 className="text-lg text-ink-900">Ingredients</h3>
+                <span className="text-xs font-bold text-ink-500 uppercase tracking-widest">
+                  {input.ingredients.length} item{input.ingredients.length !== 1 ? 's' : ''}
                 </span>
               </div>
             }
           >
-            <div className="space-y-4">
+            <div className="space-y-lg">
               {errors.ingredients && (
-                <div className="p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-100 flex items-center gap-2">
+                <div className="p-md bg-rust/10 text-rust text-sm rounded-xl border border-rust/20 flex items-center gap-sm animate-in fade-in slide-in-from-left-2">
                   <Trash2 className="w-4 h-4" />
-                  {errors.ingredients}
+                  <span className="font-medium">{errors.ingredients}</span>
                 </div>
               )}
               
-              <div className="space-y-4">
+              <div className="space-y-md">
                 {input.ingredients.map((ing, index) => (
                   <IngredientRow
                     key={ing.id}
@@ -166,7 +166,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               <Button
                 variant="secondary"
                 onClick={onAddIngredient}
-                className="w-full mt-4 border-dashed border-2 py-4 flex items-center justify-center gap-2 hover:border-blue-400 hover:text-blue-600 transition-all"
+                className="w-full mt-lg border-dashed border-2 py-lg flex items-center justify-center gap-sm border-border-base text-ink-700 hover:border-clay hover:text-clay bg-transparent hover:bg-clay/5 transition-all duration-300 rounded-xl"
               >
                 <Plus className="w-5 h-5" />
                 Add Ingredient
@@ -175,7 +175,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           </Card>
 
           {/* Section 3: Costs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
             <LaborCost 
               value={input.laborCost} 
               onChange={handleLaborChange}
@@ -191,7 +191,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
         </div>
 
         {/* Sidebar Area */}
-        <div className="space-y-8">
+        <div className="space-y-xl">
           {/* Section 4: Pricing Strategy */}
           <PricingStrategy 
             strategy={config.strategy}
@@ -210,7 +210,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           />
 
           {/* Floating Mobile Action */}
-          <div className="fixed bottom-6 right-6 lg:hidden z-30">
+          <div className="fixed bottom-lg right-lg lg:hidden z-30">
             <Button
               variant="primary"
               onClick={onCalculate}

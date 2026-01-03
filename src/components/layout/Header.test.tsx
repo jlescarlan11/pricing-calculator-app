@@ -10,23 +10,20 @@ describe('Header', () => {
 
   it('renders the application title and subtitle', () => {
     renderWithRouter(<Header />);
-    expect(screen.getByText('Pricing Calculator')).toBeInTheDocument();
-    expect(screen.getByText(/For Food Entrepreneurs/i)).toBeInTheDocument();
+    expect(screen.getByText('PriceCraft')).toBeInTheDocument();
+    expect(screen.getByText(/Mindful Pricing/i)).toBeInTheDocument();
   });
 
   it('shows version information on desktop', () => {
     renderWithRouter(<Header />);
-    expect(screen.getByText(/v0\.1\.0-alpha/i)).toBeInTheDocument();
+    expect(screen.getByText(/v0\.1\.0/i)).toBeInTheDocument();
   });
 
-  it('opens the help modal when clicking the help button', () => {
+  it('contains navigation links', () => {
     renderWithRouter(<Header />);
-    // In our new Header, "How it works" is a NavLink, but we might still have modals for some triggers
-    // or we might need to update the test to check for navigation.
-    // Wait, I replaced the desktop buttons with NavLinks.
-    const helpLink = screen.getByRole('link', { name: /How it works/i });
-    expect(helpLink).toBeInTheDocument();
-    expect(helpLink).toHaveAttribute('href', '/help');
+    expect(screen.getByRole('link', { name: /Calculator/i })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: /How it works/i })).toHaveAttribute('href', '/help');
+    expect(screen.getByRole('link', { name: /Pricing Tips/i })).toHaveAttribute('href', '/faq');
   });
 
   it('toggles mobile menu when sidebar is NOT present', () => {
@@ -35,9 +32,9 @@ describe('Header', () => {
     const menuButton = screen.getByRole('button', { name: /Open main menu/i });
     fireEvent.click(menuButton);
     
-    // There will be two "Pricing Tips" (one for desktop, one for mobile)
-    const pricingTips = screen.getAllByText(/Pricing Tips/i);
-    expect(pricingTips.length).toBeGreaterThan(1);
+    // Check if mobile menu links are visible
+    const links = screen.getAllByRole('link', { name: /Calculator/i });
+    expect(links.length).toBeGreaterThan(1);
   });
 
   it('calls onToggleSidebar when sidebar button is clicked', () => {

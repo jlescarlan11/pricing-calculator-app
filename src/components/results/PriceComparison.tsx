@@ -42,75 +42,77 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
   if (isLower) {
     statusMessage = `You're leaving ${formatCurrency(absDiff)} per unit on the table`;
     statusIcon = <TrendingUp className="w-5 h-5 shrink-0" />;
-    statusColor = "text-amber-700 bg-amber-50 border-amber-200";
+    statusColor = "text-ink-900 bg-sakura/10 border-sakura/20";
   } else if (isHigher) {
     statusMessage = `You're overpriced by ${formatCurrency(absDiff)} per unit`;
     statusIcon = <TrendingDown className="w-5 h-5 shrink-0" />;
-    statusColor = "text-rose-700 bg-rose-50 border-rose-200";
+    statusColor = "text-rust bg-rust/5 border-rust/10";
   } else {
     statusMessage = "You're priced competitively";
     statusIcon = <CheckCircle className="w-5 h-5 shrink-0" />;
-    statusColor = "text-emerald-700 bg-emerald-50 border-emerald-200";
+    statusColor = "text-moss bg-moss/5 border-moss/10";
   }
 
   return (
-    <Card title="Price Comparison" className={className}>
-      <div className="space-y-6">
+    <Card title={<span className="text-ink-900">Price Comparison</span>} className={className}>
+      <div className="space-y-xl">
         {/* Visual Comparison */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-lg bg-surface rounded-2xl border border-border-subtle">
           <div className="text-center sm:text-left flex-1">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">
               Current Price
             </p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-3xl font-bold text-ink-900 tracking-tight">
               {formatCurrency(currentPrice)}
             </p>
           </div>
           
           <div className="hidden sm:flex items-center justify-center">
-            <ArrowRight className="w-6 h-6 text-gray-300" />
+            <ArrowRight className="w-8 h-8 text-border-base" />
           </div>
           
           <div className="text-center sm:text-right flex-1">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">
               Recommended
             </p>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-3xl font-bold text-clay tracking-tight">
               {formatCurrency(recommendedPrice)}
             </p>
           </div>
         </div>
 
         {/* Opportunity Cost Message */}
-        <div className={`p-4 rounded-xl border flex items-start sm:items-center gap-3 transition-colors ${statusColor}`}>
-          {statusIcon}
-          <span className="font-bold text-sm sm:text-base">
+        <div className={`p-lg rounded-2xl border flex items-start sm:items-center gap-md transition-all duration-500 ${statusColor}`}>
+          <div className="p-sm bg-white/50 rounded-lg shadow-sm">
+            {statusIcon}
+          </div>
+          <span className="font-bold text-sm sm:text-lg tracking-tight">
             {statusMessage}
           </span>
         </div>
 
         {/* Profitability at Current Price */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-white border border-gray-100 shadow-sm">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-tight mb-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
+          <div className="p-lg rounded-2xl bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
+            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-sm">
               Current Profit / Unit
             </p>
-            <p className={`text-xl font-bold ${currentProfitPerUnit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <p className={`text-2xl font-bold tracking-tight ${currentProfitPerUnit >= 0 ? 'text-moss' : 'text-rust'}`}>
               {formatCurrency(currentProfitPerUnit)}
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-ink-500 mt-sm font-medium">
               Earnings at your current price
             </p>
           </div>
 
-          <div className="p-4 rounded-lg bg-white border border-gray-100 shadow-sm">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-tight mb-1">
+          <div className="p-lg rounded-2xl bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
+            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-sm">
               Current Profit / Batch
             </p>
-            <p className={`text-xl font-bold ${currentProfitPerBatch >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <p className={`text-2xl font-bold tracking-tight ${currentProfitPerBatch >= 0 ? 'text-moss' : 'text-rust'}`}>
               {formatCurrency(currentProfitPerBatch)}
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-ink-500 mt-sm font-medium">
               Total batch earnings
             </p>
           </div>

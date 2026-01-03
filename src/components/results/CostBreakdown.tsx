@@ -15,50 +15,50 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ results, className
     {
       label: 'Ingredients',
       value: breakdown.ingredients,
-      color: 'bg-blue-500',
+      color: 'bg-clay',
     },
     {
       label: 'Labor',
       value: breakdown.labor,
-      color: 'bg-green-500',
+      color: 'bg-moss',
     },
     {
       label: 'Overhead',
       value: breakdown.overhead,
-      color: 'bg-orange-500',
+      color: 'bg-rust',
     },
   ];
 
   return (
-    <Card title="Cost Breakdown" className={className}>
-      <div className="space-y-6">
-        <div className="flex justify-between items-end border-b border-gray-50 pb-4">
+    <Card title={<span className="text-ink-900">Cost Breakdown</span>} className={className}>
+      <div className="space-y-xl">
+        <div className="flex justify-between items-end border-b border-border-subtle pb-lg">
           <div>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
+            <span className="text-[10px] font-bold text-ink-500 uppercase tracking-widest block mb-xs">
               Total Batch Cost
             </span>
-            <span className="text-2xl font-black text-gray-900 leading-none">
+            <span className="text-3xl font-bold text-ink-900 leading-none tracking-tight">
               {formatCurrency(totalCost)}
             </span>
           </div>
           <div className="text-right">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
+            <span className="text-[10px] font-bold text-ink-500 uppercase tracking-widest block mb-xs">
               Cost Per Unit
             </span>
-            <span className="text-lg font-bold text-blue-600 leading-none">
+            <span className="text-lg font-bold text-clay leading-none">
               {formatCurrency(costPerUnit)}
             </span>
           </div>
         </div>
 
         {/* Visual Bar Chart */}
-        <div className="h-4 w-full flex rounded-full overflow-hidden bg-gray-100 shadow-inner">
+        <div className="h-4 w-full flex rounded-full overflow-hidden bg-surface border border-border-subtle p-[2px]">
           {categories.map((category) => {
             const percentage = totalCost > 0 ? (category.value / totalCost) * 100 : 0;
             return (
               <div
                 key={category.label}
-                className={`h-full ${category.color} transition-all duration-1000 ease-out`}
+                className={`h-full ${category.color} transition-all duration-1000 ease-out first:rounded-l-full last:rounded-r-full`}
                 style={{ width: `${percentage}%` }}
                 title={`${category.label}: ${formatPercent(percentage)}`}
               />
@@ -67,22 +67,22 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ results, className
         </div>
 
         {/* Legend / Details */}
-        <div className="space-y-3">
+        <div className="space-y-md">
           {categories.map((category) => {
             const percentage = totalCost > 0 ? (category.value / totalCost) * 100 : 0;
             return (
               <div key={category.label} className="flex items-center justify-between group">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${category.color} shadow-sm`} />
-                  <span className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">
+                <div className="flex items-center gap-sm">
+                  <div className={`w-3.5 h-3.5 rounded-full ${category.color} shadow-sm border border-bg-main`} />
+                  <span className="text-sm font-semibold text-ink-700 group-hover:text-ink-900 transition-colors">
                     {category.label}
                   </span>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-gray-900">
+                  <p className="text-sm font-bold text-ink-900">
                     {formatCurrency(category.value)}
                   </p>
-                  <p className="text-[10px] text-gray-400 font-medium">
+                  <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider">
                     {formatPercent(percentage)}
                   </p>
                 </div>

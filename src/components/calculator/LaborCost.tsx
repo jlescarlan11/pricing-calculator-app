@@ -28,14 +28,14 @@ export const LaborCost: React.FC<LaborCostProps> = ({
   const calculatedTotal = (parseFloat(hours) || 0) * (parseFloat(rate) || 0);
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-lg space-y-lg">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Labor Cost</h3>
+        <div className="flex items-center gap-sm">
+          <h3 className="text-lg font-bold text-ink-900">Labor Cost</h3>
           <Tooltip content="Total cost of labor for this batch. You can enter a fixed amount or use the calculator below.">
             <button
               type="button"
-              className="text-gray-400 hover:text-gray-500 cursor-help"
+              className="text-ink-500 hover:text-clay cursor-help transition-colors"
               aria-label="More info about labor cost"
             >
               <HelpCircle className="w-4 h-4" />
@@ -45,11 +45,11 @@ export const LaborCost: React.FC<LaborCostProps> = ({
         <Button
           variant="ghost"
           onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
-          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 py-1 px-3 text-xs"
+          className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-lg"
         >
-          <Calculator className="w-4 h-4 mr-2" />
+          <Calculator className="w-4 h-4 mr-sm" />
           {isCalculatorOpen ? 'Hide Calculator' : 'Labor Calculator'}
-          {isCalculatorOpen ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
+          {isCalculatorOpen ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
         </Button>
       </div>
 
@@ -66,16 +66,16 @@ export const LaborCost: React.FC<LaborCostProps> = ({
       />
 
       {isCalculatorOpen && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-            <p className="font-medium text-gray-900 dark:text-white">How to calculate:</p>
+        <div className="bg-bg-main rounded-xl p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="space-y-sm text-sm text-ink-700">
+            <p className="font-medium text-ink-900">How to calculate:</p>
             <p>Labor Cost = Time Spent × Hourly Rate</p>
-            <div className="bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700 text-xs font-mono">
+            <div className="bg-surface p-sm rounded-lg border border-border-subtle text-xs font-mono text-ink-500">
               Example: 4 hours × ₱100/hour = ₱400
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-lg">
             <Input
               label="Hours Worked"
               type="number"
@@ -97,10 +97,10 @@ export const LaborCost: React.FC<LaborCostProps> = ({
             />
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between pt-lg border-t border-border-subtle">
             <div className="text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Calculated: </span>
-              <span className="font-bold text-gray-900 dark:text-white text-lg">
+              <span className="text-ink-500">Calculated: </span>
+              <span className="font-bold text-ink-900 text-xl tracking-tight">
                 ₱{calculatedTotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>

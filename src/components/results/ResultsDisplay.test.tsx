@@ -105,7 +105,7 @@ describe('ResultsDisplay', () => {
     });
 
     expect(navigator.clipboard.writeText).toHaveBeenCalled();
-    expect(screen.getByText(/Copied to Clipboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Copied/i)).toBeInTheDocument();
   });
 
   it('triggers print when Print Results is clicked in Share menu', () => {
@@ -126,6 +126,6 @@ describe('ResultsDisplay', () => {
     const saveButton = screen.getByText(/Save Product/i);
     fireEvent.click(saveButton);
     
-    expect(screen.getByText(/Save as Preset/i)).toBeInTheDocument();
+    expect(screen.getByText(/Save to Presets/i)).toBeInTheDocument();
   });
 });

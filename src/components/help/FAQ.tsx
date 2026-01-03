@@ -12,25 +12,25 @@ interface FAQItemProps {
 
 const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle }) => {
   return (
-    <div className="border-b border-gray-100 last:border-0">
+    <div className="border-b border-border-subtle last:border-0">
       <button
         onClick={onToggle}
-        className="w-full py-4 flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset rounded-lg transition-colors hover:bg-gray-50 px-2"
+        className="w-full py-lg flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-clay/20 focus:ring-inset rounded-xl transition-all duration-300 hover:bg-surface px-sm group"
         aria-expanded={isOpen}
       >
-        <span className="text-base font-medium text-gray-900 pr-4">{question}</span>
+        <span className={`text-base font-bold tracking-tight transition-colors ${isOpen ? 'text-clay' : 'text-ink-900 group-hover:text-clay'}`}>{question}</span>
         {isOpen ? (
-          <ChevronUp className="h-5 w-5 text-gray-500 shrink-0" />
+          <ChevronUp className="h-5 w-5 text-clay shrink-0" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-gray-500 shrink-0" />
+          <ChevronDown className="h-5 w-5 text-ink-300 group-hover:text-clay shrink-0" />
         )}
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-96 opacity-100 mb-4' : 'max-h-0 opacity-0'
+        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+          isOpen ? 'max-h-96 opacity-100 mb-lg' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-2 text-gray-600 leading-relaxed">
+        <div className="px-sm text-ink-700 leading-relaxed font-medium text-sm">
           {answer}
         </div>
       </div>
@@ -80,26 +80,26 @@ export const FAQ: React.FC = () => {
   return (
     <Card 
       title={
-        <div className="flex items-center gap-2">
-          <HelpCircle className="h-5 w-5 text-indigo-600" />
-          <span>Frequently Asked Questions</span>
+        <div className="flex items-center gap-sm">
+          <HelpCircle className="h-5 w-5 text-clay" />
+          <span className="text-ink-900">Frequently Asked Questions</span>
         </div>
       }
-      className="w-full max-w-2xl mx-auto"
+      className="w-full max-w-2xl mx-auto border-border-subtle shadow-none"
     >
-      <div className="space-y-6">
+      <div className="space-y-xl">
         <div className="relative">
           <Input
-            label="Search FAQ"
+            label="Search Knowledge"
             placeholder="Search for questions or keywords..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full"
           />
-          <Search className="absolute right-3 top-[38px] h-5 w-5 text-gray-400 pointer-events-none" />
+          <Search className="absolute right-lg top-[42px] h-5 w-5 text-ink-300 pointer-events-none opacity-50" />
         </div>
 
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border-subtle">
           {filteredFaqs.length > 0 ? (
             filteredFaqs.map((faq, index) => (
               <FAQItem
@@ -111,15 +111,15 @@ export const FAQ: React.FC = () => {
               />
             ))
           ) : (
-            <div className="py-8 text-center text-gray-500">
+            <div className="py-2xl text-center text-ink-500 font-medium">
               No results found for &quot;{searchQuery}&quot;.
             </div>
           )}
         </div>
 
-        <div className="pt-4 text-center">
-          <p className="text-sm text-gray-500">
-            Still have questions? Feel free to contact us for more help.
+        <div className="pt-lg text-center border-t border-border-subtle">
+          <p className="text-sm text-ink-500 font-medium leading-relaxed">
+            Still have questions? We&apos;re here to help you price with intention.
           </p>
         </div>
       </div>

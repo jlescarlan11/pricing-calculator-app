@@ -40,21 +40,21 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   };
 
   return (
-    <div className={`flex flex-col gap-1.5 w-full ${className}`}>
+    <div className={`flex flex-col gap-xs w-full ${className}`}>
       <label 
         htmlFor={id} 
-        className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center justify-between"
+        className="text-sm font-medium text-ink-700 flex items-center justify-between"
       >
         <span>
           {label}
-          {required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
+          {required && <span className="text-rust ml-xs" aria-hidden="true">*</span>}
         </span>
       </label>
 
       <div className="relative">
         {currency && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">₱</span>
+          <div className="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none">
+            <span className="text-ink-500 sm:text-sm">₱</span>
           </div>
         )}
         
@@ -72,39 +72,39 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           onKeyDown={handleKeyDown}
           min={type === 'number' ? 0 : undefined}
           className={`
-            block w-full rounded-md shadow-sm border
-            py-2 sm:text-sm transition-colors duration-200
-            disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed
+            block w-full rounded-md border
+            py-sm sm:text-sm transition-all duration-200
+            disabled:bg-surface-hover disabled:text-ink-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden
-            ${currency ? 'pl-7' : 'pl-3'}
-            ${suffix ? 'pr-8' : 'pr-3'}
+            ${currency ? 'pl-lg' : 'pl-sm'}
+            ${suffix ? 'pr-xl' : 'pr-sm'}
             ${error 
-              ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' 
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+              ? 'border-rust/50 text-rust placeholder-rust/30 focus:border-rust focus:ring-rust/20' 
+              : 'border-border-base bg-bg-main focus:border-clay focus:ring-clay/20'
             }
           `}
           {...props}
         />
 
         {suffix && !error && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">{suffix}</span>
+          <div className="absolute inset-y-0 right-0 pr-sm flex items-center pointer-events-none">
+            <span className="text-ink-500 sm:text-sm">{suffix}</span>
           </div>
         )}
 
         {error && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <AlertCircle className="h-5 w-5 text-red-500" aria-hidden="true" />
+          <div className="absolute inset-y-0 right-0 pr-sm flex items-center pointer-events-none">
+            <AlertCircle className="h-5 w-5 text-rust" aria-hidden="true" />
           </div>
         )}
       </div>
 
       {error ? (
-        <p className="mt-1 text-sm text-red-600 flex items-center gap-1" id={errorId} role="alert">
+        <p className="mt-xs text-sm text-rust flex items-center gap-xs" id={errorId} role="alert">
           {error}
         </p>
       ) : helperText ? (
-        <p className="mt-1 text-sm text-gray-500" id={helperId}>
+        <p className="mt-xs text-sm text-ink-500" id={helperId}>
           {helperText}
         </p>
       ) : null}

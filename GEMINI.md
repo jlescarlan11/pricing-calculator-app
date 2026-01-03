@@ -5,6 +5,11 @@
 A web-based pricing calculator designed for small food businesses in the Philippines to determine profitable selling prices.
 
 - **Core Goal**: Calculate accurate product costs (ingredients, labor, overhead) and recommend selling prices based on Markup or Profit Margin strategies.
+- **Design Philosophy**: Transform the generic calculator UI into a calm, intentional experience using Japanese aesthetics:
+    - **Ma (Negative Space)**: Create breathing room and reduce cognitive load.
+    - **Wabi-sabi (Imperfect Beauty)**: Use organic shapes, subtle textures, and a "human" touch.
+    - **Kanso (Simplicity)**: Focus on essential elements, eliminating clutter.
+- **Visual Aesthetic**: Muted natural colors, soft typography, and gentle interactions to reduce stress around pricing decisions.
 - **Target Audience**: Small food entrepreneurs (e.g., artisan bakers, hot sauce makers).
 - **Tech Stack**: React 19, TypeScript, Vite, Tailwind CSS 4.
 - **Architecture**: Client-side SPA, in-memory state management (no backend for MVP).
@@ -53,7 +58,24 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 - Use utility classes directly in JSX/TSX.
 - Follow **Mobile-First** design principles.
-- Maintain consistent spacing and color palette as defined in the design system/Tailwind config.
+- Maintain consistent spacing and color palette as defined in the design tokens.
+
+#### Design Tokens (Japanese Aesthetic)
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `bg-main` | `#FAFAF9` | Primary page background (Off-white) |
+| `surface` | `#F8F7F5` | Card and component surfaces |
+| `surface-hover` | `#F0EFED` | Hover states and subtle highlights |
+| `ink-900` | `#3A3632` | Primary text, headings (Soft Black) |
+| `ink-700` | `#6B6761` | Secondary text, labels (Warm Gray) |
+| `ink-500` | `#8B8680` | Tertiary text, placeholders (Light Gray) |
+| `clay` | `#A67B5B` | Primary accent, primary buttons |
+| `moss` | `#7A8B73` | Success states, positive indicators |
+| `sakura` | `#E8C5C0` | Warnings, subtle highlights |
+| `rust` | `#B85C38` | Error states, critical actions |
+| `border-base` | `#D4D2CF` | Standard component borders |
+| `border-subtle`| `#E6E4E1` | Dividers and very subtle lines |
 
 ## 4. Feature Requirements (MVP)
 
@@ -168,6 +190,20 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/help/PricingExplainerModal.tsx`
   - Tests: `src/components/help/PricingExplainerModal.test.tsx`
   - Exported from `src/components/help/index.ts`
+
+### Typography System (Added 2026-01-03)
+- [x] **Font Installation**: Integrated Google Fonts (Inter and Crimson Text) with specific weights (400, 500, 600).
+- [x] **Type Scale**: Implemented a 1.25 ratio type scale ranging from 14px to 64px.
+- [x] **Tailwind Configuration**: Configured `Crimson Text` for all headings (H1-H6) and `Inter` for body/UI text with tabular numbers enabled.
+- [x] **Global Styles**: Defined standardized line heights (1.25 for headings, 1.65 for body, 1.5 for UI) and letter spacing (0.035em for headings).
+- [x] **Component Audit**: Updated all major components and pages to remove redundant font weights and tracking classes, ensuring the new typography system is applied consistently.
+
+### Spacing System (Added 2026-01-03)
+- [x] **8px Base Scale**: Implemented a consistent spacing scale: xs (4px), sm (8px), md (16px), lg (24px), xl (32px), 2xl (48px), 3xl (64px), 4xl (96px), and 5xl (128px).
+- [x] **Tailwind Integration**: Configured the scale in `src/index.css` using Tailwind V4 CSS variables.
+- [x] **Component Audit**: Updated all components and pages to utilize the new spacing scale.
+- [x] **Layout Standards**: Enforced minimum 48px (`2xl`) spacing between sections and 24-32px (`lg`-`xl`) internal component padding.
+- [x] **Responsive Adaptation**: Configured mobile spacing with 32px section gaps, 16-24px padding, and 16px minimum edge margins.
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 

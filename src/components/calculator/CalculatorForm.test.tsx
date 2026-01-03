@@ -2,14 +2,14 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CalculatorForm } from './CalculatorForm';
 import { useCalculatorState } from '../../hooks/useCalculatorState';
-import type { CalculationInput, PricingConfig } from '../../types/calculator';
+import type { CalculationInput, PricingConfig, CalculationResult } from '../../types/calculator';
 
 const TestWrapper = ({ 
   onCalculate, 
   initialInput, 
   initialConfig 
 }: { 
-  onCalculate?: any; 
+  onCalculate?: (results: CalculationResult, input: CalculationInput, config: PricingConfig) => void; 
   initialInput?: CalculationInput;
   initialConfig?: PricingConfig;
 }) => {
