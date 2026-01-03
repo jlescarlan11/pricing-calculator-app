@@ -8,6 +8,7 @@ import {
   PricingStrategy, 
   CurrentPrice 
 } from './index';
+import { SavePresetButton } from '../presets/SavePresetButton';
 import { Button, Card } from '../shared';
 import { useSessionStorage, useDebounce } from '../../hooks';
 import { performFullCalculation } from '../../utils/calculations';
@@ -40,7 +41,7 @@ const initialConfig: PricingConfig = {
 };
 
 interface CalculatorFormProps {
-  onCalculate: (result: CalculationResult, input: CalculationInput) => void;
+  onCalculate: (result: CalculationResult, input: CalculationInput, config: PricingConfig) => void;
   onReset?: () => void;
 }
 
@@ -199,7 +200,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     }
 
     const result = performFullCalculation(input, config);
-    onCalculate(result, input);
+    onCalculate(result, input, config);
     setIsCalculating(false);
     
     // Smooth scroll to top or results area? 
@@ -216,6 +217,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     }
   };
 
+  const isFormValid = 
+    input.productName.trim().length >= 3 && 
+    input.batchSize >= 1 && 
+    input.ingredients.length > 0 && 
+    input.ingredients.every(ing => ing.name.trim() !== '' && ing.cost > 0);
+
   return (
     <div className="flex flex-col gap-8 w-full max-w-5xl mx-auto pb-20">
       {/* Header with Actions */}
@@ -225,6 +232,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           <p className="text-sm text-gray-500">Enter your production details below to calculate profitability.</p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
+          <SavePresetButton 
+            input={input}
+            config={config}
+            disabled={!isFormValid}
+            className="flex-1 sm:flex-none"
+          />
           <Button 
             variant="secondary" 
             onClick={handleReset} 

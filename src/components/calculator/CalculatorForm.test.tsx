@@ -96,6 +96,10 @@ describe('CalculatorForm', () => {
         expect.objectContaining({
           productName: 'Valid Product',
           batchSize: 10,
+        }),
+        expect.objectContaining({
+          strategy: expect.any(String),
+          value: expect.any(Number),
         })
       );
     });

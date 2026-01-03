@@ -123,6 +123,10 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **ResultsDisplay**: Orchestrator component for displaying all calculation results, including recommendations, cost breakdown, and price comparison. (Added 2026-01-03)
   - File: `src/components/results/ResultsDisplay.tsx`
   - Exported from `src/components/results/index.ts`
+- [x] **SavePresetButton**: A button component with tooltip and disabled state that triggers the SavePresetModal. Integrated into both the calculator form and results display for better UX. (Added 2026-01-03)
+  - File: `src/components/presets/SavePresetButton.tsx`
+  - Tests: `src/components/presets/SavePresetButton.test.tsx`
+  - Exported from `src/components/presets/index.ts`
 - [x] **CostBreakdown**: Component that displays total cost per unit with a categorical breakdown (Ingredients, Labor, Overhead) using percentages and a visual bar chart. (Added 2026-01-03)
   - File: `src/components/results/CostBreakdown.tsx`
   - Tests: `src/components/results/CostBreakdown.test.tsx`

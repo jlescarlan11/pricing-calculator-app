@@ -2,16 +2,18 @@ import { useState } from 'react';
 import { ChefHat, Info } from 'lucide-react';
 import { CalculatorForm } from './components/calculator';
 import { ResultsDisplay } from './components/results';
-import type { CalculationResult, CalculationInput } from './types/calculator';
+import type { CalculationResult, CalculationInput, PricingConfig } from './types/calculator';
 
 function App() {
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [lastInput, setLastInput] = useState<CalculationInput | null>(null);
+  const [lastConfig, setLastConfig] = useState<PricingConfig | null>(null);
   const [view, setView] = useState<'form' | 'results'>('form');
 
-  const handleCalculate = (result: CalculationResult, input: CalculationInput) => {
+  const handleCalculate = (result: CalculationResult, input: CalculationInput, config: PricingConfig) => {
     setResults(result);
     setLastInput(input);
+    setLastConfig(config);
     setView('results');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -24,6 +26,7 @@ function App() {
   const handleReset = () => {
     setResults(null);
     setLastInput(null);
+    setLastConfig(null);
     setView('form');
   };
 
@@ -69,10 +72,11 @@ function App() {
         {view === 'form' ? (
           <CalculatorForm onCalculate={handleCalculate} onReset={handleReset} />
         ) : (
-          results && lastInput && (
+          results && lastInput && lastConfig && (
             <ResultsDisplay 
               results={results} 
               input={lastInput} 
+              config={lastConfig}
               onEdit={handleEdit} 
             />
           )

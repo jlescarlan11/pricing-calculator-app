@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ResultsDisplay } from './ResultsDisplay';
-import type { CalculationResult, CalculationInput } from '../../types/calculator';
+import type { CalculationResult, CalculationInput, PricingConfig } from '../../types/calculator';
 
 const mockInput: CalculationInput = {
   productName: 'Test Product',
@@ -10,6 +10,11 @@ const mockInput: CalculationInput = {
   laborCost: 100,
   overhead: 50,
   currentSellingPrice: 200,
+};
+
+const mockConfig: PricingConfig = {
+  strategy: 'markup',
+  value: 50,
 };
 
 const mockResults: CalculationResult = {
@@ -39,14 +44,14 @@ describe('ResultsDisplay', () => {
   });
 
   it('renders placeholder when results are null', () => {
-    render(<ResultsDisplay results={null} input={mockInput} onEdit={() => {}} />);
+    render(<ResultsDisplay results={null} input={mockInput} config={mockConfig} onEdit={() => {}} />);
     
     expect(screen.getByText(/Ready to calculate\?/i)).toBeInTheDocument();
     expect(screen.getByText(/Start Calculation/i)).toBeInTheDocument();
   });
 
   it('renders results when provided', () => {
-    render(<ResultsDisplay results={mockResults} input={mockInput} onEdit={() => {}} />);
+    render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} onEdit={() => {}} />);
     
     expect(screen.getByText(/Calculation Results/i)).toBeInTheDocument();
     expect(screen.getByText(/Test Product/i)).toBeInTheDocument();
@@ -58,7 +63,7 @@ describe('ResultsDisplay', () => {
 
   it('calls onEdit when clicking Start Calculation in placeholder', () => {
     const onEdit = vi.fn();
-    render(<ResultsDisplay results={null} input={mockInput} onEdit={onEdit} />);
+    render(<ResultsDisplay results={null} input={mockInput} config={mockConfig} onEdit={onEdit} />);
     
     fireEvent.click(screen.getByText(/Start Calculation/i));
     expect(onEdit).toHaveBeenCalled();
@@ -66,14 +71,14 @@ describe('ResultsDisplay', () => {
 
   it('calls onEdit when clicking Adjust Inputs', () => {
     const onEdit = vi.fn();
-    render(<ResultsDisplay results={mockResults} input={mockInput} onEdit={onEdit} />);
+    render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} onEdit={onEdit} />);
     
     fireEvent.click(screen.getByText(/Adjust Inputs/i));
     expect(onEdit).toHaveBeenCalled();
   });
 
   it('copies summary to clipboard when Copy button is clicked', async () => {
-    render(<ResultsDisplay results={mockResults} input={mockInput} />);
+    render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} />);
     
     const copyButton = screen.getByText(/Copy/i);
     await act(async () => {
@@ -86,10 +91,19 @@ describe('ResultsDisplay', () => {
 
   it('triggers print when Print button is clicked', () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
-    render(<ResultsDisplay results={mockResults} input={mockInput} />);
+    render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} />);
     
     fireEvent.click(screen.getByText(/Print/i));
     expect(printSpy).toHaveBeenCalled();
     printSpy.mockRestore();
+  });
+
+  it('opens save modal when Save Product button is clicked', () => {
+    render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} />);
+    
+    const saveButton = screen.getByText(/Save Product/i);
+    fireEvent.click(saveButton);
+    
+    expect(screen.getByText(/Save as Preset/i)).toBeInTheDocument();
   });
 });
