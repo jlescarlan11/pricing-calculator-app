@@ -74,7 +74,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               placeholder="0"
             />
             <Input
-              label="Utilities"
+              label="Monthly Utilities"
               type="number"
               value={utilities}
               onChange={(e) => setUtilities(e.target.value)}

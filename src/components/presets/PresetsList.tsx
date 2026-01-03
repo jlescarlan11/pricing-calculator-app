@@ -105,7 +105,7 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
         <div
           className={
             viewMode === 'grid'
-              ? 'flex flex-col gap-md w-full'
+              ? 'grid grid-cols-1 md:grid-cols-2 gap-md w-full'
               : 'flex flex-col gap-sm w-full'
           }
         >

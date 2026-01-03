@@ -206,6 +206,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Component Audit**: Updated all components and pages to utilize the new spacing scale.
 - [x] **Layout Standards**: Enforced minimum 48px (`2xl`) spacing between sections and 24-32px (`lg`-`xl`) internal component padding.
 - [x] **Responsive Adaptation**: Configured mobile spacing with 32px section gaps, 16-24px padding, and 16px minimum edge margins.
+- [x] **Vertical Rhythm**: Enhanced `CalculatorForm` with explicit separators and consistent vertical spacing (space-y-xl) to improve visual flow and reduce cognitive load. Fixed "Monthly Utilities" label in Overhead Calculator and restored Grid view in Presets List.
 
 ### UI & Layout Restructuring (Added 2026-01-03)
 - [x] **Saved Products Modal**: Replaced the persistent sidebar with a cleaner Modal interface for managing presets.

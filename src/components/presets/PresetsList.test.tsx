@@ -97,7 +97,8 @@ describe('PresetsList', () => {
     const listViewBtn = screen.getByTitle(/list view/i);
     fireEvent.click(listViewBtn);
 
-    const listContainer = breadTitle.closest('.flex-col');
+    const breadTitleList = screen.getByText('Bread');
+    const listContainer = breadTitleList.closest('.flex-col');
     expect(listContainer).toBeInTheDocument();
     expect(listContainer).not.toHaveClass('grid');
   });
