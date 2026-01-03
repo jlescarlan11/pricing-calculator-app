@@ -57,7 +57,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
     <Card title={<span className="text-ink-900">Price Comparison</span>} className={className}>
       <div className="space-y-xl">
         {/* Visual Comparison */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-lg bg-surface rounded-2xl border border-border-subtle">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-lg bg-surface rounded-lg border border-border-subtle">
           <div className="text-center sm:text-left flex-1">
             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">
               Current Price
@@ -82,8 +82,8 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
         </div>
 
         {/* Opportunity Cost Message */}
-        <div className={`p-lg rounded-2xl border flex items-start sm:items-center gap-md transition-all duration-500 ${statusColor}`}>
-          <div className="p-sm bg-white/50 rounded-lg shadow-sm">
+        <div className={`p-lg rounded-lg border flex items-start sm:items-center gap-md transition-all duration-500 ${statusColor}`}>
+          <div className="p-sm bg-white/50 rounded-sm shadow-level-1">
             {statusIcon}
           </div>
           <span className="font-bold text-sm sm:text-lg tracking-tight">
@@ -93,7 +93,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
 
         {/* Profitability at Current Price */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
-          <div className="p-lg rounded-2xl bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
+          <div className="p-lg rounded-lg bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-sm">
               Current Profit / Unit
             </p>
@@ -105,7 +105,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
             </p>
           </div>
 
-          <div className="p-lg rounded-2xl bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
+          <div className="p-lg rounded-lg bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-sm">
               Current Profit / Batch
             </p>

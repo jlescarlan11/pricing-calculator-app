@@ -30,8 +30,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Placeholder for when no results are available
   if (!results) {
     return (
-      <div className="flex flex-col items-center justify-center p-3xl text-center bg-surface rounded-2xl border-2 border-dashed border-border-base animate-in fade-in duration-1000">
-        <div className="w-20 h-20 bg-bg-main rounded-full flex items-center justify-center mb-xl shadow-sm border border-border-subtle">
+      <div className="flex flex-col items-center justify-center p-3xl text-center bg-surface rounded-lg border-2 border-dashed border-border-base animate-in fade-in duration-1000">
+        <div className="w-20 h-20 bg-bg-main rounded-round flex items-center justify-center mb-xl shadow-level-1 border border-border-subtle">
           <Calculator className="w-10 h-10 text-ink-500" />
         </div>
         <h3 className="text-2xl text-ink-900 mb-sm">Ready to calculate?</h3>
@@ -120,7 +120,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </div>
           
           {/* Pro Tip Card */}
-          <div className="p-xl bg-surface rounded-2xl border border-border-base print:hidden relative overflow-hidden group">
+          <div className="p-xl bg-surface rounded-lg border border-border-base print:hidden relative overflow-hidden group">
             <div className="relative z-10">
               <h4 className="mb-md flex items-center gap-sm text-lg text-ink-900">
                 <Share2 className="w-5 h-5 text-clay" />
@@ -131,7 +131,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </p>
             </div>
             {/* Decorative background element */}
-            <div className="absolute -bottom-xl -right-xl w-32 h-32 bg-clay/5 rounded-full transition-transform group-hover:scale-110 duration-700" />
+            <div className="absolute -bottom-xl -right-xl w-32 h-32 bg-clay/5 rounded-round transition-transform group-hover:scale-110 duration-700" />
           </div>
         </div>
       </div>

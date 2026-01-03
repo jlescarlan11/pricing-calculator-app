@@ -15,7 +15,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle })
     <div className="border-b border-border-subtle last:border-0">
       <button
         onClick={onToggle}
-        className="w-full py-lg flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-clay/20 focus:ring-inset rounded-xl transition-all duration-300 hover:bg-surface px-sm group"
+        className="w-full py-lg flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-clay/20 focus:ring-inset rounded-md transition-all duration-300 hover:bg-surface px-sm group"
         aria-expanded={isOpen}
       >
         <span className={`text-base font-bold tracking-tight transition-colors ${isOpen ? 'text-clay' : 'text-ink-900 group-hover:text-clay'}`}>{question}</span>

@@ -1,89 +1,69 @@
-import React, { useState } from 'react';
-import { X, Package } from 'lucide-react';
-import { Button } from '../shared/Button';
+import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
 import { DataWarningBanner } from './DataWarningBanner';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  sidebar?: React.ReactNode;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({ children, sidebar }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  const [showTexture, setShowTexture] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('pc-show-texture');
+      return saved !== null ? JSON.parse(saved) : true;
+    }
+    return true;
+  });
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  useEffect(() => {
+    localStorage.setItem('pc-show-texture', JSON.stringify(showTexture));
+  }, [showTexture]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <DataWarningBanner />
-      <Header 
-        onToggleSidebar={toggleSidebar} 
-        showSidebarButton={!!sidebar}
-        isSidebarOpen={isSidebarOpen}
-      />
+    <div className="min-h-screen bg-bg-main flex flex-col relative">
+      {showTexture && <div className="paper-texture" />}
+      
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <DataWarningBanner />
+        <Header />
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Mobile Sidebar Backdrop */}
-        {sidebar && isSidebarOpen && (
-          <div 
-            className="fixed inset-0 z-30 bg-gray-600/75 md:hidden transition-opacity"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Sidebar Container */}
-        {sidebar && (
-          <aside
-            className={`
-              fixed inset-y-0 left-0 z-40 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0
-              ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}
-          >
-            <div className="h-full flex flex-col">
-              <div className="p-md border-b border-gray-200 flex items-center justify-between md:hidden">
-                <div className="flex items-center gap-sm">
-                  <Package className="text-blue-600" size={20} />
-                  <span className="font-semibold">Saved Products</span>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => setIsSidebarOpen(false)}>
-                  <X size={20} />
-                </Button>
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                {sidebar}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Main Content */}
+          <main className="flex-1 overflow-y-auto focus:outline-none">
+            <div className="py-xl md:py-2xl">
+              <div className="max-w-6xl mx-auto px-md sm:px-lg lg:px-xl">
+                {children}
               </div>
             </div>
-          </aside>
-        )}
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto focus:outline-none">
-          <div className="py-xl md:py-2xl">
-            <div className="max-w-7xl mx-auto px-md sm:px-lg lg:px-xl">
-              {children}
-            </div>
-          </div>
-        </main>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-xl md:py-2xl">
-        <div className="max-w-7xl mx-auto px-md sm:px-lg lg:px-xl">
-          <div className="md:flex md:items-center md:justify-between">
-            <div className="flex justify-center space-x-lg md:order-2">
-              <p className="text-center text-sm text-gray-400">
-                Designed for small food businesses in the Philippines.
-              </p>
-            </div>
-            <div className="mt-xl md:mt-0 md:order-1 text-center md:text-left">
-              <p className="text-sm text-gray-500">
-                &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0-alpha
-              </p>
-            </div>
-          </div>
+          </main>
         </div>
-      </footer>
+
+        {/* Footer */}
+        <footer className="bg-white border-t border-border-subtle py-xl md:py-2xl relative z-10">
+          <div className="max-w-6xl mx-auto px-md sm:px-lg lg:px-xl">
+            <div className="md:flex md:items-center md:justify-between">
+              <div className="flex flex-col md:flex-row items-center space-y-md md:space-y-0 md:space-x-lg md:order-2">
+                <button
+                  onClick={() => setShowTexture(!showTexture)}
+                  className="text-xs text-ink-500 hover:text-ink-700 transition-colors flex items-center space-x-sm cursor-pointer"
+                  title={showTexture ? "Disable background texture" : "Enable background texture"}
+                >
+                  <span className={`w-3 h-3 rounded-full border border-current ${showTexture ? 'bg-moss border-moss' : 'bg-transparent'}`} />
+                  <span>Texture {showTexture ? 'On' : 'Off'}</span>
+                </button>
+                <p className="text-center text-sm text-ink-500">
+                  Designed for small food businesses in the Philippines.
+                </p>
+              </div>
+              <div className="mt-xl md:mt-0 md:order-1 text-center md:text-left">
+                <p className="text-sm text-ink-700">
+                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0-alpha
+                </p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };

@@ -42,7 +42,7 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
     <Card title={<span className="text-ink-900">Pricing Recommendation</span>} className={className}>
       <div className="space-y-2xl">
         {/* Recommended Selling Price - Primary Focus */}
-        <div className="text-center p-2xl bg-surface rounded-2xl border border-border-subtle relative overflow-hidden group">
+        <div className="text-center p-2xl bg-surface rounded-lg border border-border-subtle relative overflow-hidden group">
           <p className="text-[10px] font-bold text-clay uppercase tracking-[0.2em] mb-sm">
             Recommended Selling Price
           </p>
@@ -55,12 +55,12 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
             </Badge>
           </div>
           {/* Subtle decorative element */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-clay/5 rounded-full -mr-16 -mt-16 blur-2xl transition-opacity group-hover:opacity-100 opacity-50" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-clay/5 rounded-round -mr-16 -mt-16 blur-2xl transition-opacity group-hover:opacity-100 opacity-50" />
         </div>
 
         {/* Secondary Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-xl">
-          <div className="space-y-sm p-lg rounded-2xl bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
+          <div className="space-y-sm p-lg rounded-lg bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
               Break-even Price
             </p>
@@ -72,7 +72,7 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
             </p>
           </div>
 
-          <div className="space-y-sm p-lg rounded-2xl bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
+          <div className="space-y-sm p-lg rounded-lg bg-bg-main border border-border-subtle hover:border-border-base transition-colors">
             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
               Profit Margin
             </p>
@@ -84,7 +84,7 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
             </p>
           </div>
 
-          <div className="space-y-sm p-lg rounded-2xl bg-moss/5 border border-moss/10 hover:border-moss/20 transition-colors">
+          <div className="space-y-sm p-lg rounded-lg bg-moss/5 border border-moss/10 hover:border-moss/20 transition-colors">
             <p className="text-[10px] font-bold text-moss uppercase tracking-widest">
               Profit Per Unit
             </p>
@@ -96,7 +96,7 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
             </p>
           </div>
 
-          <div className="space-y-sm p-lg rounded-2xl bg-moss/5 border border-moss/10 hover:border-moss/20 transition-colors">
+          <div className="space-y-sm p-lg rounded-lg bg-moss/5 border border-moss/10 hover:border-moss/20 transition-colors">
             <p className="text-[10px] font-bold text-moss uppercase tracking-widest">
               Total Batch Profit
             </p>

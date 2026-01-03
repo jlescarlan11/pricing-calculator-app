@@ -1,5 +1,5 @@
-import React from 'react';
-import { FileEdit, Trash2, Play, Calendar, Package } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { FileEdit, Trash2, Play, Calendar, Package, MoreVertical } from 'lucide-react';
 import type { SavedPreset } from '../../types';
 import { formatDate } from '../../utils/formatters';
 import { Button, Card, Badge, Tooltip } from '../shared';
@@ -9,106 +9,197 @@ interface PresetListItemProps {
   onLoad: (preset: SavedPreset) => void;
   onEdit: (preset: SavedPreset) => void;
   onDelete: (preset: SavedPreset) => void;
+  viewMode?: 'grid' | 'list';
 }
 
 /**
  * A list item component for displaying a saved preset with its metadata and actions.
+ * Supports 'grid' (detailed card) and 'list' (minimal row) view modes.
  */
 export const PresetListItem: React.FC<PresetListItemProps> = ({
   preset,
   onLoad,
   onEdit,
   onDelete,
+  viewMode = 'grid',
 }) => {
   const { name, input, lastModified, config } = preset;
   const { productName, batchSize, ingredients } = input;
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsActionsOpen(false);
+      }
+    };
+
+    if (isActionsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isActionsOpen]);
+
+  if (viewMode === 'list') {
+    return (
+      <div className="group relative flex items-center justify-between p-md bg-surface hover:bg-surface-hover rounded-md border border-border-subtle transition-all duration-300">
+        <div className="flex-1 min-w-0 flex items-center gap-md">
+          <div className="p-xs bg-clay/10 rounded-sm text-clay">
+            <Package size={16} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-sm font-bold text-ink-900 truncate tracking-tight" title={name}>
+              {name}
+            </h4>
+            <p className="text-[10px] text-ink-500 font-medium">
+              {formatDate(lastModified)}
+            </p>
+          </div>
+        </div>
+
+        <div className="relative" ref={dropdownRef}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsActionsOpen(!isActionsOpen)}
+            className="w-8 h-8 p-0 rounded-sm text-ink-500 hover:text-clay"
+            aria-label="Actions"
+          >
+            <MoreVertical size={18} />
+          </Button>
+
+          {isActionsOpen && (
+            <div className="absolute right-0 mt-xs w-48 origin-top-right bg-bg-main border border-border-base rounded-md shadow-level-4 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+              <div className="py-xs">
+                <button
+                  onClick={() => {
+                    onLoad(preset);
+                    setIsActionsOpen(false);
+                  }}
+                  className="flex items-center w-full px-lg py-md text-xs font-bold text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md"
+                >
+                  <Play size={14} className="fill-current text-clay" />
+                  Load into Calculator
+                </button>
+                <button
+                  onClick={() => {
+                    onEdit(preset);
+                    setIsActionsOpen(false);
+                  }}
+                  className="flex items-center w-full px-lg py-md text-xs font-bold text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md"
+                >
+                  <FileEdit size={14} className="text-ink-500" />
+                  Edit Name
+                </button>
+                <div className="border-t border-border-subtle my-xs" />
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+                      onDelete(preset);
+                    }
+                    setIsActionsOpen(false);
+                  }}
+                  className="flex items-center w-full px-lg py-md text-xs font-bold text-rust hover:bg-rust/5 transition-colors text-left gap-md"
+                >
+                  <Trash2 size={14} />
+                  Delete Preset
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Card className="group transition-all duration-500 hover:border-clay/50 bg-bg-main hover:bg-surface border-border-subtle shadow-none">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-lg">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-sm mb-sm">
-            <h4 className="text-lg font-bold text-ink-900 truncate tracking-tight" title={name}>
-              {name}
-            </h4>
-            <Badge variant="info" className="hidden sm:inline-flex text-[10px] uppercase tracking-widest py-xs px-sm">
-              Saved
-            </Badge>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-x-lg gap-y-sm text-sm text-ink-500 font-medium">
-            <div className="flex items-center gap-sm">
-              <Package className="w-4 h-4 text-clay/60" />
-              <span className="truncate max-w-[150px] text-ink-700" title={productName || 'Unnamed Product'}>
-                {productName || 'Unnamed Product'}
-              </span>
-            </div>
-            <div className="flex items-center gap-sm">
-              <span className="font-bold text-ink-900">{batchSize}</span>
-              <span>unit{batchSize !== 1 ? 's' : ''} / batch</span>
-            </div>
-            <div className="flex items-center gap-sm">
-              <Calendar className="w-4 h-4 text-ink-300" />
-              <span>{formatDate(lastModified)}</span>
-            </div>
-          </div>
+      {/* Header: Name and Date */}
+      <div className="flex items-start justify-between gap-sm mb-md">
+        <div className="min-w-0">
+          <h4 className="text-base font-bold text-ink-900 truncate tracking-tight" title={name}>
+            {name}
+          </h4>
+          <p className="text-[10px] text-ink-500 font-medium flex items-center gap-xs mt-0.5">
+            <Calendar size={10} className="opacity-70" />
+            {formatDate(lastModified)}
+          </p>
         </div>
+        <Badge variant="info" className="text-[9px] uppercase tracking-widest py-0 px-xs shrink-0">
+          Saved
+        </Badge>
+      </div>
 
-        <div className="flex items-center gap-sm sm:ml-lg">
-          <Tooltip content="Load this preset into calculator">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => onLoad(preset)}
-              className="flex-1 sm:flex-none flex items-center gap-sm px-lg"
-            >
-              <Play className="w-4 h-4 fill-current" />
-              Load
-            </Button>
-          </Tooltip>
-
-          <Tooltip content="Edit preset name">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => onEdit(preset)}
-              className="p-sm sm:w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-300 hover:text-clay hover:border-clay/30"
-              aria-label="Edit preset name"
-            >
-              <FileEdit className="w-4 h-4" />
-            </Button>
-          </Tooltip>
-
-          <Tooltip content="Delete preset">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
-                  onDelete(preset);
-                }
-              }}
-              className="p-sm sm:w-11 h-11 flex items-center justify-center text-ink-300 hover:text-rust hover:bg-rust/5 hover:border-rust/20 rounded-xl transition-all duration-300"
-              aria-label="Delete preset"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </Tooltip>
+      {/* Product Details Section */}
+      <div className="space-y-sm mb-md bg-surface/50 p-sm rounded-sm border border-border-subtle/50">
+        <div className="flex items-center gap-sm text-xs text-ink-700">
+          <Package className="w-3.5 h-3.5 text-clay/60 shrink-0" />
+          <span className="truncate font-semibold" title={productName || 'Unnamed Product'}>
+            {productName || 'Unnamed Product'}
+          </span>
+        </div>
+        <div className="flex items-center gap-sm text-[11px] text-ink-500">
+          <span className="font-bold text-ink-900">{batchSize}</span>
+          <span>unit{batchSize !== 1 ? 's' : ''} / batch</span>
         </div>
       </div>
 
-      {/* Secondary Preview Info */}
-      <div className="mt-lg pt-lg border-t border-border-subtle grid grid-cols-2 sm:grid-cols-4 gap-lg text-[10px] uppercase tracking-widest font-bold">
-        <div>
+      {/* Info Grid */}
+      <div className="grid grid-cols-2 gap-md text-[9px] uppercase tracking-widest font-bold mb-md">
+        <div className="border-r border-border-subtle pr-md">
           <span className="block text-ink-500 mb-xs opacity-70">Ingredients</span>
           <span className="text-ink-900">{ingredients.length} item{ingredients.length !== 1 ? 's' : ''}</span>
         </div>
-        <div>
+        <div className="pl-md">
           <span className="block text-ink-500 mb-xs opacity-70">Strategy</span>
           <span className="text-ink-900">
             {config.strategy} ({config.value}%)
           </span>
         </div>
+      </div>
+
+      {/* Actions row */}
+      <div className="flex items-center gap-sm pt-md border-t border-border-subtle">
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => onLoad(preset)}
+          className="flex-1 flex items-center justify-center gap-sm h-10 px-md font-bold text-[11px]"
+        >
+          <Play className="w-3.5 h-3.5 fill-current" />
+          Load
+        </Button>
+        <Tooltip content="Edit Name">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onEdit(preset)}
+            className="w-10 h-10 p-0 flex items-center justify-center rounded-sm hover:text-clay transition-colors"
+            aria-label="Edit preset name"
+          >
+            <FileEdit size={16} />
+          </Button>
+        </Tooltip>
+        <Tooltip content="Delete">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+                onDelete(preset);
+              }
+            }}
+            className="w-10 h-10 p-0 flex items-center justify-center text-ink-300 hover:text-rust hover:bg-rust/5 rounded-sm transition-colors"
+            aria-label="Delete preset"
+          >
+            <Trash2 size={16} />
+          </Button>
+        </Tooltip>
       </div>
     </Card>
   );

@@ -18,10 +18,10 @@ export const DataWarningBanner: React.FC = () => {
       role="alert"
       aria-live="polite"
     >
-      <div className="max-w-7xl mx-auto px-lg sm:px-xl lg:px-2xl py-md">
+      <div className="max-w-6xl mx-auto px-md sm:px-lg lg:px-xl py-md">
         <div className="flex items-center justify-between gap-lg">
           <div className="flex items-center gap-md">
-            <div className="shrink-0 p-xs bg-sakura/20 rounded-lg">
+            <div className="shrink-0 p-xs bg-sakura/20 rounded-sm">
               <AlertTriangle className="h-5 w-5 text-ink-700" aria-hidden="true" />
             </div>
             <p className="text-sm font-medium text-ink-900 leading-relaxed">
@@ -37,7 +37,7 @@ export const DataWarningBanner: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsVisible(false)}
-              className="p-sm rounded-lg text-ink-500 hover:text-ink-900 hover:bg-sakura/20 focus:outline-none transition-all duration-300"
+              className="p-sm rounded-sm text-ink-500 hover:text-ink-900 hover:bg-sakura/20 focus:outline-none transition-all duration-300"
               aria-label="Dismiss warning"
             >
               <X className="h-4 w-4" />

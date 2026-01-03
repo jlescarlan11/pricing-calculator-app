@@ -72,12 +72,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           onKeyDown={handleKeyDown}
           min={type === 'number' ? 0 : undefined}
           className={`
-            block w-full rounded-md border
-            py-sm sm:text-sm transition-all duration-200
+            block w-full rounded-sm border
+            py-2 sm:text-sm transition-all duration-200
             disabled:bg-surface-hover disabled:text-ink-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden
-            ${currency ? 'pl-lg' : 'pl-sm'}
-            ${suffix ? 'pr-xl' : 'pr-sm'}
+            ${currency ? 'pl-10' : 'pl-3'}
+            ${suffix || error ? 'pr-10' : 'pr-3'}
             ${error 
               ? 'border-rust/50 text-rust placeholder-rust/30 focus:border-rust focus:ring-rust/20' 
               : 'border-border-base bg-bg-main focus:border-clay focus:ring-clay/20'

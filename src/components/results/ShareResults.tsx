@@ -66,7 +66,7 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
         size="sm"
         disabled={isDisabled}
         onClick={() => setIsOpen(!isOpen)}
-        className="gap-sm shadow-sm min-w-[100px]"
+        className="gap-sm min-w-[100px]"
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
@@ -80,7 +80,7 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
 
       {isOpen && (
         <div 
-          className="absolute right-0 mt-sm w-64 origin-top-right bg-bg-main border border-border-base rounded-2xl shadow-xl z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
+          className="absolute right-0 mt-sm w-64 origin-top-right bg-bg-main border border-border-base rounded-2xl shadow-level-4 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="share-menu-button"

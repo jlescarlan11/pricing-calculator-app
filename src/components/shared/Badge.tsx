@@ -16,7 +16,7 @@ export const Badge: React.FC<BadgeProps> = ({
   variant = 'info',
   className = '',
 }) => {
-  const baseStyles = 'inline-flex items-center rounded-full px-sm py-xs text-xs font-semibold border transition-colors';
+  const baseStyles = 'inline-flex items-center rounded-sm px-sm py-xs text-xs font-semibold border transition-colors';
 
   const variants = {
     success: 'bg-moss/10 text-moss border-moss/20',

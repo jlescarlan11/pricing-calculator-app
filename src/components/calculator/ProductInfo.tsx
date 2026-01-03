@@ -24,7 +24,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 }) => {
   return (
     <Card title={<span className="text-ink-900">Product Details</span>} className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-xl">
         <Input
           label="Business Name (Optional)"
           value={businessName}

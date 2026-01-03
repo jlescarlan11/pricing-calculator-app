@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { Header } from './Header';
 
@@ -26,8 +26,8 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: /Pricing Tips/i })).toHaveAttribute('href', '/faq');
   });
 
-  it('toggles mobile menu when sidebar is NOT present', () => {
-    renderWithRouter(<Header showSidebarButton={false} />);
+  it('toggles mobile menu', () => {
+    renderWithRouter(<Header />);
     
     const menuButton = screen.getByRole('button', { name: /Open main menu/i });
     fireEvent.click(menuButton);
@@ -35,22 +35,5 @@ describe('Header', () => {
     // Check if mobile menu links are visible
     const links = screen.getAllByRole('link', { name: /Calculator/i });
     expect(links.length).toBeGreaterThan(1);
-  });
-
-  it('calls onToggleSidebar when sidebar button is clicked', () => {
-    const onToggleSidebar = vi.fn();
-    renderWithRouter(<Header showSidebarButton={true} onToggleSidebar={onToggleSidebar} />);
-    
-    const sidebarButton = screen.getByRole('button', { name: /Toggle sidebar/i });
-    fireEvent.click(sidebarButton);
-    
-    expect(onToggleSidebar).toHaveBeenCalledTimes(1);
-  });
-
-  it('shows different icon when sidebar is open', () => {
-    renderWithRouter(<Header showSidebarButton={true} isSidebarOpen={true} />);
-    
-    const sidebarButton = screen.getByRole('button', { name: /Toggle sidebar/i });
-    expect(sidebarButton).toHaveAttribute('aria-expanded', 'true');
   });
 });

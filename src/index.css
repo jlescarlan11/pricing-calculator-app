@@ -32,6 +32,20 @@
   --spacing-4xl: 6rem;     /* 96px */
   --spacing-5xl: 8rem;     /* 128px */
 
+  /* Max-Width overrides to prevent conflicts with the new spacing scale names.
+     Tailwind 4 maps max-w-* utilities to these --max-width-* variables. */
+  --max-width-xs: 20rem;    /* 320px */
+  --max-width-sm: 24rem;    /* 384px */
+  --max-width-md: 28rem;    /* 448px */
+  --max-width-lg: 32rem;    /* 512px */
+  --max-width-xl: 36rem;    /* 576px */
+  --max-width-2xl: 42rem;   /* 672px */
+  --max-width-3xl: 48rem;   /* 768px */
+  --max-width-4xl: 56rem;   /* 896px */
+  --max-width-5xl: 64rem;   /* 1024px */
+  --max-width-6xl: 72rem;   /* 1152px */
+  --max-width-7xl: 80rem;   /* 1280px */
+
   /* Font Definitions */
   --font-serif: "Crimson Text", serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -55,6 +69,30 @@
   /* Letter Spacing */
   --tracking-heading: 0.035em; /* 0.02em–0.05em for headings */
   --tracking-body: 0.005em;    /* 0em–0.01em for body text */
+
+  /* Elevation & Shadows */
+  --shadow-level-0: none;
+  --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-level-2: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-level-3: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-level-4: 0 12px 48px rgba(0, 0, 0, 0.10);
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-sm: 0.25rem;  /* 4px */
+  --radius-md: 0.5rem;   /* 8px */
+  --radius-lg: 0.75rem;  /* 12px */
+  --radius-round: 50%;
+}
+
+@layer components {
+  /* Subtle paper/linen texture overlay */
+  .paper-texture {
+    @apply fixed inset-0 pointer-events-none z-0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
 }
 
 @layer base {

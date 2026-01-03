@@ -75,7 +75,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 
   return (
     <div 
-      className="flex flex-col sm:flex-row gap-md items-start sm:items-center p-lg bg-surface rounded-xl border border-border-subtle transition-all duration-300 hover:border-border-base group/row"
+      className="flex flex-col sm:flex-row gap-md items-start sm:items-center p-lg bg-surface rounded-md border border-border-subtle transition-all duration-300 hover:border-border-base group/row"
       onKeyDown={handleKeyDown}
     >
       <div className="flex-1 w-full sm:w-auto">
@@ -124,7 +124,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
       <div className="pt-0 sm:pt-lg self-end sm:self-center opacity-0 group-hover/row:opacity-100 transition-opacity duration-300">
         <Button
           variant="ghost"
-          className="text-ink-500 hover:text-rust hover:bg-rust/10 p-sm h-auto rounded-lg"
+          className="text-ink-500 hover:text-rust hover:bg-rust/10 p-sm h-auto rounded-sm"
           onClick={handleDeleteClick}
           aria-label={`Remove ${ingredient.name || 'ingredient'}`}
           title="Remove ingredient (Shift+Delete)"

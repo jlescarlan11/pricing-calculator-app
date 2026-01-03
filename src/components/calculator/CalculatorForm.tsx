@@ -74,7 +74,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     input.ingredients.every(ing => ing.name.trim() !== '' && ing.cost > 0);
 
   return (
-    <div className="flex flex-col gap-2xl w-full max-w-5xl mx-auto pb-4xl">
+    <div className="flex flex-col gap-2xl w-full pb-4xl">
       {/* Header with Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg px-lg sm:px-0">
         <div>
@@ -108,119 +108,113 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2xl">
-        {/* Main Form Area */}
-        <div className="lg:col-span-2 space-y-2xl">
-          {/* Section 1: Product Info */}
-          <ProductInfo 
-            businessName={input.businessName}
-            productName={input.productName}
-            batchSize={input.batchSize}
-            onChange={handleProductInfoChange}
-            errors={{
-              businessName: errors.businessName,
-              productName: errors.productName,
-              batchSize: errors.batchSize,
-            }}
-          />
+      <div className="flex flex-col gap-2xl">
+        {/* Section 1: Product Info */}
+        <ProductInfo 
+          businessName={input.businessName}
+          productName={input.productName}
+          batchSize={input.batchSize}
+          onChange={handleProductInfoChange}
+          errors={{
+            businessName: errors.businessName,
+            productName: errors.productName,
+            batchSize: errors.batchSize,
+          }}
+        />
 
-          {/* Section 2: Ingredients */}
-          <Card 
-            title={
-              <div className="flex items-center justify-between w-full">
-                <h3 className="text-lg text-ink-900">Ingredients</h3>
-                <span className="text-xs font-bold text-ink-500 uppercase tracking-widest">
-                  {input.ingredients.length} item{input.ingredients.length !== 1 ? 's' : ''}
-                </span>
-              </div>
-            }
-          >
-            <div className="space-y-lg">
-              {errors.ingredients && (
-                <div className="p-md bg-rust/10 text-rust text-sm rounded-xl border border-rust/20 flex items-center gap-sm animate-in fade-in slide-in-from-left-2">
-                  <Trash2 className="w-4 h-4" />
-                  <span className="font-medium">{errors.ingredients}</span>
-                </div>
-              )}
-              
-              <div className="space-y-md">
-                {input.ingredients.map((ing, index) => (
-                  <IngredientRow
-                    key={ing.id}
-                    ingredient={ing}
-                    index={index}
-                    isOnlyRow={input.ingredients.length === 1}
-                    onUpdate={onUpdateIngredient}
-                    onRemove={onRemoveIngredient}
-                    onAdd={onAddIngredient}
-                    autoFocus={index === input.ingredients.length - 1 && index > 0}
-                    errors={{
-                      name: errors[`ingredients.${ing.id}.name`],
-                      amount: errors[`ingredients.${ing.id}.amount`],
-                      cost: errors[`ingredients.${ing.id}.cost`],
-                    }}
-                  />
-                ))}
-              </div>
-
-              <Button
-                variant="secondary"
-                onClick={onAddIngredient}
-                className="w-full mt-lg border-dashed border-2 py-lg flex items-center justify-center gap-sm border-border-base text-ink-700 hover:border-clay hover:text-clay bg-transparent hover:bg-clay/5 transition-all duration-300 rounded-xl"
-              >
-                <Plus className="w-5 h-5" />
-                Add Ingredient
-              </Button>
+        {/* Section 2: Ingredients */}
+        <Card 
+          title={
+            <div className="flex items-center justify-between w-full">
+              <h3 className="text-lg text-ink-900">Ingredients</h3>
+              <span className="text-xs font-bold text-ink-500 uppercase tracking-widest">
+                {input.ingredients.length} item{input.ingredients.length !== 1 ? 's' : ''}
+              </span>
             </div>
-          </Card>
+          }
+        >
+          <div className="space-y-lg">
+            {errors.ingredients && (
+              <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20 flex items-center gap-sm animate-in fade-in slide-in-from-left-2">
+                <Trash2 className="w-4 h-4" />
+                <span className="font-medium">{errors.ingredients}</span>
+              </div>
+            )}
+            
+            <div className="space-y-md">
+              {input.ingredients.map((ing, index) => (
+                <IngredientRow
+                  key={ing.id}
+                  ingredient={ing}
+                  index={index}
+                  isOnlyRow={input.ingredients.length === 1}
+                  onUpdate={onUpdateIngredient}
+                  onRemove={onRemoveIngredient}
+                  onAdd={onAddIngredient}
+                  autoFocus={index === input.ingredients.length - 1 && index > 0}
+                  errors={{
+                    name: errors[`ingredients.${ing.id}.name`],
+                    amount: errors[`ingredients.${ing.id}.amount`],
+                    cost: errors[`ingredients.${ing.id}.cost`],
+                  }}
+                />
+              ))}
+            </div>
 
-          {/* Section 3: Costs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-            <LaborCost 
-              value={input.laborCost} 
-              onChange={handleLaborChange}
-              error={errors.laborCost}
-            />
-            <OverheadCost 
-              value={input.overhead} 
-              batchSize={input.batchSize}
-              onChange={handleOverheadChange}
-              error={errors.overhead}
-            />
-          </div>
-        </div>
-
-        {/* Sidebar Area */}
-        <div className="space-y-xl">
-          {/* Section 4: Pricing Strategy */}
-          <PricingStrategy 
-            strategy={config.strategy}
-            value={config.value}
-            costPerUnit={
-              // Background calculation for preview
-              performFullCalculation(input, config).costPerUnit
-            }
-            onChange={handlePricingChange}
-          />
-
-          {/* Section 5: Current Price Comparison */}
-          <CurrentPrice 
-            value={input.currentSellingPrice}
-            onChange={handleCurrentPriceChange}
-          />
-
-          {/* Floating Mobile Action */}
-          <div className="fixed bottom-lg right-lg lg:hidden z-30">
             <Button
-              variant="primary"
-              onClick={onCalculate}
-              isLoading={isCalculating}
-              className="rounded-full w-16 h-16 shadow-2xl flex items-center justify-center p-0"
-              aria-label="Calculate Results"
+              variant="secondary"
+              onClick={onAddIngredient}
+              className="w-full mt-lg border-dashed border-2 py-lg flex items-center justify-center gap-sm border-border-base text-ink-700 hover:border-clay hover:text-clay bg-transparent hover:bg-clay/5 transition-all duration-300 rounded-sm"
             >
-              <Calculator className="w-8 h-8" />
+              <Plus className="w-5 h-5" />
+              Add Ingredient
             </Button>
           </div>
+        </Card>
+
+        {/* Section 3: Costs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+          <LaborCost 
+            value={input.laborCost} 
+            onChange={handleLaborChange}
+            error={errors.laborCost}
+          />
+          <OverheadCost 
+            value={input.overhead} 
+            batchSize={input.batchSize}
+            onChange={handleOverheadChange}
+            error={errors.overhead}
+          />
+        </div>
+
+        {/* Section 4: Pricing Strategy */}
+        <PricingStrategy 
+          strategy={config.strategy}
+          value={config.value}
+          costPerUnit={
+            // Background calculation for preview
+            performFullCalculation(input, config).costPerUnit
+          }
+          onChange={handlePricingChange}
+        />
+
+        {/* Section 5: Current Price Comparison */}
+        <CurrentPrice 
+          value={input.currentSellingPrice}
+          onChange={handleCurrentPriceChange}
+        />
+
+        {/* Floating Mobile Action */}
+        <div className="fixed bottom-lg right-lg lg:hidden z-30">
+          <Button
+            variant="primary"
+            onClick={onCalculate}
+            isLoading={isCalculating}
+            className="rounded-round w-16 h-16 shadow-level-3 flex items-center justify-center p-0"
+            aria-label="Calculate Results"
+          >
+            <Calculator className="w-8 h-8" />
+          </Button>
         </div>
       </div>
     </div>

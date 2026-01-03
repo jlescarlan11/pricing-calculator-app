@@ -5,6 +5,7 @@ export interface CardProps {
   title?: React.ReactNode;
   className?: string;
   footer?: React.ReactNode;
+  noPadding?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -12,11 +13,12 @@ export const Card: React.FC<CardProps> = ({
   title,
   className = '',
   footer,
+  noPadding = false,
 }) => {
   return (
-    <div className={`bg-surface rounded-xl border border-border-base overflow-hidden ${className}`}>
+    <div className={`bg-surface rounded-md border border-border-base shadow-level-1 overflow-hidden ${className}`}>
       {title && (
-        <div className="px-lg py-md border-b border-border-subtle">
+        <div className="px-xl py-xl border-b border-border-subtle">
           {typeof title === 'string' ? (
             <h3 className="text-lg text-ink-900">{title}</h3>
           ) : (
@@ -24,11 +26,11 @@ export const Card: React.FC<CardProps> = ({
           )}
         </div>
       )}
-      <div className="px-lg py-md">
+      <div className={noPadding ? '' : 'px-xl py-xl'}>
         {children}
       </div>
       {footer && (
-        <div className="px-lg py-md bg-bg-main border-t border-border-subtle">
+        <div className="px-xl py-xl bg-bg-main border-t border-border-subtle">
           {footer}
         </div>
       )}

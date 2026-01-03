@@ -5,9 +5,9 @@ import { Card } from '../components/shared/Card';
 
 export const HelpPage: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto space-y-2xl animate-in fade-in duration-700">
+    <div className="space-y-2xl animate-in fade-in duration-700">
       <div className="flex items-center gap-lg mb-2xl px-lg sm:px-0">
-        <div className="p-md bg-surface rounded-2xl text-clay border border-border-subtle shadow-sm">
+        <div className="p-md bg-surface rounded-lg text-clay border border-border-subtle shadow-level-1">
           <HelpCircle size={32} />
         </div>
         <div>
@@ -16,7 +16,7 @@ export const HelpPage: React.FC = () => {
         </div>
       </div>
 
-      <Card className="p-0 border-none bg-transparent shadow-none">
+      <Card noPadding className="border-none bg-transparent shadow-none">
         <PricingGuide showActionButton={false} />
       </Card>
     </div>

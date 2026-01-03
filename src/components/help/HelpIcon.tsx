@@ -42,7 +42,7 @@ export const HelpIcon: React.FC<HelpIconProps> = ({
           onClick();
         }
       }}
-      className={`inline-flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 p-0.5 ${className}`}
+      className={`inline-flex items-center justify-center rounded-round text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 p-0.5 ${className}`}
       aria-label={ariaLabel}
     >
       {icon}

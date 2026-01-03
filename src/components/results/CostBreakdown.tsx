@@ -52,13 +52,13 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ results, className
         </div>
 
         {/* Visual Bar Chart */}
-        <div className="h-4 w-full flex rounded-full overflow-hidden bg-surface border border-border-subtle p-[2px]">
+        <div className="h-4 w-full flex rounded-round overflow-hidden bg-surface border border-border-subtle p-[2px]">
           {categories.map((category) => {
             const percentage = totalCost > 0 ? (category.value / totalCost) * 100 : 0;
             return (
               <div
                 key={category.label}
-                className={`h-full ${category.color} transition-all duration-1000 ease-out first:rounded-l-full last:rounded-r-full`}
+                className={`h-full ${category.color} transition-all duration-1000 ease-out first:rounded-l-round last:rounded-r-round`}
                 style={{ width: `${percentage}%` }}
                 title={`${category.label}: ${formatPercent(percentage)}`}
               />
@@ -73,7 +73,7 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ results, className
             return (
               <div key={category.label} className="flex items-center justify-between group">
                 <div className="flex items-center gap-sm">
-                  <div className={`w-3.5 h-3.5 rounded-full ${category.color} shadow-sm border border-bg-main`} />
+                  <div className={`w-3.5 h-3.5 rounded-round ${category.color} shadow-level-1 border border-bg-main`} />
                   <span className="text-sm font-semibold text-ink-700 group-hover:text-ink-900 transition-colors">
                     {category.label}
                   </span>

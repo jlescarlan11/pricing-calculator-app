@@ -67,7 +67,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       <div
         id={tooltipId}
         role="tooltip"
-        className={`absolute z-50 whitespace-nowrap rounded bg-gray-800 px-sm py-xs text-xs text-white shadow-lg transition-all duration-200 ease-in-out ${
+        className={`absolute z-50 whitespace-nowrap rounded-sm bg-gray-800 px-sm py-xs text-xs text-white shadow-level-4 transition-all duration-200 ease-in-out ${
           positionClasses[position]
         } ${
           isVisible

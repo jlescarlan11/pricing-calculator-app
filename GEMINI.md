@@ -190,6 +190,8 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - File: `src/components/help/PricingExplainerModal.tsx`
   - Tests: `src/components/help/PricingExplainerModal.test.tsx`
   - Exported from `src/components/help/index.ts`
+- [x] **Background Texture**: Implemented a subtle paper/linen texture overlay using an SVG noise filter (2.5% opacity) applied to the main background. Includes a persistent toggle in the footer. (Added 2026-01-03)
+  - File: `src/index.css` (styles), `src/components/layout/AppLayout.tsx` (implementation)
 
 ### Typography System (Added 2026-01-03)
 - [x] **Font Installation**: Integrated Google Fonts (Inter and Crimson Text) with specific weights (400, 500, 600).
@@ -204,6 +206,12 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Component Audit**: Updated all components and pages to utilize the new spacing scale.
 - [x] **Layout Standards**: Enforced minimum 48px (`2xl`) spacing between sections and 24-32px (`lg`-`xl`) internal component padding.
 - [x] **Responsive Adaptation**: Configured mobile spacing with 32px section gaps, 16-24px padding, and 16px minimum edge margins.
+
+### UI & Layout Restructuring (Added 2026-01-03)
+- [x] **Saved Products Modal**: Replaced the persistent sidebar with a cleaner Modal interface for managing presets.
+- [x] **Floating Action Button (FAB)**: Added a "Package" icon FAB in the bottom-right for quick access to saved products.
+- [x] **Minimalist Layout**: Simplified `AppLayout` and `Header` by removing sidebar-specific logic and UI elements, maximizing workspace "Ma" (Negative Space).
+- [x] **Test Suite Update**: Refactored `AppLayout.test.tsx` and `Header.test.tsx` to reflect the new layout structure.
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 

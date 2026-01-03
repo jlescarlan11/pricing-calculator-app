@@ -30,12 +30,12 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
   return (
     <div className="space-y-xl">
       {/* Tabs */}
-      <div className="flex p-xs bg-surface rounded-xl border border-border-subtle">
+      <div className="flex p-xs bg-surface rounded-md border border-border-subtle">
         <button
           onClick={() => setActiveTab('markup')}
-          className={`flex-1 flex items-center justify-center gap-sm py-md text-sm font-bold rounded-lg transition-all duration-300 ${
+          className={`flex-1 flex items-center justify-center gap-sm py-md text-sm font-bold rounded-sm transition-all duration-300 ${
             activeTab === 'markup'
-              ? 'bg-clay text-white shadow-sm'
+              ? 'bg-clay text-white shadow-level-1'
               : 'text-ink-500 hover:text-ink-900'
           }`}
         >
@@ -44,9 +44,9 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
         </button>
         <button
           onClick={() => setActiveTab('margin')}
-          className={`flex-1 flex items-center justify-center gap-sm py-md text-sm font-bold rounded-lg transition-all duration-300 ${
+          className={`flex-1 flex items-center justify-center gap-sm py-md text-sm font-bold rounded-sm transition-all duration-300 ${
             activeTab === 'margin'
-              ? 'bg-clay text-white shadow-sm'
+              ? 'bg-clay text-white shadow-level-1'
               : 'text-ink-500 hover:text-ink-900'
           }`}
         >
@@ -68,17 +68,17 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
           </section>
 
           {/* Markup Visual Example */}
-          <section className="bg-surface border border-border-subtle rounded-2xl p-lg">
+          <section className="bg-surface border border-border-subtle rounded-lg p-lg">
             <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Visual Example (50% Markup)</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
-              <div className="text-center p-md bg-bg-main rounded-xl border border-border-subtle">
+              <div className="text-center p-md bg-bg-main rounded-md border border-border-subtle">
                 <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">Cost</p>
                 <p className="text-xl font-bold text-ink-900 tracking-tight">{formatCurrency(cost)}</p>
               </div>
               <div className="flex justify-center">
                 <ArrowRight className="h-6 w-6 text-border-base rotate-90 md:rotate-0" />
               </div>
-              <div className="text-center p-md bg-clay rounded-xl shadow-sm border border-clay/10">
+              <div className="text-center p-md bg-clay rounded-md shadow-level-1 border border-clay/10">
                 <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">Selling Price</p>
                 <p className="text-xl font-bold text-white tracking-tight">{formatCurrency(markupPrice)}</p>
               </div>
@@ -101,15 +101,15 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
               </h4>
               <ul className="space-y-sm text-sm text-ink-700 font-medium">
                 <li className="flex gap-sm">
-                  <div className="h-1.5 w-1.5 rounded-full bg-clay/40 mt-2 shrink-0" />
+                  <div className="h-1.5 w-1.5 rounded-round bg-clay/40 mt-2 shrink-0" />
                   Simple cost-plus pricing
                 </li>
                 <li className="flex gap-sm">
-                  <div className="h-1.5 w-1.5 rounded-full bg-clay/40 mt-2 shrink-0" />
+                  <div className="h-1.5 w-1.5 rounded-round bg-clay/40 mt-2 shrink-0" />
                   Handmade or custom goods
                 </li>
                 <li className="flex gap-sm">
-                  <div className="h-1.5 w-1.5 rounded-full bg-clay/40 mt-2 shrink-0" />
+                  <div className="h-1.5 w-1.5 rounded-round bg-clay/40 mt-2 shrink-0" />
                   Ensuring item costs are covered
                 </li>
               </ul>
@@ -144,17 +144,17 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
           </section>
 
           {/* Margin Visual Example */}
-          <section className="bg-surface border border-border-subtle rounded-2xl p-lg">
+          <section className="bg-surface border border-border-subtle rounded-lg p-lg">
             <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">Visual Example (50% Margin)</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
-              <div className="text-center p-md bg-bg-main rounded-xl border border-border-subtle">
+              <div className="text-center p-md bg-bg-main rounded-md border border-border-subtle">
                 <p className="text-[10px] text-ink-500 font-bold uppercase tracking-wider mb-xs">Cost</p>
                 <p className="text-xl font-bold text-ink-900 tracking-tight">{formatCurrency(cost)}</p>
               </div>
               <div className="flex justify-center">
                 <ArrowRight className="h-6 w-6 text-border-base rotate-90 md:rotate-0" />
               </div>
-              <div className="text-center p-md bg-moss rounded-xl shadow-sm border border-moss/10">
+              <div className="text-center p-md bg-moss rounded-md shadow-level-1 border border-moss/10">
                 <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mb-xs">Selling Price</p>
                 <p className="text-xl font-bold text-white tracking-tight">{formatCurrency(marginPrice)}</p>
               </div>
@@ -177,15 +177,15 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
               </h4>
               <ul className="space-y-sm text-sm text-ink-700 font-medium">
                 <li className="flex gap-sm">
-                  <div className="h-1.5 w-1.5 rounded-full bg-moss/40 mt-2 shrink-0" />
+                  <div className="h-1.5 w-1.5 rounded-round bg-moss/40 mt-2 shrink-0" />
                   Retail and wholesale businesses
                 </li>
                 <li className="flex gap-sm">
-                  <div className="h-1.5 w-1.5 rounded-full bg-moss/40 mt-2 shrink-0" />
+                  <div className="h-1.5 w-1.5 rounded-round bg-moss/40 mt-2 shrink-0" />
                   Tracking overall business health
                 </li>
                 <li className="flex gap-sm">
-                  <div className="h-1.5 w-1.5 rounded-full bg-moss/40 mt-2 shrink-0" />
+                  <div className="h-1.5 w-1.5 rounded-round bg-moss/40 mt-2 shrink-0" />
                   Comparing profit to total revenue
                 </li>
               </ul>
@@ -212,7 +212,7 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
       {/* Comparison Table */}
       <section className="pt-xl border-t border-border-subtle">
         <h4 className="font-bold text-ink-900 mb-lg tracking-tight">Quick Comparison</h4>
-        <div className="overflow-hidden rounded-2xl border border-border-subtle shadow-sm bg-bg-main">
+        <div className="overflow-hidden rounded-lg border border-border-subtle shadow-level-1 bg-bg-main">
           <table className="w-full text-sm text-left">
             <thead className="bg-surface text-ink-500 font-bold text-[10px] uppercase tracking-widest">
               <tr>
@@ -244,7 +244,7 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
 
       {showActionButton && onAction && (
         <div className="flex justify-center pt-md">
-          <Button onClick={onAction} variant="secondary" className="px-2xl py-md font-bold tracking-tight rounded-xl">
+          <Button onClick={onAction} variant="secondary" className="px-2xl py-md font-bold tracking-tight rounded-sm">
             Mindfulness Gained
           </Button>
         </div>

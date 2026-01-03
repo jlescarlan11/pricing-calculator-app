@@ -68,13 +68,13 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
     >
       <div className="space-y-xl">
         {/* Strategy Selection - Tabs style */}
-        <div className="flex p-xs bg-surface rounded-xl border border-border-subtle">
+        <div className="flex p-xs bg-surface rounded-md border border-border-subtle">
           <button
             type="button"
             onClick={() => handleStrategyChange('markup')}
-            className={`flex-1 py-sm text-sm font-medium rounded-lg transition-all cursor-pointer ${
+            className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
               strategy === 'markup' 
-                ? 'bg-clay text-white shadow-sm' 
+                ? 'bg-clay text-white shadow-level-1' 
                 : 'text-ink-500 hover:text-ink-900'
             }`}
           >
@@ -83,9 +83,9 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
           <button
             type="button"
             onClick={() => handleStrategyChange('margin')}
-            className={`flex-1 py-sm text-sm font-medium rounded-lg transition-all cursor-pointer ${
+            className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
               strategy === 'margin' 
-                ? 'bg-clay text-white shadow-sm' 
+                ? 'bg-clay text-white shadow-level-1' 
                 : 'text-ink-500 hover:text-ink-900'
             }`}
           >
@@ -94,7 +94,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         </div>
 
         {/* Visual Explanation */}
-        <div className="bg-surface border border-border-subtle rounded-xl p-lg transition-all duration-500">
+        <div className="bg-surface border border-border-subtle rounded-md p-lg transition-all duration-500">
           {strategy === 'markup' ? (
             <div className="space-y-sm">
               <p className="text-sm text-ink-900 font-medium">
@@ -141,7 +141,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
               step="1"
               value={value}
               onChange={handleSliderChange}
-              className="w-full h-1.5 bg-border-subtle rounded-full appearance-none cursor-pointer accent-clay"
+              className="w-full h-1.5 bg-border-subtle rounded-round appearance-none cursor-pointer accent-clay"
             />
             <div className="flex justify-between text-[10px] text-ink-500 font-bold uppercase tracking-widest">
               <span>0%</span>

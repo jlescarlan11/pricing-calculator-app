@@ -1,18 +1,14 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Info, Package } from 'lucide-react';
 import { CalculatorForm, SampleDemo } from '../components/calculator';
 import { ResultsDisplay } from '../components/results';
-import { FAQ } from '../components/help';
 import { PresetsList } from '../components/presets';
+import { Modal, Tooltip } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
 import type { SavedPreset } from '../types';
 
-interface CalculatorPageProps {
-  setSidebar: (sidebar: React.ReactNode) => void;
-}
-
-export const CalculatorPage: React.FC<CalculatorPageProps> = ({ setSidebar }) => {
+export const CalculatorPage: React.FC = () => {
   const {
     input,
     config,
@@ -30,6 +26,7 @@ export const CalculatorPage: React.FC<CalculatorPageProps> = ({ setSidebar }) =>
   } = useCalculatorState();
 
   const [view, setView] = useState<'form' | 'results'>('form');
+  const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
 
   const handleCalculate = async () => {
     const res = await calculate();
@@ -69,39 +66,24 @@ export const CalculatorPage: React.FC<CalculatorPageProps> = ({ setSidebar }) =>
 
   const handleLoadPreset = useCallback((preset: SavedPreset) => {
     loadPreset(preset);
+    setIsPresetsModalOpen(false);
     setView('results');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [loadPreset]);
 
   const handleEditPreset = useCallback((preset: SavedPreset) => {
     loadPreset(preset);
+    setIsPresetsModalOpen(false);
     setView('form');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [loadPreset]);
 
-  // Update sidebar on mount
-  useEffect(() => {
-    setSidebar(
-      <div className="p-md space-y-lg">
-        <div className="flex items-center gap-sm px-sm">
-          <Package className="text-clay w-5 h-5" />
-          <h3 className="text-ink-900">Saved Products</h3>
-        </div>
-        <PresetsList 
-          onLoad={handleLoadPreset}
-          onEdit={handleEditPreset}
-        />
-      </div>
-    );
-    return () => setSidebar(null);
-  }, [setSidebar, handleLoadPreset, handleEditPreset]);
-
   return (
-    <div className="animate-in fade-in duration-700">
+    <div className="animate-in fade-in duration-700 relative">
       {/* Intro Section (only on form view) */}
       {view === 'form' && (
         <div className="space-y-lg mb-2xl">
-          <div className="p-lg md:p-xl bg-surface rounded-2xl border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="p-lg md:p-xl bg-surface rounded-lg border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
             <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
             <div>
               <p className="text-ink-900 font-medium mb-xs">Welcome to your profit partner.</p>
@@ -143,13 +125,38 @@ export const CalculatorPage: React.FC<CalculatorPageProps> = ({ setSidebar }) =>
         )}
       </div>
 
-      <div className="mt-3xl border-t border-border-subtle pt-3xl">
-        <div className="text-center mb-2xl">
-          <h3 className="text-xl text-ink-900">Mindful Pricing Knowledge</h3>
-          <p className="text-sm text-ink-500 font-medium mt-xs">Foundational concepts for your business journey.</p>
-        </div>
-        <FAQ />
+      {/* Floating Action Button for Presets */}
+      <div className="fixed bottom-lg right-lg z-40">
+        <Tooltip content="Your Saved Products" position="left">
+          <button
+            onClick={() => setIsPresetsModalOpen(true)}
+            className="w-14 h-14 bg-clay text-white rounded-round shadow-level-3 flex items-center justify-center hover:scale-110 transition-all duration-300 group"
+            aria-label="View Saved Products"
+          >
+            <Package className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+          </button>
+        </Tooltip>
       </div>
+
+      {/* Presets Modal */}
+      <Modal
+        isOpen={isPresetsModalOpen}
+        onClose={() => setIsPresetsModalOpen(false)}
+        title={
+          <div className="flex items-center gap-sm">
+            <Package className="text-clay w-5 h-5" />
+            <span className="text-ink-900">Saved Products</span>
+          </div>
+        }
+        maxWidth="max-w-3xl"
+      >
+        <div className="py-md">
+          <PresetsList 
+            onLoad={handleLoadPreset}
+            onEdit={handleEditPreset}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

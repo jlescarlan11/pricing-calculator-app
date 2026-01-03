@@ -57,7 +57,7 @@ export const Select: React.FC<SelectProps> = ({
           aria-invalid={!!error}
           aria-describedby={describedBy}
           className={`
-            block w-full rounded-md shadow-sm border appearance-none
+            block w-full rounded-sm border appearance-none
             py-sm pl-sm pr-2xl sm:text-sm transition-colors duration-200
             disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden

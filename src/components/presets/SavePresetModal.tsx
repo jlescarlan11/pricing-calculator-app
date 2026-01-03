@@ -121,7 +121,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
     >
       {isSuccess ? (
         <div className="flex flex-col items-center justify-center py-2xl text-center animate-in fade-in zoom-in-95 duration-500">
-          <div className="rounded-full bg-moss/10 p-lg mb-lg animate-bounce border border-moss/20">
+          <div className="rounded-round bg-moss/10 p-lg mb-lg animate-bounce border border-moss/20">
             <CheckCircle2 className="w-12 h-12 text-moss" />
           </div>
           <h3 className="text-2xl font-bold text-ink-900 tracking-tight">Saved Successfully</h3>
@@ -148,7 +148,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
             disabled={isSaving}
           />
 
-          <div className="bg-surface rounded-2xl p-lg border border-border-subtle">
+          <div className="bg-surface rounded-md p-lg border border-border-subtle">
             <h4 className="text-[10px] font-bold text-clay uppercase tracking-[0.2em] mb-md">
               Calculation Summary
             </h4>

@@ -4,9 +4,9 @@ import { FAQ } from '../components/help/FAQ';
 
 export const FAQPage: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto space-y-2xl animate-in fade-in duration-700">
+    <div className="space-y-2xl animate-in fade-in duration-700">
       <div className="flex items-center gap-lg mb-2xl px-lg sm:px-0">
-        <div className="p-md bg-surface rounded-2xl text-clay border border-border-subtle shadow-sm">
+        <div className="p-md bg-surface rounded-lg text-clay border border-border-subtle shadow-level-1">
           <Lightbulb size={32} />
         </div>
         <div>

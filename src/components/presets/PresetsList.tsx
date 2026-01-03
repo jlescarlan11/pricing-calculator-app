@@ -33,7 +33,7 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
 
   if (presets.length === 0) {
     return (
-      <div className="text-center py-3xl bg-surface rounded-2xl border-2 border-dashed border-border-base">
+      <div className="text-center py-3xl bg-surface rounded-lg border-2 border-dashed border-border-base">
         <div className="max-w-xs mx-auto">
           <p className="text-ink-900 font-bold mb-sm tracking-tight">No saved products yet</p>
           <p className="text-sm text-ink-500 font-medium leading-relaxed">
@@ -46,8 +46,8 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
 
   return (
     <div className="space-y-xl">
-      <div className="flex flex-col sm:flex-row gap-lg items-end justify-between">
-        <div className="w-full sm:max-w-md">
+      <div className="flex flex-col gap-md">
+        <div className="w-full">
           <Input
             label="Search Products"
             placeholder="Search by name or product..."
@@ -57,17 +57,17 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
           />
         </div>
 
-        <div className="flex items-center gap-sm">
-          <span className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] mr-xs">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em]">
             View Mode
           </span>
-          <div className="flex items-center bg-surface p-xs rounded-xl border border-border-subtle">
+          <div className="flex items-center bg-surface p-xs rounded-md border border-border-subtle">
             <Button
               variant="secondary"
               size="sm"
               onClick={() => setViewMode('grid')}
-              className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-lg transition-all duration-300 ${
-                viewMode === 'grid' ? 'bg-bg-main shadow-sm text-clay' : 'bg-transparent text-ink-500'
+              className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-sm transition-all duration-300 ${
+                viewMode === 'grid' ? 'bg-bg-main shadow-level-1 text-clay' : 'bg-transparent text-ink-500'
               }`}
               title="Grid view"
             >
@@ -77,8 +77,8 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
               variant="secondary"
               size="sm"
               onClick={() => setViewMode('list')}
-              className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-lg transition-all duration-300 ${
-                viewMode === 'list' ? 'bg-bg-main shadow-sm text-clay' : 'bg-transparent text-ink-500'
+              className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-sm transition-all duration-300 ${
+                viewMode === 'list' ? 'bg-bg-main shadow-level-1 text-clay' : 'bg-transparent text-ink-500'
               }`}
               title="List view"
             >
@@ -89,7 +89,7 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
       </div>
 
       {filteredPresets.length === 0 ? (
-        <div className="text-center py-3xl bg-surface rounded-2xl border border-border-subtle animate-in fade-in duration-500">
+        <div className="text-center py-3xl bg-surface rounded-lg border border-border-subtle animate-in fade-in duration-500">
           <Search className="w-12 h-12 text-ink-300 mx-auto mb-md opacity-50" />
           <p className="text-ink-500 font-medium">No results match your search &quot;{searchQuery}&quot;</p>
           <Button 
@@ -105,8 +105,8 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 lg:grid-cols-2 gap-md'
-              : 'flex flex-col gap-md'
+              ? 'flex flex-col gap-md w-full'
+              : 'flex flex-col gap-sm w-full'
           }
         >
           {filteredPresets.map((preset) => (
@@ -116,6 +116,7 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
               onLoad={onLoad}
               onEdit={onEdit}
               onDelete={(p) => deletePreset(p.id)}
+              viewMode={viewMode}
             />
           ))}
         </div>
