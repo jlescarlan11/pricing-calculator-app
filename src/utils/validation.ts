@@ -1,3 +1,4 @@
+import { MAX_BATCH_SIZE } from '../constants';
 import type { Ingredient } from '../types';
 
 export interface ValidationError {
@@ -23,8 +24,8 @@ export const validateBatchSize = (value: number): ValidationError | null => {
   if (!Number.isInteger(value)) {
     return { field: 'batchSize', message: `${fieldName} must be a whole number.` };
   }
-  if (value < 1 || value > 10000) {
-    return { field: 'batchSize', message: `${fieldName} must be between 1 and 10,000.` };
+  if (value < 1 || value > MAX_BATCH_SIZE) {
+    return { field: 'batchSize', message: `${fieldName} must be between 1 and ${MAX_BATCH_SIZE.toLocaleString()}.` };
   }
   return null;
 };
