@@ -76,3 +76,20 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - **Verify**: Ensure build passes (`npm run build`) and linting is clean (`npm run lint`) before marking tasks complete.
 - **Comments**: Comment _why_ complex logic exists, not _what_ it does.
 - **idiomatic Code**: Follow existing patterns in the codebase.
+
+## 6. Progress Tracking
+
+### Components
+- [x] **Badge**: Reusable status indicator with success, warning, error, and info variants. (Added 2026-01-03)
+  - File: `src/components/shared/Badge.tsx`
+  - Tests: `src/components/shared/Badge.test.tsx`
+  - Exported from `src/components/shared/index.ts`
+
+## 7. Build Fixes & Configuration (Added 2026-01-03)
+
+- **Vite/Vitest Config**: Changed `vite.config.ts` to import `defineConfig` from `vitest/config` instead of `vite`. This ensures proper typing for the `test` configuration object.
+- **Tooltip Component**:
+  - Replaced `NodeJS.Timeout` with `ReturnType<typeof setTimeout>` to avoid namespace issues in browser environments.
+  - Cast props in `React.cloneElement` to `any` (e.g., `{ 'aria-describedby': tooltipId } as any`) to resolve strict type checking errors with `aria-describedby` on generic `ReactElement`.
+- **Modal Component Test**:
+  - Fixed a timeout issue in `Modal.test.tsx` ("restores body scroll when closed") by removing `waitFor` (which conflicts with `vi.useFakeTimers` in this context) and using direct assertions after manually advancing timers with `vi.advanceTimersByTime`.
