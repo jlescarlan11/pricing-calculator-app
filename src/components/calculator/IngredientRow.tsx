@@ -146,11 +146,11 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title="Remove Last Ingredient?"
+        title="Remove ingredient?"
         footer={
           <div className="flex justify-end gap-sm">
             <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-              Cancel
+              Keep
             </Button>
             <Button variant="danger" onClick={confirmDelete}>
               Remove
@@ -159,7 +159,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
         }
       >
         <p className="text-ink-700">
-          This is the last ingredient in your list. Are you sure you want to remove it?
+          Removing this will leave your ingredient list empty. Shall we continue?
         </p>
       </Modal>
     </div>

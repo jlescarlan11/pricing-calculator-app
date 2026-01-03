@@ -50,7 +50,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         <div className="flex gap-md">
           <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
           <div className="text-sm text-ink-700">
-            <p className="font-bold text-ink-900 mb-sm tracking-tight">How it&apos;s calculated:</p>
+            <p className="font-bold text-ink-900 mb-sm tracking-tight">Calculation guide:</p>
             <p className="opacity-90 leading-relaxed font-medium">
               Formula: <code className="bg-bg-main px-sm py-[2px] rounded-sm border border-border-subtle font-mono text-[11px] text-clay">((Fixed Costs) / Batches) + (Packaging × Batch Size)</code>
             </p>
@@ -63,7 +63,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
         <div className="space-y-lg">
-          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Fixed Monthly Costs</p>
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Monthly Costs</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
             <Input
               label="Monthly Rent"
@@ -104,12 +104,12 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
             value={batchesPerMonth}
             onChange={(e) => setBatchesPerMonth(e.target.value)}
             placeholder="e.g. 20"
-            helperText="Average production volume"
+            helperText="How many batches you make in a month."
           />
         </div>
 
         <div className="space-y-lg">
-          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Batch Variable Costs</p>
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">Packaging Costs</p>
           <Input
             label="Packaging per Unit"
             type="number"
@@ -117,7 +117,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
             onChange={(e) => setPackagingPerUnit(e.target.value)}
             currency
             placeholder="0.00"
-            helperText="Cost of jars, boxes, or labels per individual item"
+            helperText="Cost of packaging for each item"
           />
           <Input
             label="Current Batch Size"
@@ -156,7 +156,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         onClick={() => onApply(calculation.total)}
         disabled={calculation.total <= 0}
       >
-        Apply to Overhead Cost
+        Apply
       </Button>
     </div>
   );

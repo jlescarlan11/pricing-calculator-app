@@ -16,15 +16,15 @@ export const PROFIT_MARGIN_THRESHOLDS = {
 
 export const MESSAGES = {
   WARNINGS: {
-    LOW_MARGIN: 'Warning: Your profit margin is below the recommended threshold.',
-    NEGATIVE_VALUE: 'Please enter a positive value.',
-    REQUIRED_FIELD: 'This field is required.',
-    BATCH_SIZE_ZERO: 'Batch size must be at least 1.',
+    LOW_MARGIN: 'Your margin is a bit low. Consider adjusting costs or price.',
+    NEGATIVE_VALUE: 'Oops, values should be more than zero.',
+    REQUIRED_FIELD: 'Please fill this in to continue.',
+    BATCH_SIZE_ZERO: 'Oops, batch size must be at least 1.',
   },
   HELP_TEXT: {
-    MARKUP_STRATEGY: 'Markup is the percentage added to the cost price to determine the selling price.',
-    MARGIN_STRATEGY: 'Profit Margin is the percentage of the selling price that is profit.',
-    BATCH_SIZE: 'The number of units produced in a single production run.',
-    OVERHEAD_COSTS: 'Fixed costs like rent, utilities, and packaging that are not tied to a single ingredient.',
+    MARKUP_STRATEGY: 'Markup is what you add to your cost to reach a selling price.',
+    MARGIN_STRATEGY: 'Margin is the share of your selling price that remains as profit.',
+    BATCH_SIZE: 'How many units do you make in one go?',
+    OVERHEAD_COSTS: 'Daily costs like rent or packaging that support your business.',
   },
 } as const;

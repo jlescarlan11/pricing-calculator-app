@@ -44,11 +44,11 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
 
     // Validation
     if (trimmedName.length < 3) {
-      setError('Name must be at least 3 characters.');
+      setError('Try a slightly longer name.');
       return;
     }
     if (trimmedName.length > 50) {
-      setError('Name must be less than 50 characters.');
+      setError('Try a shorter name.');
       return;
     }
     
@@ -57,7 +57,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
     );
     
     if (isDuplicate) {
-      setError('A product with this name already exists in your presets.');
+      setError('You already have a product with this name.');
       return;
     }
 
@@ -81,7 +81,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
         onClose();
       }, 1800);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save preset. Please try again.');
+      setError(err instanceof Error ? err.message : 'Oops, we couldn\'t save that. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -98,14 +98,14 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
             onClick={onClose} 
             disabled={isSaving}
           >
-            Cancel
+            Back
           </Button>
           <Button 
             variant="primary" 
             onClick={handleSave} 
             isLoading={isSaving}
           >
-            Save Product
+            Save
           </Button>
         </>
       )}
@@ -116,7 +116,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={<span className="text-ink-900">Save to Presets</span>}
+      title={<span className="text-ink-900">Save calculation</span>}
       footer={footer}
     >
       {isSuccess ? (
@@ -124,7 +124,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
           <div className="rounded-round bg-moss/10 p-lg mb-lg animate-bounce border border-moss/20">
             <CheckCircle2 className="w-12 h-12 text-moss" />
           </div>
-          <h3 className="text-2xl font-bold text-ink-900 tracking-tight">Saved Successfully</h3>
+          <h3 className="text-2xl font-bold text-ink-900 tracking-tight">Saved</h3>
           <p className="text-ink-500 mt-sm font-medium">
             &quot;{name}&quot; is now available in your saved products.
           </p>

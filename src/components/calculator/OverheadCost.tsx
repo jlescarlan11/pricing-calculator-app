@@ -56,7 +56,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
             className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm"
           >
             <Calculator className="w-4 h-4 mr-sm" />
-            {isHelperOpen ? 'Hide Helper' : 'Overhead Helper'}
+            {isHelperOpen ? 'Hide' : 'Helper'}
             {isHelperOpen ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
           </Button>
         </div>
@@ -77,7 +77,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
             <div className="flex items-center gap-sm mt-sm">
               <Badge variant="warning" className="flex items-center gap-xs text-[10px] py-xs px-sm uppercase tracking-wide">
                 <AlertCircle className="w-3.5 h-3.5" />
-                Overhead is zero. Are you sure?
+                Zero overhead? This is rare but possible.
               </Badge>
             </div>
           )}

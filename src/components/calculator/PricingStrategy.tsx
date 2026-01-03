@@ -61,7 +61,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
             aria-label="Help with pricing strategies"
           >
             <HelpCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
-            <span>Understanding Pricing</span>
+            <span>Learn More</span>
           </button>
         </div>
       }
@@ -89,7 +89,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
                 : 'text-ink-500 hover:text-ink-900'
             }`}
           >
-            Profit Margin
+            Margin
           </button>
         </div>
 
@@ -98,7 +98,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
           {strategy === 'markup' ? (
             <div className="space-y-sm">
               <p className="text-sm text-ink-900 font-medium">
-                Add <span className="text-clay font-bold">{value}%</span> to your total cost.
+                Add <span className="text-clay font-bold">{value}%</span> of the cost to your price.
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
                 If your cost is {formatCurrency(exampleCost)}, 
@@ -109,7 +109,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
           ) : (
             <div className="space-y-sm">
               <p className="text-sm text-ink-900 font-medium">
-                Keep <span className="text-clay font-bold">{value}%</span> of the final sale price as profit.
+                Keep <span className="text-clay font-bold">{value}%</span> of the price as your profit.
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
                 To earn a {value}% margin on a {formatCurrency(exampleCost)} cost, 

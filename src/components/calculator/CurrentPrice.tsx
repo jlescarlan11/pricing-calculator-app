@@ -41,7 +41,7 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
             onClick={toggleVisibility}
             className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-lg transition-all duration-300"
           >
-            {isVisible ? 'Remove Comparison' : 'Compare Current'}
+            {isVisible ? 'Hide' : 'Compare'}
             {isVisible ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
           </Button>
         </div>
@@ -56,7 +56,7 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
               currency
               placeholder="0.00"
               error={error}
-              helperText="Compare what you currently charge against the recommended price."
+              helperText="See how your current price compares to our recommendation."
               min={0}
               step="0.01"
             />

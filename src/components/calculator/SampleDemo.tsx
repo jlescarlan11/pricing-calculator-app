@@ -58,12 +58,12 @@ export const SampleDemo: React.FC<SampleDemoProps> = ({ onLoadSample }) => {
             className="w-full flex items-center justify-center gap-sm h-14 px-xl font-bold tracking-tight rounded-sm"
           >
             <PlayCircle className="w-5 h-5" />
-            Explore Sample
+            Explore
             <ArrowRight className="w-4 h-4 ml-xs" />
           </Button>
           <div className="flex items-center justify-center gap-sm text-xs text-ink-500 font-bold uppercase tracking-widest">
             <Info className="w-3.5 h-3.5 opacity-50" />
-            Populate form instantly
+            See how it works instantly
           </div>
         </div>
       </div>

@@ -49,7 +49,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({
             className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm"
           >
             <Calculator className="w-4 h-4 mr-sm" />
-            {isCalculatorOpen ? 'Hide Calculator' : 'Labor Calculator'}
+            {isCalculatorOpen ? 'Hide' : 'Calculator'}
             {isCalculatorOpen ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
           </Button>
         </div>
@@ -69,7 +69,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({
         {isCalculatorOpen && (
           <div className="bg-bg-main rounded-md p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
             <div className="space-y-sm text-sm text-ink-700">
-              <p className="font-medium text-ink-900">How to calculate:</p>
+              <p className="font-medium text-ink-900">Your time is valuable—include it in labor costs.</p>
               <p>Labor Cost = Time Spent × Hourly Rate</p>
               <div className="bg-surface p-sm rounded-sm border border-border-subtle text-xs font-mono text-ink-500">
                 Example: 4 hours × ₱100/hour = ₱400
@@ -111,7 +111,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({
                 disabled={!hours || !rate}
                 type="button"
               >
-                Apply to Total
+                Apply
               </Button>
             </div>
           </div>

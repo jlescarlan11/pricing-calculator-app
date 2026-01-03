@@ -26,10 +26,10 @@ export const DataWarningBanner: React.FC = () => {
             </div>
             <p className="text-sm font-medium text-ink-900 leading-relaxed">
               <span className="md:hidden">
-                Session data only. Saved until tab close.
+                A gentle reminder: your progress is temporary.
               </span>
               <span className="hidden md:inline">
-                Your progress is temporary. Data will be cleared when you close this tab.
+                A gentle reminder: your progress is temporary and stays with this tab.
               </span>
             </p>
           </div>

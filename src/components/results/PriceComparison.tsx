@@ -40,22 +40,22 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
   let statusColor = "";
 
   if (isLower) {
-    statusMessage = `You're leaving ${formatCurrency(absDiff)} per unit on the table`;
+    statusMessage = `There's an opportunity for ${formatCurrency(absDiff)} more per unit`;
     statusIcon = <TrendingUp className="w-5 h-5 shrink-0" />;
     statusColor = "text-ink-900 bg-sakura/10 border-sakura/20";
   } else if (isHigher) {
-    statusMessage = `You're overpriced by ${formatCurrency(absDiff)} per unit`;
+    statusMessage = `Your price is ${formatCurrency(absDiff)} higher than the recommendation`;
     statusIcon = <TrendingDown className="w-5 h-5 shrink-0" />;
     statusColor = "text-rust bg-rust/5 border-rust/10";
   } else {
-    statusMessage = "You're priced competitively";
+    statusMessage = "Your pricing is perfectly aligned";
     statusIcon = <CheckCircle className="w-5 h-5 shrink-0" />;
     statusColor = "text-moss bg-moss/5 border-moss/10";
   }
 
   return (
     <div className={`space-y-xl ${className}`}>
-      <h3 className="text-xl font-serif text-ink-900">Market Context</h3>
+      <h3 className="text-xl font-serif text-ink-900">Comparison</h3>
       
       <div className="space-y-lg">
         {/* Visual Comparison */}

@@ -98,7 +98,7 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
                   <Copy className="w-4 h-4 text-ink-500 group-hover:text-clay" />
                 )}
               </div>
-              <span className="flex-1 font-bold tracking-tight">{copied ? 'Copied' : 'Copy Summary'}</span>
+              <span className="flex-1 font-bold tracking-tight">{copied ? 'Copied' : 'Copy'}</span>
             </button>
 
             <button
@@ -109,7 +109,7 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
               <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center group-hover:bg-bg-main transition-colors">
                 <Printer className="w-4 h-4 text-ink-500 group-hover:text-clay" />
               </div>
-              <span className="flex-1 font-bold tracking-tight">Print Results</span>
+              <span className="flex-1 font-bold tracking-tight">Print</span>
             </button>
 
             <div className="border-t border-border-subtle my-sm" />

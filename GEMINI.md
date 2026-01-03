@@ -212,6 +212,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Vertical Rhythm**: Enhanced `CalculatorForm` with explicit separators and consistent vertical spacing (space-y-xl) to improve visual flow and reduce cognitive load. Fixed "Monthly Utilities" label in Overhead Calculator and restored Grid view in Presets List.
 
 ### UI & Layout Restructuring (Added 2026-01-03)
+- [x] **Copy Refinement**: Audited and refined all button labels, helper text, and error messages. Implemented a gentle, supportive, and concise tone ("Explore", "Save", "Calculate", "Oops") consistent with the Japanese aesthetic. Replaced all aggressive phrasing and ensured labels are 1-2 words.
 - [x] **Saved Products Modal**: Replaced the persistent sidebar with a cleaner Modal interface for managing presets.
 - [x] **Floating Action Button (FAB)**: Added a "Package" icon FAB in the bottom-right for quick access to saved products.
 - [x] **Minimalist Layout**: Simplified `AppLayout` and `Header` by removing sidebar-specific logic and UI elements, maximizing workspace "Ma" (Negative Space).

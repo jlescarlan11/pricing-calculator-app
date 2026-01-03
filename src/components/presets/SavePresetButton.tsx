@@ -57,8 +57,8 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
   };
 
   const tooltipContent = disabled 
-    ? "Complete all required fields to save this product" 
-    : "Save this calculation to your presets for later use";
+    ? "Please complete the details above to save your progress." 
+    : "Keep this calculation for your future records.";
 
   return (
     <>
@@ -73,7 +73,7 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
           aria-label="Save current calculation as preset"
         >
           <Save className="w-4 h-4" />
-          <span>Save Product</span>
+          <span>Save</span>
         </Button>
       </Tooltip>
 

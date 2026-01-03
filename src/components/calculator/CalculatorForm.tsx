@@ -78,7 +78,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       {/* Header with Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg px-lg sm:px-0">
         <div>
-          <h2 className="text-2xl text-ink-900">Cost Calculator</h2>
+          <h2 className="text-2xl text-ink-900">Calculator</h2>
           <p className="text-sm text-ink-500 font-medium">Define your production costs with intention.</p>
         </div>
         <div className="flex items-center gap-sm w-full sm:w-auto">
@@ -94,7 +94,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             className="flex-1 sm:flex-none flex items-center gap-sm"
           >
             <RefreshCcw className="w-4 h-4" />
-            Clear
+            Reset
           </Button>
           <Button 
             variant="primary" 
@@ -268,7 +268,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                             className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 border-2 border-dashed border-border-base transition-all duration-300"
                           >
                             <Plus className="w-5 h-5" />
-                            Add Ingredient
+                            Add Item
                           </Button>
 
                         

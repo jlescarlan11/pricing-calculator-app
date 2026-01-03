@@ -34,13 +34,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         <div className="w-20 h-20 bg-bg-main rounded-round flex items-center justify-center mb-xl shadow-level-1 border border-border-subtle">
           <Calculator className="w-10 h-10 text-ink-500" />
         </div>
-        <h3 className="text-2xl text-ink-900 mb-sm">Ready to calculate?</h3>
+        <h3 className="text-2xl text-ink-900 mb-sm">Shall we begin?</h3>
         <p className="text-ink-500 max-w-sm mx-auto mb-2xl leading-relaxed font-medium">
           Input your ingredients, labor, and overhead costs to see your recommended selling price and profit analysis.
         </p>
         <Button onClick={onEdit} variant="primary" className="gap-sm px-xl py-md">
           <Edit2 className="w-4 h-4" />
-          Start Calculation
+          Explore
         </Button>
       </div>
     );
@@ -67,7 +67,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       {/* Action Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg print:hidden">
         <div>
-          <h2 className="text-3xl font-serif text-ink-900">Calculation Results</h2>
+          <h2 className="text-3xl font-serif text-ink-900">Results</h2>
           <p className="text-sm text-ink-500 mt-xs font-medium">
             Analysis for <span className="text-ink-900">{input.productName || 'Unnamed Product'}</span>
           </p>

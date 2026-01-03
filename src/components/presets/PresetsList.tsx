@@ -35,9 +35,9 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
     return (
       <div className="text-center py-3xl bg-surface rounded-lg border-2 border-dashed border-border-base">
         <div className="max-w-xs mx-auto">
-          <p className="text-ink-900 font-bold mb-sm tracking-tight">No saved products yet</p>
+          <p className="text-ink-900 font-bold mb-sm tracking-tight">A clean slate</p>
           <p className="text-sm text-ink-500 font-medium leading-relaxed">
-            Save your calculations to quickly access them later with intention.
+            Your saved calculations will appear here for easy access.
           </p>
         </div>
       </div>
@@ -91,14 +91,14 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
       {filteredPresets.length === 0 ? (
         <div className="text-center py-3xl bg-surface rounded-lg border border-border-subtle animate-in fade-in duration-500">
           <Search className="w-12 h-12 text-ink-300 mx-auto mb-md opacity-50" />
-          <p className="text-ink-500 font-medium">No results match your search &quot;{searchQuery}&quot;</p>
+          <p className="text-ink-500 font-medium">We couldn&apos;t find a match for &quot;{searchQuery}&quot;</p>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => setSearchQuery('')}
             className="mt-md text-clay"
           >
-            Clear search
+            Clear
           </Button>
         </div>
       ) : (

@@ -82,7 +82,7 @@ export const FAQ: React.FC = () => {
       title={
         <div className="flex items-center gap-sm">
           <HelpCircle className="h-5 w-5 text-clay" />
-          <span className="text-ink-900">Frequently Asked Questions</span>
+          <span className="text-ink-900">Questions</span>
         </div>
       }
       className="w-full max-w-2xl mx-auto border-border-subtle shadow-none"
@@ -112,7 +112,7 @@ export const FAQ: React.FC = () => {
             ))
           ) : (
             <div className="py-2xl text-center text-ink-500 font-medium">
-              No results found for &quot;{searchQuery}&quot;.
+              We couldn&apos;t find a match for &quot;{searchQuery}&quot;.
             </div>
           )}
         </div>
