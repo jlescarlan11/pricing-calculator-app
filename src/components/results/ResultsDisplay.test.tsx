@@ -93,23 +93,29 @@ describe('ResultsDisplay', () => {
     expect(onEdit).toHaveBeenCalled();
   });
 
-  it('copies summary to clipboard when Copy button is clicked', async () => {
+  it('copies summary to clipboard when Copy Summary is clicked in Share menu', async () => {
     render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} />);
     
-    const copyButton = screen.getByText(/Copy/i);
+    // Open share menu
+    fireEvent.click(screen.getByText(/Share/i));
+    
+    const copyOption = screen.getByText(/Copy Summary/i);
     await act(async () => {
-      fireEvent.click(copyButton);
+      fireEvent.click(copyOption);
     });
 
     expect(navigator.clipboard.writeText).toHaveBeenCalled();
-    expect(screen.getByText(/Copied/i)).toBeInTheDocument();
+    expect(screen.getByText(/Copied to Clipboard/i)).toBeInTheDocument();
   });
 
-  it('triggers print when Print button is clicked', () => {
+  it('triggers print when Print Results is clicked in Share menu', () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
     render(<ResultsDisplay results={mockResults} input={mockInput} config={mockConfig} />);
     
-    fireEvent.click(screen.getByText(/Print/i));
+    // Open share menu
+    fireEvent.click(screen.getByText(/Share/i));
+    
+    fireEvent.click(screen.getByText(/Print Results/i));
     expect(printSpy).toHaveBeenCalled();
     printSpy.mockRestore();
   });

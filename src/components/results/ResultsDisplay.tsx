@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { CalculationResult, CalculationInput, PricingConfig } from '../../types/calculator';
 import { PricingRecommendations } from './PricingRecommendations';
 import { CostBreakdown } from './CostBreakdown';
 import { PriceComparison } from './PriceComparison';
+import { ShareResults } from './ShareResults';
 import { Button } from '../shared/Button';
 import { SavePresetButton } from '../presets/SavePresetButton';
-import { Share2, Printer, Calculator, Copy, Check, Edit2 } from 'lucide-react';
-import { triggerPrint, getPrintDate, getPrintTitle, formatCalculationSummary, copyToClipboard } from '../../utils';
+import { Share2, Calculator, Edit2 } from 'lucide-react';
+import { getPrintDate, getPrintTitle } from '../../utils';
 
 interface ResultsDisplayProps {
   results: CalculationResult | null | undefined;
@@ -18,7 +19,7 @@ interface ResultsDisplayProps {
 /**
  * Orchestrator component that displays all calculation results.
  * Includes recommendations, cost breakdown, and price comparison.
- * Handles empty states and provides utility actions like Print and Copy.
+ * Handles empty states and provides utility actions via ShareResults and SavePresetButton.
  */
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   results,
@@ -26,24 +27,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   config,
   onEdit,
 }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopySummary = async () => {
-    if (!results) return;
-
-    const summary = formatCalculationSummary(input, results);
-
-    const success = await copyToClipboard(summary);
-    if (success) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handlePrint = () => {
-    triggerPrint();
-  };
-
   // Placeholder for when no results are available
   if (!results) {
     return (
@@ -97,33 +80,10 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             size="sm"
             className="flex-1 sm:flex-none shadow-lg shadow-blue-100"
           />
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="flex-1 sm:flex-none gap-2 min-w-[100px]"
-            onClick={handleCopySummary}
-          >
-            {copied ? (
-              <>
-                <Check className="w-4 h-4 text-emerald-500" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                Copy
-              </>
-            )}
-          </Button>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="flex-1 sm:flex-none gap-2"
-            onClick={handlePrint}
-          >
-            <Printer className="w-4 h-4" />
-            Print
-          </Button>
+          <ShareResults 
+            results={results} 
+            input={input} 
+          />
         </div>
       </div>
 
