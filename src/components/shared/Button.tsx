@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'soft';
+export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost' | 'soft';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -19,21 +19,29 @@ export const Button: React.FC<ButtonProps> = ({
   type = 'button',
   ...props
 }) => {
+  // Updated base styles: rounded-lg (8px), transition-all duration-400 ease-in-out, min touch target
   const baseStyles =
-    'inline-flex items-center justify-center rounded-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer sm:w-auto w-full sm:flex-none shadow-level-0 hover:shadow-level-2 active:shadow-level-0';
+    'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-400 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer sm:w-auto w-full sm:flex-none active:scale-95 min-h-[44px] min-w-[44px]';
 
   const variants = {
-    primary: 'bg-clay text-white hover:opacity-90 focus-visible:ring-clay',
-    secondary: 'bg-surface text-ink-900 border border-border-base hover:bg-surface-hover focus-visible:ring-border-base',
-    danger: 'bg-rust text-white hover:opacity-90 focus-visible:ring-rust',
-    ghost: 'hover:bg-surface-hover text-ink-700 hover:text-ink-900 focus-visible:ring-border-base',
-    soft: 'bg-moss/10 text-moss hover:bg-moss/20 focus-visible:ring-moss',
+    // Primary: 1px solid #A67B5B, text matching, transparent bg, hover bg rgba(166, 123, 91, 0.05), scale 1.02
+    primary: 'border border-[#A67B5B] text-[#A67B5B] bg-transparent hover:bg-[rgba(166,123,91,0.05)] hover:scale-[1.02] focus-visible:ring-[#A67B5B]',
+    // Secondary: 1px solid #D4D2CF, text #6B6761, transparent bg, hover scale 1.02
+    secondary: 'border border-[#D4D2CF] text-[#6B6761] bg-transparent hover:bg-surface-hover hover:scale-[1.02] focus-visible:ring-[#D4D2CF]',
+    // Success: 1px solid #7A8B73, text matching, transparent bg, hover scale 1.02
+    success: 'border border-[#7A8B73] text-[#7A8B73] bg-transparent hover:bg-[rgba(122,139,115,0.05)] hover:scale-[1.02] focus-visible:ring-[#7A8B73]',
+    // Danger: 1px solid #B85C38, text matching, transparent bg, hover scale 1.02
+    danger: 'border border-[#B85C38] text-[#B85C38] bg-transparent hover:bg-[rgba(184,92,56,0.05)] hover:scale-[1.02] focus-visible:ring-[#B85C38]',
+    // Ghost: maintained for backward compatibility but updated with transitions
+    ghost: 'hover:bg-surface-hover text-ink-700 hover:text-ink-900 focus-visible:ring-border-base hover:scale-[1.02]',
+    // Soft: maintained for backward compatibility
+    soft: 'bg-moss/10 text-moss hover:bg-moss/20 focus-visible:ring-moss hover:scale-[1.02]',
   };
 
   const sizes = {
-    sm: 'px-sm py-xs text-xs',
-    md: 'px-6 py-3 text-sm',
-    lg: 'px-8 py-4 text-base',
+    sm: 'px-4 py-2 text-xs', // adjusted for proportion
+    md: 'px-8 py-3 text-sm', // 12px vertical, 32px horizontal
+    lg: 'px-10 py-4 text-base',
   };
 
   const variantStyles = variants[variant];
@@ -50,7 +58,7 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {isLoading && (
         <svg
-          className="mr-sm h-4 w-4 animate-spin"
+          className="mr-2 h-4 w-4 animate-spin"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
