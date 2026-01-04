@@ -1,3 +1,5 @@
+import type { VariantInput } from './variants';
+
 export interface Ingredient {
   id: string;
   name: string;
@@ -13,6 +15,7 @@ export interface CalculationInput {
   laborCost: number;
   overhead: number;
   currentSellingPrice?: number;
+  variants?: VariantInput[];
 }
 
 export type PricingStrategy = 'markup' | 'margin';
@@ -40,6 +43,7 @@ export interface CalculationResult {
 export interface SavedPreset {
   id: string;
   name: string;
+  type?: 'single' | 'variant';
   input: CalculationInput;
   config: PricingConfig;
   lastModified: number;

@@ -4,13 +4,16 @@ import { PricingRecommendations } from './PricingRecommendations';
 import { CostBreakdown } from './CostBreakdown';
 import { PriceComparison } from './PriceComparison';
 import { ShareResults } from './ShareResults';
+import { VariantResultsSummary } from './VariantResultsSummary';
 import { Button } from '../shared/Button';
 import { SavePresetButton } from '../presets/SavePresetButton';
 import { Share2, Calculator, Edit2 } from 'lucide-react';
 import { getPrintDate, getPrintTitle } from '../../utils';
+import type { VariantCalculation } from '../../types/variants';
 
 interface ResultsDisplayProps {
   results: CalculationResult | null | undefined;
+  variantResults?: VariantCalculation[];
   input: CalculationInput;
   config: PricingConfig;
   onEdit?: () => void;
@@ -23,6 +26,7 @@ interface ResultsDisplayProps {
  */
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   results,
+  variantResults,
   input,
   config,
   onEdit,
@@ -92,6 +96,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
           <PricingRecommendations results={results} />
         </div>
+
+        {/* Priority 1.5: Variants Summary */}
+        {variantResults && variantResults.length > 0 && (
+            <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+            <VariantResultsSummary variantResults={variantResults} input={input} />
+            </div>
+        )}
 
         {/* Priority 2: Cost Breakdown */}
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">

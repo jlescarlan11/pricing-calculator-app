@@ -118,7 +118,7 @@ describe('ExportService', () => {
       const removeChildSpy = vi.spyOn(document.body, 'removeChild').mockImplementation(() => mockLink);
       
       // Mock URL methods
-      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test-url');
+      vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test-url');
       const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
 
       const content = JSON.stringify({ test: 'data' });

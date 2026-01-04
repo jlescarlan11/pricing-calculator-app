@@ -111,8 +111,11 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **CalculatorPage**: Main route containing the pricing calculator logic and state management.
 - [x] **HelpPage**: Educational route explaining pricing strategies (Markup vs Margin) using the `PricingGuide` component.
 - [x] **FAQPage**: Information route for common pricing questions and tips.
+- [x] **DashboardPage**: Landing page for authenticated users to manage presets and start new calculations. (Added 2026-01-04)
+- [x] **Calculator Mode Switching**: Implemented `CalculatorTabs` to easily toggle between Single and Variant calculator modes. (Added 2026-01-04)
 
 ### Components
+- [x] **CalculatorTabs**: A mode switcher component for the calculator pages (Single vs Variants). (Added 2026-01-04)
 - [x] **PricingGuide**: Extracted from `PricingExplainerModal` to be reused in both the modal and the standalone Help page. (Added 2026-01-03)
 
 

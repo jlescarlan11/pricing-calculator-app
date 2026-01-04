@@ -5,7 +5,8 @@ export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 export const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env.local file.');
+  console.error('Missing Supabase environment variables. Please check your .env.local file. Cloud features will be disabled.');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// Fallback to empty strings if missing to avoid createClient crashing
+export const supabase = createClient<Database>(supabaseUrl || '', supabaseAnonKey || '');

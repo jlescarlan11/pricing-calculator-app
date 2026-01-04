@@ -1,6 +1,6 @@
 import React from 'react';
 
-export interface CardProps {
+export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   children: React.ReactNode;
   title?: React.ReactNode;
   className?: string;
@@ -18,12 +18,13 @@ export const Card: React.FC<CardProps> = ({
   noPadding = false,
   interactive = false,
   texture = false,
+  ...props
 }) => {
   const baseClasses = 'bg-surface rounded-lg border border-border-subtle shadow-level-1 overflow-hidden relative transition-all duration-[400ms] ease-in-out';
   const interactiveClasses = interactive ? 'hover:shadow-level-2 hover:-translate-y-0.5 cursor-pointer' : '';
   
   return (
-    <div className={`${baseClasses} ${interactiveClasses} ${className}`}>
+    <div className={`${baseClasses} ${interactiveClasses} ${className}`} {...props}>
       {texture && <div className="paper-texture absolute inset-0 opacity-30 pointer-events-none" />}
       
       {noPadding ? (

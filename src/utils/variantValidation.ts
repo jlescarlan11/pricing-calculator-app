@@ -1,25 +1,17 @@
-import { VariantInput } from '../types/variants';
-import { ValidationError, validateIngredients } from './validation';
+import type { VariantInput } from '../types/variants';
+import { validateIngredients, type ValidationError } from './validation';
 
 /**
- * Validates that the sum of variant quantities matches the batch size
- * and that all variants have valid positive quantities.
+ * Validates that all variants have valid positive quantities.
  */
 export const validateVariantQuantities = (
-  variants: VariantInput[],
-  batchSize: number
+  variants: VariantInput[]
 ): ValidationError[] => {
   const errors: ValidationError[] = [];
 
-  if (!variants || variants.length === 0) {
-    errors.push({
-      field: 'variants',
-      message: 'At least one variant is required.',
-    });
+  if (!variants) {
     return errors;
   }
-
-  let totalQuantity = 0;
 
   variants.forEach((variant, index) => {
     if (variant.amount === null || variant.amount === undefined || isNaN(variant.amount)) {
@@ -32,25 +24,14 @@ export const validateVariantQuantities = (
         field: `variants[${index}].amount`,
         message: 'Quantity must be at least 0.01.',
       });
-    } else {
-      totalQuantity += variant.amount;
     }
   });
-
-  // Only check total if individual quantities are valid numbers
-  // Floating point tolerance of 0.01
-  if (Math.abs(totalQuantity - batchSize) > 0.01) {
-    errors.push({
-      field: 'totalQuantity',
-      message: `Total variant quantity (${totalQuantity.toFixed(2)}) must match batch size (${batchSize}).`,
-    });
-  }
 
   return errors;
 };
 
 /**
- * Validates individual variant data integrity including name, pricing,
+ * Validates individual variant data integrity including name
  * and additional costs.
  */
 export const validateVariantData = (variant: VariantInput, index: number): ValidationError[] => {
@@ -77,31 +58,7 @@ export const validateVariantData = (variant: VariantInput, index: number): Valid
     });
   }
 
-  // 3. Validate Pricing
-  if (variant.pricingValue === null || variant.pricingValue === undefined || isNaN(variant.pricingValue)) {
-     errors.push({
-      field: `variants[${index}].pricingValue`,
-      message: 'Please enter a pricing value.',
-    });
-  } else {
-    if (variant.pricingStrategy === 'markup') {
-        if (variant.pricingValue < 0) {
-            errors.push({
-                field: `variants[${index}].pricingValue`,
-                message: 'Markup cannot be negative.',
-            });
-        }
-    } else if (variant.pricingStrategy === 'margin') {
-        if (variant.pricingValue < 0 || variant.pricingValue >= 100) {
-             errors.push({
-                field: `variants[${index}].pricingValue`,
-                message: 'Margin must be between 0% and 100%.',
-            });
-        }
-    }
-  }
-
-  // 4. Validate Additional Ingredients
+  // 3. Validate Additional Ingredients
   if (variant.additionalIngredients && variant.additionalIngredients.length > 0) {
       const ingredientErrors = validateIngredients(variant.additionalIngredients);
       // Remap errors to include variant index context
@@ -127,31 +84,3 @@ export const validateVariantData = (variant: VariantInput, index: number): Valid
   return errors;
 };
 
-interface QuantityAllocation {
-  totalAllocated: number;
-  remaining: number;
-  isOverAllocated: boolean;
-  isFullyAllocated: boolean;
-}
-
-/**
- * Computes allocation status for UI feedback.
- */
-export const getQuantityAllocation = (
-  variants: VariantInput[],
-  batchSize: number
-): QuantityAllocation => {
-  const totalAllocated = variants.reduce((sum, v) => sum + (v.amount || 0), 0);
-  // Round to avoid floating point issues
-  const roundedTotal = Math.round(totalAllocated * 100) / 100;
-  const roundedBatch = Math.round(batchSize * 100) / 100;
-  
-  const remaining = roundedBatch - roundedTotal;
-  
-  return {
-    totalAllocated: roundedTotal,
-    remaining: Math.round(remaining * 100) / 100,
-    isOverAllocated: roundedTotal > roundedBatch,
-    isFullyAllocated: Math.abs(roundedTotal - roundedBatch) < 0.01
-  };
-};

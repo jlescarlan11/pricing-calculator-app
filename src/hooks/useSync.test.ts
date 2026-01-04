@@ -173,7 +173,7 @@ describe('useSync', () => {
 
   it('should clean up listeners and intervals on unmount', () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-    const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
 
     const { unmount } = renderHook(() => useSync());
     unmount();

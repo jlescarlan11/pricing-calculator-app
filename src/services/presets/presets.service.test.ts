@@ -170,7 +170,7 @@ describe('PresetsService', () => {
 
     it('should throw AuthenticationError if user is not logged in', async () => {
       vi.spyOn(supabase.auth, 'getUser').mockResolvedValue({
-        data: { user: null },
+        data: { user: null as any },
         error: null
       });
 

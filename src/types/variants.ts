@@ -12,8 +12,6 @@ export interface VariantInput {
   unit: string; // e.g., "pc", "box", "kg"
   additionalIngredients: Ingredient[];
   additionalLabor: number;
-  pricingStrategy: PricingStrategy;
-  pricingValue: number;
   currentSellingPrice: number | null;
 }
 
@@ -44,45 +42,15 @@ export interface BasePreset {
 }
 
 /**
- * Preset for a single product with a direct pricing strategy.
- * Enforces preset_type: 'single', contains no variants, and requires valid pricing.
+ * Unified Preset type for both single products and products with variants.
+ * 'variants' is now an optional array. If empty or null, it treats the product as a single base product.
+ * 'preset_type' is kept for database compatibility but is less strict in the application model.
  */
-export interface SinglePreset extends BasePreset {
-  preset_type: 'single';
+export interface Preset extends BasePreset {
+  preset_type: 'single' | 'variants';
   pricing_strategy: PricingStrategy;
   pricing_value: number;
   current_selling_price: number | null;
-  variants: null;
-}
-
-/**
- * Preset with multiple variants, each with its own pricing strategy.
- * Enforces preset_type: 'variants', contains a list of VariantInput, 
- * and sets all single-product pricing fields to null.
- */
-export interface VariantsPreset extends BasePreset {
-  preset_type: 'variants';
-  pricing_strategy: null;
-  pricing_value: null;
-  current_selling_price: null;
   variants: VariantInput[];
 }
 
-/**
- * Discriminated union for all preset types.
- */
-export type Preset = SinglePreset | VariantsPreset;
-
-/**
- * Type-safe guard to check if a preset is a SinglePreset.
- */
-export function isSinglePreset(preset: Preset): preset is SinglePreset {
-  return preset.preset_type === 'single';
-}
-
-/**
- * Type-safe guard to check if a preset is a VariantsPreset.
- */
-export function isVariantsPreset(preset: Preset): preset is VariantsPreset {
-  return preset.preset_type === 'variants';
-}

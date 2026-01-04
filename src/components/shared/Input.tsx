@@ -10,8 +10,10 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   helperText?: string;
   currency?: boolean;
   suffix?: React.ReactNode;
+  icon?: React.ReactNode;
   tooltip?: React.ReactNode;
   inputClassName?: string;
+  hideLabel?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
@@ -26,9 +28,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   disabled = false,
   currency = false,
   suffix,
+  icon,
   tooltip,
   className = '',
   inputClassName = '',
+  hideLabel = false,
   ...props
 }, ref) => {
   const id = useId();
@@ -46,7 +50,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
 
   return (
     <div className={`flex flex-col w-full ${className}`}>
-      <div className="flex items-center justify-between mb-2">
+      <div className={`flex items-center justify-between mb-2 ${hideLabel ? 'sr-only' : ''}`}>
         <label 
           htmlFor={id} 
           className="text-sm font-medium text-ink-700 flex items-center gap-xs tracking-[0.01em]"
@@ -70,9 +74,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
       </div>
 
       <div className="relative">
-        {currency && (
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <span className="text-ink-500 sm:text-sm">₱</span>
+        {(currency || icon) && (
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-ink-500 sm:text-sm">
+            {currency ? '₱' : icon}
           </div>
         )}
         
@@ -95,7 +99,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
             disabled:bg-surface-hover disabled:text-ink-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden
             placeholder:text-ink-500 placeholder:italic
-            ${currency ? 'pl-10' : 'pl-4'}
+            ${currency || icon ? 'pl-10' : 'pl-4'}
             ${suffix || error ? 'pr-10' : 'pr-4'}
             ${error 
               ? 'border-rust text-rust placeholder-rust/30 focus:border-rust focus:ring-rust/20' 

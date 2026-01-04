@@ -1,23 +1,38 @@
 /**
- * Formats a number as Philippine currency (PHP).
+ * Formats a number as currency.
  * Handles zero values and negative amounts.
  * 
  * @param amount - The numerical amount to format.
- * @returns The formatted currency string (e.g., "₱1,000.00").
+ * @param currency - The currency code (e.g., 'PHP'). Defaults to 'PHP'.
+ * @returns The formatted currency string.
  */
-export const formatCurrency = (amount: number): string => {
+export const formatCurrency = (amount: number, currency: string = 'PHP'): string => {
+  // Map common symbols to codes if needed, though Intl works best with codes
+  const code = currency === '₱' ? 'PHP' : currency;
+
   // Handle strict zero or -0
   if (amount === 0) {
-    return '₱0.00';
+    const symbol = code === 'PHP' ? '₱' : (code === 'USD' ? '$' : '');
+    return `${symbol}0.00`;
   }
 
-  // Use Intl.NumberFormat for locale-aware formatting
-  return new Intl.NumberFormat('en-PH', {
-    style: 'currency',
-    currency: 'PHP',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  try {
+    // Use Intl.NumberFormat for locale-aware formatting
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch (e) {
+    // Fallback if currency code is invalid
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  }
 };
 
 /**

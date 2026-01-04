@@ -3,10 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SavePresetModal } from './SavePresetModal';
 import { ToastProvider } from '../shared/Toast';
 import * as usePresetsHook from '../../hooks/use-presets';
+import * as useSyncHook from '../../hooks/useSync';
 import type { CalculationInput, PricingConfig } from '../../types/calculator';
 
-// Mock the usePresets hook
+// Mock the hooks
 vi.mock('../../hooks/use-presets');
+vi.mock('../../hooks/useSync');
 
 const mockInput: CalculationInput = {
   productName: 'Test Product',
@@ -26,6 +28,7 @@ const mockConfig: PricingConfig = {
 describe('SavePresetModal', () => {
   const mockOnClose = vi.fn();
   const mockAddPreset = vi.fn();
+  const mockOnSave = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -40,10 +43,20 @@ describe('SavePresetModal', () => {
       getAllPresets: vi.fn(),
       syncPresets: vi.fn().mockResolvedValue(undefined),
       refresh: vi.fn().mockResolvedValue(undefined),
+      syncStatus: 'synced',
     });
+
+    vi.mocked(useSyncHook.useSync).mockReturnValue({
+      isOnline: true,
+      status: 'synced',
+      syncToCloud: vi.fn(),
+      syncFromCloud: vi.fn(),
+      refreshQueueLength: vi.fn(),
+      queueLength: 0,
+    } as any);
   });
 
-  it('renders correctly when open', () => {
+  it('renders correctly for single product', () => {
     render(
       <ToastProvider>
         <SavePresetModal
@@ -56,108 +69,84 @@ describe('SavePresetModal', () => {
     );
 
     expect(screen.getByText(/Save calculation/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Test Product');
-    expect(screen.getByText(/Calculation Summary/i)).toBeInTheDocument();
+    expect(screen.getByText(/Single/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Preset Name/i)).toHaveValue('Test Product');
+    expect(screen.getByText(/Data Preview/i)).toBeInTheDocument();
     
     // Check calculated values in summary
-    // Total cost = 50 + 20 + 10 = 80
-    // Recommended Price (50% markup on 80/10=8) = 8 * 1.5 = 12
     expect(screen.getByText(/₱80.00/)).toBeInTheDocument();
     expect(screen.getByText(/₱12.00/)).toBeInTheDocument();
   });
 
-  it('validates name length (too short)', async () => {
+  it('renders correctly for variants', () => {
     render(
       <ToastProvider>
         <SavePresetModal
           isOpen={true}
           onClose={mockOnClose}
-          input={{ ...mockInput, productName: '' }}
-          config={mockConfig}
+          presetType="variants"
+          initialName="Variant Box"
+          previewData={{
+            batchSize: 24,
+            variantsCount: 3,
+            topVariants: [
+              { name: 'Large', recommendedPrice: 150 },
+              { name: 'Small', recommendedPrice: 75 },
+            ]
+          }}
         />
       </ToastProvider>
     );
 
-    const input = screen.getByLabelText(/Product Name/i);
-    fireEvent.change(input, { target: { value: 'Ab' } });
-
-    const saveBtn = screen.getByText(/^Save$/);
-    fireEvent.click(saveBtn);
-
-    expect(await screen.findByText(/Try a slightly longer name/i)).toBeInTheDocument();
-    expect(mockAddPreset).not.toHaveBeenCalled();
+    expect(screen.getByText(/^Variants$/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Preset Name/i)).toHaveValue('Variant Box');
+    expect(screen.getByText(/3 Variations/i)).toBeInTheDocument();
+    expect(screen.getByText(/24 units/i)).toBeInTheDocument();
+    expect(screen.getByText(/Large/i)).toBeInTheDocument();
+    expect(screen.getByText(/₱150.00/)).toBeInTheDocument();
+    expect(screen.getByText(/\+ 1 more variants/i)).toBeInTheDocument();
   });
 
-  it('validates name length (too long)', async () => {
+  it('shows online status correctly', () => {
     render(
       <ToastProvider>
-        <SavePresetModal
-          isOpen={true}
-          onClose={mockOnClose}
-          input={{ ...mockInput, productName: '' }}
-          config={mockConfig}
-        />
+        <SavePresetModal isOpen={true} onClose={mockOnClose} />
       </ToastProvider>
     );
 
-    const input = screen.getByLabelText(/Product Name/i);
-    fireEvent.change(input, { target: { value: 'a'.repeat(51) } });
-
-    const saveBtn = screen.getByText(/^Save$/);
-    fireEvent.click(saveBtn);
-
-    expect(await screen.findByText(/Try a shorter name/i)).toBeInTheDocument();
-    expect(mockAddPreset).not.toHaveBeenCalled();
+    expect(screen.getByText(/Connection secure - syncing enabled/i)).toBeInTheDocument();
   });
 
-  it('validates duplicate names', async () => {
-    vi.mocked(usePresetsHook.usePresets).mockReturnValue({
-      presets: [{ id: '1', name: 'Existing Product', input: mockInput, config: mockConfig, lastModified: Date.now() }],
-      loading: false,
-      error: null,
-      addPreset: vi.fn().mockResolvedValue({ id: '1' }),
-      updatePreset: vi.fn().mockResolvedValue(undefined),
-      deletePreset: vi.fn().mockResolvedValue(true),
-      getPreset: vi.fn(),
-      getAllPresets: vi.fn(),
-      syncPresets: vi.fn().mockResolvedValue(undefined),
-      refresh: vi.fn().mockResolvedValue(undefined),
-    });
+  it('shows offline status correctly', () => {
+    vi.mocked(useSyncHook.useSync).mockReturnValue({
+      isOnline: false,
+      status: 'offline',
+    } as any);
 
     render(
       <ToastProvider>
-        <SavePresetModal
-          isOpen={true}
-          onClose={mockOnClose}
-          input={{ ...mockInput, productName: 'Existing Product' }}
-          config={mockConfig}
-        />
+        <SavePresetModal isOpen={true} onClose={mockOnClose} />
       </ToastProvider>
     );
 
-    const saveBtn = screen.getByText(/^Save$/);
-    fireEvent.click(saveBtn);
-
-    expect(await screen.findByText(/already have a product with this name/i)).toBeInTheDocument();
-    expect(mockAddPreset).not.toHaveBeenCalled();
+    expect(screen.getByText(/Currently offline - saving locally/i)).toBeInTheDocument();
   });
 
-  it('saves successfully and shows success message', async () => {
+  it('saves successfully and shows "Saved & Synced" when online', async () => {
     vi.useFakeTimers();
     render(
       <ToastProvider>
         <SavePresetModal
           isOpen={true}
           onClose={mockOnClose}
-          input={mockInput}
-          config={mockConfig}
+          onSave={mockOnSave}
+          initialName="Cloud Product"
         />
       </ToastProvider>
     );
 
     const saveBtn = screen.getByText(/^Save$/);
     
-    // We need to wrap the click and the advancement of timers in act
     await act(async () => {
       fireEvent.click(saveBtn);
     });
@@ -167,65 +156,94 @@ describe('SavePresetModal', () => {
       vi.advanceTimersByTime(100);
     });
 
-    expect(screen.getByText(/^Saved$/)).toBeInTheDocument();
-    expect(screen.getByText(/Preset saved/i)).toBeInTheDocument();
+    expect(screen.getByText(/Saved & Synced/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cloud Sync Active/i)).toBeInTheDocument();
+    expect(mockOnSave).toHaveBeenCalledWith('Cloud Product');
 
-    expect(mockAddPreset).toHaveBeenCalledWith({
-      name: 'Test Product',
-      input: mockInput,
-      config: mockConfig,
-    });
-
-    // Should auto-close after delay (1800ms in component)
+    // Should auto-close after delay (2500ms in component)
     act(() => {
-      vi.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(3000);
     });
     
     expect(mockOnClose).toHaveBeenCalled();
     vi.useRealTimers();
   });
 
-  it('calls onClose when Back is clicked', () => {
+  it('saves successfully and shows "Saved Locally" when offline', async () => {
+    vi.mocked(useSyncHook.useSync).mockReturnValue({
+      isOnline: false,
+      status: 'offline',
+    } as any);
+
+    vi.useFakeTimers();
     render(
       <ToastProvider>
         <SavePresetModal
           isOpen={true}
           onClose={mockOnClose}
-          input={mockInput}
-          config={mockConfig}
+          onSave={mockOnSave}
+          initialName="Offline Product"
         />
       </ToastProvider>
     );
 
-    const backBtn = screen.getByText(/Back/i);
-    fireEvent.click(backBtn);
+    const saveBtn = screen.getByText(/^Save$/);
+    
+    await act(async () => {
+      fireEvent.click(saveBtn);
+    });
 
-    expect(mockOnClose).toHaveBeenCalled();
+    await act(async () => {
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(screen.getByText(/Saved Locally/i)).toBeInTheDocument();
+    expect(screen.getByText(/Waiting for Connection/i)).toBeInTheDocument();
+    
+    vi.useRealTimers();
   });
 
-  it('resets state when reopened', async () => {
-    const { rerender } = render(
-      <ToastProvider>
-        <SavePresetModal
-          isOpen={false}
-          onClose={mockOnClose}
-          input={mockInput}
-          config={mockConfig}
-        />
-      </ToastProvider>
-    );
-
-    rerender(
+  it('handles save errors gracefully', async () => {
+    mockOnSave.mockRejectedValueOnce(new Error('Network failure'));
+    
+    render(
       <ToastProvider>
         <SavePresetModal
           isOpen={true}
           onClose={mockOnClose}
-          input={{ ...mockInput, productName: 'New Name' }}
-          config={mockConfig}
+          onSave={mockOnSave}
+          initialName="Error Product"
         />
       </ToastProvider>
     );
 
-    expect(screen.getByLabelText(/Product Name/i)).toHaveValue('New Name');
+    const saveBtn = screen.getByText(/^Save$/);
+    
+    await act(async () => {
+      fireEvent.click(saveBtn);
+    });
+
+    expect(await screen.findByText(/Network failure/i)).toBeInTheDocument();
+    // Input should still have the name
+    expect(screen.getByLabelText(/Preset Name/i)).toHaveValue('Error Product');
+    expect(screen.getByText(/^Save$/)).toBeEnabled();
+  });
+
+  it('validates name length', async () => {
+    render(
+      <ToastProvider>
+        <SavePresetModal
+          isOpen={true}
+          onClose={mockOnClose}
+          initialName="Ab"
+        />
+      </ToastProvider>
+    );
+
+    const saveBtn = screen.getByText(/^Save$/);
+    fireEvent.click(saveBtn);
+
+    expect(await screen.findByText(/Try a slightly longer name/i)).toBeInTheDocument();
+    expect(mockOnSave).not.toHaveBeenCalled();
   });
 });

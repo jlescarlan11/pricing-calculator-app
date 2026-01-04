@@ -41,7 +41,7 @@ export class OfflineQueue {
     
     const newOperation: QueuedOperation = {
       ...operation,
-      id: crypto.randomUUID(),
+      id: crypto.randomUUID?.() || Math.random().toString(36).substring(2),
       timestamp: Date.now(),
       retryCount: 0,
     };

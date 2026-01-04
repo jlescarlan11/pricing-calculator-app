@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Calculator, HelpCircle, Menu, X, Lightbulb, User, LogIn } from 'lucide-react';
+import { Calculator, HelpCircle, Menu, X, Lightbulb, User, LogIn, Package } from 'lucide-react';
 import { PricingExplainerModal } from '../help/PricingExplainerModal';
 import { FAQ } from '../help/FAQ';
 import { Modal } from '../shared/Modal';
@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
         <div className="max-w-6xl mx-auto px-md sm:px-lg lg:px-xl">
           <div className="flex justify-between items-center h-20">
             {/* Logo and Title */}
-            <Link to="/" className="flex items-center gap-md group">
+            <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-md group">
               <div className="p-sm bg-clay rounded-md text-white shadow-level-1 transition-transform group-hover:scale-105 duration-300">
                 <Calculator size={24} />
               </div>
@@ -37,7 +37,13 @@ export const Header: React.FC = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-sm">
-              <NavLink to="/" className={navLinkClass}>
+              {user && (
+                <NavLink to="/dashboard" className={navLinkClass}>
+                  <Package size={18} />
+                  <span>Dashboard</span>
+                </NavLink>
+              )}
+              <NavLink to="/calculator/single" className={navLinkClass}>
                 <Calculator size={18} />
                 <span>Calculator</span>
               </NavLink>
@@ -92,8 +98,18 @@ export const Header: React.FC = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-border-subtle bg-bg-main py-lg px-lg space-y-sm animate-in fade-in slide-in-from-top-4 duration-500">
+            {user && (
+              <NavLink 
+                to="/dashboard" 
+                className={navLinkClass}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Package size={18} />
+                Dashboard
+              </NavLink>
+            )}
             <NavLink 
-              to="/" 
+              to="/calculator/single" 
               className={navLinkClass}
               onClick={() => setIsMobileMenuOpen(false)}
             >

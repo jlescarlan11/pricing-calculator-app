@@ -6,7 +6,8 @@ import {
   LaborCost, 
   OverheadCost, 
   PricingStrategy, 
-  CurrentPrice 
+  CurrentPrice,
+  VariantsSection
 } from './index';
 import { SavePresetButton } from '../presets/SavePresetButton';
 import { Button, Card } from '../shared';
@@ -16,6 +17,7 @@ import type {
   PricingConfig, 
   Ingredient 
 } from '../../types/calculator';
+import type { VariantInput, VariantCalculation } from '../../types/variants';
 
 interface CalculatorFormProps {
   input: CalculationInput;
@@ -29,6 +31,12 @@ interface CalculatorFormProps {
   onUpdateConfig: (updates: Partial<PricingConfig>) => void;
   onCalculate: () => void;
   onReset: () => void;
+  // Variants (Optional to support gradual migration if needed)
+  variants?: VariantInput[];
+  variantResults?: VariantCalculation[];
+  onAddVariant?: () => void;
+  onUpdateVariant?: (id: string, updates: Partial<VariantInput>) => void;
+  onRemoveVariant?: (id: string) => void;
 }
 
 export const CalculatorForm: React.FC<CalculatorFormProps> = ({ 
@@ -43,6 +51,11 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onUpdateConfig,
   onCalculate,
   onReset,
+  variants = [],
+  variantResults = [],
+  onAddVariant,
+  onUpdateVariant,
+  onRemoveVariant,
 }) => {
   // Local state for UI only (like which ingredient is being focused, or hover states)
   // But business logic state is now passed as props.
@@ -382,6 +395,20 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
                     />
 
+                    {/* Section 6: Variants */}
+                    {onAddVariant && onUpdateVariant && onRemoveVariant && (
+                        <>
+                            <div className="h-px bg-border-subtle" role="separator" />
+                            <VariantsSection
+                                variants={variants}
+                                variantResults={variantResults}
+                                onAddVariant={onAddVariant}
+                                onUpdateVariant={onUpdateVariant}
+                                onRemoveVariant={onRemoveVariant}
+                                errors={errors}
+                            />
+                        </>
+                    )}
             
 
                     {/* Floating Mobile Action */}

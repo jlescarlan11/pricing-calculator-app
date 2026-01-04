@@ -3,7 +3,7 @@ import { useAuth } from './useAuth';
 import { useSync } from './useSync';
 import { syncService } from '../services/sync/sync.service';
 import { mapDbToPreset, mapPresetToDbInsert, mapPresetToDbUpdate } from '../services/presets';
-import type { SavedPreset } from '../types';
+import type { SavedPreset, Preset } from '../types';
 
 /**
  * Custom hook for managing saved calculation presets.
@@ -12,7 +12,7 @@ import type { SavedPreset } from '../types';
 export function usePresets() {
   const { user } = useAuth();
   const { syncFromCloud, syncToCloud, status, error: syncError } = useSync();
-  const [presets, setPresets] = useState<SavedPreset[]>(() => 
+  const [presets, setPresets] = useState<(SavedPreset | Preset)[]>(() => 
     syncService.getLocalCache().map(mapDbToPreset)
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -45,15 +45,29 @@ export function usePresets() {
   /**
    * Adds a new preset with optimistic updates.
    */
-  const addPreset = useCallback(async (presetData: Omit<SavedPreset, 'id' | 'lastModified'>) => {
+  const addPreset = useCallback(async (presetData: Partial<SavedPreset | Preset>) => {
     const id = crypto.randomUUID?.() || Math.random().toString(36).substring(2);
     const now = new Date().toISOString();
-    const newPreset: SavedPreset = {
-      ...presetData,
+    
+    // Normalize type fields
+    const pData = presetData as any;
+    
+    // Determine if it should be single or variants based on data
+    const hasVariants = (pData.variants && pData.variants.length > 0) || 
+                        (pData.input?.variants && pData.input.variants.length > 0);
+    
+    // We treat everything as the unified Preset type or SavedPreset
+    // We set preset_type mainly for DB compatibility
+    const preset_type = hasVariants ? 'variants' : 'single';
+    // Remove specific 'type' field usage if it was for the old discriminated union
+    
+    const newPreset = {
+      ...pData,
       id,
       lastModified: Date.now(),
       created_at: now,
-    };
+      preset_type,
+    } as SavedPreset | Preset;
 
     // Optimistic Update
     setPresets(prev => [newPreset, ...prev]);
@@ -73,15 +87,15 @@ export function usePresets() {
   /**
    * Updates an existing preset with optimistic updates.
    */
-  const updatePreset = useCallback(async (id: string, updates: Partial<Omit<SavedPreset, 'id' | 'lastModified'>>) => {
+  const updatePreset = useCallback(async (id: string, updates: Partial<Preset>) => {
     const existing = presets.find(p => p.id === id);
     if (!existing) return;
 
-    const updatedPreset: SavedPreset = {
+    const updatedPreset = {
       ...existing,
       ...updates,
       lastModified: Date.now(),
-    };
+    } as Preset;
 
     // Optimistic Update
     setPresets(prev => prev.map(p => p.id === id ? updatedPreset : p));

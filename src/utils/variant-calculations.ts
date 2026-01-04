@@ -1,5 +1,5 @@
 import type { VariantInput, VariantCalculation } from '../types/variants';
-import type { Ingredient } from '../types/calculator';
+import type { Ingredient, PricingStrategy } from '../types/calculator';
 import {
   calculateTotalIngredientCost,
   calculateRecommendedPrice,
@@ -40,13 +40,17 @@ export const calculateBaseCostShare = (
  * @param baseLabor - Labor cost of the base recipe
  * @param baseOverhead - Overhead cost of the base recipe
  * @param batchSize - Total yield of the base recipe
+ * @param pricingStrategy - The global pricing strategy
+ * @param pricingValue - The global pricing value (markup or margin)
  */
 export const calculateVariantCosts = (
   variant: VariantInput,
   baseIngredients: Ingredient[],
   baseLabor: number,
   baseOverhead: number,
-  batchSize: number
+  batchSize: number,
+  pricingStrategy: PricingStrategy,
+  pricingValue: number
 ): VariantCalculation => {
   // 1. Calculate Base Costs
   const totalBaseIngredientsCost = calculateTotalIngredientCost(baseIngredients);
@@ -73,8 +77,8 @@ export const calculateVariantCosts = (
   // 5. Calculate Pricing
   const recommendedPrice = calculateRecommendedPrice(
     totalCostPerUnit,
-    variant.pricingStrategy,
-    variant.pricingValue
+    pricingStrategy,
+    pricingValue
   );
 
   // 6. Calculate Profits
@@ -82,9 +86,11 @@ export const calculateVariantCosts = (
   const profitMarginPercent = calculateProfitMargin(totalCostPerUnit, recommendedPrice);
 
   // Profit per Batch:
-  // How many variant units can we make from the base batch?
-  // count = batchSize / variant.amount
-  // profitBatch = profitPerUnit * count
+  // For the new model, "Profit per Batch" is ambiguous if we don't have allocation.
+  // However, we can interpret it as "Profit if we sold a whole batch worth of THIS variant".
+  // Or just "Profit per Unit" is what matters most now.
+  // Let's keep the calculation as: profitPerUnit * (batchSize / variant.amount) 
+  // This tells "If I converted my whole batch into this variant, how much would I make?"
   let profitPerBatch = 0;
   if (variant.amount > 0) {
     const unitsPerBatch = batchSize / variant.amount;
@@ -118,10 +124,12 @@ export const calculateAllVariants = (
   baseIngredients: Ingredient[],
   baseLabor: number,
   baseOverhead: number,
-  batchSize: number
+  batchSize: number,
+  pricingStrategy: PricingStrategy,
+  pricingValue: number
 ): VariantCalculation[] => {
   return variants.map((variant) =>
-    calculateVariantCosts(variant, baseIngredients, baseLabor, baseOverhead, batchSize)
+    calculateVariantCosts(variant, baseIngredients, baseLabor, baseOverhead, batchSize, pricingStrategy, pricingValue)
   );
 };
 

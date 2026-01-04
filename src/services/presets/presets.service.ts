@@ -9,15 +9,23 @@ export type PresetUpdate = TableUpdate<'presets'>;
  * Custom error types for Presets service
  */
 export class PresetsError extends Error {
+  public code?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public originalError?: any;
+  public status?: number;
+
   constructor(
     message: string,
-    public code?: string,
+    code?: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public originalError?: any,
-    public status?: number
+    originalError?: any,
+    status?: number
   ) {
     super(message);
     this.name = 'PresetsError';
+    this.code = code;
+    this.originalError = originalError;
+    this.status = status;
   }
 }
 

@@ -106,6 +106,7 @@ describe('SyncService', () => {
 
   describe('pullFromCloud', () => {
     it('should pull from cloud and update local cache', async () => {
+      const cloudPresets = [mockPreset];
       vi.mocked(cloudService.getAll).mockResolvedValue(cloudPresets as unknown as Preset[]);
 
       const result = await service.pullFromCloud();

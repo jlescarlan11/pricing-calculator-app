@@ -1,8 +1,9 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Download, Upload, FileJson, AlertTriangle, CheckCircle, XCircle, Trash2, Info } from 'lucide-react';
+import { Download, Upload, FileJson, AlertTriangle, CheckCircle, Trash2, Info } from 'lucide-react';
 import { usePresets } from '../../hooks/use-presets';
 import { useAuth } from '../../hooks/useAuth';
-import { exportService, ExportData } from '../../services/export.service';
+import { mapPresetToDbInsert } from '../../services/presets';
+import { exportService, type ExportData } from '../../services/export.service';
 import { Card, Button, Modal, Badge } from '../shared';
 import type { SavedPreset } from '../../types';
 
@@ -36,7 +37,18 @@ export const ExportImport: React.FC = () => {
 
   const confirmExport = () => {
     try {
-      const json = exportService.exportAllPresets(presets, user?.email || 'guest');
+      const dbPresets = presets.map(p => {
+        const dbInsert = mapPresetToDbInsert(p);
+        return {
+          ...dbInsert,
+          user_id: user?.id || 'guest',
+          created_at: (p as any).created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          last_synced_at: (p as any).last_synced_at || null,
+        };
+      }) as any[];
+
+      const json = exportService.exportAllPresets(dbPresets, user?.email || 'guest');
       const filename = `pricing-calculator-export-${new Date().toISOString().split('T')[0]}.json`;
       exportService.downloadAsFile(json, filename);
       setExportSuccess(filename);

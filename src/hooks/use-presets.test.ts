@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { usePresets } from './use-presets';
+import { usePresets, type Preset } from './use-presets';
 import { useAuth } from './useAuth';
 import { useSync } from './useSync';
 import { syncService } from '../services/sync/sync.service';
-import type { CalculationInput, PricingConfig, SavedPreset } from '../types';
+import type { CalculationInput, PricingConfig } from '../types';
 
 // Mock dependencies
 vi.mock('./useAuth', () => ({
@@ -93,7 +93,7 @@ describe('usePresets', () => {
     // Wait for initial load to finish
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    let addedPreset: SavedPreset | undefined;
+    let addedPreset: Preset | undefined;
     await act(async () => {
       addedPreset = await result.current.addPreset({
         name: 'New Product',
