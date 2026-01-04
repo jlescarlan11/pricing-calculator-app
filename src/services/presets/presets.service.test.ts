@@ -60,12 +60,14 @@ const server = setupServer(
 
   // POST /presets
   http.post(new RegExp(`${escapedUrl}/rest/v1/presets`), async ({ request }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = await request.json() as any;
     return HttpResponse.json({ ...body, id: '3' }, { status: 201 });
   }),
 
   // PATCH /presets
   http.patch(new RegExp(`${escapedUrl}/rest/v1/presets`), async ({ request }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = await request.json() as any;
     return HttpResponse.json({ ...body, id: '1' }, { status: 200 });
   }),
@@ -87,6 +89,7 @@ describe('PresetsService', () => {
   beforeEach(() => {
     // Default mock for getUser
     vi.spyOn(supabase.auth, 'getUser').mockResolvedValue({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: { user: { id: 'user-1' } as any },
       error: null
     });
@@ -171,6 +174,7 @@ describe('PresetsService', () => {
         error: null
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(presetsService.create({ name: 'Test', preset_type: 'single' } as any))
         .rejects.toThrow(AuthenticationError);
     });

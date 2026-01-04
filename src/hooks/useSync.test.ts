@@ -1,4 +1,4 @@
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useSync } from './useSync';
 import { syncService } from '../services/sync/sync.service';
@@ -36,6 +36,7 @@ describe('useSync', () => {
   });
 
   it('should initialize and trigger initial cloud pull on mount', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.pullFromCloud as any).mockResolvedValue([]);
     
     const { result } = renderHook(() => useSync());
@@ -85,7 +86,9 @@ describe('useSync', () => {
     expect(result.current.status).toBe('offline');
 
     // Transition back to online
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let resolveQueue: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.processQueue as any).mockReturnValue(new Promise(resolve => { resolveQueue = resolve; }));
 
     await act(async () => {
@@ -107,6 +110,7 @@ describe('useSync', () => {
   });
 
   it('should debounce syncToCloud calls', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.syncToCloud as any).mockResolvedValue(undefined);
     const { result } = renderHook(() => useSync());
     
@@ -132,6 +136,7 @@ describe('useSync', () => {
 
   it('should handle sync errors gracefully', async () => {
     const errorMessage = 'Network Failure';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.pullFromCloud as any).mockRejectedValue(new Error(errorMessage));
     
     const { result } = renderHook(() => useSync());
@@ -145,6 +150,7 @@ describe('useSync', () => {
   });
 
   it('should poll for queue length updates', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (offlineQueue.getCount as any).mockResolvedValue(0);
     const { result } = renderHook(() => useSync());
     
@@ -154,6 +160,7 @@ describe('useSync', () => {
     expect(result.current.queueLength).toBe(0);
 
     // Update mock for next poll
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (offlineQueue.getCount as any).mockResolvedValue(5);
 
     // Advance timers by 5 seconds
@@ -177,8 +184,10 @@ describe('useSync', () => {
   });
 
   it('should provide optimistic updates during syncToCloud', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let resolveSync: any;
     const syncPromise = new Promise(resolve => { resolveSync = resolve; });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.syncToCloud as any).mockReturnValue(syncPromise);
     
     const { result } = renderHook(() => useSync());

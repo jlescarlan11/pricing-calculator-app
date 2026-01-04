@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SyncService } from './sync.service';
 import { authService } from '../auth';
 import { presetsService as cloudService } from '../presets/presets.service';
+import type { Preset } from '../presets/presets.service';
 import { offlineQueue } from '../../lib/offline-queue';
 
 // Mock dependencies
@@ -52,7 +53,8 @@ describe('SyncService', () => {
     localStorage.clear();
     // Default online
     vi.stubGlobal('navigator', { onLine: true });
-    vi.mocked(authService.getUser).mockResolvedValue(mockUser as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(authService.getUser).mockResolvedValue(mockUser as unknown as any); // Mock partial user
   });
 
   afterEach(() => {
@@ -61,7 +63,8 @@ describe('SyncService', () => {
 
   describe('syncToCloud', () => {
     it('should execute operation immediately when online and logged in', async () => {
-      vi.mocked(cloudService.getById).mockResolvedValue(mockPreset as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(cloudService.getById).mockResolvedValue(mockPreset as unknown as any);
 
       await service.syncToCloud('create', mockPreset.id, mockPreset);
 
@@ -103,8 +106,7 @@ describe('SyncService', () => {
 
   describe('pullFromCloud', () => {
     it('should pull from cloud and update local cache', async () => {
-      const cloudPresets = [mockPreset];
-      vi.mocked(cloudService.getAll).mockResolvedValue(cloudPresets as any);
+      vi.mocked(cloudService.getAll).mockResolvedValue(cloudPresets as unknown as Preset[]);
 
       const result = await service.pullFromCloud();
 
@@ -131,7 +133,7 @@ describe('SyncService', () => {
       const cloudPreset = { ...mockPreset, updated_at: newerDate, name: 'Cloud New' };
       
       localStorage.setItem('presets_cache', JSON.stringify([localPreset]));
-      vi.mocked(cloudService.getAll).mockResolvedValue([cloudPreset] as any);
+      vi.mocked(cloudService.getAll).mockResolvedValue([cloudPreset] as unknown as Preset[]);
 
       const result = await service.pullFromCloud();
 
@@ -142,9 +144,9 @@ describe('SyncService', () => {
     it('should preserve local-only presets', async () => {
       const localOnly = { ...mockPreset, id: 'local-only' };
       localStorage.setItem('presets_cache', JSON.stringify([localOnly]));
-      vi.mocked(cloudService.getAll).mockResolvedValue([mockPreset] as any);
+      vi.mocked(cloudService.getAll).mockResolvedValue([mockPreset] as unknown as Preset[]);
 
-      const result = await service.pullFromCloud();
+      await service.pullFromCloud();
 
       const cache = service.getLocalCache();
       expect(cache).toHaveLength(2);
@@ -161,16 +163,17 @@ describe('SyncService', () => {
 
       vi.mocked(offlineQueue.processNext)
         .mockImplementationOnce(async (fn) => {
-          await fn(operations[0] as any);
+          await fn(operations[0] as unknown as any);
           return true;
         })
         .mockImplementationOnce(async (fn) => {
-          await fn(operations[1] as any);
+          await fn(operations[1] as unknown as any);
           return true;
         })
         .mockResolvedValueOnce(false);
 
-      vi.mocked(cloudService.getById).mockResolvedValue({ id: '1', name: 'P1' } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(cloudService.getById).mockResolvedValue({ id: '1', name: 'P1' } as unknown as any);
 
       await service.processQueue();
 

@@ -4,7 +4,7 @@ import { usePresets } from './use-presets';
 import { useAuth } from './useAuth';
 import { useSync } from './useSync';
 import { syncService } from '../services/sync/sync.service';
-import type { CalculationInput, PricingConfig } from '../types';
+import type { CalculationInput, PricingConfig, SavedPreset } from '../types';
 
 // Mock dependencies
 vi.mock('./useAuth', () => ({
@@ -43,13 +43,16 @@ describe('usePresets', () => {
     vi.clearAllMocks();
     
     // Default mock implementations
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({ user: { id: 'user-123' } });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useSync as any).mockReturnValue({
       syncFromCloud: mockSyncFromCloud.mockResolvedValue(undefined),
       syncToCloud: mockSyncToCloud.mockResolvedValue(undefined),
       status: 'synced',
       error: null,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.getLocalCache as any).mockReturnValue([]);
   });
 
@@ -68,6 +71,7 @@ describe('usePresets', () => {
         updated_at: new Date().toISOString(),
       }
     ];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.getLocalCache as any).mockReturnValue(cachedPresets);
 
     const { result } = renderHook(() => usePresets());
@@ -89,7 +93,7 @@ describe('usePresets', () => {
     // Wait for initial load to finish
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    let addedPreset: any;
+    let addedPreset: SavedPreset | undefined;
     await act(async () => {
       addedPreset = await result.current.addPreset({
         name: 'New Product',
@@ -112,6 +116,7 @@ describe('usePresets', () => {
       })
     );
 
+    if (!addedPreset) throw new Error('addedPreset is undefined');
     expect(addedPreset.id).toBe(result.current.presets[0].id);
   });
 
@@ -129,6 +134,7 @@ describe('usePresets', () => {
       pricing_value: 50,
       updated_at: new Date().toISOString(),
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.getLocalCache as any).mockReturnValue([initialPreset]);
 
     const { result } = renderHook(() => usePresets());
@@ -164,6 +170,7 @@ describe('usePresets', () => {
       pricing_value: 50,
       updated_at: new Date().toISOString(),
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.getLocalCache as any).mockReturnValue([initialPreset]);
 
     const { result } = renderHook(() => usePresets());
@@ -182,6 +189,7 @@ describe('usePresets', () => {
   });
 
   it('should reflect loading state from useSync', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useSync as any).mockReturnValue({
       syncFromCloud: vi.fn().mockResolvedValue(undefined),
       syncToCloud: vi.fn().mockResolvedValue(undefined),
@@ -194,6 +202,7 @@ describe('usePresets', () => {
   });
 
   it('should reflect error state from useSync', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useSync as any).mockReturnValue({
       syncFromCloud: vi.fn().mockResolvedValue(undefined),
       syncToCloud: vi.fn().mockResolvedValue(undefined),
@@ -222,6 +231,7 @@ describe('usePresets', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     // Setup: cache will change
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (syncService.getLocalCache as any).mockReturnValue([
       { id: 'new-id', name: 'Refreshed Product', preset_type: 'single', updated_at: '2026-01-04T12:00:00Z' }
     ]);

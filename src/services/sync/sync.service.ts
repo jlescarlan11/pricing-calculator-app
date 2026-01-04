@@ -2,7 +2,6 @@ import { authService } from '../auth';
 import { presetsService as cloudService } from '../presets/presets.service';
 import { offlineQueue } from '../../lib/offline-queue';
 import type { Preset, PresetUpdate } from '../presets/presets.service';
-import type { QueuedOperation, SyncStatus } from '../../types/sync';
 
 /**
  * Centralized synchronization service for managing bi-directional preset syncing.
@@ -31,6 +30,7 @@ export class SyncService {
     if (SyncService.instance && typeof window !== 'undefined') {
       window.removeEventListener('online', SyncService.instance.handleOnline);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     SyncService.instance = undefined as any;
   }
 
@@ -55,6 +55,7 @@ export class SyncService {
   public async syncToCloud(
     type: 'create' | 'update' | 'delete',
     presetId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any
   ): Promise<void> {
     const isOnline = navigator.onLine;
@@ -138,7 +139,7 @@ export class SyncService {
             try {
               const updated = await cloudService.getById(op.presetId);
               this.updateLocalCache(updated);
-            } catch (e) {
+            } catch {
               // If getById fails, we still processed the operation
               console.warn(`[SyncService] Could not refresh cache for ${op.presetId} after sync`);
             }
@@ -161,6 +162,7 @@ export class SyncService {
   private async executeOperation(
     type: 'create' | 'update' | 'delete',
     id: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any
   ): Promise<void> {
     switch (type) {

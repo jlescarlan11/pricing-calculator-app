@@ -39,7 +39,7 @@ export const presetsService = {
       const dbUpdates = mapPresetToDbUpdate(preset);
       const data = await cloudService.update(preset.id, dbUpdates);
       return mapDbToPreset(data);
-    } catch (error) {
+    } catch {
       // If not found or other error (e.g. 404/ValidationError from getById)
       // we attempt to create it
       const dbInsert = mapPresetToDbInsert(preset);
@@ -74,6 +74,7 @@ export function mapDbToPreset(dbRecord: TableRow<'presets'>): SavedPreset {
     last_synced_at: dbRecord.last_synced_at || undefined,
     input: {
       productName: dbRecord.name,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ingredients: (dbRecord.ingredients as any) || [],
       laborCost: Number(dbRecord.labor_cost) || 0,
       overhead: Number(dbRecord.overhead_cost) || 0,
@@ -93,6 +94,7 @@ export function mapPresetToDbInsert(preset: SavedPreset): Omit<TableInsert<'pres
     name: preset.name,
     preset_type: 'single',
     batch_size: preset.input.batchSize,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ingredients: preset.input.ingredients as any,
     labor_cost: preset.input.laborCost,
     overhead_cost: preset.input.overhead,
@@ -107,6 +109,7 @@ export function mapPresetToDbUpdate(preset: SavedPreset): Omit<TableInsert<'pres
     name: preset.name,
     preset_type: 'single',
     batch_size: preset.input.batchSize,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ingredients: preset.input.ingredients as any,
     labor_cost: preset.input.laborCost,
     overhead_cost: preset.input.overhead,

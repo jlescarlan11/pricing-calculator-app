@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import 'fake-indexeddb/auto';
 import { OfflineQueue } from './offline-queue';
-import type { QueuedOperation } from '../../types/sync';
 
 describe('OfflineQueue', () => {
   let queue: OfflineQueue;

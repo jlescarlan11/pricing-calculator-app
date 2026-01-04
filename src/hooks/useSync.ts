@@ -78,7 +78,7 @@ export function useSync() {
    * Implements debouncing to prevent redundant calls.
    */
   const syncToCloud = useCallback(
-    async (type: 'create' | 'update' | 'delete', id: string, payload?: any) => {
+    async (type: 'create' | 'update' | 'delete', id: string, payload?: unknown) => {
       // Optimistic update: we assume it will eventually sync
       if (isMounted.current) {
         setState(prev => ({ 
@@ -153,7 +153,8 @@ export function useSync() {
       }
       clearInterval(intervalId);
     };
-  }, [syncFromCloud, updateStatus, refreshQueueLength]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount
 
   return {
     ...state,

@@ -22,7 +22,9 @@ describe('useAuth', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (authService.getSession as any).mockResolvedValue(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (authService.onAuthStateChange as any).mockReturnValue({
       unsubscribe: vi.fn(),
     });
@@ -40,6 +42,7 @@ describe('useAuth', () => {
   });
 
   it('should set user when session exists on mount', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (authService.getSession as any).mockResolvedValue(mockSession);
     const { result } = renderHook(() => useAuth());
 
@@ -50,7 +53,9 @@ describe('useAuth', () => {
   });
 
   it('should update state on auth change', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let authCallback: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (authService.onAuthStateChange as any).mockImplementation((cb: any) => {
       authCallback = cb;
       return { unsubscribe: vi.fn() };
@@ -90,6 +95,7 @@ describe('useAuth', () => {
 
   it('should unsubscribe on unmount', () => {
     const mockUnsubscribe = vi.fn();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (authService.onAuthStateChange as any).mockReturnValue({
       unsubscribe: mockUnsubscribe,
     });

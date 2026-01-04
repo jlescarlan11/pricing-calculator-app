@@ -2,6 +2,7 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ToastProvider, useToast } from './Toast';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TestComponent = ({ message, type }: { message: string; type?: any }) => {
   const { addToast } = useToast();
   return (

@@ -16,6 +16,7 @@ describe('AuthCallback', () => {
   });
 
   it('renders loading state initially', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       isAuthenticated: false,
       loading: true,
@@ -31,6 +32,7 @@ describe('AuthCallback', () => {
   });
 
   it('redirects to home after successful authentication', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       isAuthenticated: true,
       loading: false,
@@ -57,6 +59,7 @@ describe('AuthCallback', () => {
   });
 
   it('redirects to the path stored in sessionStorage', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       isAuthenticated: true,
       loading: false,

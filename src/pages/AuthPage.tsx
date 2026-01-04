@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { SignUp, Login, ForgotPassword } from '../components/auth';
@@ -12,16 +12,13 @@ export const AuthPage: React.FC = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [view, setView] = useState<AuthView>('onboarding');
-
-  // Sync view with pathname
-  useEffect(() => {
+  const view: AuthView = (() => {
     const path = location.pathname;
-    if (path === '/auth/signup') setView('signup');
-    else if (path === '/auth/login') setView('signin');
-    else if (path === '/auth/forgot-password') setView('forgot-password');
-    else setView('onboarding');
-  }, [location.pathname]);
+    if (path === '/auth/signup') return 'signup';
+    if (path === '/auth/login') return 'signin';
+    if (path === '/auth/forgot-password') return 'forgot-password';
+    return 'onboarding';
+  })();
 
   if (loading) {
     return (
@@ -32,7 +29,7 @@ export const AuthPage: React.FC = () => {
   }
 
   if (user) {
-    const from = (location.state as any)?.from?.pathname || '/account';
+    const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/account';
     return <Navigate to={from} replace />;
   }
 

@@ -30,6 +30,7 @@ describe('AccountSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       user: mockUser,
       updatePassword: mockUpdatePassword,
@@ -44,16 +45,19 @@ describe('AccountSettings', () => {
       resetPassword: vi.fn(),
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (usePresets as any).mockReturnValue({
       presets: mockPresets,
       addPreset: mockAddPreset,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useToast as any).mockReturnValue({
       addToast: mockAddToast,
       removeToast: vi.fn(),
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (presetsService.deleteAllPresets as any).mockResolvedValue(undefined);
   });
 
@@ -113,6 +117,7 @@ describe('AccountSettings', () => {
     
     const originalCreateElement = document.createElement.bind(document);
     vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (tagName === 'a') return mockAnchor as any;
       return originalCreateElement(tagName);
     });

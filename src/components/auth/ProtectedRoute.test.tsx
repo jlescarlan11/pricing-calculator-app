@@ -15,6 +15,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('renders loading state when auth is loading', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       isAuthenticated: false,
       loading: true,
@@ -33,6 +34,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('redirects to login when not authenticated', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       isAuthenticated: false,
       loading: false,
@@ -59,6 +61,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('renders children when authenticated', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       isAuthenticated: true,
       loading: false,
@@ -83,6 +86,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('renders Outlet when authenticated and no children provided', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (useAuth as any).mockReturnValue({
       isAuthenticated: true,
       loading: false,

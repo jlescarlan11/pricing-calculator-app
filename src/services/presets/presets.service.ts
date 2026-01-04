@@ -12,6 +12,7 @@ export class PresetsError extends Error {
   constructor(
     message: string,
     public code?: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public originalError?: any,
     public status?: number
   ) {
@@ -28,6 +29,7 @@ export class AuthenticationError extends PresetsError {
 }
 
 export class NetworkError extends PresetsError {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(message: string, originalError?: any) {
     super(message, 'NETWORK_ERROR', originalError, 0);
     this.name = 'NetworkError';
@@ -64,10 +66,11 @@ export class PresetsService {
     maxRetries = 3,
     delay = 500
   ): Promise<T> {
-    let lastError: any;
+    let lastError: unknown;
     for (let i = 0; i < maxRetries; i++) {
       try {
         return await fn();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         lastError = error;
         if (!this.isTransientError(error)) throw this.handleError(error);
@@ -85,6 +88,7 @@ export class PresetsService {
   /**
    * Determines if an error is transient and should be retried.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private isTransientError(error: any): boolean {
     // Check for fetch/network errors
     if (error.name === 'TypeError' || error.message?.includes('fetch') || error.message?.includes('network')) {
@@ -111,6 +115,7 @@ export class PresetsService {
   /**
    * Maps generic errors to structured PresetsError types.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private handleError(error: any): PresetsError {
     if (error instanceof PresetsError) return error;
 

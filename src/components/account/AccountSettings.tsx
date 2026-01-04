@@ -91,7 +91,7 @@ export const AccountSettings: React.FC = () => {
       setLastBackupDate(now);
       
       addToast('Data exported successfully', 'success');
-    } catch (error) {
+    } catch {
       addToast('Failed to export data', 'error');
     }
   };
@@ -126,7 +126,7 @@ export const AccountSettings: React.FC = () => {
         addToast(`Successfully imported ${successCount} presets`, 'success');
         // Reset file input
         e.target.value = '';
-      } catch (error) {
+      } catch {
         addToast('Failed to import data: Invalid file format', 'error');
       }
     };
@@ -143,7 +143,7 @@ export const AccountSettings: React.FC = () => {
       // usePresets hook should ideally react to this if it uses a real-time listener
       // but here we might need to manually refresh if it doesn't.
       window.location.reload(); // Simple way to refresh all state
-    } catch (error) {
+    } catch {
       addToast('Failed to delete data', 'error');
     } finally {
       setIsDeletingData(false);
@@ -164,7 +164,7 @@ export const AccountSettings: React.FC = () => {
       await authService.deleteAccount();
       addToast('Account deleted successfully', 'success');
       // Sign out and redirect is handled by deleteAccount (which calls signOut)
-    } catch (error) {
+    } catch {
       addToast('Failed to delete account', 'error');
     } finally {
       setIsDeletingAccount(false);

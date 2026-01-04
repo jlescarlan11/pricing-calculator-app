@@ -9,7 +9,7 @@ import { usePresets } from '../../hooks/use-presets';
 export const SyncManager: React.FC = () => {
   const { user } = useAuth();
   const { syncPresets } = usePresets();
-  const prevUserRef = useRef<any>(null);
+  const prevUserRef = useRef<unknown>(null);
 
   useEffect(() => {
     // If user just logged in (transition from no user to user)

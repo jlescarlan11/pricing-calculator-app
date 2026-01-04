@@ -29,6 +29,7 @@ describe('AuthService', () => {
   describe('signUp', () => {
     it('should call supabase.auth.signUp and return data', async () => {
       const mockData = { user: { id: '123' }, session: { access_token: 'token' } };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.signUp as any).mockResolvedValue({ data: mockData, error: null });
 
       const result = await authService.signUp('test@example.com', 'password123');
@@ -41,6 +42,7 @@ describe('AuthService', () => {
     });
 
     it('should throw formatted error when supabase.auth.signUp fails', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.signUp as any).mockResolvedValue({
         data: { user: null, session: null },
         error: { message: 'User already registered' },
@@ -54,6 +56,7 @@ describe('AuthService', () => {
   describe('signIn', () => {
     it('should call supabase.auth.signInWithPassword and return data', async () => {
       const mockData = { user: { id: '123' }, session: { access_token: 'token' } };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.signInWithPassword as any).mockResolvedValue({ data: mockData, error: null });
 
       const result = await authService.signIn('test@example.com', 'password123');
@@ -66,6 +69,7 @@ describe('AuthService', () => {
     });
 
     it('should throw formatted error when signIn fails', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.signInWithPassword as any).mockResolvedValue({
         data: { user: null, session: null },
         error: { message: 'Invalid login credentials' },
@@ -78,6 +82,7 @@ describe('AuthService', () => {
 
   describe('signOut', () => {
     it('should call supabase.auth.signOut', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.signOut as any).mockResolvedValue({ error: null });
 
       await authService.signOut();
@@ -86,6 +91,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error when signOut fails', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.signOut as any).mockResolvedValue({ error: { message: 'Sign out error' } });
 
       await expect(authService.signOut()).rejects.toThrow('Sign out error');
@@ -94,6 +100,7 @@ describe('AuthService', () => {
 
   describe('resetPassword', () => {
     it('should call supabase.auth.resetPasswordForEmail', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.resetPasswordForEmail as any).mockResolvedValue({ error: null });
 
       await authService.resetPassword('test@example.com');
@@ -104,6 +111,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error when resetPassword fails', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.resetPasswordForEmail as any).mockResolvedValue({ error: { message: 'Reset error' } });
 
       await expect(authService.resetPassword('test@example.com')).rejects.toThrow('Reset error');
@@ -112,6 +120,7 @@ describe('AuthService', () => {
 
   describe('updatePassword', () => {
     it('should call supabase.auth.updateUser', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.updateUser as any).mockResolvedValue({ error: null });
 
       await authService.updatePassword('newpassword123');
@@ -120,6 +129,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error when updatePassword fails', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.updateUser as any).mockResolvedValue({ error: { message: 'Update error' } });
 
       await expect(authService.updatePassword('newpassword123')).rejects.toThrow('Update error');
@@ -129,6 +139,7 @@ describe('AuthService', () => {
   describe('getUser', () => {
     it('should return user from supabase.auth.getUser', async () => {
       const mockUser = { id: '123' };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.getUser as any).mockResolvedValue({ data: { user: mockUser }, error: null });
 
       const result = await authService.getUser();
@@ -139,6 +150,7 @@ describe('AuthService', () => {
 
     it('should return null and log error when getUser fails', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.getUser as any).mockResolvedValue({ data: { user: null }, error: { message: 'Get user error' } });
 
       const result = await authService.getUser();
@@ -152,6 +164,7 @@ describe('AuthService', () => {
   describe('getSession', () => {
     it('should return session from supabase.auth.getSession', async () => {
       const mockSession = { access_token: 'token' };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.getSession as any).mockResolvedValue({ data: { session: mockSession }, error: null });
 
       const result = await authService.getSession();
@@ -162,6 +175,7 @@ describe('AuthService', () => {
 
     it('should return null and log error when getSession fails', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.getSession as any).mockResolvedValue({ data: { session: null }, error: { message: 'Get session error' } });
 
       const result = await authService.getSession();
@@ -175,6 +189,7 @@ describe('AuthService', () => {
   describe('onAuthStateChange', () => {
     it('should call supabase.auth.onAuthStateChange', () => {
       const mockSubscription = { unsubscribe: vi.fn() };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase.auth.onAuthStateChange as any).mockReturnValue({ data: { subscription: mockSubscription } });
 
       const callback = vi.fn();

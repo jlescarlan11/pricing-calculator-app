@@ -23,6 +23,8 @@ export interface VariantInput {
  */
 export interface VariantCalculation extends CalculationResult {
   variantId: string;
+  baseCost: number; // Cost allocated from base recipe
+  additionalCost: number; // Cost from variant-specific additions
 }
 
 /**
