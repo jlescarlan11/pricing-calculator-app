@@ -101,6 +101,11 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 ## 6. Progress Tracking
 
+### Database & Backend (Added 2026-01-04)
+- [x] **Initial Schema**: Created `presets` table with support for single/variant pricing, RLS policies, and indexes. (Migration: `20260104025041_initial_schema.sql`)
+- [x] **Schema Reset**: Removed previous migrations, repaired migration history, and applied a clean initial schema with `drop table` safeguards.
+
+
 ### Routing & Pages (Added 2026-01-03)
 - [x] **Client-side Routing**: Configured `react-router-dom` with `BrowserRouter` and defined routes for `/`, `/help`, and `/faq`.
 - [x] **CalculatorPage**: Main route containing the pricing calculator logic and state management.
@@ -229,3 +234,18 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - Implemented Portal-based rendering and manual position calculation to resolve clipping issues at card boundaries. (Updated 2026-01-03)
 - **Modal Component Test**:
   - Fixed a timeout issue in `Modal.test.tsx` ("restores body scroll when closed") by removing `waitFor` (which conflicts with `vi.useFakeTimers` in this context) and using direct assertions after manually advancing timers with `vi.advanceTimersByTime`.
+
+### Phase 2: Cloud & Advanced Features (Added 2026-01-04)
+- [x] **Project Structure**: Restructured codebase to support authentication, variants, and cloud sync. Created directories for `auth`, `variants`, `sync-status`, `account`, and `migration`. Added services for `supabase`, `auth`, `presets`, and `sync`. Updated types and hooks (`useAuth`, `useSync`, `useOfflineQueue`).
+- [x] **Authentication Service**: Implemented `authService` using Supabase Auth (Google OAuth, SignOut, Session Management). Updated `useAuth` hook to provide reactive user state.
+- [x] **Direct Resend Confirmation**: Implemented `resendConfirmationEmail` using direct Supabase Auth REST API call for better reliability and control. (Added 2026-01-04)
+- [x] **Authentication UI**: Created `AuthPage` with Google Sign-In and benefit explanations. Created `AccountPage` for user profile management. Updated `Header` to show responsive auth status and navigation.
+- [x] **Cloud Persistence**: Implemented `presetsService` for Supabase CRUD. Updated `usePresets` to support cloud storage with local fallback/sync.
+- [x] **Automatic Sync**: Implemented `SyncManager` to automatically sync guest calculations to the cloud upon sign-in.
+
+### Data Migration (Added 2026-01-04)
+- [x] **Migration Types**: Formalized `Phase1Preset` and `MigrationResult` interfaces to support type-safe migration from legacy Phase 1 presets to the modern Phase 2 union schema.
+  - File: `src/types/migration.ts`
+  - Exported from `src/types/index.ts`
+
+

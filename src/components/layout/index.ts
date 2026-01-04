@@ -1,3 +1,4 @@
 export * from './AppLayout';
 export * from './Header';
 export * from './DataWarningBanner';
+export * from './SyncManager';

@@ -31,11 +31,15 @@ describe('SavePresetModal', () => {
     vi.clearAllMocks();
     vi.mocked(usePresetsHook.usePresets).mockReturnValue({
       presets: [],
+      loading: false,
+      error: null,
       addPreset: mockAddPreset,
-      updatePreset: vi.fn(),
-      deletePreset: vi.fn(),
+      updatePreset: vi.fn().mockResolvedValue(undefined),
+      deletePreset: vi.fn().mockResolvedValue(true),
       getPreset: vi.fn(),
       getAllPresets: vi.fn(),
+      syncPresets: vi.fn().mockResolvedValue(undefined),
+      refresh: vi.fn().mockResolvedValue(undefined),
     });
   });
 
@@ -109,11 +113,15 @@ describe('SavePresetModal', () => {
   it('validates duplicate names', async () => {
     vi.mocked(usePresetsHook.usePresets).mockReturnValue({
       presets: [{ id: '1', name: 'Existing Product', input: mockInput, config: mockConfig, lastModified: Date.now() }],
-      addPreset: mockAddPreset,
-      updatePreset: vi.fn(),
-      deletePreset: vi.fn(),
+      loading: false,
+      error: null,
+      addPreset: vi.fn().mockResolvedValue({ id: '1' }),
+      updatePreset: vi.fn().mockResolvedValue(undefined),
+      deletePreset: vi.fn().mockResolvedValue(true),
       getPreset: vi.fn(),
       getAllPresets: vi.fn(),
+      syncPresets: vi.fn().mockResolvedValue(undefined),
+      refresh: vi.fn().mockResolvedValue(undefined),
     });
 
     render(

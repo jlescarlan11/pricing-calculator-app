@@ -9,8 +9,9 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   error?: string;
   helperText?: string;
   currency?: boolean;
-  suffix?: string;
+  suffix?: React.ReactNode;
   tooltip?: React.ReactNode;
+  inputClassName?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
@@ -27,6 +28,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   suffix,
   tooltip,
   className = '',
+  inputClassName = '',
   ...props
 }, ref) => {
   const id = useId();
@@ -99,13 +101,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
               ? 'border-rust text-rust placeholder-rust/30 focus:border-rust focus:ring-rust/20' 
               : 'border-border-subtle bg-bg-main focus:border-clay focus:ring-clay/20'
             }
+            ${inputClassName}
           `}
           {...props}
         />
 
         {suffix && !error && (
-          <div className="absolute inset-y-0 right-0 pr-sm flex items-center pointer-events-none">
-            <span className="text-ink-500 sm:text-sm">{suffix}</span>
+          <div className="absolute inset-y-0 right-0 pr-xs flex items-center">
+            <div className="text-ink-500 sm:text-sm">
+              {suffix}
+            </div>
           </div>
         )}
 

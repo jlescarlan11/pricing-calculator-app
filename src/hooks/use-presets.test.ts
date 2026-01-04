@@ -32,12 +32,12 @@ describe('usePresets', () => {
     expect(result.current.presets).toEqual([]);
   });
 
-  it('should add a preset', () => {
+  it('should add a preset', async () => {
     const { result } = renderHook(() => usePresets());
     
     let addedPreset;
-    act(() => {
-      addedPreset = result.current.addPreset({
+    await act(async () => {
+      addedPreset = await result.current.addPreset({
         name: 'New Preset',
         input: mockInput,
         config: mockConfig,
@@ -51,13 +51,13 @@ describe('usePresets', () => {
     expect(addedPreset).toEqual(result.current.presets[0]);
   });
 
-  it('should update a preset and refresh lastModified', () => {
+  it('should update a preset and refresh lastModified', async () => {
     const { result } = renderHook(() => usePresets());
     
     let id = '';
     let initialModified = 0;
-    act(() => {
-      const added = result.current.addPreset({
+    await act(async () => {
+      const added = await result.current.addPreset({
         name: 'Original Name',
         input: mockInput,
         config: mockConfig,
@@ -69,20 +69,20 @@ describe('usePresets', () => {
     // Ensure some time passes for lastModified change
     vi.advanceTimersByTime(100);
 
-    act(() => {
-      result.current.updatePreset(id, { name: 'Updated Name' });
+    await act(async () => {
+      await result.current.updatePreset(id, { name: 'Updated Name' });
     });
 
     expect(result.current.presets[0].name).toBe('Updated Name');
     expect(result.current.presets[0].lastModified).toBeGreaterThan(initialModified);
   });
 
-  it('should delete a preset', () => {
+  it('should delete a preset', async () => {
     const { result } = renderHook(() => usePresets());
     
     let id = '';
-    act(() => {
-      const added = result.current.addPreset({
+    await act(async () => {
+      const added = await result.current.addPreset({
         name: 'To Be Deleted',
         input: mockInput,
         config: mockConfig,
@@ -92,20 +92,20 @@ describe('usePresets', () => {
 
     expect(result.current.presets).toHaveLength(1);
 
-    act(() => {
-      const deleted = result.current.deletePreset(id);
+    await act(async () => {
+      const deleted = await result.current.deletePreset(id);
       expect(deleted).toBe(true);
     });
 
     expect(result.current.presets).toHaveLength(0);
   });
 
-  it('should get a preset by ID', () => {
+  it('should get a preset by ID', async () => {
     const { result } = renderHook(() => usePresets());
     
     let id = '';
-    act(() => {
-      const added = result.current.addPreset({
+    await act(async () => {
+      const added = await result.current.addPreset({
         name: 'Target Preset',
         input: mockInput,
         config: mockConfig,
@@ -120,12 +120,12 @@ describe('usePresets', () => {
     expect(notFound).toBeUndefined();
   });
 
-  it('should get all presets', () => {
+  it('should get all presets', async () => {
     const { result } = renderHook(() => usePresets());
     
-    act(() => {
-      result.current.addPreset({ name: 'P1', input: mockInput, config: mockConfig });
-      result.current.addPreset({ name: 'P2', input: mockInput, config: mockConfig });
+    await act(async () => {
+      await result.current.addPreset({ name: 'P1', input: mockInput, config: mockConfig });
+      await result.current.addPreset({ name: 'P2', input: mockInput, config: mockConfig });
     });
 
     expect(result.current.getAllPresets()).toHaveLength(2);

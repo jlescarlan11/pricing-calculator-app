@@ -27,6 +27,29 @@ The project follows a feature-based and functional organization within the `src`
 - **Node.js**: (Version 18 or higher recommended)
 - **npm** or **yarn** or **pnpm**
 
+## Environment Configuration
+
+This project uses environment variables for configuration.
+
+1.  **Create a local environment file:**
+    Copy `.env.example` to `.env.local`:
+    ```bash
+    cp .env.example .env.local
+    ```
+    (Or manually create `.env.local` in the root directory)
+
+2.  **Configure variables:**
+    Open `.env.local` and update the values:
+
+    | Variable | Description | Required | Example |
+    |----------|-------------|----------|---------|
+    | `VITE_SUPABASE_URL` | Your Supabase project URL | Yes | `https://your-project.supabase.co` |
+    | `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous API key | Yes | `eyJ...` |
+    | `VITE_APP_VERSION` | Current application version | Yes | `2.0.0` |
+    | `VITE_ENABLE_OFFLINE_MODE` | Enable offline capabilities | Yes | `true` |
+
+    *Note: `.env.local` is git-ignored to protect your secrets.*
+
 ## How to Run Locally
 
 1.  **Clone the repository:**

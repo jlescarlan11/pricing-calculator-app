@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Calculator, HelpCircle, Menu, X, Lightbulb } from 'lucide-react';
+import { Calculator, HelpCircle, Menu, X, Lightbulb, User, LogIn } from 'lucide-react';
 import { PricingExplainerModal } from '../help/PricingExplainerModal';
 import { FAQ } from '../help/FAQ';
 import { Modal } from '../shared/Modal';
+import { useAuth } from '../../hooks/useAuth';
 
 export const Header: React.FC = () => {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isFAQModalOpen, setIsFAQModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-sm px-md py-sm rounded-sm text-sm font-medium transition-all duration-300 ${
@@ -47,12 +49,33 @@ export const Header: React.FC = () => {
                 <Lightbulb size={18} />
                 <span>Pricing Tips</span>
               </NavLink>
+              
               <div className="h-6 w-px bg-border-subtle mx-md" />
-              <span className="text-xs text-ink-500 font-medium">v0.1.0</span>
+              
+              {user ? (
+                <NavLink to="/account" className={navLinkClass}>
+                  <User size={18} />
+                  <span>Account</span>
+                </NavLink>
+              ) : (
+                <NavLink to="/auth" className={navLinkClass}>
+                  <LogIn size={18} />
+                  <span>Sign In</span>
+                </NavLink>
+              )}
             </div>
 
             {/* Mobile Actions */}
             <div className="flex md:hidden items-center gap-sm">
+               {user ? (
+                <Link to="/account" className="p-sm rounded-sm text-ink-700 hover:text-clay">
+                  <User size={24} />
+                </Link>
+              ) : (
+                <Link to="/auth" className="p-sm rounded-sm text-ink-700 hover:text-clay">
+                  <LogIn size={24} />
+                </Link>
+              )}
               <button
                 type="button"
                 className="p-sm rounded-sm text-ink-700 hover:text-clay hover:bg-surface-hover transition-colors"
@@ -92,6 +115,14 @@ export const Header: React.FC = () => {
             >
               <Lightbulb size={18} />
               Pricing Tips
+            </NavLink>
+             <NavLink 
+              to={user ? "/account" : "/auth"}
+              className={navLinkClass}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {user ? <User size={18} /> : <LogIn size={18} />}
+              {user ? "Account" : "Sign In"}
             </NavLink>
             <div className="pt-md flex items-center justify-between text-[10px] text-ink-500 px-md border-t border-border-subtle mt-md uppercase tracking-widest">
               <span>Version 0.1.0</span>

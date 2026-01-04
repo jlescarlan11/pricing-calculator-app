@@ -49,8 +49,8 @@ export interface CalculatorState {
   
   // Preset Actions
   loadPreset: (preset: SavedPreset) => void;
-  saveAsPreset: (name: string) => SavedPreset;
-  deletePreset: (id: string) => void;
+  saveAsPreset: (name: string) => Promise<SavedPreset>;
+  deletePreset: (id: string) => Promise<void>;
 }
 
 /**
@@ -205,16 +205,16 @@ export function useCalculatorState(
     return result;
   }, []);
 
-  const saveAsPreset = useCallback((name: string) => {
-    return addPreset({
+  const saveAsPreset = useCallback(async (name: string) => {
+    return await addPreset({
       name,
       input,
       config
     });
   }, [addPreset, input, config]);
 
-  const deletePreset = useCallback((id: string) => {
-    removePreset(id);
+  const deletePreset = useCallback(async (id: string) => {
+    await removePreset(id);
   }, [removePreset]);
 
   return {
