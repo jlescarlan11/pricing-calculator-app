@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
 import { DataWarningBanner } from './DataWarningBanner';
+import { SyncStatus } from '../sync-status';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       
       <div className="relative z-10 flex flex-col min-h-screen">
         <DataWarningBanner />
+        <SyncStatus />
         <Header />
 
         <div className="flex-1 flex overflow-hidden">

@@ -1,1 +1,1 @@
-export const SyncStatusPlaceholder = () => null;
+export * from './SyncStatus';

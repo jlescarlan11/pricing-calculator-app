@@ -1,3 +1,1 @@
-export const syncService = {
-  sync: async () => { console.log('Sync placeholder'); },
-};
+export * from './sync.service';

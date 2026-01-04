@@ -240,7 +240,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Authentication Service**: Implemented `authService` using Supabase Auth (Google OAuth, SignOut, Session Management). Updated `useAuth` hook to provide reactive user state.
 - [x] **Direct Resend Confirmation**: Implemented `resendConfirmationEmail` using direct Supabase Auth REST API call for better reliability and control. (Added 2026-01-04)
 - [x] **Authentication UI**: Created `AuthPage` with Google Sign-In and benefit explanations. Created `AccountPage` for user profile management. Updated `Header` to show responsive auth status and navigation.
-- [x] **Cloud Persistence**: Implemented `presetsService` for Supabase CRUD. Updated `usePresets` to support cloud storage with local fallback/sync.
+- [x] **Cloud Persistence**: Implemented `presetsService` for Supabase CRUD. Updated `usePresets` to support full cloud synchronization using the sync layer with optimistic updates and offline-first behavior.
 - [x] **Automatic Sync**: Implemented `SyncManager` to automatically sync guest calculations to the cloud upon sign-in.
 
 ### Data Migration (Added 2026-01-04)

@@ -43,4 +43,6 @@ export interface SavedPreset {
   input: CalculationInput;
   config: PricingConfig;
   lastModified: number;
+  created_at?: string;
+  last_synced_at?: string;
 }

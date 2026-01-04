@@ -20,6 +20,8 @@ export interface QueuedOperation {
   payload?: Partial<SavedPreset | Preset>;
   /** Unix timestamp when the operation was created */
   timestamp: number;
+  /** Unix timestamp of the most recent processing attempt */
+  lastAttemptAt?: number;
   /** Number of failed attempts to process this operation */
   retryCount: number;
   /** Optional error message from the most recent failure */

@@ -65,11 +65,13 @@ export const presetsService = {
 
 // Mappers
 
-function mapDbToPreset(dbRecord: TableRow<'presets'>): SavedPreset {
+export function mapDbToPreset(dbRecord: TableRow<'presets'>): SavedPreset {
   return {
     id: dbRecord.id,
     name: dbRecord.name,
     lastModified: dbRecord.updated_at ? new Date(dbRecord.updated_at).getTime() : Date.now(),
+    created_at: dbRecord.created_at || undefined,
+    last_synced_at: dbRecord.last_synced_at || undefined,
     input: {
       productName: dbRecord.name,
       ingredients: (dbRecord.ingredients as any) || [],
@@ -85,7 +87,7 @@ function mapDbToPreset(dbRecord: TableRow<'presets'>): SavedPreset {
   };
 }
 
-function mapPresetToDbInsert(preset: SavedPreset): Omit<TableInsert<'presets'>, 'user_id' | 'created_at' | 'updated_at' | 'last_synced_at'> {
+export function mapPresetToDbInsert(preset: SavedPreset): Omit<TableInsert<'presets'>, 'user_id' | 'created_at' | 'updated_at' | 'last_synced_at'> {
   return {
     id: preset.id,
     name: preset.name,
@@ -100,7 +102,7 @@ function mapPresetToDbInsert(preset: SavedPreset): Omit<TableInsert<'presets'>, 
   };
 }
 
-function mapPresetToDbUpdate(preset: SavedPreset): Omit<TableInsert<'presets'>, 'user_id' | 'id' | 'created_at' | 'updated_at' | 'last_synced_at'> {
+export function mapPresetToDbUpdate(preset: SavedPreset): Omit<TableInsert<'presets'>, 'user_id' | 'id' | 'created_at' | 'updated_at' | 'last_synced_at'> {
   return {
     name: preset.name,
     preset_type: 'single',

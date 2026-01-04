@@ -1,7 +1,26 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePresets } from './use-presets';
+import { useAuth } from './useAuth';
+import { useSync } from './useSync';
+import { syncService } from '../services/sync/sync.service';
 import type { CalculationInput, PricingConfig } from '../types';
+
+// Mock dependencies
+vi.mock('./useAuth', () => ({
+  useAuth: vi.fn(),
+}));
+
+vi.mock('./useSync', () => ({
+  useSync: vi.fn(),
+}));
+
+vi.mock('../services/sync/sync.service', () => ({
+  syncService: {
+    getLocalCache: vi.fn(),
+    processQueue: vi.fn(),
+  },
+}));
 
 const mockInput: CalculationInput = {
   productName: 'Test Product',
@@ -17,118 +36,202 @@ const mockConfig: PricingConfig = {
 };
 
 describe('usePresets', () => {
+  const mockSyncFromCloud = vi.fn();
+  const mockSyncToCloud = vi.fn();
+
   beforeEach(() => {
-    window.sessionStorage.clear();
-    vi.restoreAllMocks();
-    vi.useFakeTimers();
+    vi.clearAllMocks();
+    
+    // Default mock implementations
+    (useAuth as any).mockReturnValue({ user: { id: 'user-123' } });
+    (useSync as any).mockReturnValue({
+      syncFromCloud: mockSyncFromCloud.mockResolvedValue(undefined),
+      syncToCloud: mockSyncToCloud.mockResolvedValue(undefined),
+      status: 'synced',
+      error: null,
+    });
+    (syncService.getLocalCache as any).mockReturnValue([]);
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+  it('should initialize with local cache and trigger syncFromCloud on mount', async () => {
+    const cachedPresets = [
+      {
+        id: '1',
+        name: 'Cached',
+        preset_type: 'single',
+        batch_size: 10,
+        ingredients: [],
+        labor_cost: 100,
+        overhead_cost: 50,
+        pricing_strategy: 'markup',
+        pricing_value: 50,
+        updated_at: new Date().toISOString(),
+      }
+    ];
+    (syncService.getLocalCache as any).mockReturnValue(cachedPresets);
 
-  it('should initialize with an empty array', () => {
     const { result } = renderHook(() => usePresets());
-    expect(result.current.presets).toEqual([]);
+
+    // Initial state from cache (synchronous via lazy initializer)
+    expect(result.current.presets).toHaveLength(1);
+    expect(result.current.presets[0].name).toBe('Cached');
+
+    // Wait for the async loadPresets to finish
+    await waitFor(() => {
+      expect(mockSyncFromCloud).toHaveBeenCalled();
+      expect(result.current.loading).toBe(false);
+    });
   });
 
-  it('should add a preset', async () => {
+  it('should add a preset optimistically and call syncToCloud', async () => {
     const { result } = renderHook(() => usePresets());
     
-    let addedPreset;
+    // Wait for initial load to finish
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    let addedPreset: any;
     await act(async () => {
       addedPreset = await result.current.addPreset({
-        name: 'New Preset',
+        name: 'New Product',
         input: mockInput,
         config: mockConfig,
       });
     });
 
+    // Optimistic update
     expect(result.current.presets).toHaveLength(1);
-    expect(result.current.presets[0].name).toBe('New Preset');
-    expect(result.current.presets[0].id).toBeDefined();
-    expect(result.current.presets[0].lastModified).toBeDefined();
-    expect(addedPreset).toEqual(result.current.presets[0]);
+    expect(result.current.presets[0].name).toBe('New Product');
+    
+    // Verify sync call
+    expect(mockSyncToCloud).toHaveBeenCalledWith(
+      'create',
+      expect.any(String),
+      expect.objectContaining({
+        name: 'New Product',
+        preset_type: 'single',
+      })
+    );
+
+    expect(addedPreset.id).toBe(result.current.presets[0].id);
   });
 
-  it('should update a preset and refresh lastModified', async () => {
+  it('should update a preset optimistically and call syncToCloud', async () => {
+    // Start with one preset
+    const initialPreset = {
+      id: 'p1',
+      name: 'Old Name',
+      preset_type: 'single',
+      batch_size: 10,
+      ingredients: [],
+      labor_cost: 100,
+      overhead_cost: 50,
+      pricing_strategy: 'markup',
+      pricing_value: 50,
+      updated_at: new Date().toISOString(),
+    };
+    (syncService.getLocalCache as any).mockReturnValue([initialPreset]);
+
     const { result } = renderHook(() => usePresets());
+    await waitFor(() => expect(result.current.loading).toBe(false));
     
-    let id = '';
-    let initialModified = 0;
     await act(async () => {
-      const added = await result.current.addPreset({
-        name: 'Original Name',
-        input: mockInput,
-        config: mockConfig,
-      });
-      id = added.id;
-      initialModified = added.lastModified;
+      await result.current.updatePreset('p1', { name: 'New Name' });
     });
 
-    // Ensure some time passes for lastModified change
-    vi.advanceTimersByTime(100);
+    // Optimistic update
+    expect(result.current.presets[0].name).toBe('New Name');
 
-    await act(async () => {
-      await result.current.updatePreset(id, { name: 'Updated Name' });
-    });
-
-    expect(result.current.presets[0].name).toBe('Updated Name');
-    expect(result.current.presets[0].lastModified).toBeGreaterThan(initialModified);
+    // Verify sync call
+    expect(mockSyncToCloud).toHaveBeenCalledWith(
+      'update',
+      'p1',
+      expect.objectContaining({
+        name: 'New Name',
+      })
+    );
   });
 
-  it('should delete a preset', async () => {
-    const { result } = renderHook(() => usePresets());
-    
-    let id = '';
-    await act(async () => {
-      const added = await result.current.addPreset({
-        name: 'To Be Deleted',
-        input: mockInput,
-        config: mockConfig,
-      });
-      id = added.id;
-    });
+  it('should delete a preset optimistically and call syncToCloud', async () => {
+    const initialPreset = {
+      id: 'p1',
+      name: 'To Delete',
+      preset_type: 'single',
+      batch_size: 10,
+      ingredients: [],
+      labor_cost: 100,
+      overhead_cost: 50,
+      pricing_strategy: 'markup',
+      pricing_value: 50,
+      updated_at: new Date().toISOString(),
+    };
+    (syncService.getLocalCache as any).mockReturnValue([initialPreset]);
 
+    const { result } = renderHook(() => usePresets());
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.presets).toHaveLength(1);
 
     await act(async () => {
-      const deleted = await result.current.deletePreset(id);
-      expect(deleted).toBe(true);
+      await result.current.deletePreset('p1');
     });
 
+    // Optimistic delete
     expect(result.current.presets).toHaveLength(0);
+
+    // Verify sync call
+    expect(mockSyncToCloud).toHaveBeenCalledWith('delete', 'p1');
   });
 
-  it('should get a preset by ID', async () => {
-    const { result } = renderHook(() => usePresets());
-    
-    let id = '';
-    await act(async () => {
-      const added = await result.current.addPreset({
-        name: 'Target Preset',
-        input: mockInput,
-        config: mockConfig,
-      });
-      id = added.id;
+  it('should reflect loading state from useSync', async () => {
+    (useSync as any).mockReturnValue({
+      syncFromCloud: vi.fn().mockResolvedValue(undefined),
+      syncToCloud: vi.fn().mockResolvedValue(undefined),
+      status: 'syncing',
+      error: null,
     });
 
-    const found = result.current.getPreset(id);
-    expect(found?.name).toBe('Target Preset');
-    
-    const notFound = result.current.getPreset('non-existent');
-    expect(notFound).toBeUndefined();
+    const { result } = renderHook(() => usePresets());
+    expect(result.current.loading).toBe(true);
   });
 
-  it('should get all presets', async () => {
-    const { result } = renderHook(() => usePresets());
-    
-    await act(async () => {
-      await result.current.addPreset({ name: 'P1', input: mockInput, config: mockConfig });
-      await result.current.addPreset({ name: 'P2', input: mockInput, config: mockConfig });
+  it('should reflect error state from useSync', async () => {
+    (useSync as any).mockReturnValue({
+      syncFromCloud: vi.fn().mockResolvedValue(undefined),
+      syncToCloud: vi.fn().mockResolvedValue(undefined),
+      status: 'error',
+      error: 'Cloud sync failed',
     });
 
-    expect(result.current.getAllPresets()).toHaveLength(2);
-    expect(result.current.getAllPresets()).toEqual(result.current.presets);
+    const { result } = renderHook(() => usePresets());
+    expect(result.current.error).toBe('Cloud sync failed');
+  });
+
+  it('should handle manual syncPresets call', async () => {
+    const { result } = renderHook(() => usePresets());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.syncPresets();
+    });
+
+    expect(syncService.processQueue).toHaveBeenCalled();
+    expect(mockSyncFromCloud).toHaveBeenCalledTimes(2); // One on mount, one in syncPresets
+  });
+
+  it('should refresh presets from cache after manual refresh', async () => {
+    const { result } = renderHook(() => usePresets());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Setup: cache will change
+    (syncService.getLocalCache as any).mockReturnValue([
+      { id: 'new-id', name: 'Refreshed Product', preset_type: 'single', updated_at: '2026-01-04T12:00:00Z' }
+    ]);
+
+    await act(async () => {
+      await result.current.refresh();
+    });
+
+    // Should have refreshed from cache
+    expect(result.current.presets[0].name).toBe('Refreshed Product');
+    expect(result.current.presets[0].id).toBe('new-id');
   });
 });

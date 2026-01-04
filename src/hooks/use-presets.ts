@@ -1,120 +1,115 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useSessionStorage } from './use-session-storage';
 import { useAuth } from './useAuth';
-import { presetsService } from '../services/presets';
+import { useSync } from './useSync';
+import { syncService } from '../services/sync/sync.service';
+import { mapDbToPreset, mapPresetToDbInsert, mapPresetToDbUpdate } from '../services/presets';
 import type { SavedPreset } from '../types';
-
-const PRESETS_STORAGE_KEY = 'pricing_calculator_presets';
 
 /**
  * Custom hook for managing saved calculation presets.
- * Supports both local session storage and Supabase cloud sync.
+ * Supports cloud synchronization with offline-first behavior using the sync layer.
  */
 export function usePresets() {
   const { user } = useAuth();
-  const [localPresets, setLocalPresets] = useSessionStorage<SavedPreset[]>(PRESETS_STORAGE_KEY, []);
-  const [cloudPresets, setCloudPresets] = useState<SavedPreset[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { syncFromCloud, syncToCloud, status, error: syncError } = useSync();
+  const [presets, setPresets] = useState<SavedPreset[]>(() => 
+    syncService.getLocalCache().map(mapDbToPreset)
+  );
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Determine which source to use
-  const presets = user ? cloudPresets : localPresets;
-
   /**
-   * Fetch presets from cloud
+   * Loads presets from the cloud and updates local state.
+   * Falls back to local cache if offline or sync fails.
    */
-  const fetchCloudPresets = useCallback(async () => {
-    if (!user) return;
-    setLoading(true);
+  const loadPresets = useCallback(async () => {
+    setIsLoading(true);
     setError(null);
     try {
-      const data = await presetsService.getPresets();
-      setCloudPresets(data);
+      await syncFromCloud();
+      setPresets(syncService.getLocalCache().map(mapDbToPreset));
     } catch (err) {
-      console.error('Failed to fetch cloud presets:', err);
-      setError('Could not load your saved products from the cloud.');
+      console.error('[usePresets] Load failed:', err);
+      setError(err instanceof Error ? err.message : 'Could not synchronize with cloud.');
+      // State is already initialized from cache, so we don't need to do anything else
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [user]);
+  }, [syncFromCloud]);
 
-  // Load cloud presets when user logs in
+  // Load presets on mount or when user changes
   useEffect(() => {
-    if (user) {
-      fetchCloudPresets();
-    } else {
-      setCloudPresets([]);
-    }
-  }, [user, fetchCloudPresets]);
+    loadPresets();
+  }, [user, loadPresets]);
 
   /**
-   * Adds a new preset.
+   * Adds a new preset with optimistic updates.
    */
   const addPreset = useCallback(async (presetData: Omit<SavedPreset, 'id' | 'lastModified'>) => {
-    try {
-      const newPreset: SavedPreset = {
-        ...presetData,
-        id: crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).substring(2),
-        lastModified: Date.now(),
-      };
+    const id = crypto.randomUUID?.() || Math.random().toString(36).substring(2);
+    const now = new Date().toISOString();
+    const newPreset: SavedPreset = {
+      ...presetData,
+      id,
+      lastModified: Date.now(),
+      created_at: now,
+    };
 
-      if (user) {
-        const saved = await presetsService.savePreset(newPreset);
-        setCloudPresets(prev => [saved, ...prev]);
-        return saved;
-      } else {
-        setLocalPresets(prev => [newPreset, ...prev]);
-        return newPreset;
-      }
-    } catch (error) {
-      console.error('Failed to add preset:', error);
-      throw new Error('Could not save preset. Please try again.');
+    // Optimistic Update
+    setPresets(prev => [newPreset, ...prev]);
+
+    try {
+      const dbInsert = mapPresetToDbInsert(newPreset);
+      await syncToCloud('create', id, dbInsert);
+      return newPreset;
+    } catch (err) {
+      console.error('[usePresets] Add failed:', err);
+      // We don't revert here as the operation is likely queued in the offline queue
+      // and will eventually sync.
+      throw err;
     }
-  }, [user, setLocalPresets]);
+  }, [syncToCloud]);
 
   /**
-   * Updates an existing preset.
+   * Updates an existing preset with optimistic updates.
    */
   const updatePreset = useCallback(async (id: string, updates: Partial<Omit<SavedPreset, 'id' | 'lastModified'>>) => {
+    const existing = presets.find(p => p.id === id);
+    if (!existing) return;
+
+    const updatedPreset: SavedPreset = {
+      ...existing,
+      ...updates,
+      lastModified: Date.now(),
+    };
+
+    // Optimistic Update
+    setPresets(prev => prev.map(p => p.id === id ? updatedPreset : p));
+
     try {
-      const existing = presets.find(p => p.id === id);
-      if (!existing) return;
-
-      const updatedPreset: SavedPreset = {
-        ...existing,
-        ...updates,
-        lastModified: Date.now(),
-      };
-
-      if (user) {
-        const saved = await presetsService.savePreset(updatedPreset);
-        setCloudPresets(prev => prev.map(p => p.id === id ? saved : p));
-      } else {
-        setLocalPresets(prev => prev.map(p => p.id === id ? updatedPreset : p));
-      }
-    } catch (error) {
-      console.error('Failed to update preset:', error);
-      throw new Error('Could not update preset. Please try again.');
+      const dbUpdate = mapPresetToDbUpdate(updatedPreset);
+      await syncToCloud('update', id, dbUpdate);
+    } catch (err) {
+      console.error('[usePresets] Update failed:', err);
+      throw err;
     }
-  }, [user, presets, setLocalPresets]);
+  }, [presets, syncToCloud]);
 
   /**
-   * Deletes a preset.
+   * Deletes a preset with optimistic updates.
    */
   const deletePreset = useCallback(async (id: string) => {
+    // Optimistic Update
+    setPresets(prev => prev.filter(p => p.id !== id));
+
     try {
-      if (user) {
-        await presetsService.deletePreset(id);
-        setCloudPresets(prev => prev.filter(p => p.id !== id));
-      } else {
-        setLocalPresets(prev => prev.filter(p => p.id !== id));
-      }
+      await syncToCloud('delete', id);
       return true;
-    } catch (error) {
-      console.error('Failed to delete preset:', error);
-      throw new Error('Could not delete preset. Please try again.');
+    } catch (err) {
+      console.error('[usePresets] Delete failed:', err);
+      throw err;
     }
-  }, [user, setLocalPresets]);
+  }, [syncToCloud]);
 
   /**
    * Retrieves a specific preset by ID.
@@ -131,40 +126,33 @@ export function usePresets() {
   }, [presets]);
 
   /**
-   * Syncs local presets to the cloud.
+   * Triggers a manual synchronization of the offline queue and pulls latest data.
    */
   const syncPresets = useCallback(async () => {
-    if (!user || localPresets.length === 0) return;
-    
-    setLoading(true);
+    setIsLoading(true);
     try {
-      // Simple strategy: Upload all local presets to cloud
-      // (Could be improved with collision detection)
-      for (const preset of localPresets) {
-        await presetsService.savePreset(preset);
-      }
-      // After sync, clear local storage or leave as backup?
-      // Clearing prevents double sync if logout/login occurs.
-      setLocalPresets([]);
-      await fetchCloudPresets();
+      await syncService.processQueue();
+      await syncFromCloud();
+      setPresets(syncService.getLocalCache().map(mapDbToPreset));
     } catch (err) {
-      console.error('Sync failed:', err);
-      setError('Some items could not be synced to the cloud.');
+      console.error('[usePresets] Sync failed:', err);
+      setError('Some changes could not be synced.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [user, localPresets, setLocalPresets, fetchCloudPresets]);
+  }, [syncFromCloud]);
 
   return {
     presets,
-    loading,
-    error,
+    loading: isLoading || status === 'syncing',
+    error: error || (status === 'error' ? syncError : null),
     addPreset,
     updatePreset,
     deletePreset,
     getPreset,
     getAllPresets,
     syncPresets,
-    refresh: fetchCloudPresets,
+    refresh: loadPresets,
+    syncStatus: status,
   };
 }
