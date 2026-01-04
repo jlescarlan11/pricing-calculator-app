@@ -23,12 +23,7 @@ describe('AccountSettings', () => {
     { id: '1', name: 'Test Product', input: {}, config: {}, lastModified: Date.now() }
   ];
 
-  const mockShowToast = {
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-  };
+  const mockAddToast = vi.fn();
   const mockUpdatePassword = vi.fn();
   const mockAddPreset = vi.fn();
 
@@ -54,7 +49,10 @@ describe('AccountSettings', () => {
       addPreset: mockAddPreset,
     });
 
-    (useToast as any).mockReturnValue(mockShowToast);
+    (useToast as any).mockReturnValue({
+      addToast: mockAddToast,
+      removeToast: vi.fn(),
+    });
 
     (presetsService.deleteAllPresets as any).mockResolvedValue(undefined);
   });
@@ -87,7 +85,7 @@ describe('AccountSettings', () => {
     
     await waitFor(() => {
       expect(mockUpdatePassword).toHaveBeenCalledWith('newpassword123');
-      expect(mockShowToast).toHaveBeenCalledWith('Password updated successfully', 'success');
+      expect(mockAddToast).toHaveBeenCalledWith('Password updated successfully', 'success');
     });
   });
 
@@ -101,7 +99,7 @@ describe('AccountSettings', () => {
     
     fireEvent.click(screen.getByText('Update Password'));
     
-    expect(mockShowToast).toHaveBeenCalledWith('Passwords do not match', 'error');
+    expect(mockAddToast).toHaveBeenCalledWith('Passwords do not match', 'error');
     expect(mockUpdatePassword).not.toHaveBeenCalled();
   });
 
@@ -125,17 +123,16 @@ describe('AccountSettings', () => {
     
     expect(mockAnchor.setAttribute).toHaveBeenCalledWith('download', expect.stringContaining('.json'));
     expect(mockClick).toHaveBeenCalled();
-    expect(mockShowToast).toHaveBeenCalledWith('Data exported successfully', 'success');
+    expect(mockAddToast).toHaveBeenCalledWith('Data exported successfully', 'success');
   });
 
   it('clears all data when confirmed', async () => {
     const mockReload = vi.fn();
-    const originalReload = window.location.reload;
+    const originalLocation = window.location;
     
-    // Use defineProperty to mock reload
-    Object.defineProperty(window.location, 'reload', {
-      configurable: true,
-      value: mockReload,
+    vi.stubGlobal('location', {
+      ...originalLocation,
+      reload: mockReload,
     });
 
     render(<AccountSettings />);
@@ -151,11 +148,7 @@ describe('AccountSettings', () => {
       expect(mockReload).toHaveBeenCalled();
     });
 
-    // Restore
-    Object.defineProperty(window.location, 'reload', {
-      configurable: true,
-      value: originalReload,
-    });
+    vi.unstubAllGlobals();
   });
 
   it('opens delete account modal and requires DELETE text to confirm', async () => {
@@ -174,7 +167,7 @@ describe('AccountSettings', () => {
     fireEvent.click(confirmButton);
     
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith('Account deleted successfully', 'success');
+      expect(mockAddToast).toHaveBeenCalledWith('Account deleted successfully', 'success');
     });
   });
 });

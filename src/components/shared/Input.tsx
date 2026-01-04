@@ -3,7 +3,7 @@ import { AlertCircle, HelpCircle } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-  label: string;
+  label: React.ReactNode;
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;

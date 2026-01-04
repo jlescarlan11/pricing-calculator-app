@@ -1,65 +1,65 @@
-import { supabase } from '../../services/supabase';
+import { presetsService as cloudService } from './presets.service';
 import type { SavedPreset, PricingStrategy, TableRow, TableInsert } from '../../types';
 
+// Re-export the new service and types
+export * from './presets.service';
+
+/**
+ * UI-facing presets service that handles mapping between
+ * database rows (Preset) and application models (SavedPreset).
+ * Uses the underlying cloud-backed PresetsService for CRUD operations.
+ */
 export const presetsService = {
   /**
    * Fetch all presets for the current user
    */
   getPresets: async (): Promise<SavedPreset[]> => {
-    const { data, error } = await supabase
-      .from('presets')
-      .select('*')
-      .order('updated_at', { ascending: false });
-
-    if (error) throw error;
-
-    return (data || []).map(mapDbToPreset);
+    const data = await cloudService.getAll();
+    return data.map(mapDbToPreset);
   },
 
   /**
    * Save a new preset or update an existing one
    */
   savePreset: async (preset: SavedPreset) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const dbPreset = mapPresetToDb(preset, user.id);
-
-    const { data, error } = await supabase
-      .from('presets')
-      .upsert(dbPreset)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return mapDbToPreset(data);
+    // If it has an ID and exists, we could use update, but upsert is handled by the old service.
+    // The new service separates create and update.
+    // To maintain compatibility with the old savePreset (which was an upsert), 
+    // we'll check if it's an update or create.
+    
+    // Actually, the old mapPresetToDb didn't have user_id in its signature,
+    // but the new service's create/update handle user_id automatically.
+    
+    // We'll use the new service's methods.
+    try {
+      // Try to get by ID to see if it exists
+      await cloudService.getById(preset.id);
+      
+      // If it exists, update it
+      const dbUpdates = mapPresetToDbUpdate(preset);
+      const data = await cloudService.update(preset.id, dbUpdates);
+      return mapDbToPreset(data);
+    } catch (error) {
+      // If not found or other error (e.g. 404/ValidationError from getById)
+      // we attempt to create it
+      const dbInsert = mapPresetToDbInsert(preset);
+      const data = await cloudService.create(dbInsert);
+      return mapDbToPreset(data);
+    }
   },
 
   /**
    * Delete a preset by ID
    */
   deletePreset: async (id: string) => {
-    const { error } = await supabase
-      .from('presets')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    await cloudService.delete(id);
   },
 
   /**
    * Delete all presets for the current user
    */
   deleteAllPresets: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const { error } = await supabase
-      .from('presets')
-      .delete()
-      .eq('user_id', user.id);
-
-    if (error) throw error;
+    await cloudService.deleteAll();
   },
 };
 
@@ -85,25 +85,31 @@ function mapDbToPreset(dbRecord: TableRow<'presets'>): SavedPreset {
   };
 }
 
-function mapPresetToDb(preset: SavedPreset, userId: string): TableInsert<'presets'> {
+function mapPresetToDbInsert(preset: SavedPreset): Omit<TableInsert<'presets'>, 'user_id' | 'created_at' | 'updated_at' | 'last_synced_at'> {
   return {
     id: preset.id,
-    user_id: userId,
     name: preset.name,
-    preset_type: 'single', // Default to single for now
-    
-    // Flatten input
+    preset_type: 'single',
     batch_size: preset.input.batchSize,
     ingredients: preset.input.ingredients as any,
     labor_cost: preset.input.laborCost,
     overhead_cost: preset.input.overhead,
     current_selling_price: preset.input.currentSellingPrice,
-    
-    // Flatten config
     pricing_strategy: preset.config.strategy,
     pricing_value: preset.config.value,
-    
-    // Others
-    updated_at: new Date().toISOString(),
+  };
+}
+
+function mapPresetToDbUpdate(preset: SavedPreset): Omit<TableInsert<'presets'>, 'user_id' | 'id' | 'created_at' | 'updated_at' | 'last_synced_at'> {
+  return {
+    name: preset.name,
+    preset_type: 'single',
+    batch_size: preset.input.batchSize,
+    ingredients: preset.input.ingredients as any,
+    labor_cost: preset.input.laborCost,
+    overhead_cost: preset.input.overhead,
+    current_selling_price: preset.input.currentSellingPrice,
+    pricing_strategy: preset.config.strategy,
+    pricing_value: preset.config.value,
   };
 }

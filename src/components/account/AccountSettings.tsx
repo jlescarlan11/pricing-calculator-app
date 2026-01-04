@@ -187,36 +187,35 @@ export const AccountSettings: React.FC = () => {
           <h2 className="text-xl font-serif text-ink-900">Account Info</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
+          <Input 
+            label={
+              <span className="flex items-center gap-xs">
+                <Mail className="w-4 h-4" /> Email Address
+              </span>
+            }
+            value={user.email || ''} 
+            onChange={() => {}} 
+            readOnly 
+            disabled 
+            className="cursor-not-allowed" 
+          />
           <div className="space-y-sm">
-            <label className="text-sm font-medium text-ink-700 flex items-center gap-xs">
-              <Mail className="w-4 h-4" /> Email Address
-            </label>
-            <Input 
-              label="Email" 
-              value={user.email || ''} 
-              onChange={() => {}} 
-              readOnly 
-              disabled 
-              className="bg-surface-hover cursor-not-allowed" 
-            />
-          </div>
-          <div className="space-y-sm">
-            <label className="text-sm font-medium text-ink-700 flex items-center gap-xs">
+            <label className="text-sm font-medium text-ink-700 flex items-center gap-xs h-[20px] mb-2">
               <Calendar className="w-4 h-4" /> Member Since
             </label>
-            <div className="p-3 bg-surface-hover rounded-lg text-ink-900 flex items-center h-[42px]">
+            <div className="p-3 bg-surface-hover rounded-sm text-ink-900 flex items-center h-[48px] border border-border-subtle">
               {user.created_at ? format(new Date(user.created_at), 'MMMM d, yyyy') : 'Unknown'}
             </div>
           </div>
           <div className="space-y-sm">
-            <label className="text-sm font-medium text-ink-700 flex items-center gap-xs">
+            <label className="text-sm font-medium text-ink-700 flex items-center gap-xs h-[20px] mb-2">
               <Clock className="w-4 h-4" /> Last Login
             </label>
-            <div className="p-3 bg-surface-hover rounded-lg text-ink-900 flex items-center h-[42px]">
+            <div className="p-3 bg-surface-hover rounded-sm text-ink-900 flex items-center h-[48px] border border-border-subtle">
               {user.last_sign_in_at ? format(new Date(user.last_sign_in_at), 'MMM d, yyyy HH:mm') : 'Just now'}
             </div>
           </div>
-          <div className="flex items-end">
+          <div className="flex items-end h-[76px] pb-[14px]">
              <Badge variant="info">Verified Account</Badge>
           </div>
         </div>
