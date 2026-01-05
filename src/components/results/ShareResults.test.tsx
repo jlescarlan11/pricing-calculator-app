@@ -56,8 +56,8 @@ describe('ShareResults', () => {
     
     fireEvent.click(shareButton);
     
-    expect(screen.getByText(/Copy Summary/i)).toBeInTheDocument();
-    expect(screen.getByText(/Print Results/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Copy$/)).toBeInTheDocument();
+    expect(screen.getByText(/^Print$/)).toBeInTheDocument();
     expect(screen.getByText(/Email Report/i)).toBeInTheDocument();
     expect(screen.getByText(/Export PDF/i)).toBeInTheDocument();
   });
@@ -66,7 +66,7 @@ describe('ShareResults', () => {
     render(<ShareResults results={mockResults} input={mockInput} />);
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
     
-    const copyOption = screen.getByText(/Copy Summary/i);
+    const copyOption = screen.getByText(/^Copy$/);
     await act(async () => {
       fireEvent.click(copyOption);
     });
@@ -80,7 +80,7 @@ describe('ShareResults', () => {
     render(<ShareResults results={mockResults} input={mockInput} />);
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
     
-    fireEvent.click(screen.getByText(/Print Results/i));
+    fireEvent.click(screen.getByText(/^Print$/));
     
     expect(printSpy).toHaveBeenCalled();
     printSpy.mockRestore();
@@ -106,19 +106,19 @@ describe('ShareResults', () => {
     );
     
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
-    expect(screen.queryByText(/Copy Summary/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^Copy$/)).toBeInTheDocument();
     
     fireEvent.mouseDown(screen.getByTestId('outside'));
-    expect(screen.queryByText(/Copy Summary/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Copy$/)).not.toBeInTheDocument();
   });
 
   it('closes dropdown after clicking an action', async () => {
     render(<ShareResults results={mockResults} input={mockInput} />);
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
     
-    const printOption = screen.getByText(/Print Results/i);
+    const printOption = screen.getByText(/^Print$/);
     fireEvent.click(printOption);
     
-    expect(screen.queryByText(/Print Results/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Print$/)).not.toBeInTheDocument();
   });
 });

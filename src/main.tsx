@@ -8,9 +8,7 @@ import App from './App.tsx';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
+      <App />
     </BrowserRouter>
   </StrictMode>
 );

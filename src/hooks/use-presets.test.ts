@@ -1,134 +1,111 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePresets } from './use-presets';
-import type { CalculationInput, PricingConfig } from '../types';
+import { presetService } from '../services/presetService';
+import { useAuth } from '../context/AuthContext';
+import type { Preset } from '../types';
 
-const mockInput: CalculationInput = {
-  productName: 'Test Product',
-  batchSize: 10,
-  ingredients: [],
-  laborCost: 100,
-  overhead: 50,
-};
+vi.mock('../services/presetService');
+vi.mock('../context/AuthContext');
 
-const mockConfig: PricingConfig = {
-  strategy: 'markup',
-  value: 50,
+const mockPreset: Preset = {
+  id: '1',
+  name: 'Test Preset',
+  presetType: 'default',
+  baseRecipe: { productName: 'P1', batchSize: 1, ingredients: [], laborCost: 0, overhead: 0 },
+  pricingConfig: { strategy: 'markup', value: 50 },
+  variants: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  userId: 'user-1'
 };
 
 describe('usePresets', () => {
   beforeEach(() => {
-    window.sessionStorage.clear();
-    vi.restoreAllMocks();
-    vi.useFakeTimers();
+    vi.clearAllMocks();
+    (useAuth as Mock).mockReturnValue({ user: { id: 'user-1' } });
+    (presetService.fetchPresets as Mock).mockResolvedValue([]);
+    (presetService.savePreset as Mock).mockImplementation(async (p) => p);
+    (presetService.deletePreset as Mock).mockResolvedValue(undefined);
+    (presetService.syncPendingItems as Mock).mockResolvedValue(undefined);
+    // Mock navigator.onLine
+    Object.defineProperty(navigator, 'onLine', {
+        value: true,
+        configurable: true,
+        writable: true
+    });
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('should initialize with an empty array', () => {
-    const { result } = renderHook(() => usePresets());
-    expect(result.current.presets).toEqual([]);
-  });
-
-  it('should add a preset', () => {
+  it('should fetch presets on mount', async () => {
+    (presetService.fetchPresets as Mock).mockResolvedValue([mockPreset]);
+    
     const { result } = renderHook(() => usePresets());
     
-    let addedPreset;
+    // Initial state might be syncing or synced depending on how fast the promise resolves or if we check immediately
+    // In strict mode, effects run twice.
+    
+    await waitFor(() => {
+        expect(result.current.presets).toHaveLength(1);
+    });
+    
+    expect(presetService.fetchPresets).toHaveBeenCalledWith('user-1');
+    expect(result.current.syncStatus).toBe('synced');
+  });
+
+  it('should add a preset optimistically', async () => {
+    const { result } = renderHook(() => usePresets());
+    
+    await waitFor(() => expect(result.current.syncStatus).toBe('synced'));
+
+    let newPresetPromise: Promise<Preset>;
     act(() => {
-      addedPreset = result.current.addPreset({
+      newPresetPromise = result.current.addPreset({
         name: 'New Preset',
-        input: mockInput,
-        config: mockConfig,
+        baseRecipe: mockPreset.baseRecipe,
+        pricingConfig: mockPreset.pricingConfig,
+        presetType: 'default',
+        variants: []
       });
     });
 
+    // Optimistic update
     expect(result.current.presets).toHaveLength(1);
     expect(result.current.presets[0].name).toBe('New Preset');
-    expect(result.current.presets[0].id).toBeDefined();
-    expect(result.current.presets[0].lastModified).toBeDefined();
-    expect(addedPreset).toEqual(result.current.presets[0]);
+    // Status should be syncing
+    expect(result.current.syncStatus).toBe('syncing');
+
+    await act(async () => {
+        await newPresetPromise;
+    });
+
+    expect(presetService.savePreset).toHaveBeenCalled();
+    expect(result.current.syncStatus).toBe('synced');
   });
 
-  it('should update a preset and refresh lastModified', () => {
+  it('should delete a preset optimistically', async () => {
+    (presetService.fetchPresets as Mock).mockResolvedValue([mockPreset]);
     const { result } = renderHook(() => usePresets());
     
-    let id = '';
-    let initialModified = 0;
-    act(() => {
-      const added = result.current.addPreset({
-        name: 'Original Name',
-        input: mockInput,
-        config: mockConfig,
-      });
-      id = added.id;
-      initialModified = added.lastModified;
-    });
-
-    // Ensure some time passes for lastModified change
-    vi.advanceTimersByTime(100);
+    await waitFor(() => expect(result.current.presets).toHaveLength(1));
 
     act(() => {
-      result.current.updatePreset(id, { name: 'Updated Name' });
-    });
-
-    expect(result.current.presets[0].name).toBe('Updated Name');
-    expect(result.current.presets[0].lastModified).toBeGreaterThan(initialModified);
-  });
-
-  it('should delete a preset', () => {
-    const { result } = renderHook(() => usePresets());
-    
-    let id = '';
-    act(() => {
-      const added = result.current.addPreset({
-        name: 'To Be Deleted',
-        input: mockInput,
-        config: mockConfig,
-      });
-      id = added.id;
-    });
-
-    expect(result.current.presets).toHaveLength(1);
-
-    act(() => {
-      const deleted = result.current.deletePreset(id);
-      expect(deleted).toBe(true);
+      result.current.deletePreset(mockPreset.id);
     });
 
     expect(result.current.presets).toHaveLength(0);
+    expect(result.current.syncStatus).toBe('syncing');
+
+    await waitFor(() => expect(result.current.syncStatus).toBe('synced'));
+    expect(presetService.deletePreset).toHaveBeenCalledWith(mockPreset.id, 'user-1');
   });
 
-  it('should get a preset by ID', () => {
+  it('should handle offline status', async () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
+    
     const { result } = renderHook(() => usePresets());
     
-    let id = '';
-    act(() => {
-      const added = result.current.addPreset({
-        name: 'Target Preset',
-        input: mockInput,
-        config: mockConfig,
-      });
-      id = added.id;
+    await waitFor(() => {
+       expect(result.current.syncStatus).toBe('offline'); 
     });
-
-    const found = result.current.getPreset(id);
-    expect(found?.name).toBe('Target Preset');
-    
-    const notFound = result.current.getPreset('non-existent');
-    expect(notFound).toBeUndefined();
-  });
-
-  it('should get all presets', () => {
-    const { result } = renderHook(() => usePresets());
-    
-    act(() => {
-      result.current.addPreset({ name: 'P1', input: mockInput, config: mockConfig });
-      result.current.addPreset({ name: 'P2', input: mockInput, config: mockConfig });
-    });
-
-    expect(result.current.getAllPresets()).toHaveLength(2);
-    expect(result.current.getAllPresets()).toEqual(result.current.presets);
   });
 });

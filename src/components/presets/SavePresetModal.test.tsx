@@ -108,12 +108,24 @@ describe('SavePresetModal', () => {
 
   it('validates duplicate names', async () => {
     vi.mocked(usePresetsHook.usePresets).mockReturnValue({
-      presets: [{ id: '1', name: 'Existing Product', input: mockInput, config: mockConfig, lastModified: Date.now() }],
+      presets: [{ 
+        id: '1', 
+        name: 'Existing Product', 
+        baseRecipe: mockInput, 
+        pricingConfig: mockConfig, 
+        updatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        presetType: 'default',
+        variants: []
+      }],
       addPreset: mockAddPreset,
       updatePreset: vi.fn(),
       deletePreset: vi.fn(),
       getPreset: vi.fn(),
       getAllPresets: vi.fn(),
+      syncStatus: 'synced',
+      error: null,
+      refresh: vi.fn()
     });
 
     render(
@@ -164,8 +176,10 @@ describe('SavePresetModal', () => {
 
     expect(mockAddPreset).toHaveBeenCalledWith({
       name: 'Test Product',
-      input: mockInput,
-      config: mockConfig,
+      baseRecipe: mockInput,
+      pricingConfig: mockConfig,
+      presetType: 'default',
+      variants: []
     });
 
     // Should auto-close after delay (1800ms in component)

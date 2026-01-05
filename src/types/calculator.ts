@@ -37,10 +37,15 @@ export interface CalculationResult {
   };
 }
 
-export interface SavedPreset {
+export interface Preset {
   id: string;
+  userId?: string;
   name: string;
-  input: CalculationInput;
-  config: PricingConfig;
-  lastModified: number;
+  presetType: 'default' | 'variant';
+  baseRecipe: CalculationInput;
+  variants: any[];
+  pricingConfig: PricingConfig;
+  createdAt: string;
+  updatedAt: string;
+  lastSyncedAt?: string | null;
 }

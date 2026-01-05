@@ -1,12 +1,20 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCalculatorState } from './useCalculatorState';
+import { usePresets } from './use-presets';
+
+vi.mock('./use-presets');
 
 describe('useCalculatorState', () => {
   beforeEach(() => {
     window.sessionStorage.clear();
     vi.restoreAllMocks();
     vi.useFakeTimers();
+    (usePresets as Mock).mockReturnValue({
+      presets: [],
+      addPreset: vi.fn(),
+      deletePreset: vi.fn(),
+    });
   });
 
   afterEach(() => {
@@ -109,18 +117,18 @@ describe('useCalculatorState', () => {
 
   it('should load a preset', () => {
     const { result } = renderHook(() => useCalculatorState());
-    const mockPreset = {
+    const mockPreset: any = {
       id: '1',
       name: 'Loaded Preset',
-      input: {
+      baseRecipe: {
         productName: 'Preset Product',
         batchSize: 5,
         ingredients: [{ id: 'i1', name: 'Ing 1', amount: 1, cost: 10 }],
         laborCost: 20,
         overhead: 5,
       },
-      config: { strategy: 'margin' as const, value: 30 },
-      lastModified: Date.now(),
+      pricingConfig: { strategy: 'margin', value: 30 },
+      updatedAt: new Date().toISOString(),
     };
 
     act(() => {

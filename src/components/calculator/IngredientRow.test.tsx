@@ -89,12 +89,12 @@ describe('IngredientRow', () => {
     expect(mockHandlers.onRemove).not.toHaveBeenCalled();
 
     // Modal should be visible
-    expect(screen.getByText('Remove Last Ingredient?')).toBeInTheDocument();
+    expect(screen.getByText('Remove ingredient?')).toBeInTheDocument();
 
     // Click confirm
-    const confirmBtn = screen.getByRole('button', { name: 'Remove' });
+    const modalRemoveBtn = screen.getByRole('button', { name: /^Remove$/ });
     act(() => {
-      fireEvent.click(confirmBtn);
+      fireEvent.click(modalRemoveBtn);
     });
 
     // Still not called immediately (wait for exit animation)

@@ -3,11 +3,11 @@ import { Search, LayoutGrid, List } from 'lucide-react';
 import { usePresets } from '../../hooks/use-presets';
 import { Input, Button } from '../shared';
 import { PresetListItem } from './PresetListItem';
-import type { SavedPreset } from '../../types';
+import type { Preset } from '../../types';
 
 interface PresetsListProps {
-  onLoad: (preset: SavedPreset) => void;
-  onEdit: (preset: SavedPreset) => void;
+  onLoad: (preset: Preset) => void;
+  onEdit: (preset: Preset) => void;
 }
 
 /**
@@ -25,10 +25,10 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
         const search = searchQuery.toLowerCase();
         return (
           preset.name.toLowerCase().includes(search) ||
-          preset.input.productName.toLowerCase().includes(search)
+          preset.baseRecipe.productName.toLowerCase().includes(search)
         );
       })
-      .sort((a, b) => b.lastModified - a.lastModified);
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }, [presets, searchQuery]);
 
   if (presets.length === 0) {

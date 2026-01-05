@@ -20,28 +20,27 @@ describe('PriceComparison', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders correctly when currentPrice is lower than recommendedPrice', () => {
-    render(<PriceComparison {...defaultProps} currentPrice={12} recommendedPrice={15} />);
-    
-    expect(screen.getByText('₱12.00')).toBeDefined();
-    expect(screen.getByText('₱15.00')).toBeDefined();
-    expect(screen.getByText(/You're leaving ₱3.00 per unit on the table/i)).toBeDefined();
-  });
-
-  it('renders correctly when currentPrice is higher than recommendedPrice', () => {
-    render(<PriceComparison {...defaultProps} currentPrice={20} recommendedPrice={15} />);
-    
-    expect(screen.getByText('₱20.00')).toBeDefined();
-    expect(screen.getByText('₱15.00')).toBeDefined();
-    expect(screen.getByText(/You're overpriced by ₱5.00 per unit/i)).toBeDefined();
-  });
-
-  it('renders correctly when currentPrice matches recommendedPrice', () => {
-    render(<PriceComparison {...defaultProps} currentPrice={15} recommendedPrice={15} />);
-    
-    expect(screen.getByText(/You're priced competitively/i)).toBeDefined();
-  });
-
+    it('renders correctly when currentPrice is lower than recommendedPrice', () => {
+      render(<PriceComparison {...defaultProps} currentPrice={12} recommendedPrice={15} />);
+  
+      expect(screen.getByText('₱12.00')).toBeDefined();
+      expect(screen.getByText('₱15.00')).toBeDefined();
+      expect(screen.getByText(/There's an opportunity for ₱3.00 more per unit/i)).toBeDefined();
+    });
+  
+    it('renders correctly when currentPrice is higher than recommendedPrice', () => {
+      render(<PriceComparison {...defaultProps} currentPrice={20} recommendedPrice={15} />);
+  
+      expect(screen.getByText('₱20.00')).toBeDefined();
+      expect(screen.getByText('₱15.00')).toBeDefined();
+      expect(screen.getByText(/Your price is ₱5.00 higher than the recommendation/i)).toBeDefined();
+    });
+  
+    it('renders correctly when currentPrice matches recommendedPrice', () => {
+      render(<PriceComparison {...defaultProps} currentPrice={15} recommendedPrice={15} />);
+  
+      expect(screen.getByText(/Your pricing is perfectly aligned/i)).toBeDefined();
+    });
   it('calculates current profit correctly', () => {
     render(<PriceComparison {...defaultProps} currentPrice={12} costPerUnit={10} batchSize={10} />);
     

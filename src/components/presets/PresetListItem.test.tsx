@@ -1,13 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PresetListItem } from './PresetListItem';
-import type { SavedPreset } from '../../types/calculator';
+import type { Preset } from '../../types/calculator';
 
-const mockPreset: SavedPreset = {
+const mockPreset: Preset = {
   id: '1',
   name: 'Test Preset',
-  lastModified: new Date('2026-01-01').getTime(),
-  input: {
+  presetType: 'default',
+  createdAt: new Date('2026-01-01').toISOString(),
+  updatedAt: new Date('2026-01-01').toISOString(),
+  baseRecipe: {
     productName: 'Delicious Cake',
     batchSize: 12,
     ingredients: [
@@ -17,7 +19,8 @@ const mockPreset: SavedPreset = {
     laborCost: 100,
     overhead: 50,
   },
-  config: {
+  variants: [],
+  pricingConfig: {
     strategy: 'markup',
     value: 50,
   },
@@ -52,6 +55,8 @@ describe('PresetListItem', () => {
     expect(screen.getByText(/markup \(50%\)/i)).toBeInTheDocument();
     expect(screen.getByText('Jan 01, 2026')).toBeInTheDocument();
   });
+// ... rest of tests
+
 
   it('calls onLoad when Load button is clicked', () => {
     render(

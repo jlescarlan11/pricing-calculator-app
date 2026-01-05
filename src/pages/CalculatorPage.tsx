@@ -6,7 +6,7 @@ import { PresetsList } from '../components/presets';
 import { Modal, Tooltip, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
-import type { SavedPreset } from '../types';
+import type { Preset } from '../types';
 
 export const CalculatorPage: React.FC = () => {
   const { addToast } = useToast();
@@ -57,23 +57,26 @@ export const CalculatorPage: React.FC = () => {
     loadPreset({
       id: 'sample',
       name: 'Sample Cookie',
-      input: COOKIE_SAMPLE.input,
-      config: COOKIE_SAMPLE.config,
-      lastModified: Date.now(),
+      presetType: 'default',
+      baseRecipe: COOKIE_SAMPLE.input,
+      pricingConfig: COOKIE_SAMPLE.config,
+      variants: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
     
     // Smooth scroll to form area
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [loadPreset]);
 
-  const handleLoadPreset = useCallback((preset: SavedPreset) => {
+  const handleLoadPreset = useCallback((preset: Preset) => {
     loadPreset(preset);
     setIsPresetsModalOpen(false);
     // Scroll to results
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [loadPreset]);
 
-  const handleEditPreset = useCallback((preset: SavedPreset) => {
+  const handleEditPreset = useCallback((preset: Preset) => {
     loadPreset(preset);
     setIsPresetsModalOpen(false);
     // Scroll to form

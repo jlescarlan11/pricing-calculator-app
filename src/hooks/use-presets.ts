@@ -1,82 +1,121 @@
-import { useCallback } from 'react';
-import { useSessionStorage } from './use-session-storage';
-import type { SavedPreset } from '../types';
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { presetService } from '../services/presetService';
+import type { Preset } from '../types';
 
-const PRESETS_STORAGE_KEY = 'pricing_calculator_presets';
+export type SyncStatus = 'synced' | 'syncing' | 'offline' | 'error';
 
-/**
- * Custom hook for managing saved calculation presets.
- * Persists presets in sessionStorage.
- */
 export function usePresets() {
-  const [presets, setPresets] = useSessionStorage<SavedPreset[]>(PRESETS_STORAGE_KEY, []);
+  const { user } = useAuth();
+  const [presets, setPresets] = useState<Preset[]>([]);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced');
+  const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Adds a new preset to the list.
-   * Generates a unique ID and sets the lastModified timestamp.
-   */
-  const addPreset = useCallback((presetData: Omit<SavedPreset, 'id' | 'lastModified'>) => {
+  const loadPresets = useCallback(async () => {
+    setSyncStatus('syncing');
     try {
-      const newPreset: SavedPreset = {
-        ...presetData,
-        id: crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).substring(2),
-        lastModified: Date.now(),
-      };
-      setPresets(prev => [...prev, newPreset]);
+      const data = await presetService.fetchPresets(user?.id);
+      setPresets(data);
+      setSyncStatus(navigator.onLine ? 'synced' : 'offline');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load presets');
+      setSyncStatus('error');
+    }
+  }, [user?.id]);
+
+  // Initial load
+  useEffect(() => {
+    loadPresets();
+  }, [loadPresets]);
+
+  // Sync listeners
+  useEffect(() => {
+    const handleOnline = () => {
+      setSyncStatus('syncing');
+      presetService.syncPendingItems()
+        .then(() => loadPresets())
+        .catch(() => setSyncStatus('error'));
+    };
+    const handleOffline = () => setSyncStatus('offline');
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [loadPresets]);
+
+  const addPreset = useCallback(async (presetData: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'lastSyncedAt'>) => {
+    const newPreset: Preset = {
+      ...presetData,
+      id: crypto.randomUUID(),
+      userId: user?.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastSyncedAt: null,
+    };
+
+    // Optimistic update
+    setPresets(prev => [...prev, newPreset]);
+    setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+
+    try {
+      await presetService.savePreset(newPreset);
+      setSyncStatus(navigator.onLine ? 'synced' : 'offline');
       return newPreset;
-    } catch (error) {
-      console.error('Failed to add preset:', error);
-      throw new Error('Could not save preset. Please try again.');
+    } catch (err) {
+      console.error(err);
+      setSyncStatus('error');
+      throw err;
     }
-  }, [setPresets]);
+  }, [user?.id]);
 
-  /**
-   * Updates an existing preset by ID.
-   * Refreshes the lastModified timestamp.
-   */
-  const updatePreset = useCallback((id: string, updates: Partial<Omit<SavedPreset, 'id' | 'lastModified'>>) => {
+  const updatePreset = useCallback(async (id: string, updates: Partial<Preset>) => {
+    setPresets(prev => {
+      const index = prev.findIndex(p => p.id === id);
+      if (index === -1) return prev;
+
+      const oldPreset = prev[index];
+      const newPreset = { 
+        ...oldPreset, 
+        ...updates, 
+        updatedAt: new Date().toISOString() 
+      };
+
+      // Trigger save (fire and forget for UI responsiveness)
+      presetService.savePreset(newPreset)
+        .then(() => setSyncStatus(navigator.onLine ? 'synced' : 'offline'))
+        .catch(() => setSyncStatus('error'));
+      
+      const newArr = [...prev];
+      newArr[index] = newPreset;
+      return newArr;
+    });
+    
+    setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+  }, []);
+
+  const deletePreset = useCallback(async (id: string) => {
+    // Optimistic update
+    setPresets(prev => prev.filter(p => p.id !== id));
+    setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+
     try {
-      setPresets(prev => {
-        const index = prev.findIndex(p => p.id === id);
-        if (index === -1) return prev;
-
-        const updatedPresets = [...prev];
-        updatedPresets[index] = {
-          ...updatedPresets[index],
-          ...updates,
-          lastModified: Date.now(),
-        };
-        return updatedPresets;
-      });
-    } catch (error) {
-      console.error('Failed to update preset:', error);
-      throw new Error('Could not update preset. Please try again.');
+      await presetService.deletePreset(id, user?.id);
+      setSyncStatus(navigator.onLine ? 'synced' : 'offline');
+    } catch (err) {
+      console.error(err);
+      setSyncStatus('error');
     }
-  }, [setPresets]);
+  }, [user?.id]);
 
-  /**
-   * Deletes a preset by ID.
-   */
-  const deletePreset = useCallback((id: string) => {
-    try {
-      setPresets(prev => prev.filter(preset => preset.id !== id));
-      return true;
-    } catch (error) {
-      console.error('Failed to delete preset:', error);
-      throw new Error('Could not delete preset. Please try again.');
-    }
-  }, [setPresets]);
-
-  /**
-   * Retrieves a specific preset by ID.
-   */
   const getPreset = useCallback((id: string) => {
     return presets.find(p => p.id === id);
   }, [presets]);
 
-  /**
-   * Returns all saved presets.
-   */
   const getAllPresets = useCallback(() => {
     return presets;
   }, [presets]);
@@ -88,5 +127,8 @@ export function usePresets() {
     deletePreset,
     getPreset,
     getAllPresets,
+    syncStatus,
+    error,
+    refresh: loadPresets
   };
 }

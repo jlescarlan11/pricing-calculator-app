@@ -12,7 +12,7 @@ import type {
   PricingConfig, 
   CalculationResult, 
   Ingredient,
-  SavedPreset
+  Preset
 } from '../types/calculator';
 
 const SESSION_STORAGE_KEY = 'pricing_calculator_draft';
@@ -36,7 +36,7 @@ export interface CalculatorState {
   results: CalculationResult | null;
   errors: Record<string, string>;
   isCalculating: boolean;
-  presets: SavedPreset[];
+  presets: Preset[];
   
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
@@ -48,8 +48,8 @@ export interface CalculatorState {
   reset: () => void;
   
   // Preset Actions
-  loadPreset: (preset: SavedPreset) => void;
-  saveAsPreset: (name: string) => SavedPreset;
+  loadPreset: (preset: Preset) => void;
+  saveAsPreset: (name: string) => Promise<Preset>;
   deletePreset: (id: string) => void;
 }
 
@@ -196,20 +196,21 @@ export function useCalculatorState(
     window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
   }, []);
 
-  const loadPreset = useCallback((preset: SavedPreset) => {
-    setInput(preset.input);
-    setConfig(preset.config);
-    const result = performFullCalculation(preset.input, preset.config);
+  const loadPreset = useCallback((preset: Preset) => {
+    setInput(preset.baseRecipe);
+    setConfig(preset.pricingConfig);
+    const result = performFullCalculation(preset.baseRecipe, preset.pricingConfig);
     setResults(result);
     setErrors({});
-    return result;
   }, []);
 
-  const saveAsPreset = useCallback((name: string) => {
+  const saveAsPreset = useCallback(async (name: string) => {
     return addPreset({
       name,
-      input,
-      config
+      baseRecipe: input,
+      pricingConfig: config,
+      presetType: 'default',
+      variants: []
     });
   }, [addPreset, input, config]);
 

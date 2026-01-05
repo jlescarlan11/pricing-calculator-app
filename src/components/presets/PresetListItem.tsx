@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FileEdit, Trash2, Play, Calendar, Package, MoreVertical } from 'lucide-react';
-import type { SavedPreset } from '../../types';
+import type { Preset } from '../../types';
 import { formatDate } from '../../utils/formatters';
 import { Button, Card, Badge, Tooltip } from '../shared';
 
 interface PresetListItemProps {
-  preset: SavedPreset;
-  onLoad: (preset: SavedPreset) => void;
-  onEdit: (preset: SavedPreset) => void;
-  onDelete: (preset: SavedPreset) => void;
+  preset: Preset;
+  onLoad: (preset: Preset) => void;
+  onEdit: (preset: Preset) => void;
+  onDelete: (preset: Preset) => void;
   viewMode?: 'grid' | 'list';
 }
 
@@ -23,8 +23,8 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
   onDelete,
   viewMode = 'grid',
 }) => {
-  const { name, input, lastModified, config } = preset;
-  const { productName, batchSize, ingredients } = input;
+  const { name, baseRecipe, updatedAt, pricingConfig } = preset;
+  const { productName, batchSize, ingredients } = baseRecipe;
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -57,7 +57,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
               {name}
             </h4>
             <p className="text-[10px] text-ink-500 font-medium">
-              {formatDate(lastModified)}
+              {formatDate(updatedAt)}
             </p>
           </div>
         </div>
@@ -127,7 +127,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
           </h4>
           <p className="text-[10px] text-ink-500 font-medium flex items-center gap-xs mt-0.5">
             <Calendar size={10} className="opacity-70" />
-            {formatDate(lastModified)}
+            {formatDate(updatedAt)}
           </p>
         </div>
         <Badge variant="info" className="text-[9px] uppercase tracking-widest py-0 px-xs shrink-0">
@@ -158,7 +158,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
         <div className="pl-md">
           <span className="block text-ink-500 mb-xs opacity-70">Strategy</span>
           <span className="text-ink-900">
-            {config.strategy} ({config.value}%)
+            {pricingConfig.strategy} ({pricingConfig.value}%)
           </span>
         </div>
       </div>

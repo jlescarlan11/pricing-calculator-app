@@ -70,10 +70,12 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
         await new Promise(resolve => setTimeout(resolve, 600));
       }
       
-      addPreset({
+      await addPreset({
         name: trimmedName,
-        input,
-        config,
+        baseRecipe: input,
+        pricingConfig: config,
+        presetType: 'default',
+        variants: []
       });
       
       addToast('✓ Preset saved', 'success');

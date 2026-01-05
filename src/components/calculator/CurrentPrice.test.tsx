@@ -8,24 +8,24 @@ describe('CurrentPrice', () => {
   it('is hidden by default when value is undefined', () => {
     render(<CurrentPrice value={undefined} onChange={mockOnChange} />);
     expect(screen.queryByLabelText(/Current Selling Price/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/Compare Current/i)).toBeInTheDocument();
+    expect(screen.getByText(/Compare/i)).toBeInTheDocument();
   });
 
   it('is visible when value is provided and greater than 0', () => {
     render(<CurrentPrice value={150} onChange={mockOnChange} />);
     expect(screen.getByLabelText(/Current Selling Price/i)).toHaveValue(150);
-    expect(screen.getByText(/Remove Comparison/i)).toBeInTheDocument();
+    expect(screen.getByText(/Hide/i)).toBeInTheDocument();
   });
 
   it('toggles visibility when button is clicked', () => {
     render(<CurrentPrice value={undefined} onChange={mockOnChange} />);
     
-    const toggleBtn = screen.getByRole('button', { name: /Compare Current/i });
+    const toggleBtn = screen.getByRole('button', { name: /Compare/i });
     fireEvent.click(toggleBtn);
     
     expect(screen.getByLabelText(/Current Selling Price/i)).toBeInTheDocument();
     
-    const hideBtn = screen.getByRole('button', { name: /Remove Comparison/i });
+    const hideBtn = screen.getByRole('button', { name: /Hide/i });
     fireEvent.click(hideBtn);
     
     expect(screen.queryByLabelText(/Current Selling Price/i)).not.toBeInTheDocument();
@@ -44,7 +44,7 @@ describe('CurrentPrice', () => {
 
   it('displays helper text when visible', () => {
     render(<CurrentPrice value={100} onChange={mockOnChange} />);
-    expect(screen.getByText(/Compare what you currently charge/i)).toBeInTheDocument();
+    expect(screen.getByText(/See how your current price compares to our recommendation/i)).toBeInTheDocument();
   });
 
   it('handles invalid input by calling onChange with undefined', () => {

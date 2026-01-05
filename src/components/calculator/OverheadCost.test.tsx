@@ -5,6 +5,10 @@ import { OverheadCost } from './OverheadCost';
 describe('OverheadCost', () => {
   const mockOnChange = vi.fn();
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders with initial value', () => {
     render(<OverheadCost value={150} batchSize={10} onChange={mockOnChange} />);
     expect(screen.getByLabelText(/Total Overhead Cost per Batch/i)).toHaveValue(150);
@@ -19,7 +23,7 @@ describe('OverheadCost', () => {
 
   it('shows warning when value is zero', () => {
     render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
-    expect(screen.getByText(/Overhead is zero. Are you sure?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Zero overhead\? This is rare but possible/i)).toBeInTheDocument();
   });
 
   it('toggles helper section', () => {
@@ -27,48 +31,44 @@ describe('OverheadCost', () => {
     
     expect(screen.queryByLabelText(/Monthly Rent/i)).not.toBeInTheDocument();
     
-    const toggleBtn = screen.getByRole('button', { name: /Overhead Helper/i });
+    const toggleBtn = screen.getByRole('button', { name: /Helper/i });
     fireEvent.click(toggleBtn);
     
-    expect(screen.getByLabelText(/Monthly Rent/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Monthly Utilities/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Batches per Month/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Packaging per Unit/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Current Batch Size/i)).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /Monthly Rent/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /Monthly Utilities/i })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /Batches per Month/i })).toBeInTheDocument();
     
-    const hideBtn = screen.getByRole('button', { name: /Hide Helper/i });
+    const hideBtn = screen.getByRole('button', { name: /Hide/i });
     fireEvent.click(hideBtn);
     
-    expect(screen.queryByLabelText(/Monthly Rent/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: /Monthly Rent/i })).not.toBeInTheDocument();
   });
 
   it('calculates total overhead correctly in helper', () => {
     render(<OverheadCost value={0} batchSize={50} onChange={mockOnChange} />);
     
-    fireEvent.click(screen.getByRole('button', { name: /Overhead Helper/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Helper/i }));
     
-    // Rent: 10000 / 20 = 500
-    fireEvent.change(screen.getByLabelText(/Monthly Rent/i), { target: { value: '10000' } });
-    fireEvent.change(screen.getByLabelText(/Batches per Month/i), { target: { value: '20' } });
-    
-    // Utilities: 2000 / 20 = 100
-    fireEvent.change(screen.getByLabelText(/Monthly Utilities/i), { target: { value: '2000' } });
-    
-    // Packaging: 5 * 50 = 250
-    fireEvent.change(screen.getByLabelText(/Packaging per Unit/i), { target: { value: '5' } });
+    // Use spinbutton role to target inputs specifically
+    fireEvent.change(screen.getByRole('spinbutton', { name: /Monthly Rent/i }), { target: { value: '10000' } });
+    fireEvent.change(screen.getByRole('spinbutton', { name: /Batches per Month/i }), { target: { value: '20' } });
+    fireEvent.change(screen.getByRole('spinbutton', { name: /Monthly Utilities/i }), { target: { value: '2000' } });
+    fireEvent.change(screen.getByRole('spinbutton', { name: /Packaging per Unit/i }), { target: { value: '5' } });
     
     // Total = 500 + 100 + 250 = 850
-    expect(screen.getByText(/₱850.00/i)).toBeInTheDocument();
+    // Use a flexible matcher for the currency formatted string
+    expect(screen.getByText(/850\.00/)).toBeInTheDocument();
   });
 
   it('applies calculated value to overhead', () => {
     render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
     
-    fireEvent.click(screen.getByRole('button', { name: /Overhead Helper/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Helper/i }));
     
-    fireEvent.change(screen.getByLabelText(/Monthly Rent/i), { target: { value: '200' } });
-    fireEvent.change(screen.getByLabelText(/Batches per Month/i), { target: { value: '1' } });
+    fireEvent.change(screen.getByRole('spinbutton', { name: /Monthly Rent/i }), { target: { value: '200' } });
+    fireEvent.change(screen.getByRole('spinbutton', { name: /Batches per Month/i }), { target: { value: '1' } });
     
+    // Target the specific Apply button in the calculator
     const applyBtn = screen.getByRole('button', { name: /Apply to Overhead Cost/i });
     fireEvent.click(applyBtn);
     

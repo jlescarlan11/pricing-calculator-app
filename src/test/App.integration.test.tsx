@@ -34,27 +34,27 @@ describe('App Integration', () => {
     fireEvent.click(calculateBtns[0]);
     
     // Should show results
-    expect(await screen.findByText(/Calculation Results/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^Results$/)).toBeInTheDocument();
     expect(screen.getByText(/Analysis for/i)).toHaveTextContent('Test Product');
     
     // Check if results are displayed
-    expect(screen.getByText(/Recommended Selling Price/i)).toBeInTheDocument();
+    expect(screen.getByText(/Recommended Price/i)).toBeInTheDocument();
   });
 
   it('can edit results to go back to form', async () => {
     renderWithRouter(<App />);
     
     // Load sample to speed up
-    const loadSampleBtn = screen.getByText(/Explore Sample/i);
+    const loadSampleBtn = screen.getByText(/^Explore$/);
     fireEvent.click(loadSampleBtn);
     
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
     
-    expect(await screen.findByText(/Calculation Results/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^Results$/)).toBeInTheDocument();
     
     // Form is visible below results, so we can access inputs directly
-    expect(screen.getByText(/Cost Calculator/i)).toBeInTheDocument();
+    expect(screen.getByText(/Product Details/i)).toBeInTheDocument();
     
     const nameInput = screen.getByLabelText(/Product Name/i);
     expect(nameInput).toHaveValue('Chocolate Chip Cookies');
@@ -66,7 +66,7 @@ describe('App Integration', () => {
   it('loads sample data correctly', () => {
     renderWithRouter(<App />);
     
-    const loadSampleBtn = screen.getByText(/Explore Sample/i);
+    const loadSampleBtn = screen.getByText(/^Explore$/);
     fireEvent.click(loadSampleBtn);
     
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Chocolate Chip Cookies');

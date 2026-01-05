@@ -57,7 +57,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </div>
               <div className="mt-xl md:mt-0 md:order-1 text-center md:text-left">
                 <p className="text-sm text-ink-700">
-                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0-alpha
+                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0
                 </p>
               </div>
             </div>

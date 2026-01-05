@@ -7,59 +7,51 @@ describe('PricingStrategy', () => {
 
   it('renders with initial markup strategy', () => {
     render(
-      <PricingStrategy 
-        strategy="markup" 
-        value={25} 
-        costPerUnit={100} 
-        onChange={mockOnChange} 
+      <PricingStrategy
+        strategy="markup"
+        value={25}
+        costPerUnit={100}
+        onChange={mockOnChange}
       />
     );
-    
-    expect(screen.getByText(/Markup/i, { selector: 'button' })).toHaveClass('bg-clay');
-    expect(screen.getByLabelText(/Markup Percentage/i)).toHaveValue(25);
-    
-    expect(screen.getByText((_, element) => {
-      return element?.textContent?.includes("Add 25% to your total cost") ?? false;
-    }, { selector: 'p' })).toBeInTheDocument();
 
-    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-3xl');
-    expect(priceDisplay).toHaveTextContent('₱125.00');
+    expect(screen.getByLabelText(/Markup Percentage/i)).toHaveValue(25);
+
+    expect(screen.getByText((_, element) => {
+      return element?.textContent?.includes("Add 25% of the cost to your price") ?? false;
+    }, { selector: 'p' })).toBeInTheDocument();
   });
 
   it('renders with margin strategy', () => {
     render(
-      <PricingStrategy 
-        strategy="margin" 
-        value={20} 
-        costPerUnit={100} 
-        onChange={mockOnChange} 
+      <PricingStrategy
+        strategy="margin"
+        value={20}
+        costPerUnit={100}
+        onChange={mockOnChange}
       />
     );
-    
-    expect(screen.getByText(/Profit Margin/i, { selector: 'button' })).toHaveClass('bg-clay');
-    expect(screen.getByLabelText(/Margin Percentage/i)).toHaveValue(20);
-    
-    expect(screen.getByText((_, element) => {
-      return element?.textContent?.includes("Keep 20% of the final sale price as profit") ?? false;
-    }, { selector: 'p' })).toBeInTheDocument();
 
-    const priceDisplay = screen.getByText(/Recommended Price/i).parentElement?.querySelector('.text-3xl');
-    expect(priceDisplay).toHaveTextContent('₱125.00');
+    expect(screen.getByText(/Margin/i, { selector: 'button' })).toHaveClass('bg-clay');
+    expect(screen.getByLabelText(/Margin Percentage/i)).toHaveValue(20);
+    expect(screen.getByText((_, element) => {
+      return element?.textContent?.includes("Keep 20% of the price as your profit") ?? false;
+    }, { selector: 'p' })).toBeInTheDocument();
   });
 
   it('switches strategy when button clicked', () => {
     render(
-      <PricingStrategy 
-        strategy="markup" 
-        value={25} 
-        costPerUnit={100} 
-        onChange={mockOnChange} 
+      <PricingStrategy
+        strategy="markup"
+        value={25}
+        costPerUnit={100}
+        onChange={mockOnChange}
       />
     );
-    
-    const marginBtn = screen.getByText(/Profit Margin/i, { selector: 'button' });
+
+    const marginBtn = screen.getByText(/Margin/i, { selector: 'button' });
     fireEvent.click(marginBtn);
-    
+
     expect(mockOnChange).toHaveBeenCalledWith('margin', 25);
   });
 

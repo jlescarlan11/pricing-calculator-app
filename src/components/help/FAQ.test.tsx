@@ -6,9 +6,9 @@ describe('FAQ', () => {
   it('renders correctly with initial questions', () => {
     render(<FAQ />);
     
-    expect(screen.getByText(/Frequently Asked Questions/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Questions$/i)).toBeInTheDocument();
     expect(screen.getByText(/What’s a good profit margin for food products\?/i)).toBeInTheDocument();
-    expect(screen.getByText(/How often should I recalculate prices\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/How often should I change my prices\?/i)).toBeInTheDocument();
   });
 
   it('expands and collapses an item when clicked', () => {
@@ -23,7 +23,7 @@ describe('FAQ', () => {
     
     fireEvent.click(button!);
     expect(button).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText(/A healthy profit margin for most food businesses is typically between 25% and 35%/i)).toBeInTheDocument();
+    expect(screen.getByText(/Aim for a profit margin of 30% or more to stay healthy/i)).toBeInTheDocument();
     
     fireEvent.click(button!);
     expect(button).toHaveAttribute('aria-expanded', 'false');
@@ -37,7 +37,7 @@ describe('FAQ', () => {
     fireEvent.change(searchInput, { target: { value: 'profit margin' } });
     
     expect(screen.getByText(/What’s a good profit margin for food products\?/i)).toBeInTheDocument();
-    expect(screen.queryByText(/How often should I recalculate prices\?/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/How often should I change my prices\?/i)).not.toBeInTheDocument();
   });
 
   it('shows "no results" message when no match is found', () => {
@@ -47,7 +47,7 @@ describe('FAQ', () => {
     
     fireEvent.change(searchInput, { target: { value: 'nonexistent keyword' } });
     
-    expect(screen.getByText(/No results found for "nonexistent keyword"/i)).toBeInTheDocument();
+    expect(screen.getByText(/We couldn't find a match for "nonexistent keyword"/i)).toBeInTheDocument();
   });
 
   it('only one item is expanded at a time', () => {
@@ -55,7 +55,7 @@ describe('FAQ', () => {
     
     const questions = [
       screen.getByText(/What’s a good profit margin for food products\?/i),
-      screen.getByText(/How often should I recalculate prices\?/i)
+      screen.getByText(/How often should I change my prices\?/i)
     ];
     
     const buttons = questions.map(q => q.closest('button')!);

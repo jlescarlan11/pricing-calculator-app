@@ -5,6 +5,15 @@ import { ToastProvider } from '../shared/Toast';
 import { useCalculatorState } from '../../hooks/useCalculatorState';
 import type { CalculationInput, PricingConfig, CalculationResult } from '../../types/calculator';
 
+// Mock usePresets
+vi.mock('../../hooks/use-presets', () => ({
+  usePresets: vi.fn(() => ({
+    presets: [],
+    addPreset: vi.fn(),
+    deletePreset: vi.fn(),
+  }))
+}));
+
 const TestWrapper = ({ 
   onCalculate, 
   initialInput, 

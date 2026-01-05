@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { SavePresetButton } from './SavePresetButton';
 import type { CalculationInput, PricingConfig } from '../../types/calculator';
@@ -29,6 +29,14 @@ vi.mock('./SavePresetModal', () => ({
 }));
 
 describe('SavePresetButton', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders correctly', () => {
     render(
       <SavePresetButton
@@ -39,7 +47,7 @@ describe('SavePresetButton', () => {
 
     const button = screen.getByRole('button', { name: /save current calculation as preset/i });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveTextContent(/Save Product/i);
+    expect(button).toHaveTextContent(/^Save$/);
     expect(button).not.toBeDisabled();
   });
 
@@ -112,8 +120,15 @@ describe('SavePresetButton', () => {
       />
     );
 
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
-    expect(tooltip).toHaveTextContent(/Save this calculation to your presets/i);
+    const button = screen.getByRole('button', { name: /save current calculation as preset/i });
+    fireEvent.mouseEnter(button);
+    
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toHaveTextContent(/Keep this calculation for your future records/i);
   });
 
   it('has a tooltip with correct content when disabled', () => {
@@ -125,7 +140,14 @@ describe('SavePresetButton', () => {
       />
     );
 
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
-    expect(tooltip).toHaveTextContent(/Complete all required fields/i);
+    const button = screen.getByRole('button', { name: /save current calculation as preset/i });
+    fireEvent.mouseEnter(button);
+    
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toHaveTextContent(/Please complete the details above to save your progress/i);
   });
 });
