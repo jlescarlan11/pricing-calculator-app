@@ -179,9 +179,15 @@ describe('CalculatorForm Variants', () => {
     // Find the variant block
     const variantBlock = screen.getByDisplayValue('Variant A').closest('.border-l-4');
     expect(variantBlock).not.toBeNull();
+    const withinVariant = within(variantBlock as HTMLElement);
 
-    // Find Current Price input inside variant block
-    const priceInput = within(variantBlock as HTMLElement).getByLabelText(/Current Price/i);
+    // Click "Compare" to show the input
+    const compareBtn = withinVariant.getByRole('button', { name: /Compare/i });
+    fireEvent.click(compareBtn);
+
+    // Find Current Price input inside variant block using testId
+    const priceSection = withinVariant.getByTestId('current-price-section');
+    const priceInput = within(priceSection).getByPlaceholderText('0.00');
     fireEvent.change(priceInput, { target: { value: '25.00' } });
 
     expect(priceInput).toHaveValue(25);
@@ -228,5 +234,36 @@ describe('CalculatorForm Variants', () => {
     // Note: formatCurrency usually adds symbol, assume standard formatting or check partial
     // We look for text that contains "30.00"
     expect(withinVariant.getByText(/30.00/)).toBeInTheDocument();
+  });
+
+  it('updates variant limits when base batch size decreases', () => {
+    const input: CalculationInput = {
+      productName: 'Test Base',
+      batchSize: 10,
+      ingredients: [{ id: '1', name: 'Flour', amount: 1000, cost: 50 }],
+      laborCost: 0,
+      overhead: 0,
+      hasVariants: true,
+      variants: [
+        { id: 'v1', name: 'Variant A', batchSize: 10, ingredients: [], laborCost: 0, overhead: 0, pricingConfig: { strategy: 'markup' as const, value: 50 } }
+      ]
+    };
+    
+    render(<TestWrapper initialInput={input} />);
+    
+    const v1BatchInput = screen.getByLabelText(/Batch Allocation/i);
+    expect(v1BatchInput).toHaveValue(10);
+
+    // 2. Decrease Base Batch Size to 5
+    const baseBatchInput = screen.getByLabelText(/Batch Size/i);
+    fireEvent.change(baseBatchInput, { target: { value: '5' } });
+
+    // 3. Check V1 limits (should be Max: 5 now)
+    expect(screen.getByText(/Batch Allocation \(Max: 5\)/i)).toBeInTheDocument();
+
+    // 4. Touching V1 batch size should clamp it to 5
+    // We use a value different from current (10) to ensure onChange fires
+    fireEvent.change(v1BatchInput, { target: { value: '6' } });
+    expect(v1BatchInput).toHaveValue(5);
   });
 });

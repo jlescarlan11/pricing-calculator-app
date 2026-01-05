@@ -9,13 +9,6 @@ interface VariantResultsTableProps {
 export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ results }) => {
   if (!results.variantResults || results.variantResults.length === 0) return null;
 
-  // Identify best performers
-  const sortedByMargin = [...results.variantResults].sort((a, b) => b.profitMarginPercent - a.profitMarginPercent);
-  const bestMarginId = sortedByMargin[0]?.id;
-  
-  const sortedByProfit = [...results.variantResults].sort((a, b) => b.profitPerUnit - a.profitPerUnit);
-  const bestProfitId = sortedByProfit[0]?.id;
-
   return (
     <Card title="Variant Performance" className="overflow-hidden">
       <div className="overflow-x-auto">
@@ -32,20 +25,12 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {results.variantResults.map((variant) => {
-              const isBestMargin = variant.id === bestMarginId && results.variantResults!.length > 1;
-              const isBestProfit = variant.id === bestProfitId && results.variantResults!.length > 1;
               const hasCurrentPrice = variant.currentSellingPrice !== undefined && variant.currentSellingPrice > 0;
               
               return (
                 <tr key={variant.id} className="hover:bg-surface-hover transition-colors">
                   <td className="px-md py-md font-medium text-ink-900">
                     {variant.name}
-                    {(isBestMargin || isBestProfit) && (
-                      <div className="flex flex-wrap gap-xs mt-1">
-                        {isBestMargin && <span className="text-[10px] bg-moss/10 text-moss px-1.5 py-0.5 rounded-full whitespace-nowrap">Best Margin</span>}
-                        {isBestProfit && <span className="text-[10px] bg-clay/10 text-clay px-1.5 py-0.5 rounded-full whitespace-nowrap">Best Profit</span>}
-                      </div>
-                    )}
                   </td>
                   <td className="px-md py-md text-right tabular-nums text-ink-700">
                     {variant.costPerUnit.toFixed(2)}

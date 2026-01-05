@@ -79,6 +79,58 @@ describe('CostBreakdown', () => {
 
     });
 
-  });
+    it('renders detailed variant breakdown when variants exist', () => {
+      const variantResultsMock: CalculationResult = {
+        ...mockResults,
+        profitPerBatch: 2000,
+        variantResults: [
+          {
+            id: 'v1',
+            name: 'Variant A',
+            totalCost: 100,
+            costPerUnit: 10,
+            recommendedPrice: 20,
+            profitPerUnit: 10,
+            profitMarginPercent: 50,
+            breakEvenPrice: 10,
+            breakdown: {
+              baseAllocation: 50,
+              specificIngredients: 30,
+              specificLabor: 10,
+              specificOverhead: 10
+            }
+          },
+           {
+            id: 'v2',
+            name: 'Variant B',
+            totalCost: 200,
+            costPerUnit: 20,
+            recommendedPrice: 40,
+            profitPerUnit: 20,
+            profitMarginPercent: 50,
+            breakEvenPrice: 20,
+            breakdown: {
+              baseAllocation: 50,
+              specificIngredients: 130,
+              specificLabor: 10,
+              specificOverhead: 10
+            }
+          }
+        ]
+      } as any; // Use any because VariantResult might not have breakdown in the base interface yet
 
-  
+      render(<CostBreakdown results={variantResultsMock} />);
+
+      expect(screen.getByText('Batch Summary')).toBeDefined();
+      expect(screen.getByText('Cost Analysis per Variant')).toBeDefined();
+      expect(screen.getByText('Variant A')).toBeDefined();
+      expect(screen.getByText('Variant B')).toBeDefined();
+      // Check for specific cost values
+      expect(screen.getByText('₱100.00')).toBeDefined(); // Total V1
+      expect(screen.getByText('₱200.00')).toBeDefined(); // Total V2
+      // expect(screen.getByText('₱30.00')).toBeDefined(); // V1 Specific Ing - This is hidden in tooltip or aggregated
+      expect(screen.getAllByText('₱50.00').length).toBeGreaterThan(0); // V1 Total Addons (30+10+10) + Base Allocations
+      expect(screen.getByTitle(/Ing: ₱30.00/)).toBeDefined(); // Tooltip check
+    });
+
+  });

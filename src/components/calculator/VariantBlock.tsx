@@ -35,7 +35,18 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
   // Ideally, we run the calculation logic here or pass it down.
   // For now, let's keep it simple.
 
-  const maxBatchSize = variant.batchSize + remainingBatch;
+  const maxBatchSize = Math.max(0, variant.batchSize + remainingBatch);
+
+  const handleBatchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    if (isNaN(val)) {
+        onUpdate(variant.id, { batchSize: 0 });
+        return;
+    }
+    // Clamp the value between 0 and maxBatchSize
+    const clampedVal = Math.max(0, Math.min(val, maxBatchSize));
+    onUpdate(variant.id, { batchSize: clampedVal });
+  };
 
   return (
     <Card
@@ -68,10 +79,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
             label={`Batch Allocation (Max: ${maxBatchSize})`}
             type="number"
             value={variant.batchSize}
-            onChange={(e) => {
-              const val = parseFloat(e.target.value);
-              onUpdate(variant.id, { batchSize: isNaN(val) ? 0 : val });
-            }}
+            onChange={handleBatchChange}
             className="w-full"
             min={0}
             max={maxBatchSize}

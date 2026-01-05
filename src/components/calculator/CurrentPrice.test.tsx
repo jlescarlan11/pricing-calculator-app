@@ -53,4 +53,23 @@ describe('CurrentPrice', () => {
     fireEvent.change(input, { target: { value: '' } });
     expect(mockOnChange).toHaveBeenCalledWith(undefined);
   });
+
+  it('renders correctly in embedded mode', () => {
+    render(<CurrentPrice value={undefined} onChange={mockOnChange} embedded />);
+    
+    // Header should be present
+    expect(screen.getByText('Current Price')).toBeInTheDocument();
+    
+    // Toggle button should be present
+    const toggleBtn = screen.getByRole('button', { name: /Compare/i });
+    expect(toggleBtn).toBeInTheDocument();
+    
+    // Input should be hidden initially
+    expect(screen.queryByPlaceholderText('0.00')).not.toBeInTheDocument();
+    
+    // Click toggle
+    fireEvent.click(toggleBtn);
+    expect(screen.getByPlaceholderText('0.00')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Hide/i })).toBeInTheDocument();
+  });
 });

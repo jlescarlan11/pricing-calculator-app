@@ -7,6 +7,7 @@ import {
   validateBatchSize, 
   validateIngredients 
 } from '../utils/validation';
+import { calculateMaxVariantBatch } from '../utils/variantValidation';
 import type { 
   CalculationInput, 
   PricingConfig, 
@@ -159,6 +160,11 @@ export function useCalculatorState(
       const totalUsed = currentVariants.reduce((sum, v) => sum + v.batchSize, 0);
       const remaining = Math.max(0, prev.batchSize - totalUsed);
       
+      // If no capacity remains, don't add a new variant
+      if (remaining <= 0 && currentVariants.length > 0) {
+        return prev;
+      }
+
       const newVariant: Variant = {
         id: crypto.randomUUID(),
         name: `Variant ${(currentVariants.length || 0) + 1}`,
@@ -276,6 +282,11 @@ export function useCalculatorState(
         }
         if (variant.batchSize < 0) {
            newErrors[`variants.${variant.id}.batchSize`] = 'Batch size cannot be negative.';
+        }
+        
+        const maxAllowed = calculateMaxVariantBatch(variant.id, variant.batchSize, input.batchSize, input.variants || []);
+        if (variant.batchSize > maxAllowed) {
+           newErrors[`variants.${variant.id}.batchSize`] = `Allocation exceeds available units (Max: ${maxAllowed}).`;
         }
         
         // Variant ingredients validation

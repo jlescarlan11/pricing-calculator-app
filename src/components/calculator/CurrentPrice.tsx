@@ -32,19 +32,34 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
 
   if (embedded) {
     return (
-      <div className="space-y-sm">
-        <Input
-          label="Current Price"
-          type="number"
-          value={value ?? ''}
-          onChange={handleInputChange}
-          currency
-          placeholder="0.00"
-          error={error}
-          min={0}
-          step="0.01"
-          className="w-full"
-        />
+      <div className="space-y-sm" data-testid="current-price-section">
+        <div className="flex items-center justify-between mb-xs">
+          <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">Current Price</h4>
+          <Button
+            variant="ghost"
+            onClick={toggleVisibility}
+            className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-sm h-auto text-xs font-medium rounded transition-all duration-300 flex items-center gap-xs"
+          >
+            {isVisible ? 'Hide' : 'Compare'}
+            {isVisible ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </Button>
+        </div>
+        {isVisible && (
+          <div className="animate-in fade-in slide-in-from-top-1 duration-300">
+            <Input
+              type="number"
+              value={value ?? ''}
+              onChange={handleInputChange}
+              currency
+              placeholder="0.00"
+              error={error}
+              min={0}
+              step="0.01"
+              className="w-full"
+              autoFocus
+            />
+          </div>
+        )}
       </div>
     );
   }

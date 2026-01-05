@@ -111,7 +111,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
   // Calculate remaining batch for variants
   const totalVariantBatch = input.variants?.reduce((sum, v) => sum + v.batchSize, 0) || 0;
-  const remainingBatch = Math.max(0, input.batchSize - totalVariantBatch);
+  const rawRemainingBatch = input.batchSize - totalVariantBatch;
+  const remainingBatch = Math.max(0, rawRemainingBatch);
 
   // Perform calculation to get live previews for variants
   const calculationResult = React.useMemo(() => 
@@ -433,7 +434,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                              key={variant.id}
                              variant={variant}
                              index={index}
-                             remainingBatch={remainingBatch}
+                             remainingBatch={rawRemainingBatch}
                              costPerUnit={variantCostPerUnit}
                              onUpdate={onUpdateVariant}
                              onRemove={onRemoveVariant}
