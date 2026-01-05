@@ -1,4 +1,4 @@
-import type { Ingredient, PricingStrategy } from '../types/calculator';
+import type { Ingredient, PricingStrategy, VariantResult } from '../types/calculator';
 
 /**
  * Rounds a number to a specified number of decimal places.
@@ -82,8 +82,6 @@ export const calculateMarginPrice = (costPerUnit: number, marginPercent: number)
     return 0;
   }
   if (marginPercent >= 100) {
-    // Impossible to achieve 100% or more margin (cost would need to be 0 or price infinite)
-    // Returning 0 or handling as error. Per instructions: "explicitly guarded against"
     return 0;
   }
   const price = costPerUnit / (1 - marginPercent / 100);
@@ -123,7 +121,6 @@ export const calculateProfitMargin = (costPerUnit: number, sellingPrice: number)
   if (sellingPrice <= 0) {
     return 0;
   }
-  // Formula: ((Selling Price - Cost) / Selling Price) * 100
   const margin = ((sellingPrice - costPerUnit) / sellingPrice) * 100;
   return round(margin);
 };
@@ -139,32 +136,121 @@ export const performFullCalculation = (
   input: import('../types/calculator').CalculationInput,
   config: import('../types/calculator').PricingConfig
 ): import('../types/calculator').CalculationResult => {
+  // 1. Base / Total Batch Calculation
   const ingredientCost = calculateTotalIngredientCost(input.ingredients);
   const totalCost = round(ingredientCost + input.laborCost + input.overhead);
-  const costPerUnit = calculateCostPerUnit(totalCost, input.batchSize);
   
-  const recommendedPrice = calculateRecommendedPrice(
-    costPerUnit,
+  // Base Cost Per Unit (Assuming entire batch is base product)
+  const baseCostPerUnit = calculateCostPerUnit(totalCost, input.batchSize);
+  
+  // Base Recommendation (for reference or if no variants)
+  const baseRecommendedPrice = calculateRecommendedPrice(
+    baseCostPerUnit,
     config.strategy,
     config.value
   );
 
-  const profitPerUnit = round(recommendedPrice - costPerUnit);
-  const profitPerBatch = round(profitPerUnit * input.batchSize);
-  const profitMarginPercent = calculateProfitMargin(costPerUnit, recommendedPrice);
+  const baseProfitPerUnit = round(baseRecommendedPrice - baseCostPerUnit);
+  const baseProfitMarginPercent = calculateProfitMargin(baseCostPerUnit, baseRecommendedPrice);
+  
+  // If no variants, return standard result
+  if (!input.hasVariants || !input.variants || input.variants.length === 0) {
+    const profitPerBatch = round(baseProfitPerUnit * input.batchSize);
+    return {
+      totalCost,
+      costPerUnit: baseCostPerUnit,
+      breakEvenPrice: baseCostPerUnit,
+      recommendedPrice: baseRecommendedPrice,
+      profitPerBatch,
+      profitPerUnit: baseProfitPerUnit,
+      profitMarginPercent: baseProfitMarginPercent,
+      breakdown: {
+        ingredients: ingredientCost,
+        labor: input.laborCost,
+        overhead: input.overhead,
+      },
+      variantResults: undefined
+    };
+  }
+
+  // 2. Variant Calculations
+  const variantResults: VariantResult[] = [];
+  let totalVariantBatchSize = 0;
+  let totalProfit = 0;
+
+  // Process explicitly defined variants
+  input.variants.forEach(variant => {
+    totalVariantBatchSize += variant.batchSize;
+    
+    // Allocation of base cost: (Base Unit Cost * Variant Batch Size)
+    // Note: This assumes base costs are distributed evenly per unit of batch.
+    const allocatedBaseCost = baseCostPerUnit * variant.batchSize;
+    
+    // Variant specific costs
+    const variantSpecificIngredients = calculateTotalIngredientCost(variant.ingredients);
+    const variantTotalCost = allocatedBaseCost + variantSpecificIngredients + (variant.laborCost || 0) + (variant.overhead || 0);
+    
+    // Variant Unit Cost
+    const variantCostPerUnit = calculateCostPerUnit(variantTotalCost, variant.batchSize);
+    
+    // Variant Price Recommendation
+    const variantRecPrice = calculateRecommendedPrice(
+      variantCostPerUnit,
+      variant.pricingConfig.strategy,
+      variant.pricingConfig.value
+    );
+    
+    const variantProfitPerUnit = round(variantRecPrice - variantCostPerUnit);
+    const variantProfitTotal = round(variantProfitPerUnit * variant.batchSize);
+    const variantMargin = calculateProfitMargin(variantCostPerUnit, variantRecPrice);
+
+    totalProfit += variantProfitTotal;
+
+    variantResults.push({
+      id: variant.id,
+      name: variant.name,
+      totalCost: round(variantTotalCost),
+      costPerUnit: variantCostPerUnit,
+      recommendedPrice: variantRecPrice,
+      profitPerUnit: variantProfitPerUnit,
+      profitMarginPercent: variantMargin,
+      breakEvenPrice: variantCostPerUnit
+    });
+  });
+
+  // 3. Process Leftovers (Implicit "Base" Variant)
+  const remainingBatch = input.batchSize - totalVariantBatchSize;
+  
+  if (remainingBatch > 0) {
+    const leftoverProfitTotal = round(baseProfitPerUnit * remainingBatch);
+    totalProfit += leftoverProfitTotal;
+
+    // Add Base as the first result
+    variantResults.unshift({
+      id: 'base-original',
+      name: (input.productName || 'Original') + ' (Base)',
+      totalCost: round(baseCostPerUnit * remainingBatch),
+      costPerUnit: baseCostPerUnit,
+      recommendedPrice: baseRecommendedPrice,
+      profitPerUnit: baseProfitPerUnit,
+      profitMarginPercent: baseProfitMarginPercent,
+      breakEvenPrice: baseCostPerUnit
+    });
+  }
 
   return {
-    totalCost,
-    costPerUnit,
-    breakEvenPrice: costPerUnit, // At 0% profit, price equals cost per unit
-    recommendedPrice,
-    profitPerBatch,
-    profitPerUnit,
-    profitMarginPercent,
+    totalCost, // This is still the total input cost for the whole batch
+    costPerUnit: baseCostPerUnit, // Base unit cost reference
+    breakEvenPrice: baseCostPerUnit, // Base break even reference
+    recommendedPrice: baseRecommendedPrice, // Base recommendation reference
+    profitPerBatch: round(totalProfit), // Sum of all variant profits
+    profitPerUnit: baseProfitPerUnit, // Base profit ref
+    profitMarginPercent: baseProfitMarginPercent, // Base margin ref
     breakdown: {
       ingredients: ingredientCost,
       labor: input.laborCost,
       overhead: input.overhead,
     },
+    variantResults
   };
 };

@@ -12,7 +12,8 @@ import type {
   PricingConfig, 
   CalculationResult, 
   Ingredient,
-  Preset
+  Preset,
+  Variant
 } from '../types/calculator';
 
 const SESSION_STORAGE_KEY = 'pricing_calculator_draft';
@@ -23,6 +24,8 @@ const initialInput: CalculationInput = {
   ingredients: [{ id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }],
   laborCost: 0,
   overhead: 0,
+  hasVariants: false,
+  variants: []
 };
 
 const initialConfig: PricingConfig = {
@@ -46,6 +49,15 @@ export interface CalculatorState {
   updateConfig: (updates: Partial<PricingConfig>) => void;
   calculate: () => Promise<CalculationResult | null>;
   reset: () => void;
+  
+  // Variant Actions
+  setHasVariants: (enabled: boolean) => void;
+  addVariant: () => void;
+  removeVariant: (id: string) => void;
+  updateVariant: (id: string, updates: Partial<Variant>) => void;
+  updateVariantIngredient: (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => void;
+  addVariantIngredient: (variantId: string) => void;
+  removeVariantIngredient: (variantId: string, ingredientId: string) => void;
   
   // Preset Actions
   loadPreset: (preset: Preset) => void;
@@ -136,6 +148,92 @@ export function useCalculatorState(
     setConfig(prev => ({ ...prev, ...updates }));
   }, []);
 
+  // Variant Actions
+  const setHasVariants = useCallback((enabled: boolean) => {
+    updateInput({ hasVariants: enabled });
+  }, [updateInput]);
+
+  const addVariant = useCallback(() => {
+    setInput(prev => {
+      const currentVariants = prev.variants || [];
+      const totalUsed = currentVariants.reduce((sum, v) => sum + v.batchSize, 0);
+      const remaining = Math.max(0, prev.batchSize - totalUsed);
+      
+      const newVariant: Variant = {
+        id: crypto.randomUUID(),
+        name: `Variant ${(currentVariants.length || 0) + 1}`,
+        batchSize: remaining,
+        ingredients: [],
+        laborCost: 0,
+        overhead: 0,
+        pricingConfig: { ...config }
+      };
+      
+      return {
+        ...prev,
+        variants: [...currentVariants, newVariant]
+      };
+    });
+  }, [config]);
+
+  const removeVariant = useCallback((id: string) => {
+    setInput(prev => ({
+      ...prev,
+      variants: (prev.variants || []).filter(v => v.id !== id)
+    }));
+  }, []);
+
+  const updateVariant = useCallback((id: string, updates: Partial<Variant>) => {
+    setInput(prev => ({
+      ...prev,
+      variants: (prev.variants || []).map(v => 
+        v.id === id ? { ...v, ...updates } : v
+      )
+    }));
+  }, []);
+
+  const updateVariantIngredient = useCallback((variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => {
+    setInput(prev => ({
+      ...prev,
+      variants: (prev.variants || []).map(v => {
+        if (v.id !== variantId) return v;
+        return {
+          ...v,
+          ingredients: v.ingredients.map(ing => 
+            ing.id === ingredientId ? { ...ing, [field]: value } : ing
+          )
+        };
+      })
+    }));
+  }, []);
+
+  const addVariantIngredient = useCallback((variantId: string) => {
+    setInput(prev => ({
+      ...prev,
+      variants: (prev.variants || []).map(v => {
+        if (v.id !== variantId) return v;
+        return {
+          ...v,
+          ingredients: [...v.ingredients, { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }]
+        };
+      })
+    }));
+  }, []);
+
+  const removeVariantIngredient = useCallback((variantId: string, ingredientId: string) => {
+    setInput(prev => ({
+      ...prev,
+      variants: (prev.variants || []).map(v => {
+        if (v.id !== variantId) return v;
+        return {
+          ...v,
+          ingredients: v.ingredients.filter(ing => ing.id !== ingredientId)
+        };
+      })
+    }));
+  }, []);
+
+
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -164,6 +262,38 @@ export function useCalculatorState(
 
     if (input.overhead < 0 || isNaN(input.overhead)) {
       newErrors.overhead = 'Overhead must be a valid number.';
+    }
+
+    if (input.hasVariants && input.variants) {
+      const totalVariantBatch = input.variants.reduce((sum, v) => sum + v.batchSize, 0);
+      if (totalVariantBatch > input.batchSize) {
+        newErrors.variants = `Total variant batch size (${totalVariantBatch}) exceeds base batch size (${input.batchSize}).`;
+      }
+
+      input.variants.forEach((variant, idx) => {
+        if (!variant.name.trim()) {
+           newErrors[`variants.${variant.id}.name`] = 'Variant name is required.';
+        }
+        if (variant.batchSize < 0) {
+           newErrors[`variants.${variant.id}.batchSize`] = 'Batch size cannot be negative.';
+        }
+        
+        // Variant ingredients validation
+        /* 
+           Technically variant ingredients are optional (e.g. just a smaller size pack),
+           but if added, must be valid.
+        */
+        const vIngErrs = validateIngredients(variant.ingredients);
+        vIngErrs.forEach(err => {
+            const match = err.field.match(/ingredients\[(\d+)\]\.(\w+)/);
+            if (match) {
+                const index = parseInt(match[1]);
+                const field = match[2];
+                const id = variant.ingredients[index].id;
+                newErrors[`variants.${variant.id}.ingredients.${id}.${field}`] = err.message;
+            }
+        });
+      });
     }
 
     setErrors(newErrors);
@@ -197,9 +327,17 @@ export function useCalculatorState(
   }, []);
 
   const loadPreset = useCallback((preset: Preset) => {
-    setInput(preset.baseRecipe);
+    setInput({
+        ...preset.baseRecipe,
+        hasVariants: preset.presetType === 'variant',
+        variants: preset.variants || []
+    });
     setConfig(preset.pricingConfig);
-    const result = performFullCalculation(preset.baseRecipe, preset.pricingConfig);
+    const result = performFullCalculation({
+        ...preset.baseRecipe,
+        hasVariants: preset.presetType === 'variant',
+        variants: preset.variants || []
+    }, preset.pricingConfig);
     setResults(result);
     setErrors({});
   }, []);
@@ -209,8 +347,8 @@ export function useCalculatorState(
       name,
       baseRecipe: input,
       pricingConfig: config,
-      presetType: 'default',
-      variants: []
+      presetType: input.hasVariants ? 'variant' : 'default',
+      variants: input.variants || []
     });
   }, [addPreset, input, config]);
 
@@ -235,5 +373,14 @@ export function useCalculatorState(
     loadPreset,
     saveAsPreset,
     deletePreset,
+    
+    // Variant Actions Export
+    setHasVariants,
+    addVariant,
+    removeVariant,
+    updateVariant,
+    updateVariantIngredient,
+    addVariantIngredient,
+    removeVariantIngredient
   };
 }

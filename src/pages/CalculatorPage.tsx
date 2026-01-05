@@ -24,6 +24,13 @@ export const CalculatorPage: React.FC = () => {
     calculate,
     reset,
     loadPreset,
+    setHasVariants,
+    addVariant,
+    removeVariant,
+    updateVariant,
+    updateVariantIngredient,
+    addVariantIngredient,
+    removeVariantIngredient
   } = useCalculatorState();
 
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
@@ -131,6 +138,13 @@ export const CalculatorPage: React.FC = () => {
           onUpdateConfig={updateConfig}
           onCalculate={handleCalculate}
           onReset={handleReset}
+          onSetHasVariants={setHasVariants}
+          onAddVariant={addVariant}
+          onRemoveVariant={removeVariant}
+          onUpdateVariant={updateVariant}
+          onUpdateVariantIngredient={updateVariantIngredient}
+          onAddVariantIngredient={addVariantIngredient}
+          onRemoveVariantIngredient={removeVariantIngredient}
         />
       </div>
 

@@ -35,6 +35,17 @@ export interface PricingConfig {
   value: number;
 }
 
+export interface VariantResult {
+  id: string;
+  name: string;
+  totalCost: number;
+  costPerUnit: number;
+  recommendedPrice: number;
+  profitPerUnit: number;
+  profitMarginPercent: number;
+  breakEvenPrice: number;
+}
+
 export interface CalculationResult {
   totalCost: number;
   costPerUnit: number;
@@ -48,6 +59,7 @@ export interface CalculationResult {
     labor: number;
     overhead: number;
   };
+  variantResults?: VariantResult[];
 }
 
 export interface Preset {
@@ -56,7 +68,7 @@ export interface Preset {
   name: string;
   presetType: 'default' | 'variant';
   baseRecipe: CalculationInput;
-  variants: any[];
+  variants: Variant[];
   pricingConfig: PricingConfig;
   createdAt: string;
   updatedAt: string;

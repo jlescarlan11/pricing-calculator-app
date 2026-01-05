@@ -3,6 +3,7 @@ import type { CalculationResult, CalculationInput, PricingConfig } from '../../t
 import { PricingRecommendations } from './PricingRecommendations';
 import { CostBreakdown } from './CostBreakdown';
 import { PriceComparison } from './PriceComparison';
+import { VariantResultsTable } from './VariantResultsTable';
 import { ShareResults } from './ShareResults';
 import { Button } from '../shared/Button';
 import { SavePresetButton } from '../presets/SavePresetButton';
@@ -46,6 +47,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     );
   }
 
+  const hasVariants = results.variantResults && results.variantResults.length > 0;
+
   return (
     <div className="space-y-4xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
       {/* Print-only Header */}
@@ -88,9 +91,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       </div>
 
       <div className="flex flex-col gap-4xl max-w-4xl mx-auto">
-        {/* Priority 1: Recommended Price & Profit Scenarios */}
+        {/* Priority 1: Results Table (Variants) or Recommendations (Single) */}
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-          <PricingRecommendations results={results} />
+          {hasVariants ? (
+            <VariantResultsTable results={results} />
+          ) : (
+            <PricingRecommendations results={results} />
+          )}
         </div>
 
         {/* Priority 2: Cost Breakdown */}
@@ -98,15 +105,17 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <CostBreakdown results={results} />
         </div>
           
-        {/* Priority 3: Price Comparison (Context) */}
-        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-          <PriceComparison 
-            currentPrice={input.currentSellingPrice}
-            recommendedPrice={results.recommendedPrice}
-            costPerUnit={results.costPerUnit}
-            batchSize={input.batchSize}
-          />
-        </div>
+        {/* Priority 3: Price Comparison (Single Only) */}
+        {!hasVariants && (
+          <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+            <PriceComparison 
+              currentPrice={input.currentSellingPrice}
+              recommendedPrice={results.recommendedPrice}
+              costPerUnit={results.costPerUnit}
+              batchSize={input.batchSize}
+            />
+          </div>
+        )}
 
         {/* Pro Tip - Low visual weight */}
         <div className="p-xl bg-surface/50 rounded-lg border border-border-subtle print:hidden flex items-start gap-md">

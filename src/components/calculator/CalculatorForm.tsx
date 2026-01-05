@@ -8,13 +8,15 @@ import {
   PricingStrategy, 
   CurrentPrice 
 } from './index';
+import { VariantBlock } from './VariantBlock';
 import { SavePresetButton } from '../presets/SavePresetButton';
-import { Button, Card } from '../shared';
+import { Button, Card, Switch } from '../shared';
 import { performFullCalculation } from '../../utils/calculations';
 import type { 
   CalculationInput, 
   PricingConfig, 
-  Ingredient 
+  Ingredient,
+  Variant
 } from '../../types/calculator';
 
 interface CalculatorFormProps {
@@ -29,6 +31,15 @@ interface CalculatorFormProps {
   onUpdateConfig: (updates: Partial<PricingConfig>) => void;
   onCalculate: () => void;
   onReset: () => void;
+  
+  // Variant Actions
+  onSetHasVariants: (enabled: boolean) => void;
+  onAddVariant: () => void;
+  onRemoveVariant: (id: string) => void;
+  onUpdateVariant: (id: string, updates: Partial<Variant>) => void;
+  onUpdateVariantIngredient: (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => void;
+  onAddVariantIngredient: (variantId: string) => void;
+  onRemoveVariantIngredient: (variantId: string, ingredientId: string) => void;
 }
 
 export const CalculatorForm: React.FC<CalculatorFormProps> = ({ 
@@ -43,6 +54,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onUpdateConfig,
   onCalculate,
   onReset,
+  onSetHasVariants,
+  onAddVariant,
+  onRemoveVariant,
+  onUpdateVariant,
+  onUpdateVariantIngredient,
+  onAddVariantIngredient,
+  onRemoveVariantIngredient
 }) => {
   // Local state for UI only (like which ingredient is being focused, or hover states)
   // But business logic state is now passed as props.
@@ -90,6 +108,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   };
 
   const feedback = getValidationFeedback();
+
+  // Calculate remaining batch for variants
+  const totalVariantBatch = input.variants?.reduce((sum, v) => sum + v.batchSize, 0) || 0;
+  const remainingBatch = Math.max(0, input.batchSize - totalVariantBatch);
 
   return (
     <div className="flex flex-col gap-3xl w-full pb-4xl">
@@ -344,46 +366,89 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
                     <div className="h-px bg-border-subtle" role="separator" />
 
+                    {/* Section 4: Variants Toggle */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-medium text-ink-900">Variants</h3>
+                        <p className="text-sm text-ink-500">Create product variations from this base recipe</p>
+                      </div>
+                      <Switch 
+                        checked={!!input.hasVariants} 
+                        onChange={onSetHasVariants}
+                        label="Enable Variants"
+                      />
+                    </div>
+                    
+                    {errors.variants && (
+                      <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20">
+                        {errors.variants}
+                      </div>
+                    )}
+
+                    {input.hasVariants ? (
+                      <div className="space-y-xl animate-in fade-in slide-in-from-top-4 duration-300">
+                        {/* Base Variant Block */}
+                        <Card className="bg-surface/50 border-border-subtle">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-bold text-ink-900">{input.productName || 'Base Product'} (Base)</h4>
+                              <p className="text-sm text-ink-500">Remaining Base Batch</p>
+                            </div>
+                            <div className="text-2xl font-bold text-ink-900 tabular-nums">
+                              {remainingBatch} <span className="text-sm font-normal text-ink-500">units</span>
+                            </div>
+                          </div>
+                        </Card>
+
+                        {/* Variants List */}
+                        {input.variants?.map((variant, index) => (
+                           <VariantBlock
+                             key={variant.id}
+                             variant={variant}
+                             index={index}
+                             remainingBatch={remainingBatch}
+                             onUpdate={onUpdateVariant}
+                             onRemove={onRemoveVariant}
+                             onUpdateIngredient={onUpdateVariantIngredient}
+                             onAddIngredient={onAddVariantIngredient}
+                             onRemoveIngredient={onRemoveVariantIngredient}
+                             errors={errors}
+                           />
+                        ))}
+
+                        {/* Add Variant Button */}
+                        <Button
+                          variant="secondary"
+                          onClick={onAddVariant}
+                          disabled={remainingBatch <= 0}
+                          className="w-full flex items-center justify-center gap-sm py-lg border-2 border-dashed border-border-base hover:border-clay hover:text-clay transition-all"
+                        >
+                          <Plus className="w-5 h-5" />
+                          {remainingBatch > 0 ? 'Add Variant' : 'No Batch Capacity Remaining'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="animate-in fade-in slide-in-from-top-4 duration-300 space-y-xl">
+                        {/* Section 5: Pricing Strategy (Single Mode) */}
+                        <PricingStrategy 
+                          strategy={config.strategy}
+                          value={config.value}
+                          costPerUnit={
+                            performFullCalculation(input, config).costPerUnit
+                          }
+                          onChange={handlePricingChange}
+                        />
+                
+                        <div className="h-px bg-border-subtle" role="separator" />
+                
+                        {/* Section 6: Current Price Comparison (Single Mode) */}
+                        <CurrentPrice 
+                          value={input.currentSellingPrice}
+                          onChange={handleCurrentPriceChange}
+                        />
+                      </div>
+                    )}
             
-
-                    {/* Section 4: Pricing Strategy */}
-
-                    <PricingStrategy 
-
-                      strategy={config.strategy}
-
-                      value={config.value}
-
-                      costPerUnit={
-
-                        // Background calculation for preview
-
-                        performFullCalculation(input, config).costPerUnit
-
-                      }
-
-                      onChange={handlePricingChange}
-
-                    />
-
-            
-
-                    <div className="h-px bg-border-subtle" role="separator" />
-
-            
-
-                    {/* Section 5: Current Price Comparison */}
-
-                    <CurrentPrice 
-
-                      value={input.currentSellingPrice}
-
-                      onChange={handleCurrentPriceChange}
-
-                    />
-
-            
-
                     {/* Floating Mobile Action */}
 
                     <div className="fixed bottom-lg right-lg lg:hidden z-30">
