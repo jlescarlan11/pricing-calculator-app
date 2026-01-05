@@ -22,11 +22,11 @@ describe('Variant Batch Allocation Logic', () => {
   });
 
   it('calculates max batch size for a new variant (not in list)', () => {
-    // Simulating checking max for a new variant creation scenario if needed, 
+    // Simulating checking max for a new variant creation scenario if needed,
     // or if we passed a theoretical variant.
     // If variant is not in list, "currentBatchSize" passed to func is usually 0 if we are asking "how much can I add?"
     // But if we are validating a new variant being added, the formula expects "currentBatchSize" to be what is currently contributing to the sum.
-    
+
     // Scenario: User wants to add a new variant. Current sum = 50. Max = 50.
     const maxNew = calculateMaxVariantBatch('new', 0, TOTAL_BASE, mockVariants);
     expect(maxNew).toBe(50);
@@ -51,9 +51,9 @@ describe('Variant Batch Allocation Logic', () => {
     expect(result.maxAllowed).toBe(70);
     expect(result.message).toContain('cannot exceed 70');
   });
-  
+
   it('invalidates negative allocation', () => {
-      const result = validateVariantBatchAllocation('v1', -5, TOTAL_BASE, mockVariants);
-      expect(result.isValid).toBe(false);
+    const result = validateVariantBatchAllocation('v1', -5, TOTAL_BASE, mockVariants);
+    expect(result.isValid).toBe(false);
   });
 });

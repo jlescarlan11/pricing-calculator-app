@@ -34,7 +34,10 @@ describe('PresetListItem', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock window.confirm
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true)
+    );
   });
 
   it('renders preset details correctly', () => {
@@ -55,8 +58,7 @@ describe('PresetListItem', () => {
     expect(screen.getByText(/markup \(50%\)/i)).toBeInTheDocument();
     expect(screen.getByText('Jan 01, 2026')).toBeInTheDocument();
   });
-// ... rest of tests
-
+  // ... rest of tests
 
   it('calls onLoad when Load button is clicked', () => {
     render(
@@ -108,8 +110,11 @@ describe('PresetListItem', () => {
   });
 
   it('does not call onDelete when Delete button is clicked but cancelled', () => {
-    vi.stubGlobal('confirm', vi.fn(() => false));
-    
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => false)
+    );
+
     render(
       <PresetListItem
         preset={mockPreset}

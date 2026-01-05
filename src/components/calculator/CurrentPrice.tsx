@@ -34,7 +34,9 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
     return (
       <div className="space-y-sm" data-testid="current-price-section">
         <div className="flex items-center justify-between mb-xs">
-          <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">Current Price</h4>
+          <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">
+            Current Price
+          </h4>
           <Button
             variant="ghost"
             onClick={toggleVisibility}
@@ -78,7 +80,11 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
             className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-lg transition-all duration-300"
           >
             {isVisible ? 'Hide' : 'Compare'}
-            {isVisible ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
+            {isVisible ? (
+              <ChevronUp className="w-4 h-4 ml-xs" />
+            ) : (
+              <ChevronDown className="w-4 h-4 ml-xs" />
+            )}
           </Button>
         </div>
 

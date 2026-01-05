@@ -67,7 +67,9 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
               size="sm"
               onClick={() => setViewMode('grid')}
               className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-sm transition-all duration-300 ${
-                viewMode === 'grid' ? 'bg-bg-main shadow-level-1 text-clay' : 'bg-transparent text-ink-500'
+                viewMode === 'grid'
+                  ? 'bg-bg-main shadow-level-1 text-clay'
+                  : 'bg-transparent text-ink-500'
               }`}
               title="Grid view"
             >
@@ -78,7 +80,9 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
               size="sm"
               onClick={() => setViewMode('list')}
               className={`p-sm min-w-0 border-0 shadow-none hover:bg-bg-main/50 rounded-sm transition-all duration-300 ${
-                viewMode === 'list' ? 'bg-bg-main shadow-level-1 text-clay' : 'bg-transparent text-ink-500'
+                viewMode === 'list'
+                  ? 'bg-bg-main shadow-level-1 text-clay'
+                  : 'bg-transparent text-ink-500'
               }`}
               title="List view"
             >
@@ -91,10 +95,12 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
       {filteredPresets.length === 0 ? (
         <div className="text-center py-3xl bg-surface rounded-lg border border-border-subtle animate-in fade-in duration-500">
           <Search className="w-12 h-12 text-ink-300 mx-auto mb-md opacity-50" />
-          <p className="text-ink-500 font-medium">We couldn&apos;t find a match for &quot;{searchQuery}&quot;</p>
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <p className="text-ink-500 font-medium">
+            We couldn&apos;t find a match for &quot;{searchQuery}&quot;
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setSearchQuery('')}
             className="mt-md text-clay"
           >

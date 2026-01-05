@@ -34,28 +34,28 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
   const currentProfitPerUnit = currentPrice - costPerUnit;
   const currentProfitPerBatch = currentProfitPerUnit * batchSize;
 
-  let statusMessage = "";
+  let statusMessage = '';
   let statusIcon = null;
-  let statusColor = "";
+  let statusColor = '';
 
   if (isLower) {
     statusMessage = `There's an opportunity for ${formatCurrency(absDiff)} more per unit`;
     statusIcon = <TrendingUp className="w-5 h-5 shrink-0" />;
-    statusColor = "text-ink-900 bg-sakura/10 border-sakura/20";
+    statusColor = 'text-ink-900 bg-sakura/10 border-sakura/20';
   } else if (isHigher) {
     statusMessage = `Your price is ${formatCurrency(absDiff)} higher than the recommendation`;
     statusIcon = <TrendingDown className="w-5 h-5 shrink-0" />;
-    statusColor = "text-rust bg-rust/5 border-rust/10";
+    statusColor = 'text-rust bg-rust/5 border-rust/10';
   } else {
-    statusMessage = "Your pricing is perfectly aligned";
+    statusMessage = 'Your pricing is perfectly aligned';
     statusIcon = <CheckCircle className="w-5 h-5 shrink-0" />;
-    statusColor = "text-moss bg-moss/5 border-moss/10";
+    statusColor = 'text-moss bg-moss/5 border-moss/10';
   }
 
   return (
     <div className={`space-y-xl ${className}`}>
       <h3 className="text-xl font-serif text-ink-900">Comparison</h3>
-      
+
       <div className="space-y-lg">
         {/* Visual Comparison */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-xl bg-surface rounded-lg border border-border-subtle">
@@ -67,11 +67,11 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
               {formatCurrency(currentPrice)}
             </p>
           </div>
-          
+
           <div className="hidden sm:flex items-center justify-center">
             <ArrowRight className="w-8 h-8 text-border-base" />
           </div>
-          
+
           <div className="text-center sm:text-right flex-1">
             <p className="text-xs font-medium text-ink-500 uppercase tracking-widest mb-xs">
               Recommended
@@ -83,13 +83,11 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
         </div>
 
         {/* Opportunity Cost Message */}
-        <div className={`p-lg rounded-lg flex items-center gap-md transition-all duration-500 ${statusColor.replace('border', 'no-border')}`}>
-          <div className="p-sm bg-white/50 rounded-sm shadow-level-1">
-            {statusIcon}
-          </div>
-          <span className="font-bold text-sm sm:text-base tracking-tight">
-            {statusMessage}
-          </span>
+        <div
+          className={`p-lg rounded-lg flex items-center gap-md transition-all duration-500 ${statusColor.replace('border', 'no-border')}`}
+        >
+          <div className="p-sm bg-white/50 rounded-sm shadow-level-1">{statusIcon}</div>
+          <span className="font-bold text-sm sm:text-base tracking-tight">{statusMessage}</span>
         </div>
 
         {/* Profitability at Current Price */}
@@ -98,7 +96,9 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
             <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
               Current Profit / Unit
             </p>
-            <p className={`text-xl font-bold tabular-nums ${currentProfitPerUnit >= 0 ? 'text-moss' : 'text-rust'}`}>
+            <p
+              className={`text-xl font-bold tabular-nums ${currentProfitPerUnit >= 0 ? 'text-moss' : 'text-rust'}`}
+            >
               {formatCurrency(currentProfitPerUnit)}
             </p>
           </div>
@@ -107,7 +107,9 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
             <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
               Current Profit / Batch
             </p>
-            <p className={`text-xl font-bold tabular-nums ${currentProfitPerBatch >= 0 ? 'text-moss' : 'text-rust'}`}>
+            <p
+              className={`text-xl font-bold tabular-nums ${currentProfitPerBatch >= 0 ? 'text-moss' : 'text-rust'}`}
+            >
               {formatCurrency(currentProfitPerBatch)}
             </p>
           </div>

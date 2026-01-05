@@ -56,9 +56,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
             <h4 className="text-sm font-bold text-ink-900 truncate tracking-tight" title={name}>
               {name}
             </h4>
-            <p className="text-[10px] text-ink-500 font-medium">
-              {formatDate(updatedAt)}
-            </p>
+            <p className="text-[10px] text-ink-500 font-medium">{formatDate(updatedAt)}</p>
           </div>
         </div>
 
@@ -153,7 +151,9 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
       <div className="grid grid-cols-2 gap-md text-[9px] uppercase tracking-widest font-bold mb-md">
         <div className="border-r border-border-subtle pr-md">
           <span className="block text-ink-500 mb-xs opacity-70">Ingredients</span>
-          <span className="text-ink-900">{ingredients.length} item{ingredients.length !== 1 ? 's' : ''}</span>
+          <span className="text-ink-900">
+            {ingredients.length} item{ingredients.length !== 1 ? 's' : ''}
+          </span>
         </div>
         <div className="pl-md">
           <span className="block text-ink-500 mb-xs opacity-70">Strategy</span>

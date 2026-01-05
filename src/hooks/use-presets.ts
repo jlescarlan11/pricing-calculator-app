@@ -22,18 +22,31 @@ export function usePresets() {
       setError('Failed to load presets');
       setSyncStatus('error');
     }
-  }, [user?.id]);
+  }, [user]);
 
   // Initial load
   useEffect(() => {
-    loadPresets();
+    let isMounted = true;
+
+    const initialLoad = async () => {
+      if (isMounted) {
+        await loadPresets();
+      }
+    };
+
+    initialLoad();
+
+    return () => {
+      isMounted = false;
+    };
   }, [loadPresets]);
 
   // Sync listeners
   useEffect(() => {
     const handleOnline = () => {
       setSyncStatus('syncing');
-      presetService.syncPendingItems()
+      presetService
+        .syncPendingItems()
         .then(() => loadPresets())
         .catch(() => setSyncStatus('error'));
     };
@@ -48,73 +61,85 @@ export function usePresets() {
     };
   }, [loadPresets]);
 
-  const addPreset = useCallback(async (presetData: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'lastSyncedAt'>) => {
-    const newPreset: Preset = {
-      ...presetData,
-      id: crypto.randomUUID(),
-      userId: user?.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      lastSyncedAt: null,
-    };
+  const addPreset = useCallback(
+    async (
+      presetData: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'lastSyncedAt'>
+    ) => {
+      const newPreset: Preset = {
+        ...presetData,
+        id: crypto.randomUUID(),
+        userId: user?.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastSyncedAt: null,
+      };
 
-    // Optimistic update
-    setPresets(prev => [...prev, newPreset]);
-    setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+      // Optimistic update
+      setPresets((prev) => [...prev, newPreset]);
+      setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
 
-    try {
-      await presetService.savePreset(newPreset);
-      setSyncStatus(navigator.onLine ? 'synced' : 'offline');
-      return newPreset;
-    } catch (err) {
-      console.error(err);
-      setSyncStatus('error');
-      throw err;
-    }
-  }, [user?.id]);
+      try {
+        await presetService.savePreset(newPreset);
+        setSyncStatus(navigator.onLine ? 'synced' : 'offline');
+        return newPreset;
+      } catch (err) {
+        console.error(err);
+        setSyncStatus('error');
+        throw err;
+      }
+    },
+    [user]
+  );
 
   const updatePreset = useCallback(async (id: string, updates: Partial<Preset>) => {
-    setPresets(prev => {
-      const index = prev.findIndex(p => p.id === id);
+    setPresets((prev) => {
+      const index = prev.findIndex((p) => p.id === id);
       if (index === -1) return prev;
 
       const oldPreset = prev[index];
-      const newPreset = { 
-        ...oldPreset, 
-        ...updates, 
-        updatedAt: new Date().toISOString() 
+      const newPreset = {
+        ...oldPreset,
+        ...updates,
+        updatedAt: new Date().toISOString(),
       };
 
       // Trigger save (fire and forget for UI responsiveness)
-      presetService.savePreset(newPreset)
+      presetService
+        .savePreset(newPreset)
         .then(() => setSyncStatus(navigator.onLine ? 'synced' : 'offline'))
         .catch(() => setSyncStatus('error'));
-      
+
       const newArr = [...prev];
       newArr[index] = newPreset;
       return newArr;
     });
-    
+
     setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
   }, []);
 
-  const deletePreset = useCallback(async (id: string) => {
-    // Optimistic update
-    setPresets(prev => prev.filter(p => p.id !== id));
-    setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+  const deletePreset = useCallback(
+    async (id: string) => {
+      // Optimistic update
+      setPresets((prev) => prev.filter((p) => p.id !== id));
+      setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
 
-    try {
-      await presetService.deletePreset(id, user?.id);
-      setSyncStatus(navigator.onLine ? 'synced' : 'offline');
-    } catch (err) {
-      console.error(err);
-      setSyncStatus('error');
-    }
-  }, [user?.id]);
+      try {
+        await presetService.deletePreset(id, user?.id);
+        setSyncStatus(navigator.onLine ? 'synced' : 'offline');
+      } catch (err) {
+        console.error(err);
+        setSyncStatus('error');
+      }
+    },
+    [user]
+  );
 
-  const getPreset = useCallback((id: string) => {
-    return presets.find(p => p.id === id);
-  }, [presets]);
+  const getPreset = useCallback(
+    (id: string) => {
+      return presets.find((p) => p.id === id);
+    },
+    [presets]
+  );
 
   const getAllPresets = useCallback(() => {
     return presets;
@@ -129,6 +154,6 @@ export function usePresets() {
     getAllPresets,
     syncStatus,
     error,
-    refresh: loadPresets
+    refresh: loadPresets,
   };
 }

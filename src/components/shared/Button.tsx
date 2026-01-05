@@ -25,15 +25,20 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     // Primary: 1px solid #A67B5B, text matching, transparent bg, hover bg rgba(166, 123, 91, 0.05), scale 1.02
-    primary: 'border border-[#A67B5B] text-[#A67B5B] bg-transparent hover:bg-[rgba(166,123,91,0.05)] hover:scale-[1.02] focus-visible:ring-[#A67B5B]',
+    primary:
+      'border border-[#A67B5B] text-[#A67B5B] bg-transparent hover:bg-[rgba(166,123,91,0.05)] hover:scale-[1.02] focus-visible:ring-[#A67B5B]',
     // Secondary: 1px solid #D4D2CF, text #6B6761, transparent bg, hover scale 1.02
-    secondary: 'border border-[#D4D2CF] text-[#6B6761] bg-transparent hover:bg-surface-hover hover:scale-[1.02] focus-visible:ring-[#D4D2CF]',
+    secondary:
+      'border border-[#D4D2CF] text-[#6B6761] bg-transparent hover:bg-surface-hover hover:scale-[1.02] focus-visible:ring-[#D4D2CF]',
     // Success: 1px solid #7A8B73, text matching, transparent bg, hover scale 1.02
-    success: 'border border-[#7A8B73] text-[#7A8B73] bg-transparent hover:bg-[rgba(122,139,115,0.05)] hover:scale-[1.02] focus-visible:ring-[#7A8B73]',
+    success:
+      'border border-[#7A8B73] text-[#7A8B73] bg-transparent hover:bg-[rgba(122,139,115,0.05)] hover:scale-[1.02] focus-visible:ring-[#7A8B73]',
     // Danger: 1px solid #B85C38, text matching, transparent bg, hover scale 1.02
-    danger: 'border border-[#B85C38] text-[#B85C38] bg-transparent hover:bg-[rgba(184,92,56,0.05)] hover:scale-[1.02] focus-visible:ring-[#B85C38]',
+    danger:
+      'border border-[#B85C38] text-[#B85C38] bg-transparent hover:bg-[rgba(184,92,56,0.05)] hover:scale-[1.02] focus-visible:ring-[#B85C38]',
     // Ghost: maintained for backward compatibility but updated with transitions
-    ghost: 'hover:bg-surface-hover text-ink-700 hover:text-ink-900 focus-visible:ring-border-base hover:scale-[1.02]',
+    ghost:
+      'hover:bg-surface-hover text-ink-700 hover:text-ink-900 focus-visible:ring-border-base hover:scale-[1.02]',
     // Soft: maintained for backward compatibility
     soft: 'bg-moss/10 text-moss hover:bg-moss/20 focus-visible:ring-moss hover:scale-[1.02]',
   };

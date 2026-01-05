@@ -23,12 +23,11 @@ function getLocalPresets(): Preset[] {
   }
 }
 
-// Helper to set local presets
 function setLocalPresets(presets: Preset[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
-  } catch (e) {
-    console.error('Error saving local presets', e);
+  } catch {
+    console.error('Error saving local presets');
   }
 }
 
@@ -37,7 +36,7 @@ function getSyncQueue(): SyncQueueItem[] {
   try {
     const stored = localStorage.getItem(SYNC_QUEUE_KEY);
     return stored ? JSON.parse(stored) : [];
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -50,21 +49,32 @@ function setSyncQueue(queue: SyncQueueItem[]) {
 function addToSyncQueue(action: SyncAction, preset: Preset) {
   const queue = getSyncQueue();
   // Remove existing pending action for this ID to avoid duplicates (last one wins)
-  const filtered = queue.filter(item => item.preset.id !== preset.id);
+  const filtered = queue.filter((item) => item.preset.id !== preset.id);
   filtered.push({ action, preset, timestamp: Date.now() });
   setSyncQueue(filtered);
 }
 
 // Mapper: DB -> App
-function mapFromDb(row: any): Preset {
+function mapFromDb(row: {
+  id: string;
+  user_id?: string;
+  name: string;
+  preset_type: string;
+  base_recipe: Record<string, unknown>;
+  variants?: Record<string, unknown>[];
+  pricing_config: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  last_synced_at?: string | null;
+}): Preset {
   return {
     id: row.id,
     userId: row.user_id,
     name: row.name,
-    presetType: row.preset_type,
-    baseRecipe: row.base_recipe,
-    variants: row.variants || [],
-    pricingConfig: row.pricing_config,
+    presetType: row.preset_type as 'default' | 'variant',
+    baseRecipe: row.base_recipe as unknown as Preset['baseRecipe'],
+    variants: (row.variants || []) as unknown as Preset['variants'],
+    pricingConfig: row.pricing_config as unknown as Preset['pricingConfig'],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     lastSyncedAt: row.last_synced_at,
@@ -99,16 +109,11 @@ export const presetService = {
     for (const item of queue) {
       try {
         if (item.action === 'save') {
-           const { error } = await supabase
-            .from('presets')
-            .upsert(mapToDb(item.preset));
-           if (error) throw error;
+          const { error } = await supabase.from('presets').upsert(mapToDb(item.preset));
+          if (error) throw error;
         } else if (item.action === 'delete') {
-           const { error } = await supabase
-            .from('presets')
-            .delete()
-            .eq('id', item.preset.id);
-           if (error) throw error;
+          const { error } = await supabase.from('presets').delete().eq('id', item.preset.id);
+          if (error) throw error;
         }
       } catch (e) {
         console.error('Sync failed for item', item.preset.id, e);
@@ -125,24 +130,21 @@ export const presetService = {
     // 2. If online and user logged in, fetch from Supabase
     if (userId && navigator.onLine) {
       try {
-        const { data, error } = await supabase
-          .from('presets')
-          .select('*')
-          .eq('user_id', userId);
+        const { data, error } = await supabase.from('presets').select('*').eq('user_id', userId);
 
         if (error) throw error;
 
         if (data) {
           const cloudPresets = data.map(mapFromDb);
-          
+
           // 3. Merge Strategy (Last Write Wins based on updatedAt)
           const mergedMap = new Map<string, Preset>();
-          
+
           // Add local first
-          localPresets.forEach(p => mergedMap.set(p.id, p));
-          
+          localPresets.forEach((p) => mergedMap.set(p.id, p));
+
           // Merge cloud
-          cloudPresets.forEach(cloudP => {
+          cloudPresets.forEach((cloudP) => {
             const localP = mergedMap.get(cloudP.id);
             if (!localP) {
               mergedMap.set(cloudP.id, cloudP);
@@ -174,7 +176,7 @@ export const presetService = {
   async savePreset(preset: Preset): Promise<Preset> {
     // 1. Save Local
     const localPresets = getLocalPresets();
-    const index = localPresets.findIndex(p => p.id === preset.id);
+    const index = localPresets.findIndex((p) => p.id === preset.id);
     if (index >= 0) {
       localPresets[index] = preset;
     } else {
@@ -185,9 +187,7 @@ export const presetService = {
     // 2. Sync or Queue
     if (navigator.onLine && preset.userId) {
       try {
-        const { error } = await supabase
-          .from('presets')
-          .upsert(mapToDb(preset));
+        const { error } = await supabase.from('presets').upsert(mapToDb(preset));
         if (error) throw error;
       } catch (e) {
         console.error('Save to cloud failed, queuing', e);
@@ -203,8 +203,8 @@ export const presetService = {
   async deletePreset(id: string, userId?: string): Promise<void> {
     // 1. Delete Local
     const localPresets = getLocalPresets();
-    const presetToDelete = localPresets.find(p => p.id === id);
-    const filtered = localPresets.filter(p => p.id !== id);
+    const presetToDelete = localPresets.find((p) => p.id === id);
+    const filtered = localPresets.filter((p) => p.id !== id);
     setLocalPresets(filtered);
 
     if (!presetToDelete) return; // Already gone?
@@ -212,10 +212,7 @@ export const presetService = {
     // 2. Sync or Queue
     if (navigator.onLine && userId) {
       try {
-        const { error } = await supabase
-          .from('presets')
-          .delete()
-          .eq('id', id);
+        const { error } = await supabase.from('presets').delete().eq('id', id);
         if (error) throw error;
       } catch (e) {
         console.error('Delete from cloud failed, queuing', e);
@@ -224,5 +221,76 @@ export const presetService = {
     } else {
       addToSyncQueue('delete', presetToDelete);
     }
-  }
+  },
+
+  async deleteAllPresets(userId?: string): Promise<void> {
+    setLocalPresets([]);
+
+    if (navigator.onLine && userId) {
+      try {
+        const { error } = await supabase.from('presets').delete().eq('user_id', userId);
+        if (error) throw error;
+      } catch (e) {
+        console.error('Delete all from cloud failed', e);
+        // We can't easily queue "delete all", but since local is cleared,
+        // next sync/fetch might be messy.
+        // ideally we should track "reset" action.
+        // For now, let's just log error.
+        throw e;
+      }
+    }
+  },
+
+  async importPresets(
+    presets: Preset[],
+    strategy: 'merge' | 'replace',
+    userId?: string
+  ): Promise<void> {
+    if (strategy === 'replace') {
+      await this.deleteAllPresets(userId);
+    }
+
+    // 1. Local Update
+    const localPresets = getLocalPresets();
+    const mergedMap = new Map<string, Preset>();
+
+    // If merge, start with existing
+    if (strategy === 'merge') {
+      localPresets.forEach((p) => mergedMap.set(p.id, p));
+    }
+
+    // Apply imports (overwrite on conflict)
+    presets.forEach((p) => {
+      // Ensure imported presets are owned by current user if logged in
+      const presetToSave = { ...p, userId: userId || undefined };
+      mergedMap.set(presetToSave.id, presetToSave);
+    });
+
+    const finalPresets = Array.from(mergedMap.values());
+    setLocalPresets(finalPresets);
+
+    // 2. Cloud Update
+    if (navigator.onLine && userId) {
+      // Upsert only the imported presets (modified to have correct userId)
+      const presetsToSync = presets.map((p) => ({ ...p, userId }));
+
+      try {
+        const { error } = await supabase.from('presets').upsert(presetsToSync.map(mapToDb));
+        if (error) throw error;
+      } catch (e) {
+        console.error('Import sync to cloud failed', e);
+        // Queue individual saves as fallback?
+        // Or just let next sync handle it?
+        // Since we updated local, next sync check might miss them if we don't queue.
+        // Let's queue them to be safe.
+        presetsToSync.forEach((p) => addToSyncQueue('save', p));
+      }
+    } else {
+      // Offline import - queue all for sync
+      presets.forEach((p) => {
+        const presetToSave = { ...p, userId: userId || undefined };
+        addToSyncQueue('save', presetToSave);
+      });
+    }
+  },
 };

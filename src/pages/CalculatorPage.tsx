@@ -30,7 +30,7 @@ export const CalculatorPage: React.FC = () => {
     updateVariant,
     updateVariantIngredient,
     addVariantIngredient,
-    removeVariantIngredient
+    removeVariantIngredient,
   } = useCalculatorState();
 
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
@@ -71,24 +71,30 @@ export const CalculatorPage: React.FC = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
-    
+
     // Smooth scroll to form area
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [loadPreset]);
 
-  const handleLoadPreset = useCallback((preset: Preset) => {
-    loadPreset(preset);
-    setIsPresetsModalOpen(false);
-    // Scroll to results
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [loadPreset]);
+  const handleLoadPreset = useCallback(
+    (preset: Preset) => {
+      loadPreset(preset);
+      setIsPresetsModalOpen(false);
+      // Scroll to results
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [loadPreset]
+  );
 
-  const handleEditPreset = useCallback((preset: Preset) => {
-    loadPreset(preset);
-    setIsPresetsModalOpen(false);
-    // Scroll to form
-    formRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [loadPreset]);
+  const handleEditPreset = useCallback(
+    (preset: Preset) => {
+      loadPreset(preset);
+      setIsPresetsModalOpen(false);
+      // Scroll to form
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    },
+    [loadPreset]
+  );
 
   return (
     <div className="animate-in fade-in duration-700 relative pb-2xl">
@@ -100,8 +106,9 @@ export const CalculatorPage: React.FC = () => {
             <div>
               <p className="text-ink-900 font-medium mb-xs">Welcome to your profit partner.</p>
               <p className="text-ink-700 text-sm leading-relaxed">
-                Fill in your costs below. We&apos;ll help you find the perfect price to ensure your business grows sustainably. 
-                Don&apos;t forget to include your labor—your time is valuable.
+                Fill in your costs below. We&apos;ll help you find the perfect price to ensure your
+                business grows sustainably. Don&apos;t forget to include your labor—your time is
+                valuable.
               </p>
             </div>
           </div>
@@ -112,21 +119,24 @@ export const CalculatorPage: React.FC = () => {
 
       {/* Results Section (Top Priority) */}
       {showResults && (
-        <div ref={resultsRef} className="mb-4xl animate-in fade-in slide-in-from-top-8 duration-700">
-          <ResultsDisplay 
-            results={results} 
-            input={input} 
+        <div
+          ref={resultsRef}
+          className="mb-4xl animate-in fade-in slide-in-from-top-8 duration-700"
+        >
+          <ResultsDisplay
+            results={results}
+            input={input}
             config={config}
-            onEdit={handleScrollToForm} 
+            onEdit={handleScrollToForm}
           />
-          
+
           <div className="h-px bg-border-subtle my-3xl" role="separator" />
         </div>
       )}
 
       {/* Input Form Section (Secondary Priority) */}
       <div ref={formRef} id="calculator-form" className="min-h-[600px]">
-        <CalculatorForm 
+        <CalculatorForm
           input={input}
           config={config}
           errors={errors}
@@ -174,10 +184,7 @@ export const CalculatorPage: React.FC = () => {
         maxWidth="max-w-3xl"
       >
         <div className="py-md">
-          <PresetsList 
-            onLoad={handleLoadPreset}
-            onEdit={handleEditPreset}
-          />
+          <PresetsList onLoad={handleLoadPreset} onEdit={handleEditPreset} />
         </div>
       </Modal>
     </div>

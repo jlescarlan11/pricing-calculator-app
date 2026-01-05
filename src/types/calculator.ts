@@ -47,6 +47,12 @@ export interface VariantResult {
   currentSellingPrice?: number;
   currentProfitPerUnit?: number;
   currentProfitMargin?: number;
+  breakdown?: {
+    baseAllocation: number;
+    specificIngredients: number;
+    specificLabor: number;
+    specificOverhead: number;
+  };
 }
 
 export interface CalculationResult {

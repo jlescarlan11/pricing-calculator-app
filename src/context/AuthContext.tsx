@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { migrateGuestPresets } from '../utils/migration';
 
 interface AuthContextType {
   user: User | null;
@@ -25,13 +26,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      // Attempt migration on initial load if user exists
+      if (session?.user) {
+        migrateGuestPresets(session.user.id);
+      }
     });
 
     // Listen for changes on auth state (logged in, signed out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      if (event === 'SIGNED_IN' && session?.user) {
+        migrateGuestPresets(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();

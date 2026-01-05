@@ -65,10 +65,10 @@ describe('Validation Utils', () => {
     });
 
     it('should return error for NaN', () => {
-        expect(validateBatchSize(NaN)).toEqual({
-            field: 'batchSize',
-            message: 'Please enter a valid batch size.',
-        });
+      expect(validateBatchSize(NaN)).toEqual({
+        field: 'batchSize',
+        message: 'Please enter a valid batch size.',
+      });
     });
   });
 
@@ -92,12 +92,12 @@ describe('Validation Utils', () => {
         message: 'Margin is usually between 0% and 100%.',
       });
     });
-    
-     it('should return error for NaN', () => {
-        expect(validatePercentage(NaN, 0, 100, 'Margin')).toEqual({
-            field: 'Margin',
-            message: 'Please enter a valid percentage for margin.',
-        });
+
+    it('should return error for NaN', () => {
+      expect(validatePercentage(NaN, 0, 100, 'Margin')).toEqual({
+        field: 'Margin',
+        message: 'Please enter a valid percentage for margin.',
+      });
     });
   });
 
@@ -122,11 +122,11 @@ describe('Validation Utils', () => {
     });
 
     it('should return error for name with only whitespace', () => {
-        const invalidIngredient = { ...validIngredient, name: '   ' };
-        expect(validateIngredients([invalidIngredient])).toEqual([
-          { field: 'ingredients[0].name', message: 'Please name ingredient #1.' },
-        ]);
-      });
+      const invalidIngredient = { ...validIngredient, name: '   ' };
+      expect(validateIngredients([invalidIngredient])).toEqual([
+        { field: 'ingredients[0].name', message: 'Please name ingredient #1.' },
+      ]);
+    });
 
     it('should return error for zero cost', () => {
       const invalidIngredient = { ...validIngredient, cost: 0 };
@@ -141,14 +141,14 @@ describe('Validation Utils', () => {
         { field: 'ingredients[0].cost', message: 'Please provide a cost for ingredient #1.' },
       ]);
     });
-    
+
     it('should collect multiple errors', () => {
-        const invalid1 = { ...validIngredient, name: '' };
-        const invalid2 = { ...validIngredient, cost: 0 };
-        expect(validateIngredients([invalid1, invalid2])).toEqual([
-            { field: 'ingredients[0].name', message: 'Please name ingredient #1.' },
-            { field: 'ingredients[1].cost', message: 'Please provide a cost for ingredient #2.' }
-        ]);
+      const invalid1 = { ...validIngredient, name: '' };
+      const invalid2 = { ...validIngredient, cost: 0 };
+      expect(validateIngredients([invalid1, invalid2])).toEqual([
+        { field: 'ingredients[0].name', message: 'Please name ingredient #1.' },
+        { field: 'ingredients[1].cost', message: 'Please provide a cost for ingredient #2.' },
+      ]);
     });
   });
 
@@ -182,10 +182,10 @@ describe('Validation Utils', () => {
     });
 
     it('should return error for invalid control characters', () => {
-       // using a control character (null byte in the middle)
+      // using a control character (null byte in the middle)
       expect(validatePresetName('Ca\x00ke', existingNames)).toEqual({
         field: 'name',
-        message: 'Oops, that name has characters we can\'t use.',
+        message: "Oops, that name has characters we can't use.",
       });
     });
   });

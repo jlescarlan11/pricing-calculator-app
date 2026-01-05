@@ -31,18 +31,24 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-sm">
             <h3 className="text-lg font-bold text-ink-900">{label || 'Overhead Cost'}</h3>
-            <Tooltip content={
-              <div className="space-y-sm p-xs">
-                <p className="font-medium text-ink-900">Overhead includes all indirect costs of running your business.</p>
-                <p className="text-xs font-semibold text-ink-700 uppercase tracking-wider">Examples:</p>
-                <ul className="text-xs list-disc pl-md space-y-xs text-ink-600">
-                  <li>Rent and Utilities (divided by batches)</li>
-                  <li>Packaging (pouches, jars, labels)</li>
-                  <li>Marketing (ads, flyers)</li>
-                  <li>Equipment maintenance</li>
-                </ul>
-              </div>
-            }>
+            <Tooltip
+              content={
+                <div className="space-y-sm p-xs">
+                  <p className="font-medium text-ink-900">
+                    Overhead includes all indirect costs of running your business.
+                  </p>
+                  <p className="text-xs font-semibold text-ink-700 uppercase tracking-wider">
+                    Examples:
+                  </p>
+                  <ul className="text-xs list-disc pl-md space-y-xs text-ink-600">
+                    <li>Rent and Utilities (divided by batches)</li>
+                    <li>Packaging (pouches, jars, labels)</li>
+                    <li>Marketing (ads, flyers)</li>
+                    <li>Equipment maintenance</li>
+                  </ul>
+                </div>
+              }
+            >
               <button
                 type="button"
                 className="text-ink-500 hover:text-clay cursor-help transition-colors"
@@ -59,13 +65,17 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
           >
             <Calculator className="w-4 h-4 mr-sm" />
             {isHelperOpen ? 'Hide' : 'Helper'}
-            {isHelperOpen ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
+            {isHelperOpen ? (
+              <ChevronUp className="w-4 h-4 ml-xs" />
+            ) : (
+              <ChevronDown className="w-4 h-4 ml-xs" />
+            )}
           </Button>
         </div>
 
         <div className="space-y-sm">
           <Input
-            label={label ? `Total ${label} per Batch` : "Total Overhead Cost per Batch"}
+            label={label ? `Total ${label} per Batch` : 'Total Overhead Cost per Batch'}
             type="number"
             value={value === 0 ? '' : value}
             onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
@@ -77,7 +87,10 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
           />
           {value === 0 && (
             <div className="flex items-center gap-sm mt-sm">
-              <Badge variant="warning" className="flex items-center gap-xs text-[10px] py-xs px-sm uppercase tracking-wide">
+              <Badge
+                variant="warning"
+                className="flex items-center gap-xs text-[10px] py-xs px-sm uppercase tracking-wide"
+              >
                 <AlertCircle className="w-3.5 h-3.5" />
                 Zero overhead? This is rare but possible.
               </Badge>
@@ -87,10 +100,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
 
         {isHelperOpen && (
           <div className="-mx-xl -mb-xl border-t border-border-subtle bg-bg-main animate-in fade-in slide-in-from-top-2 duration-500">
-            <OverheadCalculator 
-              onApply={handleApplyOverhead}
-              initialBatchSize={batchSize}
-            />
+            <OverheadCalculator onApply={handleApplyOverhead} initialBatchSize={batchSize} />
           </div>
         )}
       </div>

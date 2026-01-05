@@ -25,7 +25,7 @@ describe('VariantResultsTable', () => {
         breakEvenPrice: 10,
         currentSellingPrice: 25,
         currentProfitPerUnit: 15,
-        currentProfitMargin: 60
+        currentProfitMargin: 60,
       },
       {
         id: 'v2',
@@ -37,16 +37,16 @@ describe('VariantResultsTable', () => {
         profitMarginPercent: 33.3,
         breakEvenPrice: 10,
         // No current price
-      }
-    ]
+      },
+    ],
   };
 
   it('renders variant results correctly', () => {
     render(<VariantResultsTable results={mockResults} />);
-    
+
     expect(screen.getByText('Variant A')).toBeInTheDocument();
     expect(screen.getByText('Variant B')).toBeInTheDocument();
-    
+
     // Check values
     expect(screen.getByText('20.00')).toBeInTheDocument(); // Rec Price A
     expect(screen.getByText('15.00')).toBeInTheDocument(); // Rec Price B
@@ -54,17 +54,17 @@ describe('VariantResultsTable', () => {
 
   it('does NOT display "Best Margin" or "Best Profit" badges', () => {
     render(<VariantResultsTable results={mockResults} />);
-    
+
     expect(screen.queryByText(/Best Margin/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Best Profit/i)).not.toBeInTheDocument();
   });
 
   it('handles missing current price gracefully', () => {
     render(<VariantResultsTable results={mockResults} />);
-    
+
     // Variant A has current price
     expect(screen.getByText('25.00')).toBeInTheDocument();
-    
+
     // Variant B does not - should show "-"
     const dashes = screen.getAllByText('-');
     expect(dashes.length).toBeGreaterThan(0);

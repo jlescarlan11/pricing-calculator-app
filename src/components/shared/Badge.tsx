@@ -11,12 +11,9 @@ export interface BadgeProps {
 /**
  * A reusable Badge component for displaying status or category tags.
  */
-export const Badge: React.FC<BadgeProps> = ({
-  children,
-  variant = 'info',
-  className = '',
-}) => {
-  const baseStyles = 'inline-flex items-center rounded-sm px-sm py-xs text-xs font-semibold transition-colors';
+export const Badge: React.FC<BadgeProps> = ({ children, variant = 'info', className = '' }) => {
+  const baseStyles =
+    'inline-flex items-center rounded-sm px-sm py-xs text-xs font-semibold transition-colors';
 
   const variants = {
     success: 'bg-moss/10 text-moss border border-moss/20',
@@ -27,9 +24,5 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const variantStyles = variants[variant];
 
-  return (
-    <span className={`${baseStyles} ${variantStyles} ${className}`}>
-      {children}
-    </span>
-  );
+  return <span className={`${baseStyles} ${variantStyles} ${className}`}>{children}</span>;
 };

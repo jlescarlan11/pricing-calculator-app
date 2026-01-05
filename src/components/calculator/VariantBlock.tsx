@@ -11,7 +11,12 @@ interface VariantBlockProps {
   costPerUnit: number;
   onUpdate: (id: string, updates: Partial<Variant>) => void;
   onRemove: (id: string) => void;
-  onUpdateIngredient: (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => void;
+  onUpdateIngredient: (
+    variantId: string,
+    ingredientId: string,
+    field: keyof Ingredient,
+    value: string | number
+  ) => void;
   onAddIngredient: (variantId: string) => void;
   onRemoveIngredient: (variantId: string, ingredientId: string) => void;
   errors?: Record<string, string>;
@@ -27,7 +32,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
   onUpdateIngredient,
   onAddIngredient,
   onRemoveIngredient,
-  errors = {}
+  errors = {},
 }) => {
   // Calculate variant specific cost per unit for preview in PricingStrategy
   // This is a rough preview; the main calculation happens in performFullCalculation
@@ -40,8 +45,8 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
   const handleBatchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     if (isNaN(val)) {
-        onUpdate(variant.id, { batchSize: 0 });
-        return;
+      onUpdate(variant.id, { batchSize: 0 });
+      return;
     }
     // Clamp the value between 0 and maxBatchSize
     const clampedVal = Math.max(0, Math.min(val, maxBatchSize));
@@ -94,38 +99,40 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
         {/* Specific Ingredients */}
         <div>
           <div className="flex items-center justify-between mb-sm">
-            <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">Additional Ingredients</h4>
+            <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">
+              Additional Ingredients
+            </h4>
             <span className="text-xs text-ink-500">{variant.ingredients.length} items</span>
           </div>
-          
+
           <div className="space-y-md">
-             <div className="flex flex-col divide-y divide-[#E6E4E1]">
-                {variant.ingredients.map((ing, idx) => (
-                  <IngredientRow
-                    key={ing.id}
-                    ingredient={ing}
-                    index={idx}
-                    isOnlyRow={false}
-                    onUpdate={(id, field, val) => onUpdateIngredient(variant.id, id, field, val)}
-                    onRemove={(id) => onRemoveIngredient(variant.id, id)}
-                    onAdd={() => onAddIngredient(variant.id)}
-                    errors={{
-                        name: errors[`variants.${variant.id}.ingredients.${ing.id}.name`],
-                        amount: errors[`variants.${variant.id}.ingredients.${ing.id}.amount`],
-                        cost: errors[`variants.${variant.id}.ingredients.${ing.id}.cost`],
-                    }}
-                  />
-                ))}
-             </div>
-             
-             <Button
-                variant="ghost"
-                onClick={() => onAddIngredient(variant.id)}
-                className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 border-2 border-dashed border-border-base transition-all duration-300"
-              >
-                <Plus className="w-5 h-5" />
-                Add Variant Ingredient
-              </Button>
+            <div className="flex flex-col divide-y divide-[#E6E4E1]">
+              {variant.ingredients.map((ing, idx) => (
+                <IngredientRow
+                  key={ing.id}
+                  ingredient={ing}
+                  index={idx}
+                  isOnlyRow={false}
+                  onUpdate={(id, field, val) => onUpdateIngredient(variant.id, id, field, val)}
+                  onRemove={(id) => onRemoveIngredient(variant.id, id)}
+                  onAdd={() => onAddIngredient(variant.id)}
+                  errors={{
+                    name: errors[`variants.${variant.id}.ingredients.${ing.id}.name`],
+                    amount: errors[`variants.${variant.id}.ingredients.${ing.id}.amount`],
+                    cost: errors[`variants.${variant.id}.ingredients.${ing.id}.cost`],
+                  }}
+                />
+              ))}
+            </div>
+
+            <Button
+              variant="ghost"
+              onClick={() => onAddIngredient(variant.id)}
+              className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 border-2 border-dashed border-border-base transition-all duration-300"
+            >
+              <Plus className="w-5 h-5" />
+              Add Variant Ingredient
+            </Button>
           </div>
         </div>
 
@@ -153,7 +160,9 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
           strategy={variant.pricingConfig.strategy}
           value={variant.pricingConfig.value}
           costPerUnit={costPerUnit}
-          onChange={(strategy, value) => onUpdate(variant.id, { pricingConfig: { strategy, value } })}
+          onChange={(strategy, value) =>
+            onUpdate(variant.id, { pricingConfig: { strategy, value } })
+          }
           embedded
         />
 

@@ -24,35 +24,53 @@ export const SampleDemo: React.FC<SampleDemoProps> = ({ onLoadSample }) => {
             <span className="bg-clay text-white text-[9px] font-bold px-sm py-[2px] rounded-sm uppercase tracking-[0.2em]">
               Interactive Example
             </span>
-            <h3 className="text-xl font-bold text-ink-900 tracking-tight">Artisan Cookie Case Study</h3>
+            <h3 className="text-xl font-bold text-ink-900 tracking-tight">
+              Artisan Cookie Case Study
+            </h3>
           </div>
           <p className="text-ink-700 text-sm mb-lg leading-relaxed font-medium">
-            Discover how to price your products with intention. This example shows a batch of 50 cookies 
-            with a sustainable 30% profit margin.
+            Discover how to price your products with intention. This example shows a batch of 50
+            cookies with a sustainable 30% profit margin.
           </p>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
             <div className="bg-bg-main p-md rounded-md border border-border-subtle shadow-level-1">
-              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Total Cost</p>
-              <p className="text-base font-bold text-ink-900">{formatCurrency(sampleResults.totalCost)}</p>
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">
+                Total Cost
+              </p>
+              <p className="text-base font-bold text-ink-900">
+                {formatCurrency(sampleResults.totalCost)}
+              </p>
             </div>
             <div className="bg-bg-main p-md rounded-md border border-border-subtle shadow-level-1">
-              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Cost/Unit</p>
-              <p className="text-base font-bold text-ink-900">{formatCurrency(sampleResults.costPerUnit)}</p>
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">
+                Cost/Unit
+              </p>
+              <p className="text-base font-bold text-ink-900">
+                {formatCurrency(sampleResults.costPerUnit)}
+              </p>
             </div>
             <div className="bg-bg-main p-md rounded-md border border-border-subtle shadow-level-1">
-              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Target Price</p>
-              <p className="text-base font-bold text-clay">{formatCurrency(sampleResults.recommendedPrice)}</p>
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">
+                Target Price
+              </p>
+              <p className="text-base font-bold text-clay">
+                {formatCurrency(sampleResults.recommendedPrice)}
+              </p>
             </div>
             <div className="bg-bg-main p-md rounded-md border border-border-subtle shadow-level-1">
-              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">Profit/Batch</p>
-              <p className="text-base font-bold text-moss">{formatCurrency(sampleResults.profitPerBatch)}</p>
+              <p className="text-[10px] uppercase text-ink-500 font-bold tracking-wider mb-xs">
+                Profit/Batch
+              </p>
+              <p className="text-base font-bold text-moss">
+                {formatCurrency(sampleResults.profitPerBatch)}
+              </p>
             </div>
           </div>
         </div>
 
         <div className="shrink-0 w-full lg:w-auto flex flex-col gap-md">
-          <Button 
+          <Button
             onClick={onLoadSample}
             variant="primary"
             className="w-full flex items-center justify-center gap-sm h-14 px-xl font-bold tracking-tight rounded-sm"
@@ -67,6 +85,6 @@ export const SampleDemo: React.FC<SampleDemoProps> = ({ onLoadSample }) => {
           </div>
         </div>
       </div>
-        </Card>
-      );
-    };
+    </Card>
+  );
+};

@@ -6,9 +6,15 @@ export interface ValidationError {
   message: string;
 }
 
-export const validatePositiveNumber = (value: number, fieldName: string): ValidationError | null => {
+export const validatePositiveNumber = (
+  value: number,
+  fieldName: string
+): ValidationError | null => {
   if (value === null || value === undefined || isNaN(value)) {
-    return { field: fieldName, message: `Please enter a valid amount for ${fieldName.toLowerCase()}.` };
+    return {
+      field: fieldName,
+      message: `Please enter a valid amount for ${fieldName.toLowerCase()}.`,
+    };
   }
   if (value <= 0) {
     return { field: fieldName, message: `${fieldName} should be greater than zero.` };
@@ -46,7 +52,10 @@ export const validatePercentage = (
   fieldName: string
 ): ValidationError | null => {
   if (value === null || value === undefined || isNaN(value)) {
-    return { field: fieldName, message: `Please enter a valid percentage for ${fieldName.toLowerCase()}.` };
+    return {
+      field: fieldName,
+      message: `Please enter a valid percentage for ${fieldName.toLowerCase()}.`,
+    };
   }
   if (value < min || value > max) {
     return { field: fieldName, message: `${fieldName} is usually between ${min}% and ${max}%.` };
@@ -58,7 +67,10 @@ export const validateIngredients = (ingredients: Ingredient[]): ValidationError[
   const errors: ValidationError[] = [];
 
   if (!ingredients || ingredients.length === 0) {
-    errors.push({ field: 'ingredients', message: 'Add at least one ingredient to begin the calculation.' });
+    errors.push({
+      field: 'ingredients',
+      message: 'Add at least one ingredient to begin the calculation.',
+    });
     return errors;
   }
 
@@ -81,11 +93,14 @@ export const validateIngredients = (ingredients: Ingredient[]): ValidationError[
   return errors;
 };
 
-export const validatePresetName = (name: string, existingNames: string[]): ValidationError | null => {
+export const validatePresetName = (
+  name: string,
+  existingNames: string[]
+): ValidationError | null => {
   if (!name) {
-     return { field: 'name', message: 'Please give your preset a name.' };
+    return { field: 'name', message: 'Please give your preset a name.' };
   }
-  
+
   const trimmedName = name.trim();
 
   if (trimmedName.length < 3 || trimmedName.length > 50) {

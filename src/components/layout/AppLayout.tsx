@@ -22,7 +22,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-bg-main flex flex-col relative">
       {showTexture && <div className="paper-texture" />}
-      
+
       <div className="relative z-10 flex flex-col min-h-screen">
         <DataWarningBanner />
         <Header />
@@ -46,9 +46,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <button
                   onClick={() => setShowTexture(!showTexture)}
                   className="text-xs text-ink-500 hover:text-ink-700 transition-colors flex items-center space-x-sm cursor-pointer"
-                  title={showTexture ? "Disable background texture" : "Enable background texture"}
+                  title={showTexture ? 'Disable background texture' : 'Enable background texture'}
                 >
-                  <span className={`w-3 h-3 rounded-full border border-current ${showTexture ? 'bg-moss border-moss' : 'bg-transparent'}`} />
+                  <span
+                    className={`w-3 h-3 rounded-full border border-current ${showTexture ? 'bg-moss border-moss' : 'bg-transparent'}`}
+                  />
                   <span>Texture {showTexture ? 'On' : 'Off'}</span>
                 </button>
                 <p className="text-center text-sm text-ink-500">

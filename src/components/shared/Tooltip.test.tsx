@@ -41,7 +41,7 @@ describe('Tooltip', () => {
     );
 
     const trigger = screen.getByRole('button', { name: /trigger/i });
-    
+
     // Initial state: not in document (conditional rendering)
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
@@ -50,15 +50,15 @@ describe('Tooltip', () => {
 
     // Should still be hidden immediately due to delay
     act(() => {
-        vi.advanceTimersByTime(100);
+      vi.advanceTimersByTime(100);
     });
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
     // After delay
     act(() => {
-        vi.advanceTimersByTime(100);
+      vi.advanceTimersByTime(100);
     });
-    
+
     const tooltip = screen.getByRole('tooltip');
     expect(tooltip).toBeInTheDocument();
     expect(tooltip).toHaveTextContent('Tooltip text');
@@ -74,22 +74,22 @@ describe('Tooltip', () => {
     );
 
     const trigger = screen.getByRole('button', { name: /trigger/i });
-    
+
     fireEvent.mouseEnter(trigger);
     act(() => {
-        vi.runAllTimers();
+      vi.runAllTimers();
     });
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
 
     fireEvent.mouseLeave(trigger);
-    
+
     // Immediately after mouseLeave, isAnimating should be false but still in DOM
     const tooltip = screen.getByRole('tooltip');
     expect(tooltip.style.opacity).toBe('0');
 
     // After fade-out duration
     act(() => {
-        vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
@@ -105,13 +105,13 @@ describe('Tooltip', () => {
 
     fireEvent.focus(trigger);
     act(() => {
-        vi.runAllTimers();
+      vi.runAllTimers();
     });
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
 
     fireEvent.blur(trigger);
     act(() => {
-        vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
@@ -124,12 +124,12 @@ describe('Tooltip', () => {
     );
 
     const trigger = screen.getByRole('button', { name: /trigger/i });
-    
+
     fireEvent.focus(trigger);
     act(() => {
-        vi.runAllTimers();
+      vi.runAllTimers();
     });
-    
+
     const tooltip = screen.getByRole('tooltip');
     expect(trigger).toHaveAttribute('aria-describedby', tooltip.id);
   });
@@ -146,14 +146,14 @@ describe('Tooltip', () => {
     // First click shows it
     fireEvent.click(trigger);
     act(() => {
-        vi.runAllTimers();
+      vi.runAllTimers();
     });
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
-    
+
     // Second click hides it
     fireEvent.click(trigger);
     act(() => {
-        vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
@@ -169,14 +169,14 @@ describe('Tooltip', () => {
 
     fireEvent.click(trigger);
     act(() => {
-        vi.runAllTimers();
+      vi.runAllTimers();
     });
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
 
     // Click elsewhere in document
     fireEvent.mouseDown(document.body);
     act(() => {
-        vi.advanceTimersByTime(150);
+      vi.advanceTimersByTime(150);
     });
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });

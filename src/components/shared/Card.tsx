@@ -19,18 +19,21 @@ export const Card: React.FC<CardProps> = ({
   interactive = false,
   texture = false,
 }) => {
-  const baseClasses = 'bg-surface rounded-lg border border-border-subtle shadow-level-1 overflow-hidden relative transition-all duration-[400ms] ease-in-out';
-  const interactiveClasses = interactive ? 'hover:shadow-level-2 hover:-translate-y-0.5 cursor-pointer' : '';
-  
+  const baseClasses =
+    'bg-surface rounded-lg border border-border-subtle shadow-level-1 overflow-hidden relative transition-all duration-[400ms] ease-in-out';
+  const interactiveClasses = interactive
+    ? 'hover:shadow-level-2 hover:-translate-y-0.5 cursor-pointer'
+    : '';
+
   return (
     <div className={`${baseClasses} ${interactiveClasses} ${className}`}>
       {texture && <div className="paper-texture absolute inset-0 opacity-30 pointer-events-none" />}
-      
+
       {noPadding ? (
         <>
           {title && (
             <div className="p-lg md:p-xl pb-0">
-               {typeof title === 'string' ? (
+              {typeof title === 'string' ? (
                 <h3 className="font-serif text-xl font-semibold text-ink-900 mb-lg">{title}</h3>
               ) : (
                 title
@@ -39,9 +42,7 @@ export const Card: React.FC<CardProps> = ({
           )}
           {children}
           {footer && (
-             <div className="border-t border-border-subtle bg-bg-main/50 p-lg md:p-xl">
-               {footer}
-             </div>
+            <div className="border-t border-border-subtle bg-bg-main/50 p-lg md:p-xl">{footer}</div>
           )}
         </>
       ) : (
@@ -55,14 +56,10 @@ export const Card: React.FC<CardProps> = ({
               )}
             </div>
           )}
-          
+
           {children}
-          
-          {footer && (
-            <div className="mt-lg pt-lg border-t border-border-subtle">
-              {footer}
-            </div>
-          )}
+
+          {footer && <div className="mt-lg pt-lg border-t border-border-subtle">{footer}</div>}
         </div>
       )}
     </div>

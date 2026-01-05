@@ -11,7 +11,9 @@ export const FAQPage: React.FC = () => {
         </div>
         <div>
           <h1 className="text-3xl text-ink-900">Pricing Knowledge</h1>
-          <p className="text-ink-500 font-medium mt-xs">Expert guidance for sustainable business growth.</p>
+          <p className="text-ink-500 font-medium mt-xs">
+            Expert guidance for sustainable business growth.
+          </p>
         </div>
       </div>
 

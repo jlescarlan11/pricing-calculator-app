@@ -30,15 +30,15 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   const calculatePosition = useCallback((pos: 'top' | 'right' | 'bottom' | 'left'): Coords => {
     if (!triggerRef.current) return { top: 0, left: 0, position: pos };
-    
+
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const scrollX = window.scrollX;
     const scrollY = window.scrollY;
-    
+
     // We need to know the tooltip dimensions to adjust positioning
     // Since it might not be rendered yet, we use a placeholder or wait for render
     // For now, we'll calculate based on trigger and use CSS for centering
-    
+
     let top = 0;
     let left = 0;
 
@@ -70,7 +70,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    
+
     let finalPos = preferredPosition;
 
     // Basic boundary detection and flipping
@@ -92,13 +92,13 @@ export const Tooltip: React.FC<TooltipProps> = ({
     timeoutRef.current = setTimeout(() => {
       setIsVisible(true);
       setIsAnimating(true);
-      
+
       // Force position update immediately
       if (triggerRef.current) {
         const triggerRect = triggerRef.current.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        
+
         let finalPos = preferredPosition;
 
         // Basic boundary detection and flipping
@@ -169,14 +169,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   const getTooltipStyles = () => {
     if (!coords) return { opacity: 0 };
-    
+
     const baseStyles: React.CSSProperties = {
       position: 'absolute',
       top: `${coords.top}px`,
       left: `${coords.left}px`,
       transform: '',
-      transition: isAnimating 
-        ? 'opacity 200ms ease-in-out, transform 200ms ease-in-out' 
+      transition: isAnimating
+        ? 'opacity 200ms ease-in-out, transform 200ms ease-in-out'
         : 'opacity 150ms ease-in-out, transform 150ms ease-in-out',
       opacity: isAnimating ? 1 : 0,
     };
@@ -201,7 +201,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   const getArrowStyles = () => {
     if (!coords) return {};
-    
+
     const arrowSize = 6;
     const styles: React.CSSProperties = {
       position: 'absolute',
@@ -255,24 +255,28 @@ export const Tooltip: React.FC<TooltipProps> = ({
         onFocus={showTooltip}
         onBlur={hideTooltip}
       >
-        {React.cloneElement(children as React.ReactElement, {
-          'aria-describedby': isVisible ? tooltipId : undefined,
-        } as Record<string, unknown>)}
+        {React.cloneElement(
+          children as React.ReactElement,
+          {
+            'aria-describedby': isVisible ? tooltipId : undefined,
+          } as Record<string, unknown>
+        )}
       </div>
 
-      {isVisible && createPortal(
-        <div
-          ref={tooltipRef}
-          id={tooltipId}
-          role="tooltip"
-          className="pointer-events-none z-[9999] w-max max-w-[280px] whitespace-normal break-words rounded-[6px] bg-[#3A3632] px-[12px] py-[8px] text-[13px] font-sans leading-[1.4] text-[#FAFAF9] shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-          style={getTooltipStyles()}
-        >
-          {content}
-          <div style={getArrowStyles()} aria-hidden="true" />
-        </div>,
-        document.body
-      )}
+      {isVisible &&
+        createPortal(
+          <div
+            ref={tooltipRef}
+            id={tooltipId}
+            role="tooltip"
+            className="pointer-events-none z-[9999] w-max max-w-[280px] whitespace-normal break-words rounded-[6px] bg-[#3A3632] px-[12px] py-[8px] text-[13px] font-sans leading-[1.4] text-[#FAFAF9] shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+            style={getTooltipStyles()}
+          >
+            {content}
+            <div style={getArrowStyles()} aria-hidden="true" />
+          </div>,
+          document.body
+        )}
     </>
   );
 };

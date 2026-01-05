@@ -24,10 +24,10 @@ describe('Header', () => {
 
   it('shows version information in mobile menu', () => {
     renderWithRouter(<Header />);
-    
+
     const menuButton = screen.getByRole('button', { name: /Open main menu/i });
     fireEvent.click(menuButton);
-    
+
     expect(screen.getByText(/Version 0\.1\.0/i)).toBeInTheDocument();
   });
 
@@ -40,10 +40,10 @@ describe('Header', () => {
 
   it('toggles mobile menu', () => {
     renderWithRouter(<Header />);
-    
+
     const menuButton = screen.getByRole('button', { name: /Open main menu/i });
     fireEvent.click(menuButton);
-    
+
     // Check if mobile menu links are visible
     const links = screen.getAllByRole('link', { name: /Calculator/i });
     expect(links.length).toBeGreaterThan(1);

@@ -9,7 +9,7 @@ describe('copy-to-clipboard utility', () => {
     ingredients: [],
     laborCost: 100,
     overhead: 50,
-    businessName: 'My Bakery'
+    businessName: 'My Bakery',
   };
 
   const mockResult: CalculationResult = {
@@ -23,8 +23,8 @@ describe('copy-to-clipboard utility', () => {
     breakdown: {
       ingredients: 0,
       labor: 100,
-      overhead: 50
-    }
+      overhead: 50,
+    },
   };
 
   describe('formatCalculationSummary', () => {
@@ -66,12 +66,12 @@ describe('copy-to-clipboard utility', () => {
           writeText: vi.fn().mockResolvedValue(undefined),
         },
         configurable: true,
-        writable: true
+        writable: true,
       });
-      
+
       // Mock execCommand
       document.execCommand = vi.fn().mockReturnValue(true);
-      
+
       // Mock window.isSecureContext
       vi.stubGlobal('isSecureContext', true);
     });
@@ -81,7 +81,7 @@ describe('copy-to-clipboard utility', () => {
       Object.defineProperty(navigator, 'clipboard', {
         value: originalClipboard,
         configurable: true,
-        writable: true
+        writable: true,
       });
       document.execCommand = originalExecCommand;
       vi.unstubAllGlobals();
@@ -105,9 +105,9 @@ describe('copy-to-clipboard utility', () => {
       Object.defineProperty(navigator, 'clipboard', {
         value: undefined,
         configurable: true,
-        writable: true
+        writable: true,
       });
-      
+
       const success = await copyToClipboard('test text');
       expect(document.execCommand).toHaveBeenCalledWith('copy');
       expect(success).toBe(true);

@@ -15,13 +15,13 @@ function App() {
             <Route path="/help" element={<HelpPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route 
-              path="/account" 
+            <Route
+              path="/account"
               element={
                 <ProtectedRoute>
                   <AccountPage />
                 </ProtectedRoute>
-              } 
+              }
             />
           </Routes>
         </AppLayout>

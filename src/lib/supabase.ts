@@ -19,14 +19,15 @@ export const supabase = createClient(
 export const checkSupabaseConnection = async (): Promise<boolean> => {
   try {
     const { error } = await supabase.from('not_existing_table').select('*').limit(1);
-    if (error && error.code !== '42P01') { // 42P01 is undefined_table, which is expected
-      // We only care if it's a connection error, but since we don't know the exact code for connection, 
+    if (error && error.code !== '42P01') {
+      // 42P01 is undefined_table, which is expected
+      // We only care if it's a connection error, but since we don't know the exact code for connection,
       // and getSession is safer.
       // Let's just suppress the linter by logging it in debug if ever needed.
-      // Actually, let's just use getSession() primarily as done below and remove this table check block 
+      // Actually, let's just use getSession() primarily as done below and remove this table check block
       // as it was causing the unused var issue and is less reliable.
     }
-    
+
     // Changing the implementation to avoid the unused var and be cleaner:
     if (!supabaseUrl || !supabaseAnonKey) return false;
 

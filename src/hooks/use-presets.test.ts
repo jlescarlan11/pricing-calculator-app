@@ -17,7 +17,7 @@ const mockPreset: Preset = {
   variants: [],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  userId: 'user-1'
+  userId: 'user-1',
 };
 
 describe('usePresets', () => {
@@ -30,31 +30,31 @@ describe('usePresets', () => {
     (presetService.syncPendingItems as Mock).mockResolvedValue(undefined);
     // Mock navigator.onLine
     Object.defineProperty(navigator, 'onLine', {
-        value: true,
-        configurable: true,
-        writable: true
+      value: true,
+      configurable: true,
+      writable: true,
     });
   });
 
   it('should fetch presets on mount', async () => {
     (presetService.fetchPresets as Mock).mockResolvedValue([mockPreset]);
-    
+
     const { result } = renderHook(() => usePresets());
-    
+
     // Initial state might be syncing or synced depending on how fast the promise resolves or if we check immediately
     // In strict mode, effects run twice.
-    
+
     await waitFor(() => {
-        expect(result.current.presets).toHaveLength(1);
+      expect(result.current.presets).toHaveLength(1);
     });
-    
+
     expect(presetService.fetchPresets).toHaveBeenCalledWith('user-1');
     expect(result.current.syncStatus).toBe('synced');
   });
 
   it('should add a preset optimistically', async () => {
     const { result } = renderHook(() => usePresets());
-    
+
     await waitFor(() => expect(result.current.syncStatus).toBe('synced'));
 
     let newPresetPromise: Promise<Preset>;
@@ -64,7 +64,7 @@ describe('usePresets', () => {
         baseRecipe: mockPreset.baseRecipe,
         pricingConfig: mockPreset.pricingConfig,
         presetType: 'default',
-        variants: []
+        variants: [],
       });
     });
 
@@ -75,7 +75,7 @@ describe('usePresets', () => {
     expect(result.current.syncStatus).toBe('syncing');
 
     await act(async () => {
-        await newPresetPromise;
+      await newPresetPromise;
     });
 
     expect(presetService.savePreset).toHaveBeenCalled();
@@ -85,7 +85,7 @@ describe('usePresets', () => {
   it('should delete a preset optimistically', async () => {
     (presetService.fetchPresets as Mock).mockResolvedValue([mockPreset]);
     const { result } = renderHook(() => usePresets());
-    
+
     await waitFor(() => expect(result.current.presets).toHaveLength(1));
 
     act(() => {
@@ -101,11 +101,11 @@ describe('usePresets', () => {
 
   it('should handle offline status', async () => {
     Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
-    
+
     const { result } = renderHook(() => usePresets());
-    
+
     await waitFor(() => {
-       expect(result.current.syncStatus).toBe('offline'); 
+      expect(result.current.syncStatus).toBe('offline');
     });
   });
 });

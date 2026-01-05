@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 /**
  * Custom hook that debounces a value.
  * Useful for limiting the rate at which a function or effect is triggered.
- * 
+ *
  * @param value - The value to debounce.
  * @param delay - The delay in milliseconds.
  * @returns The debounced value.

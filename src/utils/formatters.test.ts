@@ -28,7 +28,7 @@ describe('formatters', () => {
       expect(formatted).toContain('₱');
       expect(formatted).toContain('1,000.00');
       // Ideally check for negative sign presence
-      expect(formatted).toMatch(/-₱|₱-|-\s₱/); 
+      expect(formatted).toMatch(/-₱|₱-|-\s₱/);
     });
 
     it('handles large numbers', () => {

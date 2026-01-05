@@ -37,7 +37,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
         <h3 className="text-2xl text-ink-900 mb-sm">Shall we begin?</h3>
         <p className="text-ink-500 max-w-sm mx-auto mb-2xl leading-relaxed font-medium">
-          Input your ingredients, labor, and overhead costs to see your recommended selling price and profit analysis.
+          Input your ingredients, labor, and overhead costs to see your recommended selling price
+          and profit analysis.
         </p>
         <Button onClick={onEdit} variant="primary" className="gap-sm px-xl py-md">
           <Edit2 className="w-4 h-4" />
@@ -55,13 +56,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       <div className="hidden print:block border-b border-ink-900 pb-xl mb-3xl">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl text-ink-900 mb-sm">
-              {getPrintTitle(input)}
-            </h1>
+            <h1 className="text-3xl text-ink-900 mb-sm">{getPrintTitle(input)}</h1>
             <h2 className="text-xl font-medium text-ink-700">Product Pricing Report</h2>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">Date Generated</p>
+            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest mb-xs">
+              Date Generated
+            </p>
             <p className="text-xl font-bold text-ink-900 tracking-tight">{getPrintDate()}</p>
           </div>
         </div>
@@ -72,21 +73,19 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         <div>
           <h2 className="text-3xl font-serif text-ink-900">Results</h2>
           <p className="text-sm text-ink-500 mt-xs font-medium">
-            Analysis for <span className="text-ink-900">{input.productName || 'Unnamed Product'}</span>
+            Analysis for{' '}
+            <span className="text-ink-900">{input.productName || 'Unnamed Product'}</span>
           </p>
         </div>
         <div className="flex items-center gap-sm w-full sm:w-auto">
-          <SavePresetButton 
+          <SavePresetButton
             input={input}
             config={config}
             variant="primary"
             size="sm"
             className="flex-1 sm:flex-none"
           />
-          <ShareResults 
-            results={results} 
-            input={input} 
-          />
+          <ShareResults results={results} input={input} />
         </div>
       </div>
 
@@ -104,11 +103,11 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
           <CostBreakdown results={results} />
         </div>
-          
+
         {/* Priority 3: Price Comparison (Single Only) */}
         {!hasVariants && (
           <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-            <PriceComparison 
+            <PriceComparison
               currentPrice={input.currentSellingPrice}
               recommendedPrice={results.recommendedPrice}
               costPerUnit={results.costPerUnit}
@@ -123,9 +122,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <Share2 className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-ink-900 mb-xs">Pro Tip: Optimize your Batch Size</h4>
+            <h4 className="text-sm font-bold text-ink-900 mb-xs">
+              Pro Tip: Optimize your Batch Size
+            </h4>
             <p className="text-ink-500 text-sm leading-relaxed">
-              Small adjustments to your batch size or ingredient sourcing can have a huge impact on your final profit margin. Try experimenting with different batch sizes to find your &quot;sweet spot&quot;.
+              Small adjustments to your batch size or ingredient sourcing can have a huge impact on
+              your final profit margin. Try experimenting with different batch sizes to find your
+              &quot;sweet spot&quot;.
             </p>
           </div>
         </div>
@@ -134,7 +137,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       {/* Print Footer */}
       <div className="hidden print:block mt-2xl pt-xl border-t border-border-subtle text-center text-ink-500 text-xs font-medium">
         <p>This pricing report was generated using PriceCraft.</p>
-        <p className="mt-xs">Values are estimates based on user-provided costs and selected pricing strategies.</p>
+        <p className="mt-xs">
+          Values are estimates based on user-provided costs and selected pricing strategies.
+        </p>
       </div>
     </div>
   );

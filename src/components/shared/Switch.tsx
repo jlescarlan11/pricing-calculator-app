@@ -10,9 +10,9 @@ interface SwitchProps {
 export const Switch: React.FC<SwitchProps> = ({ checked, onChange, label, className = '' }) => {
   return (
     <label className={`inline-flex items-center cursor-pointer ${className}`}>
-      <input 
-        type="checkbox" 
-        className="sr-only peer" 
+      <input
+        type="checkbox"
+        className="sr-only peer"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />

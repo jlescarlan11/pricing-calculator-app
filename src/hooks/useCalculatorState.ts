@@ -2,19 +2,15 @@ import { useState, useCallback, useEffect } from 'react';
 import { usePresets } from './use-presets';
 import { useSessionStorage } from './use-session-storage';
 import { performFullCalculation } from '../utils/calculations';
-import { 
-  validateProductName, 
-  validateBatchSize, 
-  validateIngredients 
-} from '../utils/validation';
+import { validateProductName, validateBatchSize, validateIngredients } from '../utils/validation';
 import { calculateMaxVariantBatch } from '../utils/variantValidation';
-import type { 
-  CalculationInput, 
-  PricingConfig, 
-  CalculationResult, 
+import type {
+  CalculationInput,
+  PricingConfig,
+  CalculationResult,
   Ingredient,
   Preset,
-  Variant
+  Variant,
 } from '../types/calculator';
 
 const SESSION_STORAGE_KEY = 'pricing_calculator_draft';
@@ -26,7 +22,7 @@ const initialInput: CalculationInput = {
   laborCost: 0,
   overhead: 0,
   hasVariants: false,
-  variants: []
+  variants: [],
 };
 
 const initialConfig: PricingConfig = {
@@ -41,7 +37,7 @@ export interface CalculatorState {
   errors: Record<string, string>;
   isCalculating: boolean;
   presets: Preset[];
-  
+
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
   updateIngredient: (id: string, field: keyof Ingredient, value: string | number) => void;
@@ -50,16 +46,21 @@ export interface CalculatorState {
   updateConfig: (updates: Partial<PricingConfig>) => void;
   calculate: () => Promise<CalculationResult | null>;
   reset: () => void;
-  
+
   // Variant Actions
   setHasVariants: (enabled: boolean) => void;
   addVariant: () => void;
   removeVariant: (id: string) => void;
   updateVariant: (id: string, updates: Partial<Variant>) => void;
-  updateVariantIngredient: (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => void;
+  updateVariantIngredient: (
+    variantId: string,
+    ingredientId: string,
+    field: keyof Ingredient,
+    value: string | number
+  ) => void;
   addVariantIngredient: (variantId: string) => void;
   removeVariantIngredient: (variantId: string, ingredientId: string) => void;
-  
+
   // Preset Actions
   loadPreset: (preset: Preset) => void;
   saveAsPreset: (name: string) => Promise<Preset>;
@@ -70,11 +71,12 @@ export interface CalculatorState {
  * Global calculator state hook.
  * Centralizes management of form state, calculation results, and presets.
  */
-export function useCalculatorState(
-  initialValues?: { input?: CalculationInput; config?: PricingConfig }
-): CalculatorState {
+export function useCalculatorState(initialValues?: {
+  input?: CalculationInput;
+  config?: PricingConfig;
+}): CalculatorState {
   const { presets, addPreset, deletePreset: removePreset } = usePresets();
-  
+
   // Persistence using sessionStorage
   const [draft, setDraft] = useSessionStorage<{
     input: CalculationInput;
@@ -99,67 +101,70 @@ export function useCalculatorState(
   }, [input, config, setDraft]);
 
   const updateInput = useCallback((updates: Partial<CalculationInput>) => {
-    setInput(prev => ({ ...prev, ...updates }));
-    
+    setInput((prev) => ({ ...prev, ...updates }));
+
     // Clear top-level errors if they exist
-    setErrors(prev => {
+    setErrors((prev) => {
       const next = { ...prev };
-      Object.keys(updates).forEach(key => {
+      Object.keys(updates).forEach((key) => {
         delete next[key];
       });
       return next;
     });
   }, []);
 
-  const updateIngredient = useCallback((id: string, field: keyof Ingredient, value: string | number) => {
-    setInput(prev => ({
-      ...prev,
-      ingredients: prev.ingredients.map(ing => 
-        ing.id === id ? { ...ing, [field]: value } : ing
-      )
-    }));
+  const updateIngredient = useCallback(
+    (id: string, field: keyof Ingredient, value: string | number) => {
+      setInput((prev) => ({
+        ...prev,
+        ingredients: prev.ingredients.map((ing) =>
+          ing.id === id ? { ...ing, [field]: value } : ing
+        ),
+      }));
 
-    // Clear specific ingredient error
-    setErrors(prev => {
-      const next = { ...prev };
-      delete next[`ingredients.${id}.${field}`];
-      delete next['ingredients'];
-      return next;
-    });
-  }, []);
+      // Clear specific ingredient error
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[`ingredients.${id}.${field}`];
+        delete next['ingredients'];
+        return next;
+      });
+    },
+    []
+  );
 
   const addIngredient = useCallback(() => {
-    setInput(prev => ({
+    setInput((prev) => ({
       ...prev,
-      ingredients: [
-        ...prev.ingredients,
-        { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }
-      ]
+      ingredients: [...prev.ingredients, { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }],
     }));
   }, []);
 
   const removeIngredient = useCallback((id: string) => {
-    setInput(prev => ({
+    setInput((prev) => ({
       ...prev,
-      ingredients: prev.ingredients.filter(ing => ing.id !== id)
+      ingredients: prev.ingredients.filter((ing) => ing.id !== id),
     }));
   }, []);
 
   const updateConfig = useCallback((updates: Partial<PricingConfig>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev) => ({ ...prev, ...updates }));
   }, []);
 
   // Variant Actions
-  const setHasVariants = useCallback((enabled: boolean) => {
-    updateInput({ hasVariants: enabled });
-  }, [updateInput]);
+  const setHasVariants = useCallback(
+    (enabled: boolean) => {
+      updateInput({ hasVariants: enabled });
+    },
+    [updateInput]
+  );
 
   const addVariant = useCallback(() => {
-    setInput(prev => {
+    setInput((prev) => {
       const currentVariants = prev.variants || [];
       const totalUsed = currentVariants.reduce((sum, v) => sum + v.batchSize, 0);
       const remaining = Math.max(0, prev.batchSize - totalUsed);
-      
+
       // If no capacity remains, don't add a new variant
       if (remaining <= 0 && currentVariants.length > 0) {
         return prev;
@@ -172,73 +177,76 @@ export function useCalculatorState(
         ingredients: [],
         laborCost: 0,
         overhead: 0,
-        pricingConfig: { ...config }
+        pricingConfig: { ...config },
       };
-      
+
       return {
         ...prev,
-        variants: [...currentVariants, newVariant]
+        variants: [...currentVariants, newVariant],
       };
     });
   }, [config]);
 
   const removeVariant = useCallback((id: string) => {
-    setInput(prev => ({
+    setInput((prev) => ({
       ...prev,
-      variants: (prev.variants || []).filter(v => v.id !== id)
+      variants: (prev.variants || []).filter((v) => v.id !== id),
     }));
   }, []);
 
   const updateVariant = useCallback((id: string, updates: Partial<Variant>) => {
-    setInput(prev => ({
+    setInput((prev) => ({
       ...prev,
-      variants: (prev.variants || []).map(v => 
-        v.id === id ? { ...v, ...updates } : v
-      )
+      variants: (prev.variants || []).map((v) => (v.id === id ? { ...v, ...updates } : v)),
     }));
   }, []);
 
-  const updateVariantIngredient = useCallback((variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => {
-    setInput(prev => ({
-      ...prev,
-      variants: (prev.variants || []).map(v => {
-        if (v.id !== variantId) return v;
-        return {
-          ...v,
-          ingredients: v.ingredients.map(ing => 
-            ing.id === ingredientId ? { ...ing, [field]: value } : ing
-          )
-        };
-      })
-    }));
-  }, []);
+  const updateVariantIngredient = useCallback(
+    (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => {
+      setInput((prev) => ({
+        ...prev,
+        variants: (prev.variants || []).map((v) => {
+          if (v.id !== variantId) return v;
+          return {
+            ...v,
+            ingredients: v.ingredients.map((ing) =>
+              ing.id === ingredientId ? { ...ing, [field]: value } : ing
+            ),
+          };
+        }),
+      }));
+    },
+    []
+  );
 
   const addVariantIngredient = useCallback((variantId: string) => {
-    setInput(prev => ({
+    setInput((prev) => ({
       ...prev,
-      variants: (prev.variants || []).map(v => {
+      variants: (prev.variants || []).map((v) => {
         if (v.id !== variantId) return v;
         return {
           ...v,
-          ingredients: [...v.ingredients, { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }]
+          ingredients: [
+            ...v.ingredients,
+            { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 },
+          ],
         };
-      })
+      }),
     }));
   }, []);
 
   const removeVariantIngredient = useCallback((variantId: string, ingredientId: string) => {
-    setInput(prev => ({
+    setInput((prev) => ({
       ...prev,
-      variants: (prev.variants || []).map(v => {
+      variants: (prev.variants || []).map((v) => {
         if (v.id !== variantId) return v;
         return {
           ...v,
-          ingredients: v.ingredients.filter(ing => ing.id !== ingredientId)
+          ingredients: v.ingredients.filter((ing) => ing.id !== ingredientId),
         };
-      })
+      }),
     }));
   }, []);
-
 
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
@@ -250,7 +258,7 @@ export function useCalculatorState(
     if (batchErr) newErrors.batchSize = batchErr.message;
 
     const ingErrs = validateIngredients(input.ingredients);
-    ingErrs.forEach(err => {
+    ingErrs.forEach((err) => {
       const match = err.field.match(/ingredients\[(\d+)\]\.(\w+)/);
       if (match) {
         const index = parseInt(match[1]);
@@ -278,31 +286,37 @@ export function useCalculatorState(
 
       input.variants.forEach((variant) => {
         if (!variant.name.trim()) {
-           newErrors[`variants.${variant.id}.name`] = 'Variant name is required.';
+          newErrors[`variants.${variant.id}.name`] = 'Variant name is required.';
         }
         if (variant.batchSize < 0) {
-           newErrors[`variants.${variant.id}.batchSize`] = 'Batch size cannot be negative.';
+          newErrors[`variants.${variant.id}.batchSize`] = 'Batch size cannot be negative.';
         }
-        
-        const maxAllowed = calculateMaxVariantBatch(variant.id, variant.batchSize, input.batchSize, input.variants || []);
+
+        const maxAllowed = calculateMaxVariantBatch(
+          variant.id,
+          variant.batchSize,
+          input.batchSize,
+          input.variants || []
+        );
         if (variant.batchSize > maxAllowed) {
-           newErrors[`variants.${variant.id}.batchSize`] = `Allocation exceeds available units (Max: ${maxAllowed}).`;
+          newErrors[`variants.${variant.id}.batchSize`] =
+            `Allocation exceeds available units (Max: ${maxAllowed}).`;
         }
-        
+
         // Variant ingredients validation
         /* 
            Technically variant ingredients are optional (e.g. just a smaller size pack),
            but if added, must be valid.
         */
         const vIngErrs = validateIngredients(variant.ingredients);
-        vIngErrs.forEach(err => {
-            const match = err.field.match(/ingredients\[(\d+)\]\.(\w+)/);
-            if (match) {
-                const index = parseInt(match[1]);
-                const field = match[2];
-                const id = variant.ingredients[index].id;
-                newErrors[`variants.${variant.id}.ingredients.${id}.${field}`] = err.message;
-            }
+        vIngErrs.forEach((err) => {
+          const match = err.field.match(/ingredients\[(\d+)\]\.(\w+)/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            const id = variant.ingredients[index].id;
+            newErrors[`variants.${variant.id}.ingredients.${id}.${field}`] = err.message;
+          }
         });
       });
     }
@@ -317,10 +331,10 @@ export function useCalculatorState(
     }
 
     setIsCalculating(true);
-    
+
     // Artificial delay for UX (except in tests)
     if (import.meta.env.MODE !== 'test') {
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 600));
     }
 
     const result = performFullCalculation(input, config);
@@ -339,33 +353,42 @@ export function useCalculatorState(
 
   const loadPreset = useCallback((preset: Preset) => {
     setInput({
-        ...preset.baseRecipe,
-        hasVariants: preset.presetType === 'variant',
-        variants: preset.variants || []
+      ...preset.baseRecipe,
+      hasVariants: preset.presetType === 'variant',
+      variants: preset.variants || [],
     });
     setConfig(preset.pricingConfig);
-    const result = performFullCalculation({
+    const result = performFullCalculation(
+      {
         ...preset.baseRecipe,
         hasVariants: preset.presetType === 'variant',
-        variants: preset.variants || []
-    }, preset.pricingConfig);
+        variants: preset.variants || [],
+      },
+      preset.pricingConfig
+    );
     setResults(result);
     setErrors({});
   }, []);
 
-  const saveAsPreset = useCallback(async (name: string) => {
-    return addPreset({
-      name,
-      baseRecipe: input,
-      pricingConfig: config,
-      presetType: input.hasVariants ? 'variant' : 'default',
-      variants: input.variants || []
-    });
-  }, [addPreset, input, config]);
+  const saveAsPreset = useCallback(
+    async (name: string) => {
+      return addPreset({
+        name,
+        baseRecipe: input,
+        pricingConfig: config,
+        presetType: input.hasVariants ? 'variant' : 'default',
+        variants: input.variants || [],
+      });
+    },
+    [addPreset, input, config]
+  );
 
-  const deletePreset = useCallback((id: string) => {
-    removePreset(id);
-  }, [removePreset]);
+  const deletePreset = useCallback(
+    (id: string) => {
+      removePreset(id);
+    },
+    [removePreset]
+  );
 
   return {
     input,
@@ -384,7 +407,7 @@ export function useCalculatorState(
     loadPreset,
     saveAsPreset,
     deletePreset,
-    
+
     // Variant Actions Export
     setHasVariants,
     addVariant,
@@ -392,6 +415,6 @@ export function useCalculatorState(
     updateVariant,
     updateVariantIngredient,
     addVariantIngredient,
-    removeVariantIngredient
+    removeVariantIngredient,
   };
 }

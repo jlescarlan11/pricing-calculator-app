@@ -126,13 +126,13 @@ describe('IngredientRow', () => {
     // We can fire the event on the row container or an input.
     // The handler is on the main div, which bubbles.
     const nameInput = screen.getByLabelText(/Ingredient Name/i);
-    
+
     act(() => {
       fireEvent.keyDown(nameInput, { key: 'Delete', shiftKey: true });
     });
 
     expect(mockHandlers.onRemove).not.toHaveBeenCalled();
-    
+
     act(() => {
       vi.advanceTimersByTime(300);
     });
@@ -152,17 +152,16 @@ describe('IngredientRow', () => {
     const nameInput = screen.getByLabelText(/Ingredient Name/i);
     expect(nameInput).not.toHaveFocus();
   });
-  
+
   it('displays validation errors', () => {
-    renderComponent({ 
-      errors: { 
-        name: 'Name required', 
-        amount: 'Invalid amount' 
-      } 
+    renderComponent({
+      errors: {
+        name: 'Name required',
+        amount: 'Invalid amount',
+      },
     });
-    
+
     expect(screen.getByText('Name required')).toBeInTheDocument();
     expect(screen.getByText('Invalid amount')).toBeInTheDocument();
   });
 });
-

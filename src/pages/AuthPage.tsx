@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePresets } from '../hooks/use-presets';
 import { Card, Input, Button } from '../components/shared';
-import { AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight, Save } from 'lucide-react';
 
 type AuthMode = 'login' | 'signup' | 'forgot-password';
 
 export const AuthPage: React.FC = () => {
   const { signIn, signUp, resetPasswordForEmail, user } = useAuth();
+  const { presets } = usePresets(); // Load local presets
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
 
@@ -23,6 +25,11 @@ export const AuthPage: React.FC = () => {
   if (user) {
     return <Navigate to={from} replace />;
   }
+
+  // Count strictly local presets (guest mode)
+  // Actually usePresets returns all presets. If user is null, it's just local.
+  // We can filter by !p.userId to be sure, or just rely on the fact we are logged out.
+  const guestPresetsCount = presets.length;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,8 +56,9 @@ export const AuthPage: React.FC = () => {
         if (error) throw error;
         setSuccessMessage('Password reset email sent! Check your inbox.');
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -67,6 +75,24 @@ export const AuthPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center py-xl">
       <div className="w-full max-w-md">
+        {guestPresetsCount > 0 && (
+          <div className="mb-lg p-md bg-clay/10 border border-clay/20 rounded-lg flex items-start gap-md animate-in slide-in-from-top-4 fade-in duration-500">
+            <div className="p-xs bg-white rounded-full shrink-0">
+              <Save className="w-5 h-5 text-clay" />
+            </div>
+            <div>
+              <h3 className="font-medium text-ink-900 text-sm">
+                We found {guestPresetsCount} unsaved recipe{guestPresetsCount !== 1 ? 's' : ''}
+              </h3>
+              <p className="text-sm text-ink-700 mt-xs leading-relaxed">
+                {mode === 'signup'
+                  ? 'Create an account to save them permanently to the cloud.'
+                  : 'Sign in to sync them to your account and access them anywhere.'}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="text-center mb-xl">
           <h1 className="font-serif text-3xl md:text-4xl text-ink-900 mb-sm">
             {mode === 'login' && 'Welcome Back'}
@@ -129,13 +155,10 @@ export const AuthPage: React.FC = () => {
               )}
             </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={loading}
-              className="mt-xl w-full"
-            >
-              {loading ? 'Processing...' : (
+            <Button type="submit" variant="primary" disabled={loading} className="mt-xl w-full">
+              {loading ? (
+                'Processing...'
+              ) : (
                 <>
                   {mode === 'login' && 'Sign In'}
                   {mode === 'signup' && 'Create Account'}
@@ -150,7 +173,7 @@ export const AuthPage: React.FC = () => {
             {mode === 'login' && (
               <>
                 <p className="text-sm text-ink-700">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <button
                     onClick={() => toggleMode('signup')}
                     className="text-clay font-medium hover:underline focus:outline-none"

@@ -1,14 +1,10 @@
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ToastProvider, useToast } from './Toast';
+import { ToastProvider, useToast, type ToastType } from './Toast';
 
-const TestComponent = ({ message, type }: { message: string; type?: any }) => {
+const TestComponent = ({ message, type }: { message: string; type?: ToastType }) => {
   const { addToast } = useToast();
-  return (
-    <button onClick={() => addToast(message, type)}>
-      Trigger Toast
-    </button>
-  );
+  return <button onClick={() => addToast(message, type)}>Trigger Toast</button>;
 };
 
 describe('Toast', () => {

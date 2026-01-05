@@ -18,7 +18,11 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle })
         className="w-full py-lg flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-clay/20 focus:ring-inset rounded-md transition-all duration-300 hover:bg-surface px-sm group"
         aria-expanded={isOpen}
       >
-        <span className={`text-base font-bold tracking-tight transition-colors ${isOpen ? 'text-clay' : 'text-ink-900 group-hover:text-clay'}`}>{question}</span>
+        <span
+          className={`text-base font-bold tracking-tight transition-colors ${isOpen ? 'text-clay' : 'text-ink-900 group-hover:text-clay'}`}
+        >
+          {question}
+        </span>
         {isOpen ? (
           <ChevronUp className="h-5 w-5 text-clay shrink-0" />
         ) : (
@@ -40,25 +44,30 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onToggle })
 
 const FAQS = [
   {
-    question: "What’s a good profit margin for food products?",
-    answer: "Aim for a profit margin of 30% or more to stay healthy. For example, if a snack costs ₱70 to make and you sell it for ₱100, you keep ₱30 as profit. This 30% helps pay for your bills and allows you to save for your business's future."
+    question: 'What’s a good profit margin for food products?',
+    answer:
+      "Aim for a profit margin of 30% or more to stay healthy. For example, if a snack costs ₱70 to make and you sell it for ₱100, you keep ₱30 as profit. This 30% helps pay for your bills and allows you to save for your business's future.",
   },
   {
-    question: "How often should I change my prices?",
-    answer: "Check your costs every month. If the price of main ingredients like flour or sugar goes up by ₱10 or more, update your selling price. This ensures you are always making money and not losing it to rising market prices."
+    question: 'How often should I change my prices?',
+    answer:
+      'Check your costs every month. If the price of main ingredients like flour or sugar goes up by ₱10 or more, update your selling price. This ensures you are always making money and not losing it to rising market prices.',
   },
   {
-    question: "Should I pay myself for my time?",
-    answer: "Yes, always include your own labor in the cost. If you spend 2 hours making a batch, pay yourself at least ₱120 (based on ₱60 per hour). If you don't pay yourself, your business isn't truly earning a profit."
+    question: 'Should I pay myself for my time?',
+    answer:
+      "Yes, always include your own labor in the cost. If you spend 2 hours making a batch, pay yourself at least ₱120 (based on ₱60 per hour). If you don't pay yourself, your business isn't truly earning a profit.",
   },
   {
-    question: "What if my electricity bill changes every month?",
-    answer: "Use your highest monthly bill from the past year to be safe. If your bills range from ₱1,500 to ₱2,000, use ₱2,000 in your calculations. This way, you are always covered even during the most expensive months."
+    question: 'What if my electricity bill changes every month?',
+    answer:
+      'Use your highest monthly bill from the past year to be safe. If your bills range from ₱1,500 to ₱2,000, use ₱2,000 in your calculations. This way, you are always covered even during the most expensive months.',
   },
   {
-    question: "How do I deal with cheaper competitors?",
-    answer: "Focus on better quality rather than the lowest price. Many customers will gladly pay ₱20 more for a product that tastes better, uses cleaner ingredients, or has nicer packaging. Don't lower your price if it means you stop earning a fair profit."
-  }
+    question: 'How do I deal with cheaper competitors?',
+    answer:
+      "Focus on better quality rather than the lowest price. Many customers will gladly pay ₱20 more for a product that tastes better, uses cleaner ingredients, or has nicer packaging. Don't lower your price if it means you stop earning a fair profit.",
+  },
 ];
 
 export const FAQ: React.FC = () => {
@@ -67,7 +76,7 @@ export const FAQ: React.FC = () => {
 
   const filteredFaqs = useMemo(() => {
     return FAQS.filter(
-      faq => 
+      (faq) =>
         faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
         faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -78,7 +87,7 @@ export const FAQ: React.FC = () => {
   };
 
   return (
-    <Card 
+    <Card
       title={
         <div className="flex items-center gap-sm">
           <HelpCircle className="h-5 w-5 text-clay" />

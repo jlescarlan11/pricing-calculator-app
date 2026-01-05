@@ -6,9 +6,9 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 - **Core Goal**: Calculate accurate product costs (ingredients, labor, overhead) and recommend selling prices based on Markup or Profit Margin strategies.
 - **Design Philosophy**: Transform the generic calculator UI into a calm, intentional experience using Japanese aesthetics:
-    - **Ma (Negative Space)**: Create breathing room and reduce cognitive load.
-    - **Wabi-sabi (Imperfect Beauty)**: Use organic shapes, subtle textures, and a "human" touch.
-    - **Kanso (Simplicity)**: Focus on essential elements, eliminating clutter.
+  - **Ma (Negative Space)**: Create breathing room and reduce cognitive load.
+  - **Wabi-sabi (Imperfect Beauty)**: Use organic shapes, subtle textures, and a "human" touch.
+  - **Kanso (Simplicity)**: Focus on essential elements, eliminating clutter.
 - **Visual Aesthetic**: Muted natural colors, soft typography, and gentle interactions to reduce stress around pricing decisions.
 - **Target Audience**: Small food entrepreneurs (e.g., artisan bakers, hot sauce makers).
 - **Tech Stack**: React 19, TypeScript, Vite, Tailwind CSS 4.
@@ -62,20 +62,20 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 #### Design Tokens (Japanese Aesthetic)
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `bg-main` | `#FAFAF9` | Primary page background (Off-white) |
-| `surface` | `#F8F7F5` | Card and component surfaces |
-| `surface-hover` | `#F0EFED` | Hover states and subtle highlights |
-| `ink-900` | `#3A3632` | Primary text, headings (Soft Black) |
-| `ink-700` | `#6B6761` | Secondary text, labels (Warm Gray) |
-| `ink-500` | `#8B8680` | Tertiary text, placeholders (Light Gray) |
-| `clay` | `#A67B5B` | Primary accent, primary buttons |
-| `moss` | `#7A8B73` | Success states, positive indicators |
-| `sakura` | `#E8C5C0` | Warnings, subtle highlights |
-| `rust` | `#B85C38` | Error states, critical actions |
-| `border-base` | `#D4D2CF` | Standard component borders |
-| `border-subtle`| `#E6E4E1` | Dividers and very subtle lines |
+| Token           | Hex       | Usage                                    |
+| --------------- | --------- | ---------------------------------------- |
+| `bg-main`       | `#FAFAF9` | Primary page background (Off-white)      |
+| `surface`       | `#F8F7F5` | Card and component surfaces              |
+| `surface-hover` | `#F0EFED` | Hover states and subtle highlights       |
+| `ink-900`       | `#3A3632` | Primary text, headings (Soft Black)      |
+| `ink-700`       | `#6B6761` | Secondary text, labels (Warm Gray)       |
+| `ink-500`       | `#8B8680` | Tertiary text, placeholders (Light Gray) |
+| `clay`          | `#A67B5B` | Primary accent, primary buttons          |
+| `moss`          | `#7A8B73` | Success states, positive indicators      |
+| `sakura`        | `#E8C5C0` | Warnings, subtle highlights              |
+| `rust`          | `#B85C38` | Error states, critical actions           |
+| `border-base`   | `#D4D2CF` | Standard component borders               |
+| `border-subtle` | `#E6E4E1` | Dividers and very subtle lines           |
 
 ## 4. Feature Requirements (MVP)
 
@@ -102,21 +102,24 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 ## 6. Progress Tracking
 
 ### Routing & Pages (Added 2026-01-03)
+
 - [x] **Client-side Routing**: Configured `react-router-dom` with `BrowserRouter` and defined routes for `/`, `/help`, and `/faq`.
 - [x] **CalculatorPage**: Main route containing the pricing calculator logic and state management.
 - [x] **HelpPage**: Educational route explaining pricing strategies (Markup vs Margin) using the `PricingGuide` component.
 - [x] **FAQPage**: Information route for common pricing questions and tips.
 
 ### Components
+
 - [x] **PricingGuide**: Extracted from `PricingExplainerModal` to be reused in both the modal and the standalone Help page. (Added 2026-01-03)
 
-
 ### Constants
+
 - [x] **TOOLTIPS**: A library of concise, user-friendly tooltip descriptions for all calculator input fields. (Added 2026-01-03)
   - File: `src/constants/tooltips.ts`
   - Exported from `src/constants/index.ts`
 
 ### Components
+
 - [x] **HelpIcon**: Reusable component that displays a question mark icon with support for tooltips (on hover) and modals (on click). Fully accessible with keyboard support and consistent styling. (Added 2026-01-03)
   - File: `src/components/help/HelpIcon.tsx`
   - Tests: `src/components/help/HelpIcon.test.tsx`
@@ -197,6 +200,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - Tests: `src/components/shared/Card.test.tsx`
 
 ### Typography System (Added 2026-01-03)
+
 - [x] **Font Installation**: Integrated Google Fonts (Inter and Crimson Text) with specific weights (400, 500, 600).
 - [x] **Type Scale**: Implemented a 1.25 ratio type scale ranging from 14px to 64px.
 - [x] **Tailwind Configuration**: Configured `Crimson Text` for all headings (H1-H6) and `Inter` for body/UI text with tabular numbers enabled.
@@ -204,6 +208,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Component Audit**: Updated all major components and pages to remove redundant font weights and tracking classes, ensuring the new typography system is applied consistently.
 
 ### Spacing System (Added 2026-01-03)
+
 - [x] **8px Base Scale**: Implemented a consistent spacing scale: xs (4px), sm (8px), md (16px), lg (24px), xl (32px), 2xl (48px), 3xl (64px), 4xl (96px), and 5xl (128px).
 - [x] **Tailwind Integration**: Configured the scale in `src/index.css` using Tailwind V4 CSS variables.
 - [x] **Component Audit**: Updated all components and pages to utilize the new spacing scale.
@@ -212,6 +217,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Vertical Rhythm**: Enhanced `CalculatorForm` with explicit separators and consistent vertical spacing (space-y-xl) to improve visual flow and reduce cognitive load. Fixed "Monthly Utilities" label in Overhead Calculator and restored Grid view in Presets List.
 
 ### UI & Layout Restructuring (Added 2026-01-03)
+
 - [x] **Copy Refinement**: Audited and refined all button labels, helper text, and error messages. Implemented a gentle, supportive, and concise tone ("Explore", "Save", "Calculate", "Oops") consistent with the Japanese aesthetic. Replaced all aggressive phrasing and ensured labels are 1-2 words.
 - [x] **Saved Products Modal**: Replaced the persistent sidebar with a cleaner Modal interface for managing presets.
 - [x] **Floating Action Button (FAB)**: Added a "Package" icon FAB in the bottom-right for quick access to saved products.
@@ -221,6 +227,13 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Artisanal UI Touches**: Added a dashed ("chopped") border to the "Add Ingredient" button to match the handmade/artisanal theme. (Added 2026-01-03)
 - [x] **Variants Engine**: Implemented unified variant calculation logic with proportional cost allocation, validation, and comprehensive tests. (Added 2026-01-05)
 - [x] **Live Variant Pricing**: Enabled real-time "Recommended Price" preview within variant blocks by calculating costs on the fly and passing them to the embedded pricing strategy component. (Added 2026-01-05)
+
+### Migration & Final Polish (Added 2026-01-05)
+
+- [x] **Migration Strategy**: Implemented `migrateGuestPresets` in `src/utils/migration.ts` to automatically assign anonymous local presets to the user upon login. Integrated into `AuthContext` to trigger on `SIGNED_IN` event.
+- [x] **Data Portability**: Implemented full Export/Import functionality with JSON schema validation, versioning, and "Merge/Replace" strategies in `src/utils/export.ts` and `src/utils/import.ts`. Added `ExportButton` and `ImportButton` to Account Page.
+- [x] **Design System Consistency**: Verified all new components (DangerZone, AccountPage) adhere to the design tokens (colors, typography). Fixed `DangerZone` button variant to use `danger` (mapped to `rust` color).
+- [x] **Build & Verification**: Fixed all TypeScript build errors (type-only imports, unused variables, tsconfig exclusions) and verified that all 300 tests pass (`npm test`). Confirmed production build success (`npm run build`).
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 

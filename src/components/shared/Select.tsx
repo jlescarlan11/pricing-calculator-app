@@ -32,18 +32,22 @@ export const Select: React.FC<SelectProps> = ({
   const id = useId();
   const errorId = `${id}-error`;
   const helperId = `${id}-helper`;
-  
+
   const describedBy = error ? errorId : helperText ? helperId : undefined;
 
   return (
     <div className={`flex flex-col gap-xs w-full ${className}`}>
-      <label 
-        htmlFor={id} 
+      <label
+        htmlFor={id}
         className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center justify-between"
       >
         <span>
           {label}
-          {required && <span className="text-red-500 ml-xs" aria-hidden="true">*</span>}
+          {required && (
+            <span className="text-red-500 ml-xs" aria-hidden="true">
+              *
+            </span>
+          )}
         </span>
       </label>
 
@@ -61,9 +65,10 @@ export const Select: React.FC<SelectProps> = ({
             py-sm pl-sm pr-2xl sm:text-sm transition-colors duration-200
             disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden
-            ${error 
-              ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+            ${
+              error
+                ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
+                : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
             }
           `}
           {...props}
@@ -81,12 +86,19 @@ export const Select: React.FC<SelectProps> = ({
         </select>
 
         <div className="absolute inset-y-0 right-0 flex items-center pr-sm pointer-events-none">
-          <ChevronDown className={`h-5 w-5 ${error ? 'text-red-500' : 'text-gray-400'}`} aria-hidden="true" />
+          <ChevronDown
+            className={`h-5 w-5 ${error ? 'text-red-500' : 'text-gray-400'}`}
+            aria-hidden="true"
+          />
         </div>
       </div>
 
       {error ? (
-        <p className="mt-xs text-sm text-red-600 flex items-center gap-xs" id={errorId} role="alert">
+        <p
+          className="mt-xs text-sm text-red-600 flex items-center gap-xs"
+          id={errorId}
+          role="alert"
+        >
           {error}
         </p>
       ) : helperText ? (

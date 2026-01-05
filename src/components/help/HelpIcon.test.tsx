@@ -32,12 +32,12 @@ describe('HelpIcon', () => {
   it('shows tooltip content on hover', () => {
     render(<HelpIcon helpText="Detailed help text" />);
     const button = screen.getByRole('button');
-    
+
     // Initial state: tooltip not in document
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
     fireEvent.mouseEnter(button);
-    
+
     act(() => {
       vi.advanceTimersByTime(300); // Wait for delay
     });
@@ -49,7 +49,7 @@ describe('HelpIcon', () => {
   it('is keyboard accessible', () => {
     render(<HelpIcon />);
     const button = screen.getByRole('button');
-    
+
     button.focus();
     expect(document.activeElement).toBe(button);
   });
@@ -63,11 +63,11 @@ describe('HelpIcon', () => {
   it('prevents tooltip toggle on click when onClick is provided', () => {
     const onClick = vi.fn();
     render(<HelpIcon helpText="Tooltip text" onClick={onClick} />);
-    
+
     const button = screen.getByRole('button');
-    
+
     fireEvent.click(button);
-    
+
     expect(onClick).toHaveBeenCalled();
     // Tooltip should remain hidden because of delay or stopPropagation if implemented that way
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();

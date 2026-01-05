@@ -82,7 +82,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`
         grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_auto] gap-md items-start md:items-center py-md
         animate-in fade-in duration-400

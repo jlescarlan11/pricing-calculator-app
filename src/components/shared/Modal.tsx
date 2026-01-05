@@ -57,11 +57,11 @@ export const Modal: React.FC<ModalProps> = ({
 
     const handleTabKey = (e: KeyboardEvent) => {
       if (!modalRef.current) return;
-      
+
       const focusableElements = modalRef.current.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
-      
+
       if (focusableElements.length === 0) return;
 
       const firstElement = focusableElements[0] as HTMLElement;
@@ -92,7 +92,7 @@ export const Modal: React.FC<ModalProps> = ({
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    
+
     // Initial focus
     const focusableElements = modalRef.current?.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -118,7 +118,7 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby="modal-title"
     >
       {/* Backdrop */}
-      <div 
+      <div
         className={`absolute inset-0 bg-[rgba(58,54,50,0.3)] backdrop-blur-[4px] transition-opacity duration-300 ease-out ${
           isOpen ? 'opacity-100' : 'opacity-0'
         }`}
@@ -151,22 +151,19 @@ export const Modal: React.FC<ModalProps> = ({
 
         {/* Header */}
         <div className="mb-lg pr-[60px]">
-          <h2 id="modal-title" className="text-[28px] font-serif font-semibold text-ink-900 leading-heading">
+          <h2
+            id="modal-title"
+            className="text-[28px] font-serif font-semibold text-ink-900 leading-heading"
+          >
             {title}
           </h2>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto">{children}</div>
 
         {/* Footer */}
-        {footer && (
-          <div className="mt-xl pt-lg border-t border-border-subtle">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="mt-xl pt-lg border-t border-border-subtle">{footer}</div>}
       </div>
     </div>,
     document.body

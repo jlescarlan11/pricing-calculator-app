@@ -59,8 +59,8 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
           type="button"
           onClick={() => handleStrategyChange('markup')}
           className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
-            strategy === 'markup' 
-              ? 'bg-clay text-white shadow-level-1' 
+            strategy === 'markup'
+              ? 'bg-clay text-white shadow-level-1'
               : 'text-ink-500 hover:text-ink-900'
           }`}
         >
@@ -70,8 +70,8 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
           type="button"
           onClick={() => handleStrategyChange('margin')}
           className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
-            strategy === 'margin' 
-              ? 'bg-clay text-white shadow-level-1' 
+            strategy === 'margin'
+              ? 'bg-clay text-white shadow-level-1'
               : 'text-ink-500 hover:text-ink-900'
           }`}
         >
@@ -88,20 +88,27 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
                 Add <span className="text-clay font-bold">{value}%</span> of the cost to your price.
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
-                If your cost is {formatCurrency(exampleCost)}, 
-                adding {value}% markup results in a price of {formatCurrency(examplePrice)} 
-                (<span className="text-moss font-semibold">{formatCurrency(exampleProfit)} profit</span>).
+                If your cost is {formatCurrency(exampleCost)}, adding {value}% markup results in a
+                price of {formatCurrency(examplePrice)}(
+                <span className="text-moss font-semibold">
+                  {formatCurrency(exampleProfit)} profit
+                </span>
+                ).
               </p>
             </div>
           ) : (
             <div className="space-y-sm">
               <p className="text-sm text-ink-900 font-medium">
-                Keep <span className="text-clay font-bold">{value}%</span> of the price as your profit.
+                Keep <span className="text-clay font-bold">{value}%</span> of the price as your
+                profit.
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
-                To earn a {value}% margin on a {formatCurrency(exampleCost)} cost, 
-                your price should be {formatCurrency(examplePrice)} 
-                (<span className="text-moss font-semibold">{formatCurrency(exampleProfit)} profit</span>).
+                To earn a {value}% margin on a {formatCurrency(exampleCost)} cost, your price should
+                be {formatCurrency(examplePrice)}(
+                <span className="text-moss font-semibold">
+                  {formatCurrency(exampleProfit)} profit
+                </span>
+                ).
               </p>
             </div>
           )}
@@ -125,7 +132,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
           <input
             type="range"
             min="0"
-            max={strategy === 'margin' ? "95" : "300"}
+            max={strategy === 'margin' ? '95' : '300'}
             step="1"
             value={value}
             onChange={handleSliderChange}
@@ -140,18 +147,22 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
 
       {/* Real-time Result - Hide if no cost per unit calculated */}
       {(!embedded || costPerUnit > 0) && (
-      <div className="pt-lg border-t border-border-subtle">
-        <div className="flex justify-between items-end">
-          <div>
-            <p className="text-[10px] text-ink-500 uppercase tracking-widest font-bold mb-xs">Recommended Price</p>
-            <p className="text-3xl font-bold text-ink-900 tracking-tight">{formatCurrency(recommendedPrice)}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-ink-500 font-medium mb-xs">Profit per Unit</p>
-            <p className="text-lg font-bold text-moss">+{formatCurrency(profit)}</p>
+        <div className="pt-lg border-t border-border-subtle">
+          <div className="flex justify-between items-end">
+            <div>
+              <p className="text-[10px] text-ink-500 uppercase tracking-widest font-bold mb-xs">
+                Recommended Price
+              </p>
+              <p className="text-3xl font-bold text-ink-900 tracking-tight">
+                {formatCurrency(recommendedPrice)}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-ink-500 font-medium mb-xs">Profit per Unit</p>
+              <p className="text-lg font-bold text-moss">+{formatCurrency(profit)}</p>
+            </div>
           </div>
         </div>
-      </div>
       )}
     </div>
   );
@@ -159,16 +170,18 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
   if (embedded) {
     return (
       <div className="space-y-md">
-         <div className="flex items-center justify-between">
-           <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">Pricing Strategy</h4>
-         </div>
-         {content}
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">
+            Pricing Strategy
+          </h4>
+        </div>
+        {content}
       </div>
     );
   }
 
   return (
-    <Card 
+    <Card
       title={
         <div className="flex items-center justify-between w-full">
           <h3 className="text-lg text-ink-900">Pricing Strategy</h3>

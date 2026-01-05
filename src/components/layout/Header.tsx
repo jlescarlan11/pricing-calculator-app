@@ -14,9 +14,7 @@ export const Header: React.FC = () => {
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-sm px-md py-sm rounded-sm text-sm font-medium transition-all duration-300 ${
-      isActive
-        ? 'bg-clay/10 text-clay'
-        : 'text-ink-700 hover:text-clay hover:bg-surface-hover'
+      isActive ? 'bg-clay/10 text-clay' : 'text-ink-700 hover:text-clay hover:bg-surface-hover'
     }`;
 
   return (
@@ -31,7 +29,9 @@ export const Header: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-xl text-ink-900 leading-none">PriceCraft</h1>
-                <p className="text-xs text-ink-500 font-medium mt-xs uppercase tracking-wider">Mindful Pricing</p>
+                <p className="text-xs text-ink-500 font-medium mt-xs uppercase tracking-wider">
+                  Mindful Pricing
+                </p>
               </div>
             </Link>
 
@@ -50,7 +50,7 @@ export const Header: React.FC = () => {
                 <span>Pricing Tips</span>
               </NavLink>
               <div className="h-6 w-px bg-border-subtle mx-md" />
-              
+
               {user ? (
                 <NavLink to="/account" className={navLinkClass}>
                   <User size={18} />
@@ -82,36 +82,24 @@ export const Header: React.FC = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-border-subtle bg-bg-main py-lg px-lg space-y-sm animate-in fade-in slide-in-from-top-4 duration-500">
-            <NavLink 
-              to="/" 
-              className={navLinkClass}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
+            <NavLink to="/" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
               <Calculator size={18} />
               Calculator
             </NavLink>
-            <NavLink 
-              to="/help" 
-              className={navLinkClass}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
+            <NavLink to="/help" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
               <HelpCircle size={18} />
               How it works
             </NavLink>
-            <NavLink 
-              to="/faq" 
-              className={navLinkClass}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
+            <NavLink to="/faq" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
               <Lightbulb size={18} />
               Pricing Tips
             </NavLink>
-            
+
             <div className="h-px bg-border-subtle my-md" />
 
             {user ? (
-              <NavLink 
-                to="/account" 
+              <NavLink
+                to="/account"
                 className={navLinkClass}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -119,8 +107,8 @@ export const Header: React.FC = () => {
                 Account
               </NavLink>
             ) : (
-              <NavLink 
-                to="/auth" 
+              <NavLink
+                to="/auth"
                 className={navLinkClass}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -137,10 +125,7 @@ export const Header: React.FC = () => {
         )}
       </header>
 
-      <PricingExplainerModal
-        isOpen={isHelpModalOpen}
-        onClose={() => setIsHelpModalOpen(false)}
-      />
+      <PricingExplainerModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
 
       <Modal
         isOpen={isFAQModalOpen}

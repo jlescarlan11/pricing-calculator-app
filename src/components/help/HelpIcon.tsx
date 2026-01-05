@@ -26,12 +26,7 @@ export const HelpIcon: React.FC<HelpIconProps> = ({
   className = '',
   size = 16,
 }) => {
-  const icon = (
-    <HelpCircle 
-      size={size} 
-      aria-hidden="true"
-    />
-  );
+  const icon = <HelpCircle size={size} aria-hidden="true" />;
 
   const buttonContent = (
     <button
@@ -50,11 +45,7 @@ export const HelpIcon: React.FC<HelpIconProps> = ({
   );
 
   if (helpText) {
-    return (
-      <Tooltip content={helpText}>
-        {buttonContent}
-      </Tooltip>
-    );
+    return <Tooltip content={helpText}>{buttonContent}</Tooltip>;
   }
 
   return buttonContent;

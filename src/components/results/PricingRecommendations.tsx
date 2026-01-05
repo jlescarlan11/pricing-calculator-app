@@ -13,17 +13,12 @@ interface PricingRecommendationsProps {
  * Displays key pricing metrics and recommendations based on calculation results.
  * Features a color-coded profit margin indicator and prominent selling price.
  */
-export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({ 
-  results, 
-  className = '' 
+export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
+  results,
+  className = '',
 }) => {
-  const {
-    breakEvenPrice,
-    recommendedPrice,
-    profitPerUnit,
-    profitPerBatch,
-    profitMarginPercent,
-  } = results;
+  const { breakEvenPrice, recommendedPrice, profitPerUnit, profitPerBatch, profitMarginPercent } =
+    results;
 
   const getMarginBadge = (margin: number): { variant: BadgeVariant; label: string } => {
     if (margin < 15) {
@@ -42,10 +37,8 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
       {/* Recommended Selling Price - Primary Focus */}
       <div className="flex flex-col items-center px-2xl py-2xl bg-surface rounded-lg border border-border-subtle relative overflow-hidden group">
         <div className="relative z-10 w-full text-center">
-          <p className="text-xs font-semibold text-ink-700 mb-xs">
-            Recommended Selling Price
-          </p>
-          <p 
+          <p className="text-xs font-semibold text-ink-700 mb-xs">Recommended Selling Price</p>
+          <p
             key={recommendedPrice}
             className="font-serif text-5xl sm:text-6xl text-ink-900 tracking-tight transition-transform duration-700 group-hover:scale-105 animate-pulse-once"
           >

@@ -13,11 +13,7 @@ export const DataWarningBanner: React.FC = () => {
   }
 
   return (
-    <div 
-      className="bg-sakura/10 border-b border-sakura/20"
-      role="alert"
-      aria-live="polite"
-    >
+    <div className="bg-sakura/10 border-b border-sakura/20" role="alert" aria-live="polite">
       <div className="max-w-6xl mx-auto px-md sm:px-lg lg:px-xl py-md">
         <div className="flex items-center justify-between gap-lg">
           <div className="flex items-center gap-md">
@@ -25,9 +21,7 @@ export const DataWarningBanner: React.FC = () => {
               <AlertTriangle className="h-5 w-5 text-ink-700" aria-hidden="true" />
             </div>
             <p className="text-sm font-medium text-ink-900 leading-relaxed">
-              <span className="md:hidden">
-                A gentle reminder: your progress is temporary.
-              </span>
+              <span className="md:hidden">A gentle reminder: your progress is temporary.</span>
               <span className="hidden md:inline">
                 A gentle reminder: your progress is temporary and stays with this tab.
               </span>
