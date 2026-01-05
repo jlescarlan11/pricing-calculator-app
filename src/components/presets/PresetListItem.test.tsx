@@ -1,13 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PresetListItem } from './PresetListItem';
-import type { SavedPreset } from '../../types/calculator';
+import type { Preset } from '../../types/calculator';
 
-const mockPreset: SavedPreset = {
+const mockPreset: Preset = {
   id: '1',
   name: 'Test Preset',
-  lastModified: new Date('2026-01-01').getTime(),
-  input: {
+  presetType: 'default',
+  createdAt: new Date('2026-01-01').toISOString(),
+  updatedAt: new Date('2026-01-01').toISOString(),
+  baseRecipe: {
     productName: 'Delicious Cake',
     batchSize: 12,
     ingredients: [
@@ -17,7 +19,8 @@ const mockPreset: SavedPreset = {
     laborCost: 100,
     overhead: 50,
   },
-  config: {
+  variants: [],
+  pricingConfig: {
     strategy: 'markup',
     value: 50,
   },
@@ -31,7 +34,10 @@ describe('PresetListItem', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock window.confirm
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true)
+    );
   });
 
   it('renders preset details correctly', () => {
@@ -52,6 +58,7 @@ describe('PresetListItem', () => {
     expect(screen.getByText(/markup \(50%\)/i)).toBeInTheDocument();
     expect(screen.getByText('Jan 01, 2026')).toBeInTheDocument();
   });
+  // ... rest of tests
 
   it('calls onLoad when Load button is clicked', () => {
     render(
@@ -103,8 +110,11 @@ describe('PresetListItem', () => {
   });
 
   it('does not call onDelete when Delete button is clicked but cancelled', () => {
-    vi.stubGlobal('confirm', vi.fn(() => false));
-    
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => false)
+    );
+
     render(
       <PresetListItem
         preset={mockPreset}

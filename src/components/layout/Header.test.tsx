@@ -1,7 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { Header } from './Header';
+
+vi.mock('../../context/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: null,
+    loading: false,
+    signOut: vi.fn(),
+  })),
+}));
 
 describe('Header', () => {
   const renderWithRouter = (ui: React.ReactElement) => {
@@ -14,9 +22,13 @@ describe('Header', () => {
     expect(screen.getByText(/Mindful Pricing/i)).toBeInTheDocument();
   });
 
-  it('shows version information on desktop', () => {
+  it('shows version information in mobile menu', () => {
     renderWithRouter(<Header />);
-    expect(screen.getByText(/v0\.1\.0/i)).toBeInTheDocument();
+
+    const menuButton = screen.getByRole('button', { name: /Open main menu/i });
+    fireEvent.click(menuButton);
+
+    expect(screen.getByText(/Version 0\.1\.0/i)).toBeInTheDocument();
   });
 
   it('contains navigation links', () => {
@@ -28,10 +40,10 @@ describe('Header', () => {
 
   it('toggles mobile menu', () => {
     renderWithRouter(<Header />);
-    
+
     const menuButton = screen.getByRole('button', { name: /Open main menu/i });
     fireEvent.click(menuButton);
-    
+
     // Check if mobile menu links are visible
     const links = screen.getAllByRole('link', { name: /Calculator/i });
     expect(links.length).toBeGreaterThan(1);

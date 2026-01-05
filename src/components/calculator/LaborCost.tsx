@@ -6,13 +6,10 @@ interface LaborCostProps {
   value: number;
   onChange: (value: number) => void;
   error?: string;
+  label?: string;
 }
 
-export const LaborCost: React.FC<LaborCostProps> = ({
-  value,
-  onChange,
-  error,
-}) => {
+export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, label }) => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [hours, setHours] = useState<string>('');
   const [rate, setRate] = useState<string>('');
@@ -32,7 +29,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({
       <div className="space-y-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-sm">
-            <h3 className="text-lg font-bold text-ink-900">Labor Cost</h3>
+            <h3 className="text-lg font-bold text-ink-900">{label || 'Labor Cost'}</h3>
             <Tooltip content="Total cost of labor for this batch. You can enter a fixed amount or use the calculator below.">
               <button
                 type="button"
@@ -50,12 +47,16 @@ export const LaborCost: React.FC<LaborCostProps> = ({
           >
             <Calculator className="w-4 h-4 mr-sm" />
             {isCalculatorOpen ? 'Hide' : 'Calculator'}
-            {isCalculatorOpen ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
+            {isCalculatorOpen ? (
+              <ChevronUp className="w-4 h-4 ml-xs" />
+            ) : (
+              <ChevronDown className="w-4 h-4 ml-xs" />
+            )}
           </Button>
         </div>
 
         <Input
-          label="Total Labor Cost"
+          label={label ? `Total ${label}` : 'Total Labor Cost'}
           type="number"
           value={value === 0 ? '' : value}
           onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
@@ -67,9 +68,11 @@ export const LaborCost: React.FC<LaborCostProps> = ({
         />
 
         {isCalculatorOpen && (
-          <div className="bg-bg-main rounded-md p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="bg-surface-hover rounded-xl p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
             <div className="space-y-sm text-sm text-ink-700">
-              <p className="font-medium text-ink-900">Your time is valuable—include it in labor costs.</p>
+              <p className="font-medium text-ink-900">
+                Your time is valuable—include it in labor costs.
+              </p>
               <p>Labor Cost = Time Spent × Hourly Rate</p>
               <div className="bg-surface p-sm rounded-sm border border-border-subtle text-xs font-mono text-ink-500">
                 Example: 4 hours × ₱100/hour = ₱400
@@ -102,7 +105,11 @@ export const LaborCost: React.FC<LaborCostProps> = ({
               <div className="text-sm">
                 <span className="text-ink-500">Calculated: </span>
                 <span className="font-bold text-ink-900 text-xl tracking-tight">
-                  ₱{calculatedTotal.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ₱
+                  {calculatedTotal.toLocaleString('en-PH', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               </div>
               <Button

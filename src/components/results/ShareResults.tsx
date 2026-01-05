@@ -40,7 +40,7 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
 
     const summary = formatCalculationSummary(input, results);
     const success = await copyToClipboard(summary);
-    
+
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -72,14 +72,14 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
       >
         <Share2 className="w-4 h-4" />
         <span>Share</span>
-        <ChevronDown 
-          className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+        <ChevronDown
+          className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           aria-hidden="true"
         />
       </Button>
 
       {isOpen && (
-        <div 
+        <div
           className="absolute right-0 mt-sm w-64 origin-top-right bg-bg-main border border-border-base rounded-2xl shadow-level-4 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
           role="menu"
           aria-orientation="vertical"
@@ -125,7 +125,9 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
               </div>
               <div className="flex flex-col">
                 <span className="font-bold tracking-tight">Email Report</span>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-ink-400">Coming Soon</span>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-ink-400">
+                  Coming Soon
+                </span>
               </div>
             </button>
 
@@ -140,7 +142,9 @@ export const ShareResults: React.FC<ShareResultsProps> = ({ results, input }) =>
               </div>
               <div className="flex flex-col">
                 <span className="font-bold tracking-tight">Export PDF</span>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-ink-400">Coming Soon</span>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-ink-400">
+                  Coming Soon
+                </span>
               </div>
             </button>
           </div>

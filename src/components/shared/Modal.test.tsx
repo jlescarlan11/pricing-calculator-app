@@ -55,7 +55,7 @@ describe('Modal', () => {
     // The backdrop is the first child of the dialog in our implementation
     const dialog = screen.getByRole('dialog');
     const backdrop = dialog.firstElementChild;
-    
+
     if (backdrop) {
       fireEvent.click(backdrop);
     }
@@ -106,7 +106,7 @@ describe('Modal', () => {
     act(() => {
       vi.advanceTimersByTime(410);
     });
-    
+
     // Check after unmount
     expect(document.body.style.overflow).toBe('unset');
   });
@@ -138,7 +138,7 @@ describe('Modal', () => {
     act(() => {
       vi.advanceTimersByTime(300); // Total 450
     });
-    
+
     // Check it's gone
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

@@ -36,7 +36,7 @@ describe('ShareResults', () => {
         writeText: vi.fn().mockResolvedValue(undefined),
       },
       configurable: true,
-      writable: true
+      writable: true,
     });
     // Mock isSecureContext
     vi.stubGlobal('isSecureContext', true);
@@ -53,11 +53,11 @@ describe('ShareResults', () => {
   it('opens dropdown when clicked', () => {
     render(<ShareResults results={mockResults} input={mockInput} />);
     const shareButton = screen.getByRole('button', { name: /share/i });
-    
+
     fireEvent.click(shareButton);
-    
-    expect(screen.getByText(/Copy Summary/i)).toBeInTheDocument();
-    expect(screen.getByText(/Print Results/i)).toBeInTheDocument();
+
+    expect(screen.getByText(/^Copy$/)).toBeInTheDocument();
+    expect(screen.getByText(/^Print$/)).toBeInTheDocument();
     expect(screen.getByText(/Email Report/i)).toBeInTheDocument();
     expect(screen.getByText(/Export PDF/i)).toBeInTheDocument();
   });
@@ -65,8 +65,8 @@ describe('ShareResults', () => {
   it('calls copyToClipboard when Copy Summary is clicked', async () => {
     render(<ShareResults results={mockResults} input={mockInput} />);
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
-    
-    const copyOption = screen.getByText(/Copy Summary/i);
+
+    const copyOption = screen.getByText(/^Copy$/);
     await act(async () => {
       fireEvent.click(copyOption);
     });
@@ -79,9 +79,9 @@ describe('ShareResults', () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
     render(<ShareResults results={mockResults} input={mockInput} />);
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
-    
-    fireEvent.click(screen.getByText(/Print Results/i));
-    
+
+    fireEvent.click(screen.getByText(/^Print$/));
+
     expect(printSpy).toHaveBeenCalled();
     printSpy.mockRestore();
   });
@@ -89,10 +89,10 @@ describe('ShareResults', () => {
   it('has disabled options for Email and PDF', () => {
     render(<ShareResults results={mockResults} input={mockInput} />);
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
-    
+
     const emailOption = screen.getByText(/Email Report/i).closest('button');
     const pdfOption = screen.getByText(/Export PDF/i).closest('button');
-    
+
     expect(emailOption).toBeDisabled();
     expect(pdfOption).toBeDisabled();
   });
@@ -104,21 +104,21 @@ describe('ShareResults', () => {
         <ShareResults results={mockResults} input={mockInput} />
       </div>
     );
-    
+
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
-    expect(screen.queryByText(/Copy Summary/i)).toBeInTheDocument();
-    
+    expect(screen.queryByText(/^Copy$/)).toBeInTheDocument();
+
     fireEvent.mouseDown(screen.getByTestId('outside'));
-    expect(screen.queryByText(/Copy Summary/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Copy$/)).not.toBeInTheDocument();
   });
 
   it('closes dropdown after clicking an action', async () => {
     render(<ShareResults results={mockResults} input={mockInput} />);
     fireEvent.click(screen.getByRole('button', { name: /share/i }));
-    
-    const printOption = screen.getByText(/Print Results/i);
+
+    const printOption = screen.getByText(/^Print$/);
     fireEvent.click(printOption);
-    
-    expect(screen.queryByText(/Print Results/i)).not.toBeInTheDocument();
+
+    expect(screen.queryByText(/^Print$/)).not.toBeInTheDocument();
   });
 });

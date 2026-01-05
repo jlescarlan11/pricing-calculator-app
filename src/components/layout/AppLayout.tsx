@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
-import { DataWarningBanner } from './DataWarningBanner';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -22,9 +21,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-bg-main flex flex-col relative">
       {showTexture && <div className="paper-texture" />}
-      
+
       <div className="relative z-10 flex flex-col min-h-screen">
-        <DataWarningBanner />
         <Header />
 
         <div className="flex-1 flex overflow-hidden">
@@ -46,9 +44,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <button
                   onClick={() => setShowTexture(!showTexture)}
                   className="text-xs text-ink-500 hover:text-ink-700 transition-colors flex items-center space-x-sm cursor-pointer"
-                  title={showTexture ? "Disable background texture" : "Enable background texture"}
+                  title={showTexture ? 'Disable background texture' : 'Enable background texture'}
                 >
-                  <span className={`w-3 h-3 rounded-full border border-current ${showTexture ? 'bg-moss border-moss' : 'bg-transparent'}`} />
+                  <span
+                    className={`w-3 h-3 rounded-full border border-current ${showTexture ? 'bg-moss border-moss' : 'bg-transparent'}`}
+                  />
                   <span>Texture {showTexture ? 'On' : 'Off'}</span>
                 </button>
                 <p className="text-center text-sm text-ink-500">
@@ -57,7 +57,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </div>
               <div className="mt-xl md:mt-0 md:order-1 text-center md:text-left">
                 <p className="text-sm text-ink-700">
-                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0-alpha
+                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0
                 </p>
               </div>
             </div>

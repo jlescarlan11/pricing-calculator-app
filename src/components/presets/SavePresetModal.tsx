@@ -30,15 +30,24 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Reset state when modal opens
+  // Reset state during render when modal opens to avoid flicker
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen && !prevIsOpen) {
+    setPrevIsOpen(true);
+    setIsSuccess(false);
+    setIsSaving(false);
+    setError(null);
+    setName(input.productName || '');
+  } else if (!isOpen && prevIsOpen) {
+    setPrevIsOpen(false);
+  }
+
+  // Sync name when input changes while modal is open
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isSuccess && !isSaving) {
       setName(input.productName || '');
-      setError(null);
-      setIsSuccess(false);
-      setIsSaving(false);
     }
-  }, [isOpen, input.productName]);
+  }, [isOpen, input.productName, isSuccess, isSaving]);
 
   const handleSave = async () => {
     const trimmedName = name.trim();
@@ -52,11 +61,9 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
       setError('Try a shorter name.');
       return;
     }
-    
-    const isDuplicate = presets.some(
-      p => p.name.toLowerCase() === trimmedName.toLowerCase()
-    );
-    
+
+    const isDuplicate = presets.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase());
+
     if (isDuplicate) {
       setError('You already have a product with this name.');
       return;
@@ -67,15 +74,17 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
       // Artificial delay for better UX (feedback that something is happening)
       // Skip in test mode for faster execution
       if (import.meta.env.MODE !== 'test') {
-        await new Promise(resolve => setTimeout(resolve, 600));
+        await new Promise((resolve) => setTimeout(resolve, 600));
       }
-      
-      addPreset({
+
+      await addPreset({
         name: trimmedName,
-        input,
-        config,
+        baseRecipe: input,
+        pricingConfig: config,
+        presetType: 'default',
+        variants: [],
       });
-      
+
       addToast('✓ Preset saved', 'success');
       setIsSuccess(true);
       // Auto close after showing success message
@@ -83,7 +92,9 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
         onClose();
       }, 1800);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Oops, we couldn\'t save that. Please try again.');
+      setError(
+        err instanceof Error ? err.message : "Oops, we couldn't save that. Please try again."
+      );
     } finally {
       setIsSaving(false);
     }
@@ -95,18 +106,10 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
     <div className="flex gap-sm justify-end">
       {!isSuccess && (
         <>
-          <Button 
-            variant="secondary" 
-            onClick={onClose} 
-            disabled={isSaving}
-          >
+          <Button variant="secondary" onClick={onClose} disabled={isSaving}>
             Back
           </Button>
-          <Button 
-            variant="primary" 
-            onClick={handleSave} 
-            isLoading={isSaving}
-          >
+          <Button variant="primary" onClick={handleSave} isLoading={isSaving}>
             Save
           </Button>
         </>
@@ -134,7 +137,8 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
       ) : (
         <div className="space-y-xl">
           <p className="text-sm text-ink-500 leading-relaxed font-medium">
-            Give this calculation a name to save it to your presets. You can load it later to update costs or prices.
+            Give this calculation a name to save it to your presets. You can load it later to update
+            costs or prices.
           </p>
 
           <Input
@@ -156,19 +160,25 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
             </h4>
             <div className="grid grid-cols-2 gap-y-lg gap-x-md">
               <div>
-                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">Total Cost</p>
+                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">
+                  Total Cost
+                </p>
                 <p className="text-base font-bold text-ink-900">
                   {formatCurrency(results.totalCost)}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">Batch Size</p>
+                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">
+                  Batch Size
+                </p>
                 <p className="text-base font-bold text-ink-900">
                   {input.batchSize} {input.batchSize === 1 ? 'unit' : 'units'}
                 </p>
               </div>
               <div className="col-span-2 pt-md border-t border-border-subtle">
-                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">Recommended Price</p>
+                <p className="text-[10px] text-ink-500 uppercase font-bold tracking-wider mb-xs">
+                  Recommended Price
+                </p>
                 <p className="text-2xl font-bold text-clay tracking-tight">
                   {formatCurrency(results.recommendedPrice)}
                   <span className="text-xs font-medium text-ink-500 ml-sm tracking-normal uppercase">

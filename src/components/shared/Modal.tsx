@@ -57,11 +57,11 @@ export const Modal: React.FC<ModalProps> = ({
 
     const handleTabKey = (e: KeyboardEvent) => {
       if (!modalRef.current) return;
-      
+
       const focusableElements = modalRef.current.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
-      
+
       if (focusableElements.length === 0) return;
 
       const firstElement = focusableElements[0] as HTMLElement;
@@ -92,7 +92,7 @@ export const Modal: React.FC<ModalProps> = ({
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    
+
     // Initial focus
     const focusableElements = modalRef.current?.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -118,8 +118,8 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby="modal-title"
     >
       {/* Backdrop */}
-      <div 
-        className={`absolute inset-0 bg-[rgba(58,54,50,0.3)] backdrop-blur-[4px] transition-opacity duration-300 ease-out ${
+      <div
+        className={`absolute inset-0 bg-ink-900/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${
           isOpen ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
@@ -130,13 +130,14 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={`
-          relative z-10 flex flex-col bg-bg-main shadow-level-3 rounded-[16px]
-          transition-all duration-400 [transition-timing-function:cubic-bezier(0.175,0.885,0.32,1.275)]
+          relative z-10 flex flex-col bg-bg-main shadow-level-3 rounded-xl
+          transition-[opacity,transform] duration-400 [transition-timing-function:cubic-bezier(0.175,0.885,0.32,1.275)]
           w-full shrink-0 max-h-[90vh]
           max-[480px]:h-full max-[480px]:max-h-none max-[480px]:rounded-none
           p-[40px] max-[480px]:p-lg
           ${maxWidth} ${className}
           ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}
+          focus:outline-none
         `}
         tabIndex={-1}
       >
@@ -151,22 +152,19 @@ export const Modal: React.FC<ModalProps> = ({
 
         {/* Header */}
         <div className="mb-lg pr-[60px]">
-          <h2 id="modal-title" className="text-[28px] font-serif font-semibold text-ink-900 leading-heading">
+          <h2
+            id="modal-title"
+            className="text-[28px] font-serif font-semibold text-ink-900 leading-heading"
+          >
             {title}
           </h2>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto no-scrollbar">{children}</div>
 
         {/* Footer */}
-        {footer && (
-          <div className="mt-xl pt-lg border-t border-border-subtle">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="mt-xl pt-lg border-t border-border-subtle">{footer}</div>}
       </div>
     </div>,
     document.body

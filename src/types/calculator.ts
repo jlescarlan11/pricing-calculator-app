@@ -5,6 +5,17 @@ export interface Ingredient {
   cost: number;
 }
 
+export interface Variant {
+  id: string;
+  name: string;
+  batchSize: number;
+  ingredients: Ingredient[];
+  laborCost: number;
+  overhead: number;
+  pricingConfig: PricingConfig;
+  currentSellingPrice?: number;
+}
+
 export interface CalculationInput {
   businessName?: string;
   productName: string;
@@ -13,6 +24,8 @@ export interface CalculationInput {
   laborCost: number;
   overhead: number;
   currentSellingPrice?: number;
+  hasVariants?: boolean;
+  variants?: Variant[];
 }
 
 export type PricingStrategy = 'markup' | 'margin';
@@ -20,6 +33,26 @@ export type PricingStrategy = 'markup' | 'margin';
 export interface PricingConfig {
   strategy: PricingStrategy;
   value: number;
+}
+
+export interface VariantResult {
+  id: string;
+  name: string;
+  totalCost: number;
+  costPerUnit: number;
+  recommendedPrice: number;
+  profitPerUnit: number;
+  profitMarginPercent: number;
+  breakEvenPrice: number;
+  currentSellingPrice?: number;
+  currentProfitPerUnit?: number;
+  currentProfitMargin?: number;
+  breakdown?: {
+    baseAllocation: number;
+    specificIngredients: number;
+    specificLabor: number;
+    specificOverhead: number;
+  };
 }
 
 export interface CalculationResult {
@@ -35,12 +68,18 @@ export interface CalculationResult {
     labor: number;
     overhead: number;
   };
+  variantResults?: VariantResult[];
 }
 
-export interface SavedPreset {
+export interface Preset {
   id: string;
+  userId?: string;
   name: string;
-  input: CalculationInput;
-  config: PricingConfig;
-  lastModified: number;
+  presetType: 'default' | 'variant';
+  baseRecipe: CalculationInput;
+  variants: Variant[];
+  pricingConfig: PricingConfig;
+  createdAt: string;
+  updatedAt: string;
+  lastSyncedAt?: string | null;
 }

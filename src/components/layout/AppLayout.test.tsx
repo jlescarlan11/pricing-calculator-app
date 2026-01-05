@@ -1,7 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { AppLayout } from './AppLayout';
+
+vi.mock('../../context/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: null,
+    loading: false,
+  })),
+}));
 
 describe('AppLayout', () => {
   const renderWithRouter = (ui: React.ReactElement) => {
@@ -19,15 +26,9 @@ describe('AppLayout', () => {
     expect(screen.getByTestId('test-child')).toBeInTheDocument();
   });
 
-  it('renders the DataWarningBanner', () => {
-    renderWithRouter(<AppLayout>Content</AppLayout>);
-    expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText(/Your progress is temporary/i)).toBeInTheDocument();
-  });
-
   it('renders version information in the footer', () => {
     renderWithRouter(<AppLayout>Content</AppLayout>);
-    
-    expect(screen.getByText(/v0\.1\.0/i)).toBeInTheDocument();
+
+    expect(screen.getByText(/Version 0\.1\.0/i)).toBeInTheDocument();
   });
 });

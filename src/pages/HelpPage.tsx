@@ -12,7 +12,9 @@ export const HelpPage: React.FC = () => {
         </div>
         <div>
           <h1 className="text-3xl text-ink-900">Understanding Pricing</h1>
-          <p className="text-ink-500 font-medium mt-xs">Master the art of profitable pricing with intention.</p>
+          <p className="text-ink-500 font-medium mt-xs">
+            Master the art of profitable pricing with intention.
+          </p>
         </div>
       </div>
 

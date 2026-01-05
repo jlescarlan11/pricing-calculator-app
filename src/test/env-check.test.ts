@@ -10,7 +10,10 @@ describe('Environment Check', () => {
   });
 
   it('checks sessionStorage', () => {
-    console.log('sessionStorage available:', typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined');
+    console.log(
+      'sessionStorage available:',
+      typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined'
+    );
     console.log('import.meta.env.MODE:', import.meta.env.MODE);
     expect(true).toBe(true);
   });

@@ -14,7 +14,7 @@ export const COOKIE_SAMPLE: { input: CalculationInput; config: PricingConfig } =
       { id: '7', name: 'Vanilla Extract & Baking Soda', amount: 1, cost: 10 },
     ],
     laborCost: 150, // 2 hours of work
-    overhead: 50,  // Electricity and packaging
+    overhead: 50, // Electricity and packaging
     currentSellingPrice: 15,
   },
   config: {

@@ -11,9 +11,7 @@ vi.mock('../../hooks/use-presets');
 const mockInput: CalculationInput = {
   productName: 'Test Product',
   batchSize: 10,
-  ingredients: [
-    { id: '1', name: 'Ingredient 1', amount: 100, cost: 50 },
-  ],
+  ingredients: [{ id: '1', name: 'Ingredient 1', amount: 100, cost: 50 }],
   laborCost: 20,
   overhead: 10,
 };
@@ -36,6 +34,9 @@ describe('SavePresetModal', () => {
       deletePreset: vi.fn(),
       getPreset: vi.fn(),
       getAllPresets: vi.fn(),
+      syncStatus: 'synced',
+      error: null,
+      refresh: vi.fn(),
     });
   });
 
@@ -54,7 +55,7 @@ describe('SavePresetModal', () => {
     expect(screen.getByText(/Save calculation/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Test Product');
     expect(screen.getByText(/Calculation Summary/i)).toBeInTheDocument();
-    
+
     // Check calculated values in summary
     // Total cost = 50 + 20 + 10 = 80
     // Recommended Price (50% markup on 80/10=8) = 8 * 1.5 = 12
@@ -108,12 +109,26 @@ describe('SavePresetModal', () => {
 
   it('validates duplicate names', async () => {
     vi.mocked(usePresetsHook.usePresets).mockReturnValue({
-      presets: [{ id: '1', name: 'Existing Product', input: mockInput, config: mockConfig, lastModified: Date.now() }],
+      presets: [
+        {
+          id: '1',
+          name: 'Existing Product',
+          baseRecipe: mockInput,
+          pricingConfig: mockConfig,
+          updatedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          presetType: 'default',
+          variants: [],
+        },
+      ],
       addPreset: mockAddPreset,
       updatePreset: vi.fn(),
       deletePreset: vi.fn(),
       getPreset: vi.fn(),
       getAllPresets: vi.fn(),
+      syncStatus: 'synced',
+      error: null,
+      refresh: vi.fn(),
     });
 
     render(
@@ -148,7 +163,7 @@ describe('SavePresetModal', () => {
     );
 
     const saveBtn = screen.getByText(/^Save$/);
-    
+
     // We need to wrap the click and the advancement of timers in act
     await act(async () => {
       fireEvent.click(saveBtn);
@@ -164,15 +179,17 @@ describe('SavePresetModal', () => {
 
     expect(mockAddPreset).toHaveBeenCalledWith({
       name: 'Test Product',
-      input: mockInput,
-      config: mockConfig,
+      baseRecipe: mockInput,
+      pricingConfig: mockConfig,
+      presetType: 'default',
+      variants: [],
     });
 
     // Should auto-close after delay (1800ms in component)
     act(() => {
       vi.advanceTimersByTime(2000);
     });
-    
+
     expect(mockOnClose).toHaveBeenCalled();
     vi.useRealTimers();
   });

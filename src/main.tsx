@@ -1,16 +1,16 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { ToastProvider } from './components/shared';
 import './index.css';
 import App from './App.tsx';
+import { ErrorBoundary } from './components/shared';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <ToastProvider>
+    <ErrorBoundary>
+      <BrowserRouter>
         <App />
-      </ToastProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>
 );

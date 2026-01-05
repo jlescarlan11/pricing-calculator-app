@@ -6,12 +6,14 @@ interface CurrentPriceProps {
   value?: number;
   onChange: (value?: number) => void;
   error?: string;
+  embedded?: boolean;
 }
 
 export const CurrentPrice: React.FC<CurrentPriceProps> = ({
   value,
   onChange,
   error,
+  embedded = false,
 }) => {
   const [isVisible, setIsVisible] = useState(value !== undefined && value > 0);
 
@@ -28,6 +30,42 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
     onChange(isNaN(val) ? undefined : val);
   };
 
+  if (embedded) {
+    return (
+      <div className="space-y-sm" data-testid="current-price-section">
+        <div className="flex items-center justify-between mb-xs">
+          <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">
+            Current Price
+          </h4>
+          <Button
+            variant="ghost"
+            onClick={toggleVisibility}
+            className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-sm h-auto text-xs font-medium rounded transition-all duration-300 flex items-center gap-xs"
+          >
+            {isVisible ? 'Hide' : 'Compare'}
+            {isVisible ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </Button>
+        </div>
+        {isVisible && (
+          <div className="animate-in fade-in slide-in-from-top-1 duration-300">
+            <Input
+              type="number"
+              value={value ?? ''}
+              onChange={handleInputChange}
+              currency
+              placeholder="0.00"
+              error={error}
+              min={0}
+              step="0.01"
+              className="w-full"
+              autoFocus
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <Card>
       <div className="space-y-xl">
@@ -42,7 +80,11 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
             className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-lg transition-all duration-300"
           >
             {isVisible ? 'Hide' : 'Compare'}
-            {isVisible ? <ChevronUp className="w-4 h-4 ml-xs" /> : <ChevronDown className="w-4 h-4 ml-xs" />}
+            {isVisible ? (
+              <ChevronUp className="w-4 h-4 ml-xs" />
+            ) : (
+              <ChevronDown className="w-4 h-4 ml-xs" />
+            )}
           </Button>
         </div>
 

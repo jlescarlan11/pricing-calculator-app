@@ -6,6 +6,7 @@ import {
   calculateMarginPrice,
   calculateRecommendedPrice,
   calculateProfitMargin,
+  performFullCalculation,
 } from './calculations';
 import type { Ingredient } from '../types/calculator';
 
@@ -13,9 +14,9 @@ describe('Calculation Utils', () => {
   describe('calculateTotalIngredientCost', () => {
     it('should sum the costs of all ingredients', () => {
       const ingredients: Ingredient[] = [
-        { id: '1', name: 'Flour', amount: 1, cost: 10.50 },
+        { id: '1', name: 'Flour', amount: 1, cost: 10.5 },
         { id: '2', name: 'Sugar', amount: 1, cost: 5.25 },
-        { id: '3', name: 'Eggs', amount: 1, cost: 2.00 },
+        { id: '3', name: 'Eggs', amount: 1, cost: 2.0 },
       ];
       expect(calculateTotalIngredientCost(ingredients)).toBe(17.75);
     });
@@ -33,7 +34,7 @@ describe('Calculation Utils', () => {
     });
 
     it('should handle large numbers correctly', () => {
-       const ingredients: Ingredient[] = [
+      const ingredients: Ingredient[] = [
         { id: '1', name: 'Gold', amount: 1, cost: 999999.99 },
         { id: '2', name: 'Silver', amount: 1, cost: 0.01 },
       ];
@@ -56,7 +57,7 @@ describe('Calculation Utils', () => {
     });
 
     it('should return 0 when total cost is negative', () => {
-        expect(calculateCostPerUnit(-100, 10)).toBe(0);
+      expect(calculateCostPerUnit(-100, 10)).toBe(0);
     });
   });
 
@@ -88,8 +89,8 @@ describe('Calculation Utils', () => {
     });
 
     it('should round correctly', () => {
-       // Cost 75, Margin 25% -> 75 / 0.75 = 100
-       expect(calculateMarginPrice(75, 25)).toBe(100);
+      // Cost 75, Margin 25% -> 75 / 0.75 = 100
+      expect(calculateMarginPrice(75, 25)).toBe(100);
     });
   });
 
@@ -121,9 +122,96 @@ describe('Calculation Utils', () => {
     it('should return 0 if selling price is 0', () => {
       expect(calculateProfitMargin(10, 0)).toBe(0);
     });
-    
+
     it('should return 0 if selling price is negative', () => {
-        expect(calculateProfitMargin(10, -5)).toBe(0);
+      expect(calculateProfitMargin(10, -5)).toBe(0);
+    });
+  });
+
+  describe('performFullCalculation', () => {
+    const baseInput = {
+      productName: 'Test Product',
+      batchSize: 100,
+      ingredients: [{ id: '1', name: 'Ing 1', amount: 100, cost: 100 }], // Total Ing Cost = 100
+      laborCost: 0,
+      overhead: 0,
+      hasVariants: false,
+      variants: [],
+    };
+
+    it('performs full calculation with variants and calculates current price comparison', () => {
+      const result = performFullCalculation(
+        {
+          ...baseInput,
+          hasVariants: true,
+          variants: [
+            {
+              id: 'v1',
+              name: 'Variant 1',
+              batchSize: 50,
+              ingredients: [],
+              laborCost: 0,
+              overhead: 0,
+              pricingConfig: { strategy: 'markup', value: 50 },
+              currentSellingPrice: 20, // User says they sell it for 20
+            },
+          ],
+        },
+        { strategy: 'markup', value: 50 }
+      );
+
+      expect(result.variantResults).toHaveLength(2); // Base + Variant 1
+
+      const v1 = result.variantResults?.find((v) => v.id === 'v1');
+      expect(v1).toBeDefined();
+      expect(v1?.currentSellingPrice).toBe(20);
+
+      // Cost per unit is 1.00 (from base).
+      // Markup 50% -> Recommended 1.50.
+      // Current Price 20.
+      // Profit = 20 - 1 = 19.
+      // Margin = (20 - 1) / 20 = 0.95 = 95%.
+
+      expect(v1?.currentProfitPerUnit).toBe(19);
+      expect(v1?.currentProfitMargin).toBe(95);
+    });
+
+    it('populates breakdown property for variants', () => {
+      const result = performFullCalculation(
+        {
+          ...baseInput,
+          batchSize: 10,
+          ingredients: [{ id: '1', name: 'Ing 1', amount: 10, cost: 100 }], // Cost per unit = 10
+          laborCost: 20, // Total base cost = 120. Cost per unit = 12
+          overhead: 0,
+          hasVariants: true,
+          variants: [
+            {
+              id: 'v1',
+              name: 'Variant 1',
+              batchSize: 5,
+              ingredients: [{ id: '2', name: 'Add-on', amount: 1, cost: 10 }], // Specific cost = 10
+              laborCost: 5,
+              overhead: 5,
+              pricingConfig: { strategy: 'markup', value: 50 },
+            },
+          ],
+        },
+        { strategy: 'markup', value: 50 }
+      );
+
+      const v1 = result.variantResults?.find((v) => v.id === 'v1');
+      expect(v1?.breakdown).toBeDefined();
+      expect(v1?.breakdown?.baseAllocation).toBe(60); // 12 * 5
+      expect(v1?.breakdown?.specificIngredients).toBe(10);
+      expect(v1?.breakdown?.specificLabor).toBe(5);
+      expect(v1?.breakdown?.specificOverhead).toBe(5);
+      expect(v1?.totalCost).toBe(80); // 60 + 10 + 5 + 5
+
+      const base = result.variantResults?.find((v) => v.id === 'base-original');
+      expect(base?.breakdown).toBeDefined();
+      expect(base?.breakdown?.baseAllocation).toBe(60); // 12 * 5 remaining
+      expect(base?.breakdown?.specificIngredients).toBe(0);
     });
   });
 });

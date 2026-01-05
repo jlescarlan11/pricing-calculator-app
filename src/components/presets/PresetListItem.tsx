@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FileEdit, Trash2, Play, Calendar, Package, MoreVertical } from 'lucide-react';
-import type { SavedPreset } from '../../types';
+import type { Preset } from '../../types';
 import { formatDate } from '../../utils/formatters';
 import { Button, Card, Badge, Tooltip } from '../shared';
 
 interface PresetListItemProps {
-  preset: SavedPreset;
-  onLoad: (preset: SavedPreset) => void;
-  onEdit: (preset: SavedPreset) => void;
-  onDelete: (preset: SavedPreset) => void;
+  preset: Preset;
+  onLoad: (preset: Preset) => void;
+  onEdit: (preset: Preset) => void;
+  onDelete: (preset: Preset) => void;
   viewMode?: 'grid' | 'list';
 }
 
@@ -23,8 +23,10 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
   onDelete,
   viewMode = 'grid',
 }) => {
-  const { name, input, lastModified, config } = preset;
-  const { productName, batchSize, ingredients } = input;
+  const { name, baseRecipe, updatedAt, pricingConfig } = preset;
+  const productName = baseRecipe?.productName || 'Unnamed Product';
+  const batchSize = baseRecipe?.batchSize || 1;
+  const ingredients = baseRecipe?.ingredients || [];
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,18 +49,16 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
 
   if (viewMode === 'list') {
     return (
-      <div className="group relative flex items-center justify-between p-md bg-surface hover:bg-surface-hover rounded-md border border-border-subtle transition-all duration-300">
+      <div className="group relative flex items-center justify-between p-md bg-surface hover:bg-surface-hover rounded-xl border border-border-subtle transition-all duration-300">
         <div className="flex-1 min-w-0 flex items-center gap-md">
-          <div className="p-xs bg-clay/10 rounded-sm text-clay">
+          <div className="p-xs bg-clay/10 rounded-md text-clay">
             <Package size={16} />
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="text-sm font-bold text-ink-900 truncate tracking-tight" title={name}>
               {name}
             </h4>
-            <p className="text-[10px] text-ink-500 font-medium">
-              {formatDate(lastModified)}
-            </p>
+            <p className="text-[10px] text-ink-500 font-medium">{formatDate(updatedAt)}</p>
           </div>
         </div>
 
@@ -67,21 +67,21 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => setIsActionsOpen(!isActionsOpen)}
-            className="w-8 h-8 p-0 rounded-sm text-ink-500 hover:text-clay"
+            className="w-8 h-8 p-0 text-ink-500 hover:text-clay"
             aria-label="Actions"
           >
             <MoreVertical size={18} />
           </Button>
 
           {isActionsOpen && (
-            <div className="absolute right-0 mt-xs w-48 origin-top-right bg-bg-main border border-border-base rounded-md shadow-level-4 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="absolute right-0 mt-xs w-48 origin-top-right bg-bg-main border border-border-base rounded-xl shadow-level-4 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
               <div className="py-xs">
                 <button
                   onClick={() => {
                     onLoad(preset);
                     setIsActionsOpen(false);
                   }}
-                  className="flex items-center w-full px-lg py-md text-xs font-bold text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md"
+                  className="flex items-center w-full px-lg py-md text-xs font-bold text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md cursor-pointer"
                 >
                   <Play size={14} className="fill-current text-clay" />
                   Load into Calculator
@@ -91,7 +91,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
                     onEdit(preset);
                     setIsActionsOpen(false);
                   }}
-                  className="flex items-center w-full px-lg py-md text-xs font-bold text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md"
+                  className="flex items-center w-full px-lg py-md text-xs font-bold text-ink-700 hover:bg-surface-hover transition-colors text-left gap-md cursor-pointer"
                 >
                   <FileEdit size={14} className="text-ink-500" />
                   Edit Name
@@ -104,7 +104,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
                     }
                     setIsActionsOpen(false);
                   }}
-                  className="flex items-center w-full px-lg py-md text-xs font-bold text-rust hover:bg-rust/5 transition-colors text-left gap-md"
+                  className="flex items-center w-full px-lg py-md text-xs font-bold text-rust hover:bg-rust/5 transition-colors text-left gap-md cursor-pointer"
                 >
                   <Trash2 size={14} />
                   Delete Preset
@@ -118,7 +118,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
   }
 
   return (
-    <Card className="group transition-all duration-500 hover:border-clay/50 bg-bg-main hover:bg-surface border-border-subtle shadow-none">
+    <Card className="group transition-all duration-500 hover:border-clay/50 bg-bg-main hover:bg-surface border-border-subtle shadow-none rounded-xl">
       {/* Header: Name and Date */}
       <div className="flex items-start justify-between gap-sm mb-md">
         <div className="min-w-0">
@@ -127,7 +127,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
           </h4>
           <p className="text-[10px] text-ink-500 font-medium flex items-center gap-xs mt-0.5">
             <Calendar size={10} className="opacity-70" />
-            {formatDate(lastModified)}
+            {formatDate(updatedAt)}
           </p>
         </div>
         <Badge variant="info" className="text-[9px] uppercase tracking-widest py-0 px-xs shrink-0">
@@ -136,7 +136,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
       </div>
 
       {/* Product Details Section */}
-      <div className="space-y-sm mb-md bg-surface/50 p-sm rounded-sm border border-border-subtle/50">
+      <div className="space-y-sm mb-md bg-surface/50 p-sm rounded-md border border-border-subtle/50">
         <div className="flex items-center gap-sm text-xs text-ink-700">
           <Package className="w-3.5 h-3.5 text-clay/60 shrink-0" />
           <span className="truncate font-semibold" title={productName || 'Unnamed Product'}>
@@ -153,12 +153,14 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
       <div className="grid grid-cols-2 gap-md text-[9px] uppercase tracking-widest font-bold mb-md">
         <div className="border-r border-border-subtle pr-md">
           <span className="block text-ink-500 mb-xs opacity-70">Ingredients</span>
-          <span className="text-ink-900">{ingredients.length} item{ingredients.length !== 1 ? 's' : ''}</span>
+          <span className="text-ink-900">
+            {ingredients.length} item{ingredients.length !== 1 ? 's' : ''}
+          </span>
         </div>
         <div className="pl-md">
           <span className="block text-ink-500 mb-xs opacity-70">Strategy</span>
           <span className="text-ink-900">
-            {config.strategy} ({config.value}%)
+            {pricingConfig.strategy} ({pricingConfig.value}%)
           </span>
         </div>
       </div>
@@ -179,7 +181,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
             variant="secondary"
             size="sm"
             onClick={() => onEdit(preset)}
-            className="w-10 h-10 p-0 flex items-center justify-center rounded-sm hover:text-clay transition-colors"
+            className="w-10 h-10 p-0 flex items-center justify-center hover:text-clay transition-colors"
             aria-label="Edit preset name"
           >
             <FileEdit size={16} />
@@ -194,7 +196,7 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
                 onDelete(preset);
               }
             }}
-            className="w-10 h-10 p-0 flex items-center justify-center text-ink-300 hover:text-rust hover:bg-rust/5 rounded-sm transition-colors"
+            className="w-10 h-10 p-0 flex items-center justify-center text-ink-300 hover:text-rust hover:bg-rust/5 transition-colors"
             aria-label="Delete preset"
           >
             <Trash2 size={16} />

@@ -56,9 +56,9 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
     setIsModalOpen(false);
   };
 
-  const tooltipContent = disabled 
-    ? "Please complete the details above to save your progress." 
-    : "Keep this calculation for your future records.";
+  const tooltipContent = disabled
+    ? 'Please complete the details above to save your progress.'
+    : 'Keep this calculation for your future records.';
 
   return (
     <>

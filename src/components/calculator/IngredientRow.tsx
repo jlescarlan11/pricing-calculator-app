@@ -82,7 +82,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`
         grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_auto] gap-md items-start md:items-center py-md
         animate-in fade-in duration-400
@@ -132,15 +132,16 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
       </div>
 
       <div className="flex justify-end md:justify-center md:pt-6">
-        <button
-          type="button"
-          className="w-[36px] h-[36px] rounded-[50%] flex items-center justify-center text-[#8B8680] hover:text-[#B85C38] hover:bg-[rgba(184,92,56,0.05)] transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[#B85C38] focus-visible:ring-offset-2 cursor-pointer"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-10 h-10 p-0 text-ink-500 hover:text-rust hover:bg-rust/5"
           onClick={handleDeleteClick}
           aria-label={`Remove ${ingredient.name || 'ingredient'}`}
           title="Remove ingredient (Shift+Delete)"
         >
           <Trash2 className="w-5 h-5" />
-        </button>
+        </Button>
       </div>
 
       <Modal

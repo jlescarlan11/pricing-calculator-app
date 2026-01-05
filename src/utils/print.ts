@@ -27,7 +27,7 @@ export const getPrintDate = (): string => {
 };
 
 /**
- * Prepares a summary object specifically for printing if a separate 
+ * Prepares a summary object specifically for printing if a separate
  * layout or formatting is needed beyond CSS media queries.
  */
 export const preparePrintSummary = (

@@ -1,12 +1,12 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Info, Package } from 'lucide-react';
 import { CalculatorForm, SampleDemo } from '../components/calculator';
-import { ResultsDisplay } from '../components/results';
+import { ResultsDisplay, StickySummary } from '../components/results';
 import { PresetsList } from '../components/presets';
-import { Modal, Tooltip, useToast } from '../components/shared';
+import { Modal, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
-import type { SavedPreset } from '../types';
+import type { Preset } from '../types';
 
 export const CalculatorPage: React.FC = () => {
   const { addToast } = useToast();
@@ -24,13 +24,41 @@ export const CalculatorPage: React.FC = () => {
     calculate,
     reset,
     loadPreset,
+    setHasVariants,
+    addVariant,
+    removeVariant,
+    updateVariant,
+    updateVariantIngredient,
+    addVariantIngredient,
+    removeVariantIngredient,
   } = useCalculatorState();
 
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
+  const [showStickySummary, setShowStickySummary] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const showResults = !!results;
+
+  // Handle sticky summary visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!resultsRef.current) {
+        setShowStickySummary(false);
+        return;
+      }
+
+      const resultsRect = resultsRef.current.getBoundingClientRect();
+      const isResultsVisible = resultsRect.top < window.innerHeight && resultsRect.bottom > 0;
+
+      // Show sticky summary if results exist but are not fully in view
+      // and we are currently in the form section
+      setShowStickySummary(showResults && !isResultsVisible);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [showResults]);
 
   const handleCalculate = async () => {
     const res = await calculate();
@@ -39,6 +67,10 @@ export const CalculatorPage: React.FC = () => {
       // Scroll to results at the top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handleScrollToResults = () => {
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleScrollToForm = () => {
@@ -57,41 +89,51 @@ export const CalculatorPage: React.FC = () => {
     loadPreset({
       id: 'sample',
       name: 'Sample Cookie',
-      input: COOKIE_SAMPLE.input,
-      config: COOKIE_SAMPLE.config,
-      lastModified: Date.now(),
+      presetType: 'default',
+      baseRecipe: COOKIE_SAMPLE.input,
+      pricingConfig: COOKIE_SAMPLE.config,
+      variants: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
-    
+
     // Smooth scroll to form area
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [loadPreset]);
 
-  const handleLoadPreset = useCallback((preset: SavedPreset) => {
-    loadPreset(preset);
-    setIsPresetsModalOpen(false);
-    // Scroll to results
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [loadPreset]);
+  const handleLoadPreset = useCallback(
+    (preset: Preset) => {
+      loadPreset(preset);
+      setIsPresetsModalOpen(false);
+      // Scroll to results
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [loadPreset]
+  );
 
-  const handleEditPreset = useCallback((preset: SavedPreset) => {
-    loadPreset(preset);
-    setIsPresetsModalOpen(false);
-    // Scroll to form
-    formRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [loadPreset]);
+  const handleEditPreset = useCallback(
+    (preset: Preset) => {
+      loadPreset(preset);
+      setIsPresetsModalOpen(false);
+      // Scroll to form
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    },
+    [loadPreset]
+  );
 
   return (
     <div className="animate-in fade-in duration-700 relative pb-2xl">
       {/* Intro Section (only when no results) */}
       {!showResults && (
         <div className="space-y-lg mb-2xl">
-          <div className="p-lg md:p-xl bg-surface rounded-lg border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="p-lg md:p-xl bg-surface rounded-xl border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
             <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
             <div>
               <p className="text-ink-900 font-medium mb-xs">Welcome to your profit partner.</p>
               <p className="text-ink-700 text-sm leading-relaxed">
-                Fill in your costs below. We&apos;ll help you find the perfect price to ensure your business grows sustainably. 
-                Don&apos;t forget to include your labor—your time is valuable.
+                Fill in your costs below. We&apos;ll help you find the perfect price to ensure your
+                business grows sustainably. Don&apos;t forget to include your labor—your time is
+                valuable.
               </p>
             </div>
           </div>
@@ -102,21 +144,24 @@ export const CalculatorPage: React.FC = () => {
 
       {/* Results Section (Top Priority) */}
       {showResults && (
-        <div ref={resultsRef} className="mb-4xl animate-in fade-in slide-in-from-top-8 duration-700">
-          <ResultsDisplay 
-            results={results} 
-            input={input} 
+        <div
+          ref={resultsRef}
+          className="mb-4xl animate-in fade-in slide-in-from-top-8 duration-700"
+        >
+          <ResultsDisplay
+            results={results}
+            input={input}
             config={config}
-            onEdit={handleScrollToForm} 
+            onEdit={handleScrollToForm}
           />
-          
+
           <div className="h-px bg-border-subtle my-3xl" role="separator" />
         </div>
       )}
 
       {/* Input Form Section (Secondary Priority) */}
       <div ref={formRef} id="calculator-form" className="min-h-[600px]">
-        <CalculatorForm 
+        <CalculatorForm
           input={input}
           config={config}
           errors={errors}
@@ -128,21 +173,24 @@ export const CalculatorPage: React.FC = () => {
           onUpdateConfig={updateConfig}
           onCalculate={handleCalculate}
           onReset={handleReset}
+          onSetHasVariants={setHasVariants}
+          onAddVariant={addVariant}
+          onRemoveVariant={removeVariant}
+          onUpdateVariant={updateVariant}
+          onUpdateVariantIngredient={updateVariantIngredient}
+          onAddVariantIngredient={addVariantIngredient}
+          onRemoveVariantIngredient={removeVariantIngredient}
+          onOpenPresets={() => setIsPresetsModalOpen(true)}
         />
       </div>
 
-      {/* Floating Action Button for Presets (Tertiary) */}
-      <div className="fixed bottom-lg right-lg z-40 print:hidden">
-        <Tooltip content="Your Saved Products" position="left">
-          <button
-            onClick={() => setIsPresetsModalOpen(true)}
-            className="w-14 h-14 bg-clay text-white rounded-round shadow-level-3 flex items-center justify-center hover:scale-110 transition-all duration-300 group"
-            aria-label="View Saved Products"
-          >
-            <Package className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-          </button>
-        </Tooltip>
-      </div>
+      <StickySummary
+        results={results}
+        onScrollToResults={handleScrollToResults}
+        onCalculate={handleCalculate}
+        isCalculating={isCalculating}
+        isVisible={showStickySummary}
+      />
 
       {/* Presets Modal */}
       <Modal
@@ -157,10 +205,7 @@ export const CalculatorPage: React.FC = () => {
         maxWidth="max-w-3xl"
       >
         <div className="py-md">
-          <PresetsList 
-            onLoad={handleLoadPreset}
-            onEdit={handleEditPreset}
-          />
+          <PresetsList onLoad={handleLoadPreset} onEdit={handleEditPreset} />
         </div>
       </Modal>
     </div>
