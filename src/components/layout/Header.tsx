@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Calculator, HelpCircle, Menu, X, Lightbulb } from 'lucide-react';
+import { Calculator, HelpCircle, Menu, X, Lightbulb, User, LogIn } from 'lucide-react';
 import { PricingExplainerModal } from '../help/PricingExplainerModal';
 import { FAQ } from '../help/FAQ';
 import { Modal } from '../shared/Modal';
+import { useAuth } from '../../context/AuthContext';
 
 export const Header: React.FC = () => {
+  const { user } = useAuth();
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isFAQModalOpen, setIsFAQModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -48,7 +50,18 @@ export const Header: React.FC = () => {
                 <span>Pricing Tips</span>
               </NavLink>
               <div className="h-6 w-px bg-border-subtle mx-md" />
-              <span className="text-xs text-ink-500 font-medium">v0.1.0</span>
+              
+              {user ? (
+                <NavLink to="/account" className={navLinkClass}>
+                  <User size={18} />
+                  <span>Account</span>
+                </NavLink>
+              ) : (
+                <NavLink to="/auth" className={navLinkClass}>
+                  <LogIn size={18} />
+                  <span>Sign In</span>
+                </NavLink>
+              )}
             </div>
 
             {/* Mobile Actions */}
@@ -93,6 +106,29 @@ export const Header: React.FC = () => {
               <Lightbulb size={18} />
               Pricing Tips
             </NavLink>
+            
+            <div className="h-px bg-border-subtle my-md" />
+
+            {user ? (
+              <NavLink 
+                to="/account" 
+                className={navLinkClass}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <User size={18} />
+                Account
+              </NavLink>
+            ) : (
+              <NavLink 
+                to="/auth" 
+                className={navLinkClass}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <LogIn size={18} />
+                Sign In
+              </NavLink>
+            )}
+
             <div className="pt-md flex items-center justify-between text-[10px] text-ink-500 px-md border-t border-border-subtle mt-md uppercase tracking-widest">
               <span>Version 0.1.0</span>
               <span>Made with intention</span>
