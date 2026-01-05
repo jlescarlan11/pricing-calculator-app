@@ -5,6 +5,17 @@ export interface Ingredient {
   cost: number;
 }
 
+export interface Variant {
+  id: string;
+  name: string;
+  batchSize: number;
+  ingredients: Ingredient[];
+  laborCost: number;
+  overhead: number;
+  pricingConfig: PricingConfig;
+  currentSellingPrice?: number;
+}
+
 export interface CalculationInput {
   businessName?: string;
   productName: string;
@@ -13,6 +24,8 @@ export interface CalculationInput {
   laborCost: number;
   overhead: number;
   currentSellingPrice?: number;
+  hasVariants?: boolean;
+  variants?: Variant[];
 }
 
 export type PricingStrategy = 'markup' | 'margin';
