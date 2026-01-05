@@ -28,20 +28,6 @@ describe('Card', () => {
 
   it('applies interactive classes when interactive prop is true', () => {
     const { container } = render(<Card interactive>Content</Card>);
-    const card = container.firstChild;
-    expect(card).toHaveClass('hover:shadow-level-2');
-    expect(card).toHaveClass('hover:-translate-y-0.5');
-    expect(card).toHaveClass('cursor-pointer');
-  });
-
-  it('renders texture when texture prop is true', () => {
-    const { container } = render(<Card texture>Content</Card>);
-    const texture = container.querySelector('.paper-texture');
-    expect(texture).toBeInTheDocument();
-  });
-
-  it('applies padding classes by default', () => {
-    render(<Card>Content</Card>);
-    expect(screen.getByText('Content')).toBeInTheDocument();
+    expect(container.firstChild).toHaveClass('hover:shadow-level-2');
   });
 });

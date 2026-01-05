@@ -7,7 +7,6 @@ export interface CardProps {
   footer?: React.ReactNode;
   noPadding?: boolean;
   interactive?: boolean;
-  texture?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -17,7 +16,6 @@ export const Card: React.FC<CardProps> = ({
   footer,
   noPadding = false,
   interactive = false,
-  texture = false,
 }) => {
   const baseClasses =
     'bg-surface rounded-xl border border-border-subtle shadow-level-1 overflow-hidden relative transition-all duration-[400ms] ease-in-out';
@@ -27,8 +25,6 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div className={`${baseClasses} ${interactiveClasses} ${className}`}>
-      {texture && <div className="paper-texture absolute inset-0 opacity-30 pointer-events-none" />}
-
       {noPadding ? (
         <>
           {title && (

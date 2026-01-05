@@ -51,7 +51,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
 
             {hasVariants ? (
               <div className="flex gap-md overflow-x-auto no-scrollbar pb-0.5">
-                {results.variantResults.map((vr) => (
+                {results?.variantResults?.map((vr) => (
                   <div key={vr.id} className="flex flex-col min-w-max border-r border-border-subtle pr-md last:border-0 last:pr-0">
                     <span className="text-[9px] font-bold text-ink-700 truncate max-w-[100px]">
                       {vr.name.includes('(Base)') ? 'Base' : vr.name}

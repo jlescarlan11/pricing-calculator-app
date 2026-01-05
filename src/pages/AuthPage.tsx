@@ -73,56 +73,56 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-xl">
-      <div className="w-full max-w-md">
+    <div className="flex flex-col items-center justify-center min-h-[80vh] py-2xl px-lg">
+      <div className="w-full max-w-[440px] animate-in fade-in duration-700">
         {guestPresetsCount > 0 && (
-          <div className="mb-lg p-md bg-clay/10 border border-clay/20 rounded-xl flex items-start gap-md animate-in slide-in-from-top-4 fade-in duration-500">
-            <div className="p-xs bg-white rounded-full shrink-0">
-              <Save className="w-5 h-5 text-clay" />
+          <div className="mb-xl p-lg bg-moss/5 border border-moss/10 rounded-2xl flex items-center gap-lg shadow-sm animate-in slide-in-from-top-4 duration-500">
+            <div className="p-2.5 bg-white rounded-full shadow-sm shrink-0">
+              <Save className="w-5 h-5 text-moss" />
             </div>
-            <div>
-              <h3 className="font-medium text-ink-900 text-sm">
+            <div className="flex-1">
+              <h3 className="font-semibold text-ink-900 text-sm">
                 We found {guestPresetsCount} unsaved recipe{guestPresetsCount !== 1 ? 's' : ''}
               </h3>
-              <p className="text-sm text-ink-700 mt-xs leading-relaxed">
+              <p className="text-sm text-ink-700 mt-0.5 leading-relaxed">
                 {mode === 'signup'
-                  ? 'Create an account to save them permanently to the cloud.'
-                  : 'Sign in to sync them to your account and access them anywhere.'}
+                  ? 'Create an account to save them to the cloud.'
+                  : 'Sign in to sync them and access them anywhere.'}
               </p>
             </div>
           </div>
         )}
 
         <div className="text-center mb-xl">
-          <h1 className="font-serif text-3xl md:text-4xl text-ink-900 mb-sm">
+          <h1 className="font-serif text-3xl md:text-4xl text-ink-900 mb-md tracking-tight">
             {mode === 'login' && 'Welcome Back'}
             {mode === 'signup' && 'Create Account'}
             {mode === 'forgot-password' && 'Reset Password'}
           </h1>
-          <p className="text-ink-500">
-            {mode === 'login' && 'Sign in to access your saved recipes'}
-            {mode === 'signup' && 'Join to save and manage your pricing'}
-            {mode === 'forgot-password' && 'Enter your email to receive a reset link'}
+          <p className="text-ink-500 max-w-[320px] mx-auto leading-relaxed">
+            {mode === 'login' && 'Sign in to access your saved recipes and pricing calculations'}
+            {mode === 'signup' && 'Join to save your products and manage your pricing securely'}
+            {mode === 'forgot-password' && 'Enter your email to receive a secure reset link'}
           </p>
         </div>
 
-        <Card className="p-xl md:p-2xl shadow-lg border-border-subtle bg-white">
-          <form onSubmit={handleSubmit} className="space-y-lg">
+        <Card className="shadow-xl border-border-subtle/50 overflow-visible">
+          <form onSubmit={handleSubmit} className="space-y-xl">
             {error && (
-              <div className="p-md bg-rust/10 border border-rust/20 rounded-xl flex items-start space-x-sm">
+              <div className="p-md bg-rust/5 border border-rust/10 rounded-xl flex items-start space-x-sm animate-shake">
                 <AlertCircle className="w-5 h-5 text-rust shrink-0 mt-0.5" />
-                <p className="text-sm text-rust">{error}</p>
+                <p className="text-sm text-rust font-medium">{error}</p>
               </div>
             )}
 
             {successMessage && (
-              <div className="p-md bg-moss/10 border border-moss/20 rounded-xl flex items-start space-x-sm">
+              <div className="p-md bg-moss/5 border border-moss/10 rounded-xl flex items-start space-x-sm animate-in fade-in duration-500">
                 <CheckCircle2 className="w-5 h-5 text-moss shrink-0 mt-0.5" />
-                <p className="text-sm text-moss">{successMessage}</p>
+                <p className="text-sm text-moss font-medium">{successMessage}</p>
               </div>
             )}
 
-            <div className="space-y-md">
+            <div className="space-y-lg">
               <Input
                 label="Email Address"
                 type="email"
@@ -130,6 +130,7 @@ export const AuthPage: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
+                autoComplete="email"
               />
 
               {mode !== 'forgot-password' && (
@@ -140,6 +141,7 @@ export const AuthPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                 />
               )}
 
@@ -151,11 +153,17 @@ export const AuthPage: React.FC = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  autoComplete="new-password"
                 />
               )}
             </div>
 
-            <Button type="submit" variant="primary" disabled={loading} className="mt-xl w-full">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={loading}
+              className="w-full h-12 shadow-level-2"
+            >
               {loading ? (
                 'Processing...'
               ) : (
@@ -169,21 +177,21 @@ export const AuthPage: React.FC = () => {
             </Button>
           </form>
 
-          <div className="mt-xl pt-lg border-t border-border-subtle space-y-md text-center">
+          <div className="mt-xl pt-xl border-t border-border-subtle/50 flex flex-col gap-lg text-center">
             {mode === 'login' && (
               <>
                 <p className="text-sm text-ink-700">
                   Don&apos;t have an account?{' '}
                   <button
                     onClick={() => toggleMode('signup')}
-                    className="text-clay font-medium hover:underline focus:outline-none"
+                    className="text-clay font-semibold hover:text-clay/80 transition-colors focus:outline-none focus:underline"
                   >
                     Sign Up
                   </button>
                 </p>
                 <button
                   onClick={() => toggleMode('forgot-password')}
-                  className="text-sm text-ink-500 hover:text-ink-700 hover:underline focus:outline-none"
+                  className="text-xs text-ink-500 hover:text-ink-700 transition-colors focus:outline-none focus:underline"
                 >
                   Forgot your password?
                 </button>
@@ -195,7 +203,7 @@ export const AuthPage: React.FC = () => {
                 Already have an account?{' '}
                 <button
                   onClick={() => toggleMode('login')}
-                  className="text-clay font-medium hover:underline focus:outline-none"
+                  className="text-clay font-semibold hover:text-clay/80 transition-colors focus:outline-none focus:underline"
                 >
                   Sign In
                 </button>
@@ -205,7 +213,7 @@ export const AuthPage: React.FC = () => {
             {mode === 'forgot-password' && (
               <button
                 onClick={() => toggleMode('login')}
-                className="text-sm text-ink-700 hover:text-clay font-medium hover:underline focus:outline-none"
+                className="text-sm text-ink-700 hover:text-clay font-semibold transition-colors focus:outline-none focus:underline"
               >
                 Back to Sign In
               </button>
