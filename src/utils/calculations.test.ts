@@ -6,6 +6,7 @@ import {
   calculateMarginPrice,
   calculateRecommendedPrice,
   calculateProfitMargin,
+  performFullCalculation,
 } from './calculations';
 import type { Ingredient } from '../types/calculator';
 
@@ -124,6 +125,52 @@ describe('Calculation Utils', () => {
     
     it('should return 0 if selling price is negative', () => {
         expect(calculateProfitMargin(10, -5)).toBe(0);
+    });
+  });
+
+  describe('performFullCalculation', () => {
+    const baseInput = {
+      productName: 'Test Product',
+      batchSize: 100,
+      ingredients: [{ id: '1', name: 'Ing 1', amount: 100, cost: 100 }], // Total Ing Cost = 100
+      laborCost: 0,
+      overhead: 0,
+      hasVariants: false,
+      variants: []
+    };
+
+    it('performs full calculation with variants and calculates current price comparison', () => {
+      const result = performFullCalculation({
+        ...baseInput,
+        hasVariants: true,
+        variants: [
+          {
+            id: 'v1',
+            name: 'Variant 1',
+            batchSize: 50,
+            ingredients: [],
+            laborCost: 0,
+            overhead: 0,
+            pricingConfig: { strategy: 'markup', value: 50 },
+            currentSellingPrice: 20 // User says they sell it for 20
+          }
+        ]
+      }, { strategy: 'markup', value: 50 });
+  
+      expect(result.variantResults).toHaveLength(2); // Base + Variant 1
+  
+      const v1 = result.variantResults?.find(v => v.id === 'v1');
+      expect(v1).toBeDefined();
+      expect(v1?.currentSellingPrice).toBe(20);
+      
+      // Cost per unit is 1.00 (from base). 
+      // Markup 50% -> Recommended 1.50.
+      // Current Price 20.
+      // Profit = 20 - 1 = 19.
+      // Margin = (20 - 1) / 20 = 0.95 = 95%.
+      
+      expect(v1?.currentProfitPerUnit).toBe(19);
+      expect(v1?.currentProfitMargin).toBe(95);
     });
   });
 });

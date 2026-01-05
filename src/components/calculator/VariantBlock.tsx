@@ -1,14 +1,14 @@
 import React from 'react';
 import { Trash2, Plus } from 'lucide-react';
 import { Card, Button, Input } from '../shared';
-import { IngredientRow, LaborCost, OverheadCost, PricingStrategy } from './index';
+import { IngredientRow, LaborCost, OverheadCost, PricingStrategy, CurrentPrice } from './index';
 import type { Variant, Ingredient } from '../../types/calculator';
-import { performFullCalculation } from '../../utils/calculations';
 
 interface VariantBlockProps {
   variant: Variant;
   index: number;
   remainingBatch: number; // Remaining batch from base
+  costPerUnit: number;
   onUpdate: (id: string, updates: Partial<Variant>) => void;
   onRemove: (id: string) => void;
   onUpdateIngredient: (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => void;
@@ -21,6 +21,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
   variant,
   index,
   remainingBatch,
+  costPerUnit,
   onUpdate,
   onRemove,
   onUpdateIngredient,
@@ -46,6 +47,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
             placeholder={`Variant ${index + 1} Name`}
             className="font-serif text-lg font-bold bg-transparent border-none p-0 focus:ring-0 w-full"
             error={errors[`variants.${variant.id}.name`]}
+            aria-label={`Variant ${index + 1} Name`}
           />
           <Button
             variant="ghost"
@@ -62,24 +64,21 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
       <div className="space-y-lg">
         {/* Allocation */}
         <div className="bg-surface p-md rounded-lg border border-border-subtle">
-          <label className="block text-sm font-medium text-ink-700 mb-xs">
-            Batch Allocation (Max: {maxBatchSize})
-          </label>
-          <div className="flex items-center gap-sm">
-            <Input
-              type="number"
-              value={variant.batchSize}
-              onChange={(e) => {
-                const val = parseFloat(e.target.value);
-                onUpdate(variant.id, { batchSize: isNaN(val) ? 0 : val });
-              }}
-              className="w-full"
-              min={0}
-              max={maxBatchSize}
-              error={errors[`variants.${variant.id}.batchSize`]}
-            />
-            <span className="text-ink-500 text-sm">units from base</span>
-          </div>
+          <Input
+            label={`Batch Allocation (Max: ${maxBatchSize})`}
+            type="number"
+            value={variant.batchSize}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value);
+              onUpdate(variant.id, { batchSize: isNaN(val) ? 0 : val });
+            }}
+            className="w-full"
+            min={0}
+            max={maxBatchSize}
+            error={errors[`variants.${variant.id}.batchSize`]}
+            suffix="units"
+            helperText="from base batch"
+          />
         </div>
 
         <div className="h-px bg-border-subtle" role="separator" />
@@ -145,8 +144,18 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
         <PricingStrategy
           strategy={variant.pricingConfig.strategy}
           value={variant.pricingConfig.value}
-          costPerUnit={0} // We'd need to calculate this on the fly for preview, or pass it in. For now 0.
+          costPerUnit={costPerUnit}
           onChange={(strategy, value) => onUpdate(variant.id, { pricingConfig: { strategy, value } })}
+          embedded
+        />
+
+        <div className="h-px bg-border-subtle" role="separator" />
+
+        {/* Current Price */}
+        <CurrentPrice
+          value={variant.currentSellingPrice}
+          onChange={(val) => onUpdate(variant.id, { currentSellingPrice: val })}
+          embedded
         />
       </div>
     </Card>

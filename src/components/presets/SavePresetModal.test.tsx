@@ -36,6 +36,9 @@ describe('SavePresetModal', () => {
       deletePreset: vi.fn(),
       getPreset: vi.fn(),
       getAllPresets: vi.fn(),
+      syncStatus: 'synced',
+      error: null,
+      refresh: vi.fn(),
     });
   });
 

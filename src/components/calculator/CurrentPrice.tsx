@@ -6,12 +6,14 @@ interface CurrentPriceProps {
   value?: number;
   onChange: (value?: number) => void;
   error?: string;
+  embedded?: boolean;
 }
 
 export const CurrentPrice: React.FC<CurrentPriceProps> = ({
   value,
   onChange,
   error,
+  embedded = false,
 }) => {
   const [isVisible, setIsVisible] = useState(value !== undefined && value > 0);
 
@@ -27,6 +29,25 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
     const val = parseFloat(e.target.value);
     onChange(isNaN(val) ? undefined : val);
   };
+
+  if (embedded) {
+    return (
+      <div className="space-y-sm">
+        <Input
+          label="Current Price"
+          type="number"
+          value={value ?? ''}
+          onChange={handleInputChange}
+          currency
+          placeholder="0.00"
+          error={error}
+          min={0}
+          step="0.01"
+          className="w-full"
+        />
+      </div>
+    );
+  }
 
   return (
     <Card>

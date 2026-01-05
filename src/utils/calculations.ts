@@ -204,6 +204,14 @@ export const performFullCalculation = (
     const variantProfitTotal = round(variantProfitPerUnit * variant.batchSize);
     const variantMargin = calculateProfitMargin(variantCostPerUnit, variantRecPrice);
 
+    let currentProfitPerUnit: number | undefined;
+    let currentProfitMargin: number | undefined;
+    
+    if (variant.currentSellingPrice !== undefined && variant.currentSellingPrice > 0) {
+      currentProfitPerUnit = round(variant.currentSellingPrice - variantCostPerUnit);
+      currentProfitMargin = calculateProfitMargin(variantCostPerUnit, variant.currentSellingPrice);
+    }
+
     totalProfit += variantProfitTotal;
 
     variantResults.push({
@@ -214,7 +222,10 @@ export const performFullCalculation = (
       recommendedPrice: variantRecPrice,
       profitPerUnit: variantProfitPerUnit,
       profitMarginPercent: variantMargin,
-      breakEvenPrice: variantCostPerUnit
+      breakEvenPrice: variantCostPerUnit,
+      currentSellingPrice: variant.currentSellingPrice,
+      currentProfitPerUnit,
+      currentProfitMargin
     });
   });
 
@@ -225,6 +236,14 @@ export const performFullCalculation = (
     const leftoverProfitTotal = round(baseProfitPerUnit * remainingBatch);
     totalProfit += leftoverProfitTotal;
 
+    let baseCurrentProfitPerUnit: number | undefined;
+    let baseCurrentProfitMargin: number | undefined;
+
+    if (input.currentSellingPrice !== undefined && input.currentSellingPrice > 0) {
+        baseCurrentProfitPerUnit = round(input.currentSellingPrice - baseCostPerUnit);
+        baseCurrentProfitMargin = calculateProfitMargin(baseCostPerUnit, input.currentSellingPrice);
+    }
+
     // Add Base as the first result
     variantResults.unshift({
       id: 'base-original',
@@ -234,7 +253,10 @@ export const performFullCalculation = (
       recommendedPrice: baseRecommendedPrice,
       profitPerUnit: baseProfitPerUnit,
       profitMarginPercent: baseProfitMarginPercent,
-      breakEvenPrice: baseCostPerUnit
+      breakEvenPrice: baseCostPerUnit,
+      currentSellingPrice: input.currentSellingPrice,
+      currentProfitPerUnit: baseCurrentProfitPerUnit,
+      currentProfitMargin: baseCurrentProfitMargin
     });
   }
 

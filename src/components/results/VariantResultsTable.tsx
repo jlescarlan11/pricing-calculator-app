@@ -24,15 +24,17 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
             <tr>
               <th className="px-md py-sm font-medium">Variant</th>
               <th className="px-md py-sm font-medium text-right">Cost/Unit</th>
-              <th className="px-md py-sm font-medium text-right">Price</th>
-              <th className="px-md py-sm font-medium text-right">Profit/Unit</th>
-              <th className="px-md py-sm font-medium text-right">Margin</th>
+              <th className="px-md py-sm font-medium text-right">Rec. Price</th>
+              <th className="px-md py-sm font-medium text-right">Target Margin</th>
+              <th className="px-md py-sm font-medium text-right border-l border-border-subtle">Current Price</th>
+              <th className="px-md py-sm font-medium text-right">Actual Margin</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {results.variantResults.map((variant) => {
               const isBestMargin = variant.id === bestMarginId && results.variantResults!.length > 1;
               const isBestProfit = variant.id === bestProfitId && results.variantResults!.length > 1;
+              const hasCurrentPrice = variant.currentSellingPrice !== undefined && variant.currentSellingPrice > 0;
               
               return (
                 <tr key={variant.id} className="hover:bg-surface-hover transition-colors">
@@ -51,13 +53,24 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                   <td className="px-md py-md text-right tabular-nums font-semibold text-ink-900">
                     {variant.recommendedPrice.toFixed(2)}
                   </td>
-                  <td className="px-md py-md text-right tabular-nums text-moss font-medium">
-                    {variant.profitPerUnit.toFixed(2)}
+                  <td className="px-md py-md text-right tabular-nums text-moss">
+                     {variant.profitMarginPercent.toFixed(1)}%
+                  </td>
+                  <td className="px-md py-md text-right tabular-nums border-l border-border-subtle">
+                    {hasCurrentPrice ? (
+                      <span className="font-medium text-ink-900">{variant.currentSellingPrice?.toFixed(2)}</span>
+                    ) : (
+                      <span className="text-ink-300">-</span>
+                    )}
                   </td>
                   <td className="px-md py-md text-right tabular-nums">
-                     <span className={`${variant.profitMarginPercent < 20 ? 'text-rust' : 'text-moss'}`}>
-                        {variant.profitMarginPercent.toFixed(1)}%
-                     </span>
+                    {hasCurrentPrice && variant.currentProfitMargin !== undefined ? (
+                       <span className={`${variant.currentProfitMargin < 20 ? 'text-rust' : 'text-moss'}`}>
+                          {variant.currentProfitMargin.toFixed(1)}%
+                       </span>
+                    ) : (
+                      <span className="text-ink-300">-</span>
+                    )}
                   </td>
                 </tr>
               );
@@ -65,11 +78,10 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
           </tbody>
           <tfoot className="bg-surface border-t border-border-base">
             <tr>
-              <td colSpan={3} className="px-md py-md font-bold text-ink-900 text-right">Total Batch Profit</td>
-              <td className="px-md py-md font-bold text-moss text-right text-lg">
+              <td colSpan={4} className="px-md py-md font-bold text-ink-900 text-right">Total Batch Profit (Target)</td>
+              <td colSpan={2} className="px-md py-md font-bold text-moss text-right text-lg">
                 {results.profitPerBatch.toFixed(2)}
               </td>
-              <td></td>
             </tr>
           </tfoot>
         </table>

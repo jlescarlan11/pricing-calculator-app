@@ -220,6 +220,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Tooltip Redesign**: Overhauled the Tooltip component using React Portals, custom animations, and viewport boundary detection for a more robust and visually polished experience. (Added 2026-01-03)
 - [x] **Artisanal UI Touches**: Added a dashed ("chopped") border to the "Add Ingredient" button to match the handmade/artisanal theme. (Added 2026-01-03)
 - [x] **Variants Engine**: Implemented unified variant calculation logic with proportional cost allocation, validation, and comprehensive tests. (Added 2026-01-05)
+- [x] **Live Variant Pricing**: Enabled real-time "Recommended Price" preview within variant blocks by calculating costs on the fly and passing them to the embedded pricing strategy component. (Added 2026-01-05)
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 

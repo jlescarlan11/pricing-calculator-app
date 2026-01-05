@@ -42,6 +42,13 @@ const TestWrapper = ({
             state.reset();
           }
         }}
+        onSetHasVariants={state.setHasVariants}
+        onAddVariant={state.addVariant}
+        onRemoveVariant={state.removeVariant}
+        onUpdateVariant={state.updateVariant}
+        onUpdateVariantIngredient={state.updateVariantIngredient}
+        onAddVariantIngredient={state.addVariantIngredient}
+        onRemoveVariantIngredient={state.removeVariantIngredient}
       />
     </ToastProvider>
   );

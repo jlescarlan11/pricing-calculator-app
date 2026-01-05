@@ -3,7 +3,7 @@ import { AlertCircle, HelpCircle } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-  label: string;
+  label?: string;
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
@@ -44,28 +44,30 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
 
   return (
     <div className={`flex flex-col w-full ${className}`}>
-      <div className="flex items-center justify-between mb-2">
-        <label 
-          htmlFor={id} 
-          className="text-sm font-medium text-ink-700 flex items-center gap-xs tracking-[0.01em]"
-        >
-          <span>
-            {label}
-            {required && <span className="text-rust ml-xs" aria-hidden="true">*</span>}
-          </span>
-          {tooltip && (
-            <Tooltip content={tooltip}>
-              <button
-                type="button"
-                className="text-ink-500 hover:text-clay cursor-help transition-colors p-0.5"
-                aria-label={`More info about ${label}`}
-              >
-                <HelpCircle className="w-3.5 h-3.5" />
-              </button>
-            </Tooltip>
-          )}
-        </label>
-      </div>
+      {label && (
+        <div className="flex items-center justify-between mb-2">
+          <label 
+            htmlFor={id} 
+            className="text-sm font-medium text-ink-700 flex items-center gap-xs tracking-[0.01em]"
+          >
+            <span>
+              {label}
+              {required && <span className="text-rust ml-xs" aria-hidden="true">*</span>}
+            </span>
+            {tooltip && (
+              <Tooltip content={tooltip}>
+                <button
+                  type="button"
+                  className="text-ink-500 hover:text-clay cursor-help transition-colors p-0.5"
+                  aria-label={`More info about ${label}`}
+                >
+                  <HelpCircle className="w-3.5 h-3.5" />
+                </button>
+              </Tooltip>
+            )}
+          </label>
+        </div>
+      )}
 
       <div className="relative">
         {currency && (

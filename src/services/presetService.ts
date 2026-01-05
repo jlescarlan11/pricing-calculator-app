@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import type { Preset, CalculationInput, PricingConfig } from '../types';
+import type { Preset } from '../types';
 
 const STORAGE_KEY = 'pricing_calculator_presets';
 const SYNC_QUEUE_KEY = 'pricing_calculator_sync_queue';

@@ -12,6 +12,7 @@ interface PricingStrategyProps {
   value: number;
   costPerUnit: number;
   onChange: (strategy: StrategyType, value: number) => void;
+  embedded?: boolean;
 }
 
 export const PricingStrategy: React.FC<PricingStrategyProps> = ({
@@ -19,6 +20,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
   value,
   costPerUnit,
   onChange,
+  embedded = false,
 }) => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
@@ -49,51 +51,36 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
   const examplePrice = calculateRecommendedPrice(exampleCost, strategy, value);
   const exampleProfit = examplePrice - exampleCost;
 
-  return (
-    <Card 
-      title={
-        <div className="flex items-center justify-between w-full">
-          <h3 className="text-lg text-ink-900">Pricing Strategy</h3>
-          <button
-            type="button"
-            onClick={() => setIsHelpOpen(true)}
-            className="text-clay hover:text-clay/80 flex items-center gap-sm text-sm font-medium transition-colors group"
-            aria-label="Help with pricing strategies"
-          >
-            <HelpCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
-            <span>Learn More</span>
-          </button>
-        </div>
-      }
-    >
-      <div className="space-y-xl">
-        {/* Strategy Selection - Tabs style */}
-        <div className="flex p-xs bg-surface rounded-md border border-border-subtle">
-          <button
-            type="button"
-            onClick={() => handleStrategyChange('markup')}
-            className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
-              strategy === 'markup' 
-                ? 'bg-clay text-white shadow-level-1' 
-                : 'text-ink-500 hover:text-ink-900'
-            }`}
-          >
-            Markup
-          </button>
-          <button
-            type="button"
-            onClick={() => handleStrategyChange('margin')}
-            className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
-              strategy === 'margin' 
-                ? 'bg-clay text-white shadow-level-1' 
-                : 'text-ink-500 hover:text-ink-900'
-            }`}
-          >
-            Margin
-          </button>
-        </div>
+  const content = (
+    <div className="space-y-xl">
+      {/* Strategy Selection - Tabs style */}
+      <div className="flex p-xs bg-surface rounded-md border border-border-subtle">
+        <button
+          type="button"
+          onClick={() => handleStrategyChange('markup')}
+          className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
+            strategy === 'markup' 
+              ? 'bg-clay text-white shadow-level-1' 
+              : 'text-ink-500 hover:text-ink-900'
+          }`}
+        >
+          Markup
+        </button>
+        <button
+          type="button"
+          onClick={() => handleStrategyChange('margin')}
+          className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
+            strategy === 'margin' 
+              ? 'bg-clay text-white shadow-level-1' 
+              : 'text-ink-500 hover:text-ink-900'
+          }`}
+        >
+          Margin
+        </button>
+      </div>
 
-        {/* Visual Explanation */}
+      {/* Visual Explanation - Hide in embedded mode if it's too much, or keep it. Keeping for now but maybe simplified. */}
+      {!embedded && (
         <div className="bg-surface border border-border-subtle rounded-md p-lg transition-all duration-500">
           {strategy === 'markup' ? (
             <div className="space-y-sm">
@@ -119,51 +106,85 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
             </div>
           )}
         </div>
+      )}
 
-        {/* Value Inputs */}
-        <div className="space-y-lg">
-          <Input
-            label={`${strategy === 'markup' ? 'Markup' : 'Margin'} Percentage`}
-            type="number"
+      {/* Value Inputs */}
+      <div className="space-y-lg">
+        <Input
+          label={`${strategy === 'markup' ? 'Markup' : 'Margin'} Percentage`}
+          type="number"
+          value={value}
+          onChange={handleValueChange}
+          suffix="%"
+          min={0}
+          max={strategy === 'margin' ? 99.9 : undefined}
+          step="0.1"
+        />
+
+        <div className="space-y-sm px-xs">
+          <input
+            type="range"
+            min="0"
+            max={strategy === 'margin' ? "95" : "300"}
+            step="1"
             value={value}
-            onChange={handleValueChange}
-            suffix="%"
-            min={0}
-            max={strategy === 'margin' ? 99.9 : undefined}
-            step="0.1"
+            onChange={handleSliderChange}
+            className="w-full h-1.5 bg-border-subtle rounded-xs appearance-none cursor-pointer accent-clay"
           />
-
-          <div className="space-y-sm px-xs">
-            <input
-              type="range"
-              min="0"
-              max={strategy === 'margin' ? "95" : "300"}
-              step="1"
-              value={value}
-              onChange={handleSliderChange}
-              className="w-full h-1.5 bg-border-subtle rounded-xs appearance-none cursor-pointer accent-clay"
-            />
-            <div className="flex justify-between text-[10px] text-ink-500 font-bold uppercase tracking-widest">
-              <span>0%</span>
-              <span>{strategy === 'margin' ? '95%' : '300%'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Real-time Result */}
-        <div className="pt-lg border-t border-border-subtle">
-          <div className="flex justify-between items-end">
-            <div>
-              <p className="text-[10px] text-ink-500 uppercase tracking-widest font-bold mb-xs">Recommended Price</p>
-              <p className="text-3xl font-bold text-ink-900 tracking-tight">{formatCurrency(recommendedPrice)}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-ink-500 font-medium mb-xs">Profit per Unit</p>
-              <p className="text-lg font-bold text-moss">+{formatCurrency(profit)}</p>
-            </div>
+          <div className="flex justify-between text-[10px] text-ink-500 font-bold uppercase tracking-widest">
+            <span>0%</span>
+            <span>{strategy === 'margin' ? '95%' : '300%'}</span>
           </div>
         </div>
       </div>
+
+      {/* Real-time Result - Hide if no cost per unit calculated */}
+      {(!embedded || costPerUnit > 0) && (
+      <div className="pt-lg border-t border-border-subtle">
+        <div className="flex justify-between items-end">
+          <div>
+            <p className="text-[10px] text-ink-500 uppercase tracking-widest font-bold mb-xs">Recommended Price</p>
+            <p className="text-3xl font-bold text-ink-900 tracking-tight">{formatCurrency(recommendedPrice)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-ink-500 font-medium mb-xs">Profit per Unit</p>
+            <p className="text-lg font-bold text-moss">+{formatCurrency(profit)}</p>
+          </div>
+        </div>
+      </div>
+      )}
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <div className="space-y-md">
+         <div className="flex items-center justify-between">
+           <h4 className="text-sm font-medium text-ink-900 uppercase tracking-wide">Pricing Strategy</h4>
+         </div>
+         {content}
+      </div>
+    );
+  }
+
+  return (
+    <Card 
+      title={
+        <div className="flex items-center justify-between w-full">
+          <h3 className="text-lg text-ink-900">Pricing Strategy</h3>
+          <button
+            type="button"
+            onClick={() => setIsHelpOpen(true)}
+            className="text-clay hover:text-clay/80 flex items-center gap-sm text-sm font-medium transition-colors group"
+            aria-label="Help with pricing strategies"
+          >
+            <HelpCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
+            <span>Learn More</span>
+          </button>
+        </div>
+      }
+    >
+      {content}
 
       <PricingExplainerModal
         isOpen={isHelpOpen}

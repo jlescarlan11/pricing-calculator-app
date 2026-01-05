@@ -8,6 +8,7 @@ interface OverheadCostProps {
   batchSize: number;
   onChange: (value: number) => void;
   error?: string;
+  label?: string;
 }
 
 export const OverheadCost: React.FC<OverheadCostProps> = ({
@@ -15,6 +16,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
   batchSize,
   onChange,
   error,
+  label,
 }) => {
   const [isHelperOpen, setIsHelperOpen] = useState(false);
 
@@ -28,7 +30,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
       <div className="space-y-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-sm">
-            <h3 className="text-lg font-bold text-ink-900">Overhead Cost</h3>
+            <h3 className="text-lg font-bold text-ink-900">{label || 'Overhead Cost'}</h3>
             <Tooltip content={
               <div className="space-y-sm p-xs">
                 <p className="font-medium text-ink-900">Overhead includes all indirect costs of running your business.</p>
@@ -63,7 +65,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
 
         <div className="space-y-sm">
           <Input
-            label="Total Overhead Cost per Batch"
+            label={label ? `Total ${label} per Batch` : "Total Overhead Cost per Batch"}
             type="number"
             value={value === 0 ? '' : value}
             onChange={(e) => onChange(parseFloat(e.target.value) || 0)}

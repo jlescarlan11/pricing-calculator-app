@@ -113,6 +113,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   const totalVariantBatch = input.variants?.reduce((sum, v) => sum + v.batchSize, 0) || 0;
   const remainingBatch = Math.max(0, input.batchSize - totalVariantBatch);
 
+  // Perform calculation to get live previews for variants
+  const calculationResult = React.useMemo(() => 
+    performFullCalculation(input, config), 
+    [input, config]
+  );
+
   return (
     <div className="flex flex-col gap-3xl w-full pb-4xl">
       {/* Header with Actions */}
@@ -366,7 +372,24 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
                     <div className="h-px bg-border-subtle" role="separator" />
 
-                    {/* Section 4: Variants Toggle */}
+                    {/* Section 4: Base Pricing Strategy & Current Price (Always Visible) */}
+                    <PricingStrategy 
+                      strategy={config.strategy}
+                      value={config.value}
+                      costPerUnit={calculationResult.costPerUnit}
+                      onChange={handlePricingChange}
+                    />
+            
+                    <div className="h-px bg-border-subtle" role="separator" />
+            
+                    <CurrentPrice 
+                      value={input.currentSellingPrice}
+                      onChange={handleCurrentPriceChange}
+                    />
+            
+                    <div className="h-px bg-border-subtle" role="separator" />
+
+                    {/* Section 5: Variants Toggle */}
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-medium text-ink-900">Variants</h3>
@@ -385,9 +408,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                       </div>
                     )}
 
-                    {input.hasVariants ? (
+                    {input.hasVariants && (
                       <div className="space-y-xl animate-in fade-in slide-in-from-top-4 duration-300">
-                        {/* Base Variant Block */}
+                        {/* Base Variant Block (Read Only) */}
                         <Card className="bg-surface/50 border-border-subtle">
                           <div className="flex items-center justify-between">
                             <div>
@@ -401,12 +424,17 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                         </Card>
 
                         {/* Variants List */}
-                        {input.variants?.map((variant, index) => (
+                        {input.variants?.map((variant, index) => {
+                           const variantResult = calculationResult.variantResults?.find(r => r.id === variant.id);
+                           const variantCostPerUnit = variantResult?.costPerUnit || 0;
+
+                           return (
                            <VariantBlock
                              key={variant.id}
                              variant={variant}
                              index={index}
                              remainingBatch={remainingBatch}
+                             costPerUnit={variantCostPerUnit}
                              onUpdate={onUpdateVariant}
                              onRemove={onRemoveVariant}
                              onUpdateIngredient={onUpdateVariantIngredient}
@@ -414,7 +442,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                              onRemoveIngredient={onRemoveVariantIngredient}
                              errors={errors}
                            />
-                        ))}
+                           );
+                        })}
 
                         {/* Add Variant Button */}
                         <Button
@@ -426,26 +455,6 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                           <Plus className="w-5 h-5" />
                           {remainingBatch > 0 ? 'Add Variant' : 'No Batch Capacity Remaining'}
                         </Button>
-                      </div>
-                    ) : (
-                      <div className="animate-in fade-in slide-in-from-top-4 duration-300 space-y-xl">
-                        {/* Section 5: Pricing Strategy (Single Mode) */}
-                        <PricingStrategy 
-                          strategy={config.strategy}
-                          value={config.value}
-                          costPerUnit={
-                            performFullCalculation(input, config).costPerUnit
-                          }
-                          onChange={handlePricingChange}
-                        />
-                
-                        <div className="h-px bg-border-subtle" role="separator" />
-                
-                        {/* Section 6: Current Price Comparison (Single Mode) */}
-                        <CurrentPrice 
-                          value={input.currentSellingPrice}
-                          onChange={handleCurrentPriceChange}
-                        />
                       </div>
                     )}
             

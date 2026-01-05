@@ -44,6 +44,9 @@ export interface VariantResult {
   profitPerUnit: number;
   profitMarginPercent: number;
   breakEvenPrice: number;
+  currentSellingPrice?: number;
+  currentProfitPerUnit?: number;
+  currentProfitMargin?: number;
 }
 
 export interface CalculationResult {

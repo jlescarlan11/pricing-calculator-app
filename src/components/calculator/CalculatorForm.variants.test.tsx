@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act, within } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CalculatorForm } from './CalculatorForm';
 import { ToastProvider } from '../shared/Toast';
@@ -72,7 +72,8 @@ describe('CalculatorForm Variants', () => {
     expect(toggle).not.toBeChecked();
     
     // Check Single Mode UI exists (Pricing Strategy section)
-    expect(screen.getByText(/Pricing Strategy/i)).toBeInTheDocument();
+    const strategies = screen.getAllByText(/Pricing Strategy/i);
+    expect(strategies.length).toBeGreaterThan(0);
     
     // Toggle ON
     fireEvent.click(toggle);
@@ -82,12 +83,14 @@ describe('CalculatorForm Variants', () => {
     expect(screen.getByText(/Base Product/i)).toBeInTheDocument();
     expect(screen.getByText(/Remaining Base Batch/i)).toBeInTheDocument();
     
-    // Single Mode UI hidden
-    expect(screen.queryByText(/Pricing Strategy/i)).not.toBeInTheDocument();
+    // Single Mode UI (Base Pricing Strategy) should STILL be visible
+    // Note: When variant is added, it also has a Pricing Strategy, so we might have multiple.
+    // Base one is always there.
+    expect(screen.getAllByText(/Pricing Strategy/i).length).toBeGreaterThan(0);
   });
 
   it('adds a variant and updates capacity', async () => {
-    const input = {
+    const input: CalculationInput = {
         productName: 'Test Base',
         batchSize: 10,
         ingredients: [{ id: '1', name: 'Flour', amount: 1000, cost: 50 }],
@@ -123,7 +126,7 @@ describe('CalculatorForm Variants', () => {
     expect(variantCard).not.toBeNull();
     
     // Find input with value 10 inside this card
-    const batchInput = within(variantCard as HTMLElement).getByDisplayValue('10');
+    const batchInput = within(variantCard as HTMLElement).getByLabelText(/Batch Allocation/i);
     fireEvent.change(batchInput, { target: { value: '6' } });
     
     // Remaining should be 4
@@ -134,7 +137,7 @@ describe('CalculatorForm Variants', () => {
   });
 
   it('removes a variant and restores capacity', async () => {
-    const input = {
+    const input: CalculationInput = {
         productName: 'Test Base',
         batchSize: 10,
         ingredients: [],
@@ -142,7 +145,7 @@ describe('CalculatorForm Variants', () => {
         overhead: 0,
         hasVariants: true,
         variants: [
-            { id: 'v1', name: 'Variant A', batchSize: 5, ingredients: [], laborCost: 0, overhead: 0, pricingConfig: { strategy: 'markup', value: 50 } }
+            { id: 'v1', name: 'Variant A', batchSize: 5, ingredients: [], laborCost: 0, overhead: 0, pricingConfig: { strategy: 'markup' as const, value: 50 } }
         ]
     };
     
@@ -156,5 +159,74 @@ describe('CalculatorForm Variants', () => {
     // Restores full capacity
     expect(await screen.findByText('10')).toBeInTheDocument();
     expect(screen.queryByDisplayValue('Variant A')).not.toBeInTheDocument();
+  });
+
+  it('updates variant current price', async () => {
+    const input: CalculationInput = {
+        productName: 'Test Base',
+        batchSize: 10,
+        ingredients: [{ id: '1', name: 'Flour', amount: 1000, cost: 50 }],
+        laborCost: 0,
+        overhead: 0,
+        hasVariants: true,
+        variants: [
+            { id: 'v1', name: 'Variant A', batchSize: 5, ingredients: [], laborCost: 0, overhead: 0, pricingConfig: { strategy: 'markup' as const, value: 50 } }
+        ]
+    };
+    
+    render(<TestWrapper initialInput={input} />);
+
+    // Find the variant block
+    const variantBlock = screen.getByDisplayValue('Variant A').closest('.border-l-4');
+    expect(variantBlock).not.toBeNull();
+
+    // Find Current Price input inside variant block
+    const priceInput = within(variantBlock as HTMLElement).getByLabelText(/Current Price/i);
+    fireEvent.change(priceInput, { target: { value: '25.00' } });
+
+    expect(priceInput).toHaveValue(25);
+  });
+
+  it('displays calculated recommended price in variant block', async () => {
+    // Setup with valid ingredients so cost > 0
+    const input: CalculationInput = {
+        productName: 'Test Base',
+        batchSize: 10,
+        ingredients: [{ id: '1', name: 'Base Ing', amount: 10, cost: 100 }], // Base cost = 10/unit
+        laborCost: 0,
+        overhead: 0,
+        hasVariants: true,
+        variants: [
+            { 
+              id: 'v1', 
+              name: 'Variant A', 
+              batchSize: 5, 
+              ingredients: [{ id: '2', name: 'Var Ing', amount: 5, cost: 50 }], // Var specific cost = 50 total / 5 units = 10/unit
+              laborCost: 0, 
+              overhead: 0, 
+              pricingConfig: { strategy: 'markup' as const, value: 50 } // Markup 50%
+            }
+        ]
+    };
+    // Expected:
+    // Base Unit Cost = 100 / 10 = 10
+    // Variant Unit Cost = Base(10) + VarSpecific(10) = 20
+    // Markup 50% on 20 = 30
+    
+    render(<TestWrapper initialInput={input} />);
+
+    // Find the variant block
+    const variantBlock = screen.getByDisplayValue('Variant A').closest('.border-l-4');
+    expect(variantBlock).not.toBeNull();
+
+    const withinVariant = within(variantBlock as HTMLElement);
+
+    // Check for Recommended Price label (which is hidden if cost <= 0)
+    expect(withinVariant.getByText(/Recommended Price/i)).toBeInTheDocument();
+
+    // Check for the value 30.00
+    // Note: formatCurrency usually adds symbol, assume standard formatting or check partial
+    // We look for text that contains "30.00"
+    expect(withinVariant.getByText(/30.00/)).toBeInTheDocument();
   });
 });

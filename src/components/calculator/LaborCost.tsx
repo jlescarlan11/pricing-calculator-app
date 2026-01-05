@@ -6,12 +6,14 @@ interface LaborCostProps {
   value: number;
   onChange: (value: number) => void;
   error?: string;
+  label?: string;
 }
 
 export const LaborCost: React.FC<LaborCostProps> = ({
   value,
   onChange,
   error,
+  label,
 }) => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [hours, setHours] = useState<string>('');
@@ -32,7 +34,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({
       <div className="space-y-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-sm">
-            <h3 className="text-lg font-bold text-ink-900">Labor Cost</h3>
+            <h3 className="text-lg font-bold text-ink-900">{label || 'Labor Cost'}</h3>
             <Tooltip content="Total cost of labor for this batch. You can enter a fixed amount or use the calculator below.">
               <button
                 type="button"
@@ -55,7 +57,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({
         </div>
 
         <Input
-          label="Total Labor Cost"
+          label={label ? `Total ${label}` : "Total Labor Cost"}
           type="number"
           value={value === 0 ? '' : value}
           onChange={(e) => onChange(parseFloat(e.target.value) || 0)}

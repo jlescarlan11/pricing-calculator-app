@@ -270,7 +270,7 @@ export function useCalculatorState(
         newErrors.variants = `Total variant batch size (${totalVariantBatch}) exceeds base batch size (${input.batchSize}).`;
       }
 
-      input.variants.forEach((variant, idx) => {
+      input.variants.forEach((variant) => {
         if (!variant.name.trim()) {
            newErrors[`variants.${variant.id}.name`] = 'Variant name is required.';
         }
