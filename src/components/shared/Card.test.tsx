@@ -22,7 +22,7 @@ describe('Card', () => {
     const { container } = render(<Card>Content</Card>);
     const card = container.firstChild;
     expect(card).toHaveClass('bg-surface');
-    expect(card).toHaveClass('rounded-lg'); // Updated expectation
+    expect(card).toHaveClass('rounded-xl'); // Updated expectation
     expect(card).toHaveClass('shadow-level-1'); // Updated expectation
   });
 

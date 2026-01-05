@@ -119,7 +119,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-[rgba(58,54,50,0.3)] backdrop-blur-[4px] transition-opacity duration-300 ease-out ${
+        className={`absolute inset-0 bg-ink-900/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${
           isOpen ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
@@ -130,7 +130,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={`
-          relative z-10 flex flex-col bg-bg-main shadow-level-3 rounded-[16px]
+          relative z-10 flex flex-col bg-bg-main shadow-level-3 rounded-xl
           transition-[opacity,transform] duration-400 [transition-timing-function:cubic-bezier(0.175,0.885,0.32,1.275)]
           w-full shrink-0 max-h-[90vh]
           max-[480px]:h-full max-[480px]:max-h-none max-[480px]:rounded-none

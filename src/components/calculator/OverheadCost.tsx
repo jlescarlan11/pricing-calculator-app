@@ -99,7 +99,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
         </div>
 
         {isHelperOpen && (
-          <div className="-mx-xl -mb-xl border-t border-border-subtle bg-bg-main animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="-mx-xl -mb-xl border-t border-border-subtle bg-surface-hover animate-in fade-in slide-in-from-top-2 duration-500">
             <OverheadCalculator onApply={handleApplyOverhead} initialBatchSize={batchSize} />
           </div>
         )}

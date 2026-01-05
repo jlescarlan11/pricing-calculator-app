@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Button } from './Button';
 
 describe('Button', () => {
@@ -8,53 +8,50 @@ describe('Button', () => {
     const button = screen.getByRole('button', { name: /click me/i });
     expect(button).toBeInTheDocument();
     // Check for primary variant classes by default
-    expect(button).toHaveClass('border-[#A67B5B]');
-    expect(button).toHaveClass('text-[#A67B5B]');
+    expect(button).toHaveClass('bg-clay');
+    expect(button).toHaveClass('text-white');
     // Check for md size classes
     expect(button).toHaveClass('px-8');
     expect(button).toHaveClass('py-3');
-    // Check for base styles (rounded-lg)
-    expect(button).toHaveClass('rounded-lg');
+    // Check for base styles (rounded-xl)
+    expect(button).toHaveClass('rounded-xl');
   });
 
   it('renders primary variant correctly', () => {
     render(<Button variant="primary">Primary</Button>);
     const button = screen.getByRole('button', { name: /primary/i });
-    expect(button).toHaveClass('border-[#A67B5B]');
-    expect(button).toHaveClass('text-[#A67B5B]');
-    expect(button).toHaveClass('hover:bg-[rgba(166,123,91,0.05)]');
+    expect(button).toHaveClass('bg-clay');
+    expect(button).toHaveClass('text-white');
+    expect(button).toHaveClass('hover:bg-clay/90');
   });
 
   it('renders secondary variant correctly', () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole('button', { name: /secondary/i });
-    expect(button).toHaveClass('border-[#D4D2CF]');
-    expect(button).toHaveClass('text-[#6B6761]');
+    expect(button).toHaveClass('bg-surface');
+    expect(button).toHaveClass('text-ink-700');
   });
 
   it('renders success variant correctly', () => {
     render(<Button variant="success">Success</Button>);
     const button = screen.getByRole('button', { name: /success/i });
-    expect(button).toHaveClass('border-[#7A8B73]');
-    expect(button).toHaveClass('text-[#7A8B73]');
+    expect(button).toHaveClass('bg-moss');
+    expect(button).toHaveClass('text-white');
   });
 
   it('renders danger variant correctly', () => {
     render(<Button variant="danger">Danger</Button>);
     const button = screen.getByRole('button', { name: /danger/i });
-    expect(button).toHaveClass('border-[#B85C38]');
-    expect(button).toHaveClass('text-[#B85C38]');
+    expect(button).toHaveClass('bg-rust');
+    expect(button).toHaveClass('text-white');
   });
 
   it('applies loading state correctly', () => {
-    const { container } = render(<Button isLoading>Loading</Button>);
+    render(<Button isLoading>Loading</Button>);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');
-    // Check for the SVG spinner by class
-    const spinner = container.querySelector('.animate-spin');
-    expect(spinner).toBeInTheDocument();
-    expect(spinner?.tagName).toBe('svg');
+    expect(button.querySelector('svg')).toHaveClass('animate-spin');
   });
 
   it('renders disabled state correctly', () => {
@@ -64,9 +61,17 @@ describe('Button', () => {
     expect(button).toHaveClass('disabled:opacity-50');
   });
 
+  it('calls onClick when clicked', () => {
+    const handleClick = vi.fn();
+    render(<Button onClick={handleClick}>Click me</Button>);
+    const button = screen.getByRole('button', { name: /click me/i });
+    fireEvent.click(button);
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
   it('has accessible attributes', () => {
-    render(<Button>Accessible</Button>);
-    const button = screen.getByRole('button', { name: /accessible/i });
-    expect(button).toHaveAttribute('type', 'button');
+    render(<Button aria-label="custom label">Action</Button>);
+    const button = screen.getByLabelText('custom label');
+    expect(button).toBeInTheDocument();
   });
 });

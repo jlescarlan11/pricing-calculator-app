@@ -13,7 +13,7 @@ export interface BadgeProps {
  */
 export const Badge: React.FC<BadgeProps> = ({ children, variant = 'info', className = '' }) => {
   const baseStyles =
-    'inline-flex items-center rounded-sm px-sm py-xs text-xs font-semibold transition-colors';
+    'inline-flex items-center rounded-md px-sm py-xs text-xs font-semibold transition-colors';
 
   const variants = {
     success: 'bg-moss/10 text-moss border border-moss/20',

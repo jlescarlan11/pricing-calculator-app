@@ -98,7 +98,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             onKeyDown={handleKeyDown}
             min={type === 'number' ? 0 : undefined}
             className={`
-            block w-full rounded-sm border tabular-nums
+            block w-full rounded-xl border tabular-nums
             py-[14px] sm:text-sm transition-all duration-200
             disabled:bg-surface-hover disabled:text-ink-500 disabled:cursor-not-allowed
             focus:ring-2 focus:ring-offset-0 focus:outline-hidden

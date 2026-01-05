@@ -68,7 +68,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
         />
 
         {isCalculatorOpen && (
-          <div className="bg-bg-main rounded-md p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="bg-surface-hover rounded-xl p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
             <div className="space-y-sm text-sm text-ink-700">
               <p className="font-medium text-ink-900">
                 Your time is valuable—include it in labor costs.

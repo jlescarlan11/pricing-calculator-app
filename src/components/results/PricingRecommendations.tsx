@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
 import { Badge } from '../shared/Badge';
 import type { BadgeVariant } from '../shared/Badge';
 import type { CalculationResult } from '../../types/calculator';
@@ -20,22 +21,36 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
   const { breakEvenPrice, recommendedPrice, profitPerUnit, profitPerBatch, profitMarginPercent } =
     results;
 
-  const getMarginBadge = (margin: number): { variant: BadgeVariant; label: string } => {
+  const getMarginBadge = (
+    margin: number
+  ): { variant: BadgeVariant; label: string; icon: React.ReactNode } => {
     if (margin < 15) {
-      return { variant: 'error', label: 'Tight margin' };
+      return {
+        variant: 'error',
+        label: 'Tight margin',
+        icon: <AlertCircle className="w-3 h-3 mr-1" />,
+      };
     }
     if (margin <= 25) {
-      return { variant: 'warning', label: 'Modest margin' };
+      return {
+        variant: 'warning',
+        label: 'Modest margin',
+        icon: <AlertTriangle className="w-3 h-3 mr-1" />,
+      };
     }
-    return { variant: 'success', label: 'Healthy margin' };
+    return {
+      variant: 'success',
+      label: 'Healthy margin',
+      icon: <CheckCircle className="w-3 h-3 mr-1" />,
+    };
   };
 
   const badgeDetails = getMarginBadge(profitMarginPercent);
 
   return (
-    <div className={`space-y-3xl ${className}`}>
+    <div className={`space-y-2xl ${className}`}>
       {/* Recommended Selling Price - Primary Focus */}
-      <div className="flex flex-col items-center px-2xl py-2xl bg-surface rounded-lg border border-border-subtle relative overflow-hidden group">
+      <div className="flex flex-col items-center px-2xl py-2xl bg-surface rounded-xl border border-border-subtle relative overflow-hidden group">
         <div className="relative z-10 w-full text-center">
           <p className="text-xs font-semibold text-ink-700 mb-xs">Recommended Selling Price</p>
           <p
@@ -45,7 +60,11 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
             {formatCurrency(recommendedPrice)}
           </p>
           <div className="flex justify-center mt-lg">
-            <Badge variant={badgeDetails.variant} className="py-1 px-3">
+            <Badge
+              variant={badgeDetails.variant}
+              className="py-1 px-3 flex items-center justify-center"
+            >
+              {badgeDetails.icon}
               {badgeDetails.label}
             </Badge>
           </div>

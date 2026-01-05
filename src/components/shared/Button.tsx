@@ -1,12 +1,13 @@
 import React from 'react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost' | 'soft';
+export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost' | 'soft' | 'dashed';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
+  dashed?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -15,32 +16,36 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size = 'md',
   isLoading = false,
+  dashed = false,
   disabled,
   type = 'button',
   ...props
 }) => {
-  // Updated base styles: rounded-lg (8px), transition-all duration-400 ease-in-out, min touch target
+  // Updated base styles: rounded-xl (12px), transition-all duration-400 ease-in-out, min touch target
   const baseStyles =
-    'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-400 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer sm:w-auto w-full sm:flex-none active:scale-95 min-h-[44px] min-w-[44px]';
+    'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-400 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer sm:w-auto w-full sm:flex-none active:scale-95 min-h-[44px] min-w-[44px]';
 
   const variants = {
-    // Primary: 1px solid #A67B5B, text matching, transparent bg, hover bg rgba(166, 123, 91, 0.05), scale 1.02
+    // Primary: Solid Clay background, white text. Use for 'Calculate', 'Save'.
     primary:
-      'border border-[#A67B5B] text-[#A67B5B] bg-transparent hover:bg-[rgba(166,123,91,0.05)] hover:scale-[1.02] focus-visible:ring-[#A67B5B]',
-    // Secondary: 1px solid #D4D2CF, text #6B6761, transparent bg, hover scale 1.02
+      'bg-clay text-white shadow-level-1 hover:bg-clay/90 hover:shadow-level-2 hover:scale-[1.02] focus-visible:ring-clay',
+    // Secondary: Surface background, subtle border. Use for 'Add Ingredient' or secondary actions.
     secondary:
-      'border border-[#D4D2CF] text-[#6B6761] bg-transparent hover:bg-surface-hover hover:scale-[1.02] focus-visible:ring-[#D4D2CF]',
-    // Success: 1px solid #7A8B73, text matching, transparent bg, hover scale 1.02
+      'border border-border-base bg-surface text-ink-700 hover:bg-surface-hover hover:border-border-base hover:scale-[1.02] focus-visible:ring-border-base',
+    // Success: Solid Moss background, white text.
     success:
-      'border border-[#7A8B73] text-[#7A8B73] bg-transparent hover:bg-[rgba(122,139,115,0.05)] hover:scale-[1.02] focus-visible:ring-[#7A8B73]',
-    // Danger: 1px solid #B85C38, text matching, transparent bg, hover scale 1.02
+      'bg-moss text-white shadow-level-1 hover:bg-moss/90 hover:shadow-level-2 hover:scale-[1.02] focus-visible:ring-moss',
+    // Danger: Solid Rust background, white text. Use for 'Delete' or critical actions.
     danger:
-      'border border-[#B85C38] text-[#B85C38] bg-transparent hover:bg-[rgba(184,92,56,0.05)] hover:scale-[1.02] focus-visible:ring-[#B85C38]',
+      'bg-rust text-white shadow-level-1 hover:bg-rust/90 hover:shadow-level-2 hover:scale-[1.02] focus-visible:ring-rust',
     // Ghost: maintained for backward compatibility but updated with transitions
     ghost:
       'hover:bg-surface-hover text-ink-700 hover:text-ink-900 focus-visible:ring-border-base hover:scale-[1.02]',
     // Soft: maintained for backward compatibility
     soft: 'bg-moss/10 text-moss hover:bg-moss/20 focus-visible:ring-moss hover:scale-[1.02]',
+    // Dashed: Wabi-sabi style for Add actions
+    dashed:
+      'border-2 border-dashed border-border-base text-ink-700 bg-transparent hover:border-clay hover:text-clay hover:bg-clay/5 transition-all duration-300',
   };
 
   const sizes = {
@@ -49,7 +54,7 @@ export const Button: React.FC<ButtonProps> = ({
     lg: 'px-10 py-4 text-base',
   };
 
-  const variantStyles = variants[variant];
+  const variantStyles = dashed ? variants.dashed : variants[variant];
   const sizeStyles = sizes[size];
 
   return (

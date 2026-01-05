@@ -58,7 +58,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
 
       <div className="space-y-lg">
         {/* Visual Comparison */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-xl bg-surface rounded-lg border border-border-subtle">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-xl bg-surface rounded-xl border border-border-subtle">
           <div className="text-center sm:text-left flex-1">
             <p className="text-xs font-medium text-ink-500 uppercase tracking-widest mb-xs">
               Current Price
@@ -84,7 +84,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
 
         {/* Opportunity Cost Message */}
         <div
-          className={`p-lg rounded-lg flex items-center gap-md transition-all duration-500 ${statusColor.replace('border', 'no-border')}`}
+          className={`p-lg rounded-xl flex items-center gap-md transition-all duration-500 ${statusColor.replace('border', 'no-border')}`}
         >
           <div className="p-sm bg-white/50 rounded-sm shadow-level-1">{statusIcon}</div>
           <span className="font-bold text-sm sm:text-base tracking-tight">{statusMessage}</span>

@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Info, Package } from 'lucide-react';
 import { CalculatorForm, SampleDemo } from '../components/calculator';
-import { ResultsDisplay } from '../components/results';
+import { ResultsDisplay, StickySummary } from '../components/results';
 import { PresetsList } from '../components/presets';
-import { Modal, Tooltip, useToast } from '../components/shared';
+import { Modal, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
 import type { Preset } from '../types';
@@ -34,10 +34,31 @@ export const CalculatorPage: React.FC = () => {
   } = useCalculatorState();
 
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
+  const [showStickySummary, setShowStickySummary] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const showResults = !!results;
+
+  // Handle sticky summary visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!resultsRef.current) {
+        setShowStickySummary(false);
+        return;
+      }
+
+      const resultsRect = resultsRef.current.getBoundingClientRect();
+      const isResultsVisible = resultsRect.top < window.innerHeight && resultsRect.bottom > 0;
+
+      // Show sticky summary if results exist but are not fully in view
+      // and we are currently in the form section
+      setShowStickySummary(showResults && !isResultsVisible);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [showResults]);
 
   const handleCalculate = async () => {
     const res = await calculate();
@@ -46,6 +67,10 @@ export const CalculatorPage: React.FC = () => {
       // Scroll to results at the top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handleScrollToResults = () => {
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleScrollToForm = () => {
@@ -101,7 +126,7 @@ export const CalculatorPage: React.FC = () => {
       {/* Intro Section (only when no results) */}
       {!showResults && (
         <div className="space-y-lg mb-2xl">
-          <div className="p-lg md:p-xl bg-surface rounded-lg border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="p-lg md:p-xl bg-surface rounded-xl border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
             <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
             <div>
               <p className="text-ink-900 font-medium mb-xs">Welcome to your profit partner.</p>
@@ -155,21 +180,17 @@ export const CalculatorPage: React.FC = () => {
           onUpdateVariantIngredient={updateVariantIngredient}
           onAddVariantIngredient={addVariantIngredient}
           onRemoveVariantIngredient={removeVariantIngredient}
+          onOpenPresets={() => setIsPresetsModalOpen(true)}
         />
       </div>
 
-      {/* Floating Action Button for Presets (Tertiary) */}
-      <div className="fixed bottom-lg right-lg z-40 print:hidden">
-        <Tooltip content="Your Saved Products" position="left">
-          <button
-            onClick={() => setIsPresetsModalOpen(true)}
-            className="w-14 h-14 bg-clay text-white rounded-round shadow-level-3 flex items-center justify-center hover:scale-110 transition-all duration-300 group"
-            aria-label="View Saved Products"
-          >
-            <Package className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-          </button>
-        </Tooltip>
-      </div>
+      <StickySummary
+        results={results}
+        onScrollToResults={handleScrollToResults}
+        onCalculate={handleCalculate}
+        isCalculating={isCalculating}
+        isVisible={showStickySummary}
+      />
 
       {/* Presets Modal */}
       <Modal

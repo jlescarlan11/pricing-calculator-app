@@ -48,8 +48,8 @@ describe('VariantResultsTable', () => {
     expect(screen.getByText('Variant B')).toBeInTheDocument();
 
     // Check values
-    expect(screen.getByText('20.00')).toBeInTheDocument(); // Rec Price A
-    expect(screen.getByText('15.00')).toBeInTheDocument(); // Rec Price B
+    expect(screen.getByText('₱20.00')).toBeInTheDocument(); // Rec Price A
+    expect(screen.getByText('₱15.00')).toBeInTheDocument(); // Rec Price B
   });
 
   it('does NOT display "Best Margin" or "Best Profit" badges', () => {
@@ -63,7 +63,7 @@ describe('VariantResultsTable', () => {
     render(<VariantResultsTable results={mockResults} />);
 
     // Variant A has current price
-    expect(screen.getByText('25.00')).toBeInTheDocument();
+    expect(screen.getByText('₱25.00')).toBeInTheDocument();
 
     // Variant B does not - should show "-"
     const dashes = screen.getAllByText('-');

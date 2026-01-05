@@ -76,7 +76,7 @@ export const AuthPage: React.FC = () => {
     <div className="flex flex-col items-center justify-center py-xl">
       <div className="w-full max-w-md">
         {guestPresetsCount > 0 && (
-          <div className="mb-lg p-md bg-clay/10 border border-clay/20 rounded-lg flex items-start gap-md animate-in slide-in-from-top-4 fade-in duration-500">
+          <div className="mb-lg p-md bg-clay/10 border border-clay/20 rounded-xl flex items-start gap-md animate-in slide-in-from-top-4 fade-in duration-500">
             <div className="p-xs bg-white rounded-full shrink-0">
               <Save className="w-5 h-5 text-clay" />
             </div>
@@ -109,14 +109,14 @@ export const AuthPage: React.FC = () => {
         <Card className="p-xl md:p-2xl shadow-lg border-border-subtle bg-white">
           <form onSubmit={handleSubmit} className="space-y-lg">
             {error && (
-              <div className="p-md bg-rust/10 border border-rust/20 rounded-lg flex items-start space-x-sm">
+              <div className="p-md bg-rust/10 border border-rust/20 rounded-xl flex items-start space-x-sm">
                 <AlertCircle className="w-5 h-5 text-rust shrink-0 mt-0.5" />
                 <p className="text-sm text-rust">{error}</p>
               </div>
             )}
 
             {successMessage && (
-              <div className="p-md bg-moss/10 border border-moss/20 rounded-lg flex items-start space-x-sm">
+              <div className="p-md bg-moss/10 border border-moss/20 rounded-xl flex items-start space-x-sm">
                 <CheckCircle2 className="w-5 h-5 text-moss shrink-0 mt-0.5" />
                 <p className="text-sm text-moss">{successMessage}</p>
               </div>

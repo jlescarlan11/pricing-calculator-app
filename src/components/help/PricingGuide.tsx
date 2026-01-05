@@ -60,7 +60,7 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
           </section>
 
           {/* Markup Visual Example */}
-          <section className="bg-surface border border-border-subtle rounded-lg p-lg">
+          <section className="bg-surface border border-border-subtle rounded-xl p-lg">
             <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">
               Example: 50% Markup
             </h4>
@@ -147,7 +147,7 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
           </section>
 
           {/* Margin Visual Example */}
-          <section className="bg-surface border border-border-subtle rounded-lg p-lg">
+          <section className="bg-surface border border-border-subtle rounded-xl p-lg">
             <h4 className="text-[10px] font-bold text-ink-500 mb-lg uppercase tracking-[0.2em]">
               Example: 50% Margin
             </h4>
@@ -223,7 +223,7 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
       {/* Comparison Table */}
       <section className="pt-xl border-t border-border-subtle">
         <h4 className="font-bold text-ink-900 mb-lg tracking-tight">Quick Comparison</h4>
-        <div className="overflow-hidden rounded-lg border border-border-subtle shadow-level-1 bg-bg-main">
+        <div className="overflow-hidden rounded-xl border border-border-subtle shadow-level-1 bg-bg-main">
           <table className="w-full text-sm text-left">
             <thead className="bg-surface text-ink-500 font-bold text-[10px] uppercase tracking-widest">
               <tr>

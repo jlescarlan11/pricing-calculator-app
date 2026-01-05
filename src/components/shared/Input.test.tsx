@@ -68,7 +68,7 @@ describe('Input Component', () => {
     // Check new styling requirements
     expect(input).toHaveClass('py-[14px]'); // Vertical padding
     expect(input).toHaveClass('pl-4'); // Horizontal padding (default)
-    expect(input).toHaveClass('rounded-sm'); // Border radius
+    expect(input).toHaveClass('rounded-xl'); // Border radius
     expect(input).toHaveClass('border-border-subtle'); // Default border
     expect(input).toHaveClass('bg-bg-main'); // Background
     expect(input).toHaveClass('placeholder:italic'); // Placeholder style

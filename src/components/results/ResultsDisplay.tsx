@@ -31,7 +31,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Placeholder for when no results are available
   if (!results) {
     return (
-      <div className="flex flex-col items-center justify-center p-3xl text-center bg-surface rounded-lg border-2 border-dashed border-border-base animate-in fade-in duration-1000">
+      <div className="flex flex-col items-center justify-center p-3xl text-center bg-surface rounded-xl border-2 border-dashed border-border-base animate-in fade-in duration-1000">
         <div className="w-20 h-20 bg-bg-main rounded-round flex items-center justify-center mb-xl shadow-level-1 border border-border-subtle">
           <Calculator className="w-10 h-10 text-ink-500" />
         </div>
@@ -51,7 +51,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const hasVariants = results.variantResults && results.variantResults.length > 0;
 
   return (
-    <div className="space-y-4xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
+    <div className="space-y-2xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
       {/* Print-only Header */}
       <div className="hidden print:block border-b border-ink-900 pb-xl mb-3xl">
         <div className="flex justify-between items-start">
@@ -89,7 +89,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-4xl max-w-4xl mx-auto">
+      <div className="flex flex-col gap-2xl max-w-4xl mx-auto">
         {/* Priority 1: Results Table (Variants) or Recommendations (Single) */}
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
           {hasVariants ? (
@@ -117,8 +117,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         )}
 
         {/* Pro Tip - Low visual weight */}
-        <div className="p-xl bg-surface/50 rounded-lg border border-border-subtle print:hidden flex items-start gap-md">
-          <div className="p-sm bg-clay/10 rounded-full text-clay shrink-0">
+        <div className="p-xl bg-surface/50 rounded-xl border border-border-subtle print:hidden flex items-start gap-md">
+          <div className="p-sm bg-clay/10 rounded-round text-clay shrink-0">
             <Share2 className="w-5 h-5" />
           </div>
           <div>

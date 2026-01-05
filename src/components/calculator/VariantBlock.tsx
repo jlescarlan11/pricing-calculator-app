@@ -79,7 +79,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
     >
       <div className="space-y-lg">
         {/* Allocation */}
-        <div className="bg-surface p-md rounded-lg border border-border-subtle">
+        <div className="bg-surface-hover p-md rounded-lg border border-border-subtle">
           <Input
             label={`Batch Allocation (Max: ${maxBatchSize})`}
             type="number"
@@ -126,9 +126,9 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
             </div>
 
             <Button
-              variant="ghost"
+              variant="dashed"
               onClick={() => onAddIngredient(variant.id)}
-              className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 border-2 border-dashed border-border-base transition-all duration-300"
+              className="w-full flex items-center justify-center gap-sm"
             >
               <Plus className="w-5 h-5" />
               Add Variant Ingredient

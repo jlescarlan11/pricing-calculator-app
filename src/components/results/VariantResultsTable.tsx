@@ -1,6 +1,7 @@
 import React from 'react';
 import type { CalculationResult } from '../../types/calculator';
-import { Card } from '../shared';
+import { Card, Badge } from '../shared';
+import { formatCurrency, formatPercent } from '../../utils/formatters';
 
 interface VariantResultsTableProps {
   results: CalculationResult;
@@ -9,8 +10,14 @@ interface VariantResultsTableProps {
 export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ results }) => {
   if (!results.variantResults || results.variantResults.length === 0) return null;
 
+  const getMarginVariant = (margin: number) => {
+    if (margin < 15) return 'error' as const;
+    if (margin <= 25) return 'warning' as const;
+    return 'success' as const;
+  };
+
   return (
-    <Card title="Variant Performance" className="overflow-hidden">
+    <Card title="Variant Performance" className="overflow-hidden rounded-xl">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="text-xs text-ink-500 uppercase bg-surface border-b border-border-subtle">
@@ -34,18 +41,18 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                 <tr key={variant.id} className="hover:bg-surface-hover transition-colors">
                   <td className="px-md py-md font-medium text-ink-900">{variant.name}</td>
                   <td className="px-md py-md text-right tabular-nums text-ink-700">
-                    {variant.costPerUnit.toFixed(2)}
+                    {formatCurrency(variant.costPerUnit)}
                   </td>
                   <td className="px-md py-md text-right tabular-nums font-semibold text-ink-900">
-                    {variant.recommendedPrice.toFixed(2)}
+                    {formatCurrency(variant.recommendedPrice)}
                   </td>
-                  <td className="px-md py-md text-right tabular-nums text-moss">
-                    {variant.profitMarginPercent.toFixed(1)}%
+                  <td className="px-md py-md text-right tabular-nums text-moss font-semibold">
+                    {formatPercent(variant.profitMarginPercent)}
                   </td>
                   <td className="px-md py-md text-right tabular-nums border-l border-border-subtle">
                     {hasCurrentPrice ? (
                       <span className="font-medium text-ink-900">
-                        {variant.currentSellingPrice?.toFixed(2)}
+                        {formatCurrency(variant.currentSellingPrice!)}
                       </span>
                     ) : (
                       <span className="text-ink-300">-</span>
@@ -53,11 +60,12 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                   </td>
                   <td className="px-md py-md text-right tabular-nums">
                     {hasCurrentPrice && variant.currentProfitMargin !== undefined ? (
-                      <span
-                        className={`${variant.currentProfitMargin < 20 ? 'text-rust' : 'text-moss'}`}
+                      <Badge
+                        variant={getMarginVariant(variant.currentProfitMargin)}
+                        className="py-0 px-2"
                       >
-                        {variant.currentProfitMargin.toFixed(1)}%
-                      </span>
+                        {formatPercent(variant.currentProfitMargin)}
+                      </Badge>
                     ) : (
                       <span className="text-ink-300">-</span>
                     )}
@@ -72,7 +80,7 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                 Total Batch Profit (Target)
               </td>
               <td colSpan={2} className="px-md py-md font-bold text-moss text-right text-lg">
-                {results.profitPerBatch.toFixed(2)}
+                {formatCurrency(results.profitPerBatch)}
               </td>
             </tr>
           </tfoot>

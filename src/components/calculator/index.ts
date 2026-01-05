@@ -6,3 +6,4 @@ export * from './CurrentPrice';
 export * from './PricingStrategy';
 export * from './CalculatorForm';
 export * from './SampleDemo';
+export * from './VariantBlock';

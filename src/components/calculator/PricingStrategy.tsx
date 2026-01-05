@@ -58,7 +58,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         <button
           type="button"
           onClick={() => handleStrategyChange('markup')}
-          className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
+          className={`flex-1 py-sm text-sm font-medium rounded-md transition-all cursor-pointer ${
             strategy === 'markup'
               ? 'bg-clay text-white shadow-level-1'
               : 'text-ink-500 hover:text-ink-900'
@@ -69,7 +69,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         <button
           type="button"
           onClick={() => handleStrategyChange('margin')}
-          className={`flex-1 py-sm text-sm font-medium rounded-sm transition-all cursor-pointer ${
+          className={`flex-1 py-sm text-sm font-medium rounded-md transition-all cursor-pointer ${
             strategy === 'margin'
               ? 'bg-clay text-white shadow-level-1'
               : 'text-ink-500 hover:text-ink-900'

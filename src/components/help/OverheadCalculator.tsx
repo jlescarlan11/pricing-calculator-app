@@ -53,7 +53,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
 
   return (
     <div className="space-y-xl p-xl">
-      <div className="bg-surface p-lg rounded-lg border border-border-subtle animate-in fade-in duration-700">
+      <div className="bg-white p-lg rounded-xl border border-border-subtle animate-in fade-in duration-700">
         <div className="flex gap-md">
           <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
           <div className="text-sm text-ink-700">
@@ -162,7 +162,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         </div>
       </div>
 
-      <div className="bg-surface rounded-lg p-lg border border-border-subtle space-y-md">
+      <div className="bg-white rounded-xl p-lg border border-border-subtle space-y-md">
         <p className="text-xs font-bold text-ink-500 uppercase tracking-widest font-sans">
           Breakdown (per Batch)
         </p>
@@ -213,7 +213,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
       </div>
 
       <Button
-        className="w-full py-lg rounded-sm font-bold tracking-tight transition-all"
+        className="w-full py-lg font-bold tracking-tight transition-all"
         variant="primary"
         onClick={() => onApply(calculation.total)}
         disabled={calculation.total <= 0}

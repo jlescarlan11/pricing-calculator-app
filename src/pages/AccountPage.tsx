@@ -18,7 +18,7 @@ export const AccountPage: React.FC = () => {
       </div>
 
       {/* Profile Section */}
-      <section className="bg-white p-xl rounded-lg border border-border-base shadow-sm">
+      <section className="bg-white p-xl rounded-xl border border-border-base shadow-sm">
         <h2 className="text-xl font-medium text-ink-900 mb-md">Profile</h2>
         <div className="space-y-sm mb-xl">
           <p className="text-ink-700">
@@ -41,7 +41,7 @@ export const AccountPage: React.FC = () => {
       </section>
 
       {/* Data Management Section */}
-      <section className="bg-white p-xl rounded-lg border border-border-base shadow-sm">
+      <section className="bg-white p-xl rounded-xl border border-border-base shadow-sm">
         <h2 className="text-xl font-medium text-ink-900 mb-md">Data Management</h2>
         <p className="text-ink-500 mb-lg">
           Export your data for safekeeping or transfer it to another device.

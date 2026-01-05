@@ -27,7 +27,7 @@ export const DangerZone: React.FC = () => {
   if (presets.length === 0) return null;
 
   return (
-    <div className="border border-rust/20 rounded-lg p-xl bg-rust/5">
+    <div className="border border-rust/20 rounded-xl p-xl bg-rust/5">
       <h3 className="text-lg font-medium text-rust mb-sm flex items-center gap-sm">
         <AlertTriangle className="w-5 h-5" />
         Danger Zone

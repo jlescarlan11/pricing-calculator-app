@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plus, Calculator, Trash2, RefreshCcw } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Plus, Calculator, Trash2, RefreshCcw, Package } from 'lucide-react';
 import {
   ProductInfo,
   IngredientRow,
@@ -26,6 +26,7 @@ interface CalculatorFormProps {
   onUpdateConfig: (updates: Partial<PricingConfig>) => void;
   onCalculate: () => void;
   onReset: () => void;
+  onOpenPresets: () => void;
 
   // Variant Actions
   onSetHasVariants: (enabled: boolean) => void;
@@ -54,6 +55,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onUpdateConfig,
   onCalculate,
   onReset,
+  onOpenPresets,
   onSetHasVariants,
   onAddVariant,
   onRemoveVariant,
@@ -122,13 +124,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   const remainingBatch = Math.max(0, rawRemainingBatch);
 
   // Perform calculation to get live previews for variants
-  const calculationResult = React.useMemo(
+  const calculationResult = useMemo(
     () => performFullCalculation(input, config),
     [input, config]
   );
 
   return (
-    <div className="flex flex-col gap-3xl w-full pb-4xl">
+    <div className="flex flex-col gap-2xl w-full pb-4xl">
       {/* Header with Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-lg px-lg sm:px-0">
         <div>
@@ -142,7 +144,17 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-sm w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-sm w-full sm:w-auto">
+          <Button
+            variant="ghost"
+            onClick={onOpenPresets}
+            className="flex-1 sm:flex-none flex items-center gap-sm text-clay hover:bg-clay/5"
+          >
+            <Package className="w-4 h-4" />
+            <span className="hidden sm:inline">Saved Products</span>
+            <span className="sm:hidden">Presets</span>
+          </Button>
+          <div className="hidden sm:block h-6 w-px bg-border-subtle mx-xs" />
           <SavePresetButton
             input={input}
             config={config}
@@ -234,9 +246,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
             <div className="pt-lg">
               <Button
-                variant="ghost"
+                variant="dashed"
                 onClick={onAddIngredient}
-                className="w-full flex items-center justify-center gap-sm text-ink-700 hover:text-clay hover:bg-clay/5 border-2 border-dashed border-border-base transition-all duration-300"
+                className="w-full flex items-center justify-center gap-sm"
               >
                 <Plus className="w-5 h-5" />
                 Add Item
@@ -301,17 +313,62 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
         {input.hasVariants && (
           <div className="space-y-xl animate-in fade-in slide-in-from-top-4 duration-300">
-            {/* Base Variant Block (Read Only) */}
+            {/* Base Variant Block (Read Only) with Visual Allocation */}
             <Card className="bg-surface/50 border-border-subtle">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-ink-900">
-                    {input.productName || 'Base Product'} (Base)
-                  </h4>
-                  <p className="text-sm text-ink-500">Remaining Base Batch</p>
+              <div className="flex flex-col gap-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-ink-900">
+                      {input.productName || 'Base Product'} (Base)
+                    </h4>
+                    <p className="text-sm text-ink-500">Remaining Base Batch</p>
+                  </div>
+                  <div className="text-2xl font-bold text-ink-900 tabular-nums">
+                    {remainingBatch} <span className="text-sm font-normal text-ink-500">units</span>
+                  </div>
                 </div>
-                <div className="text-2xl font-bold text-ink-900 tabular-nums">
-                  {remainingBatch} <span className="text-sm font-normal text-ink-500">units</span>
+
+                {/* Visual Allocation Bar */}
+                <div className="space-y-sm">
+                  <div className="flex justify-between text-[10px] font-bold text-ink-500 uppercase tracking-widest">
+                    <span>Batch Allocation</span>
+                    <span>
+                      {totalVariantBatch} / {input.batchSize} Units allocated
+                    </span>
+                  </div>
+                  <div className="h-4 w-full bg-border-subtle rounded-lg overflow-hidden flex border border-border-subtle shadow-inner">
+                    <div
+                      className="h-full bg-clay transition-all duration-500 flex items-center justify-center text-[8px] text-white font-bold"
+                      style={{ width: `${(remainingBatch / (input.batchSize || 1)) * 100}%` }}
+                    >
+                      {remainingBatch > 0 && 'BASE'}
+                    </div>
+                    {input.variants?.map((v, i) => (
+                      <div
+                        key={v.id}
+                        className={`h-full transition-all duration-500 flex items-center justify-center text-[8px] text-white font-bold border-l border-white/20 ${i % 2 === 0 ? 'bg-moss' : 'bg-ink-700'}`}
+                        style={{ width: `${(v.batchSize / (input.batchSize || 1)) * 100}%` }}
+                      >
+                        {v.batchSize > (input.batchSize || 0) * 0.1 && `V${i + 1}`}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-md items-center text-[10px] font-medium text-ink-500">
+                    <div className="flex items-center gap-xs">
+                      <div className="w-2 h-2 rounded-full bg-clay" />
+                      <span>Base ({remainingBatch})</span>
+                    </div>
+                    {input.variants?.map((v, i) => (
+                      <div key={v.id} className="flex items-center gap-xs">
+                        <div
+                          className={`w-2 h-2 rounded-full ${i % 2 === 0 ? 'bg-moss' : 'bg-ink-700'}`}
+                        />
+                        <span>
+                          {v.name || `Variant ${i + 1}`} ({v.batchSize})
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </Card>
@@ -342,30 +399,16 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
             {/* Add Variant Button */}
             <Button
-              variant="secondary"
+              variant="dashed"
               onClick={onAddVariant}
               disabled={remainingBatch <= 0}
-              className="w-full flex items-center justify-center gap-sm py-lg border-2 border-dashed border-border-base hover:border-clay hover:text-clay transition-all"
+              className="w-full py-lg flex items-center justify-center gap-sm"
             >
               <Plus className="w-5 h-5" />
               {remainingBatch > 0 ? 'Add Variant' : 'No Batch Capacity Remaining'}
             </Button>
           </div>
         )}
-
-        {/* Floating Mobile Action */}
-
-        <div className="fixed bottom-lg right-lg lg:hidden z-30">
-          <Button
-            variant="primary"
-            onClick={onCalculate}
-            isLoading={isCalculating}
-            className="rounded-round w-16 h-16 shadow-level-3 flex items-center justify-center p-0"
-            aria-label="Calculate Results"
-          >
-            <Calculator className="w-8 h-8" />
-          </Button>
-        </div>
       </div>
     </div>
   );

@@ -230,6 +230,12 @@ export const performFullCalculation = (
       currentSellingPrice: variant.currentSellingPrice,
       currentProfitPerUnit,
       currentProfitMargin,
+      breakdown: {
+        baseAllocation: round(allocatedBaseCost),
+        specificIngredients: round(variantSpecificIngredients),
+        specificLabor: round(variant.laborCost || 0),
+        specificOverhead: round(variant.overhead || 0),
+      },
     });
   });
 
@@ -261,6 +267,12 @@ export const performFullCalculation = (
       currentSellingPrice: input.currentSellingPrice,
       currentProfitPerUnit: baseCurrentProfitPerUnit,
       currentProfitMargin: baseCurrentProfitMargin,
+      breakdown: {
+        baseAllocation: round(baseCostPerUnit * remainingBatch),
+        specificIngredients: 0,
+        specificLabor: 0,
+        specificOverhead: 0,
+      },
     });
   }
 

@@ -175,5 +175,43 @@ describe('Calculation Utils', () => {
       expect(v1?.currentProfitPerUnit).toBe(19);
       expect(v1?.currentProfitMargin).toBe(95);
     });
+
+    it('populates breakdown property for variants', () => {
+      const result = performFullCalculation(
+        {
+          ...baseInput,
+          batchSize: 10,
+          ingredients: [{ id: '1', name: 'Ing 1', amount: 10, cost: 100 }], // Cost per unit = 10
+          laborCost: 20, // Total base cost = 120. Cost per unit = 12
+          overhead: 0,
+          hasVariants: true,
+          variants: [
+            {
+              id: 'v1',
+              name: 'Variant 1',
+              batchSize: 5,
+              ingredients: [{ id: '2', name: 'Add-on', amount: 1, cost: 10 }], // Specific cost = 10
+              laborCost: 5,
+              overhead: 5,
+              pricingConfig: { strategy: 'markup', value: 50 },
+            },
+          ],
+        },
+        { strategy: 'markup', value: 50 }
+      );
+
+      const v1 = result.variantResults?.find((v) => v.id === 'v1');
+      expect(v1?.breakdown).toBeDefined();
+      expect(v1?.breakdown?.baseAllocation).toBe(60); // 12 * 5
+      expect(v1?.breakdown?.specificIngredients).toBe(10);
+      expect(v1?.breakdown?.specificLabor).toBe(5);
+      expect(v1?.breakdown?.specificOverhead).toBe(5);
+      expect(v1?.totalCost).toBe(80); // 60 + 10 + 5 + 5
+
+      const base = result.variantResults?.find((v) => v.id === 'base-original');
+      expect(base?.breakdown).toBeDefined();
+      expect(base?.breakdown?.baseAllocation).toBe(60); // 12 * 5 remaining
+      expect(base?.breakdown?.specificIngredients).toBe(0);
+    });
   });
 });
