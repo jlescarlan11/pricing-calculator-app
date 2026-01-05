@@ -12,11 +12,48 @@ interface SyncQueueItem {
   timestamp: number;
 }
 
+// Helper to sanitize a preset to prevent crashes from missing fields
+function sanitizePreset(preset: any): Preset | null {
+  if (!preset || !preset.id || !preset.name) return null;
+
+  return {
+    id: preset.id,
+    userId: preset.userId,
+    name: preset.name,
+    presetType: (preset.presetType || 'default') as 'default' | 'variant',
+    baseRecipe: {
+      productName: preset.baseRecipe?.productName || '',
+      batchSize: typeof preset.baseRecipe?.batchSize === 'number' ? preset.baseRecipe.batchSize : 1,
+      ingredients: Array.isArray(preset.baseRecipe?.ingredients)
+        ? preset.baseRecipe.ingredients
+        : [],
+      laborCost: typeof preset.baseRecipe?.laborCost === 'number' ? preset.baseRecipe.laborCost : 0,
+      overhead: typeof preset.baseRecipe?.overhead === 'number' ? preset.baseRecipe.overhead : 0,
+      hasVariants: !!preset.baseRecipe?.hasVariants,
+      variants: Array.isArray(preset.baseRecipe?.variants) ? preset.baseRecipe.variants : [],
+      businessName: preset.baseRecipe?.businessName,
+      currentSellingPrice: preset.baseRecipe?.currentSellingPrice,
+    },
+    variants: Array.isArray(preset.variants) ? preset.variants : [],
+    pricingConfig: {
+      strategy: (preset.pricingConfig?.strategy || 'markup') as 'markup' | 'margin',
+      value: typeof preset.pricingConfig?.value === 'number' ? preset.pricingConfig.value : 50,
+    },
+    createdAt: preset.createdAt || new Date().toISOString(),
+    updatedAt: preset.updatedAt || new Date().toISOString(),
+    lastSyncedAt: preset.lastSyncedAt,
+  };
+}
+
 // Helper to get local presets
 function getLocalPresets(): Preset[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.map(sanitizePreset).filter((p): p is Preset => p !== null);
   } catch (e) {
     console.error('Error reading local presets', e);
     return [];
@@ -25,7 +62,8 @@ function getLocalPresets(): Preset[] {
 
 function setLocalPresets(presets: Preset[]) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+    const sanitized = presets.map(sanitizePreset).filter((p): p is Preset => p !== null);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
   } catch {
     console.error('Error saving local presets');
   }
@@ -67,7 +105,7 @@ function mapFromDb(row: {
   updated_at: string;
   last_synced_at?: string | null;
 }): Preset {
-  return {
+  const preset = {
     id: row.id,
     userId: row.user_id,
     name: row.name,
@@ -79,6 +117,8 @@ function mapFromDb(row: {
     updatedAt: row.updated_at,
     lastSyncedAt: row.last_synced_at,
   };
+
+  return sanitizePreset(preset) as Preset;
 }
 
 // Mapper: App -> DB

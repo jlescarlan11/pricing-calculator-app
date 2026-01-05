@@ -30,15 +30,24 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Reset state when modal opens
+  // Reset state during render when modal opens to avoid flicker
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen && !prevIsOpen) {
+    setPrevIsOpen(true);
+    setIsSuccess(false);
+    setIsSaving(false);
+    setError(null);
+    setName(input.productName || '');
+  } else if (!isOpen && prevIsOpen) {
+    setPrevIsOpen(false);
+  }
+
+  // Sync name when input changes while modal is open
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isSuccess && !isSaving) {
       setName(input.productName || '');
-      setError(null);
-      setIsSuccess(false);
-      setIsSaving(false);
     }
-  }, [isOpen, input.productName]);
+  }, [isOpen, input.productName, isSuccess, isSaving]);
 
   const handleSave = async () => {
     const trimmedName = name.trim();

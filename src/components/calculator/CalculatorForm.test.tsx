@@ -273,4 +273,39 @@ describe('CalculatorForm', () => {
     expect(screen.getByLabelText(/Batch Size/i)).toHaveValue(100);
     expect(screen.getByLabelText(/Ingredient Name/i)).toHaveValue('Ext Ing');
   });
+
+  it('handles missing input fields gracefully during rendering', () => {
+    const corruptedInput = {
+      // Missing productName, ingredients, etc.
+    } as any;
+    const config = { strategy: 'markup', value: 20 } as any;
+
+    // Should not crash when rendering with partial/invalid data
+    render(
+      <ToastProvider>
+        <CalculatorForm
+          input={corruptedInput}
+          config={config}
+          errors={{}}
+          isCalculating={false}
+          onUpdateInput={vi.fn()}
+          onUpdateIngredient={vi.fn()}
+          onAddIngredient={vi.fn()}
+          onRemoveIngredient={vi.fn()}
+          onUpdateConfig={vi.fn()}
+          onCalculate={vi.fn()}
+          onReset={vi.fn()}
+          onSetHasVariants={vi.fn()}
+          onAddVariant={vi.fn()}
+          onRemoveVariant={vi.fn()}
+          onUpdateVariant={vi.fn()}
+          onUpdateVariantIngredient={vi.fn()}
+          onAddVariantIngredient={vi.fn()}
+          onRemoveVariantIngredient={vi.fn()}
+        />
+      </ToastProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: /Calculator/i })).toBeInTheDocument();
+  });
 });

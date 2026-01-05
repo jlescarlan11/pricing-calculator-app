@@ -8,7 +8,7 @@ export type SyncStatus = 'synced' | 'syncing' | 'offline' | 'error';
 export function usePresets() {
   const { user } = useAuth();
   const [presets, setPresets] = useState<Preset[]>([]);
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('syncing');
   const [error, setError] = useState<string | null>(null);
 
   const loadPresets = useCallback(async () => {

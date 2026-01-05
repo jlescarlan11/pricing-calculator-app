@@ -147,6 +147,30 @@ describe('useCalculatorState', () => {
     expect(result.current.results?.costPerUnit).toBe(7); // (10+20+5) / 5 = 7
   });
 
+  it('should handle loading a corrupted preset gracefully', () => {
+    const { result } = renderHook(() => useCalculatorState());
+    
+    // Preset with missing fields in baseRecipe
+    const corruptedPreset = {
+      id: 'corrupted',
+      name: 'Corrupted Preset',
+      baseRecipe: {
+        // Missing productName, ingredients, batchSize
+      },
+      pricingConfig: { strategy: 'markup', value: 50 },
+      updatedAt: new Date().toISOString(),
+    } as unknown as Preset;
+
+    act(() => {
+      result.current.loadPreset(corruptedPreset);
+    });
+
+    // Should not crash and should fall back to defaults
+    expect(result.current.input.productName).toBe('');
+    expect(result.current.input.ingredients).toBeDefined();
+    expect(Array.isArray(result.current.input.ingredients)).toBe(true);
+  });
+
   it('should reset state', () => {
     const { result } = renderHook(() => useCalculatorState());
 

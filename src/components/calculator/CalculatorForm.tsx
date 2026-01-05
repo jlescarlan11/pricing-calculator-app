@@ -89,19 +89,20 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   };
 
   const isFormValid =
-    input.productName.trim().length >= 3 &&
-    input.batchSize >= 1 &&
-    input.ingredients.length > 0 &&
-    input.ingredients.every((ing) => ing.name.trim() !== '' && ing.cost > 0);
+    (input?.productName?.trim()?.length || 0) >= 3 &&
+    (input?.batchSize || 0) >= 1 &&
+    (input?.ingredients?.length || 0) > 0 &&
+    input?.ingredients?.every((ing) => (ing?.name?.trim() || '') !== '' && (ing?.cost || 0) > 0);
 
   const getValidationFeedback = () => {
     if (isFormValid) return { message: 'Ready to calculate', color: 'text-moss' };
 
-    const hasName = input.productName.trim().length >= 3;
-    const hasIngredients = input.ingredients.length > 0;
+    const hasName = (input?.productName?.trim()?.length || 0) >= 3;
+    const hasIngredients = (input?.ingredients?.length || 0) > 0;
     const ingredientsComplete =
-      hasIngredients && input.ingredients.every((ing) => ing.name.trim() !== '' && ing.cost > 0);
-    const hasBatchSize = input.batchSize >= 1;
+      hasIngredients &&
+      input?.ingredients?.every((ing) => (ing?.name?.trim() || '') !== '' && (ing?.cost || 0) > 0);
+    const hasBatchSize = (input?.batchSize || 0) >= 1;
 
     if (hasName && hasIngredients && !ingredientsComplete)
       return { message: 'Almost there! Complete your ingredients', color: 'text-clay' };
@@ -116,8 +117,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   const feedback = getValidationFeedback();
 
   // Calculate remaining batch for variants
-  const totalVariantBatch = input.variants?.reduce((sum, v) => sum + v.batchSize, 0) || 0;
-  const rawRemainingBatch = input.batchSize - totalVariantBatch;
+  const totalVariantBatch = input?.variants?.reduce((sum, v) => sum + v.batchSize, 0) || 0;
+  const rawRemainingBatch = (input?.batchSize || 0) - totalVariantBatch;
   const remainingBatch = Math.max(0, rawRemainingBatch);
 
   // Perform calculation to get live previews for variants
@@ -172,9 +173,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
         {/* Section 1: Product Info */}
 
         <ProductInfo
-          businessName={input.businessName}
-          productName={input.productName}
-          batchSize={input.batchSize}
+          businessName={input?.businessName}
+          productName={input?.productName || ''}
+          batchSize={input?.batchSize || 0}
           onChange={handleProductInfoChange}
           errors={{
             businessName: errors.businessName,
@@ -195,7 +196,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               <h3 className="text-lg text-ink-900">Ingredients</h3>
 
               <span className="text-xs font-bold text-ink-500 uppercase tracking-widest">
-                {input.ingredients.length} item{input.ingredients.length !== 1 ? 's' : ''}
+                {input?.ingredients?.length || 0} item{input?.ingredients?.length !== 1 ? 's' : ''}
               </span>
             </div>
           }
@@ -210,16 +211,16 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             )}
 
             <div className="flex flex-col divide-y divide-[#E6E4E1]">
-              {input.ingredients.map((ing, index) => (
+              {input?.ingredients?.map((ing, index) => (
                 <IngredientRow
                   key={ing.id}
                   ingredient={ing}
                   index={index}
-                  isOnlyRow={input.ingredients.length === 1}
+                  isOnlyRow={input?.ingredients?.length === 1}
                   onUpdate={onUpdateIngredient}
                   onRemove={onRemoveIngredient}
                   onAdd={onAddIngredient}
-                  autoFocus={index === input.ingredients.length - 1 && index > 0}
+                  autoFocus={index === (input?.ingredients?.length || 0) - 1 && index > 0}
                   errors={{
                     name: errors[`ingredients.${ing.id}.name`],
 
@@ -250,14 +251,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
           <LaborCost
-            value={input.laborCost}
+            value={input?.laborCost || 0}
             onChange={handleLaborChange}
             error={errors.laborCost}
           />
 
           <OverheadCost
-            value={input.overhead}
-            batchSize={input.batchSize}
+            value={input?.overhead || 0}
+            batchSize={input?.batchSize || 1}
             onChange={handleOverheadChange}
             error={errors.overhead}
           />
@@ -269,7 +270,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
         <PricingStrategy
           strategy={config.strategy}
           value={config.value}
-          costPerUnit={calculationResult.costPerUnit}
+          costPerUnit={calculationResult?.costPerUnit || 0}
           onChange={handlePricingChange}
         />
 

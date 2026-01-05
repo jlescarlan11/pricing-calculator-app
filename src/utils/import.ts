@@ -68,12 +68,15 @@ export function validateBackupJSON(jsonString: string): ImportResult {
 
 function isValidPreset(p: unknown): boolean {
   if (!p || typeof p !== 'object') return false;
-  const preset = p as Record<string, unknown>;
+  const preset = p as Record<string, any>;
   return (
     typeof preset.id === 'string' &&
     typeof preset.name === 'string' &&
     typeof preset.baseRecipe === 'object' &&
-    typeof preset.pricingConfig === 'object'
-    // We can add deeper validation if needed
+    preset.baseRecipe !== null &&
+    typeof preset.baseRecipe.productName === 'string' &&
+    Array.isArray(preset.baseRecipe.ingredients) &&
+    typeof preset.pricingConfig === 'object' &&
+    preset.pricingConfig !== null
   );
 }

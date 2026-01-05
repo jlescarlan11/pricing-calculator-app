@@ -24,7 +24,9 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
   viewMode = 'grid',
 }) => {
   const { name, baseRecipe, updatedAt, pricingConfig } = preset;
-  const { productName, batchSize, ingredients } = baseRecipe;
+  const productName = baseRecipe?.productName || 'Unnamed Product';
+  const batchSize = baseRecipe?.batchSize || 1;
+  const ingredients = baseRecipe?.ingredients || [];
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

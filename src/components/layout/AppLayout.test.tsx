@@ -26,12 +26,6 @@ describe('AppLayout', () => {
     expect(screen.getByTestId('test-child')).toBeInTheDocument();
   });
 
-  it('renders the DataWarningBanner', () => {
-    renderWithRouter(<AppLayout>Content</AppLayout>);
-    expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getAllByText(/Your progress is temporary/i).length).toBeGreaterThan(0);
-  });
-
   it('renders version information in the footer', () => {
     renderWithRouter(<AppLayout>Content</AppLayout>);
 

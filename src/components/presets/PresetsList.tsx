@@ -15,9 +15,11 @@ interface PresetsListProps {
  * Supports both grid and list view modes and sorts by newest first.
  */
 export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
-  const { presets, deletePreset } = usePresets();
+  const { presets, deletePreset, syncStatus } = usePresets();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  const isLoading = syncStatus === 'syncing' && presets.length === 0;
 
   const filteredPresets = useMemo(() => {
     return presets
@@ -25,15 +27,24 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
         const search = searchQuery.toLowerCase();
         return (
           preset.name.toLowerCase().includes(search) ||
-          preset.baseRecipe.productName.toLowerCase().includes(search)
+          preset.baseRecipe?.productName?.toLowerCase().includes(search)
         );
       })
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   }, [presets, searchQuery]);
 
+  if (isLoading) {
+    return (
+      <div className="py-3xl flex flex-col items-center justify-center space-y-md animate-in fade-in duration-500">
+        <div className="w-10 h-10 border-4 border-clay/20 border-t-clay rounded-full animate-spin" />
+        <p className="text-sm text-ink-500 font-medium italic">Fetching your products...</p>
+      </div>
+    );
+  }
+
   if (presets.length === 0) {
     return (
-      <div className="text-center py-3xl bg-surface rounded-lg border-2 border-dashed border-border-base">
+      <div className="text-center py-3xl bg-surface rounded-lg border border-border-subtle">
         <div className="max-w-xs mx-auto">
           <p className="text-ink-900 font-bold mb-sm tracking-tight">A clean slate</p>
           <p className="text-sm text-ink-500 font-medium leading-relaxed">

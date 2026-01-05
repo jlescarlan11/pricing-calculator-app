@@ -30,6 +30,22 @@ const initialConfig: PricingConfig = {
   value: 50,
 };
 
+/**
+ * Safely merges partial or corrupted input with default values.
+ */
+const sanitizeInput = (input: Partial<CalculationInput>): CalculationInput => {
+  return {
+    ...initialInput,
+    ...input,
+    productName: input.productName || initialInput.productName,
+    ingredients: Array.isArray(input.ingredients) ? input.ingredients : initialInput.ingredients,
+    variants: Array.isArray(input.variants) ? input.variants : initialInput.variants,
+    batchSize: typeof input.batchSize === 'number' ? input.batchSize : initialInput.batchSize,
+    laborCost: typeof input.laborCost === 'number' ? input.laborCost : initialInput.laborCost,
+    overhead: typeof input.overhead === 'number' ? input.overhead : initialInput.overhead,
+  };
+};
+
 export interface CalculatorState {
   input: CalculationInput;
   config: PricingConfig;
@@ -86,7 +102,9 @@ export function useCalculatorState(initialValues?: {
     config: initialValues?.config || initialConfig,
   });
 
-  const [input, setInput] = useState<CalculationInput>(initialValues?.input || draft.input);
+  const [input, setInput] = useState<CalculationInput>(
+    sanitizeInput(initialValues?.input || draft.input)
+  );
   const [config, setConfig] = useState<PricingConfig>(initialValues?.config || draft.config);
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -352,20 +370,27 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const loadPreset = useCallback((preset: Preset) => {
-    setInput({
-      ...preset.baseRecipe,
+    if (!preset) return;
+
+    // Defensive check: ensure baseRecipe exists or use a default shape
+    const baseRecipe = preset.baseRecipe || {
+      productName: '',
+      batchSize: 1,
+      ingredients: [],
+      laborCost: 0,
+      overhead: 0,
+    };
+
+    const sanitizedInput = sanitizeInput({
+      ...baseRecipe,
       hasVariants: preset.presetType === 'variant',
       variants: preset.variants || [],
     });
+
+    setInput(sanitizedInput);
     setConfig(preset.pricingConfig);
-    const result = performFullCalculation(
-      {
-        ...preset.baseRecipe,
-        hasVariants: preset.presetType === 'variant',
-        variants: preset.variants || [],
-      },
-      preset.pricingConfig
-    );
+
+    const result = performFullCalculation(sanitizedInput, preset.pricingConfig);
     setResults(result);
     setErrors({});
   }, []);

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
-import { DataWarningBanner } from './DataWarningBanner';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -24,7 +23,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {showTexture && <div className="paper-texture" />}
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        <DataWarningBanner />
         <Header />
 
         <div className="flex-1 flex overflow-hidden">
