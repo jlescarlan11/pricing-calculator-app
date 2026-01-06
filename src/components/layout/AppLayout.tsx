@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
+import { APP_VERSION } from '../../constants/app';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -57,7 +58,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </div>
               <div className="mt-xl md:mt-0 md:order-1 text-center md:text-left">
                 <p className="text-sm text-ink-700">
-                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0
+                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version {APP_VERSION}
                 </p>
               </div>
             </div>
