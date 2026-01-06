@@ -34,8 +34,8 @@ describe('Header', () => {
   it('contains navigation links', () => {
     renderWithRouter(<Header />);
     expect(screen.getByRole('link', { name: /Calculator/i })).toHaveAttribute('href', '/');
-    expect(screen.getByRole('link', { name: /How it works/i })).toHaveAttribute('href', '/help');
     expect(screen.getByRole('link', { name: /Pricing Tips/i })).toHaveAttribute('href', '/faq');
+    expect(screen.getByRole('link', { name: /Sign In/i })).toHaveAttribute('href', '/auth');
   });
 
   it('toggles mobile menu', () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Calculator, HelpCircle, Menu, X, Lightbulb, User, LogIn } from 'lucide-react';
+import { Calculator, Menu, X, Lightbulb, User, LogIn } from 'lucide-react';
 import { PricingExplainerModal } from '../help/PricingExplainerModal';
 import { FAQ } from '../help/FAQ';
 import { Modal } from '../shared/Modal';
@@ -40,10 +40,6 @@ export const Header: React.FC = () => {
               <NavLink to="/" className={navLinkClass}>
                 <Calculator size={18} />
                 <span>Calculator</span>
-              </NavLink>
-              <NavLink to="/help" className={navLinkClass}>
-                <HelpCircle size={18} />
-                <span>How it works</span>
               </NavLink>
               <NavLink to="/faq" className={navLinkClass}>
                 <Lightbulb size={18} />
@@ -85,10 +81,6 @@ export const Header: React.FC = () => {
             <NavLink to="/" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
               <Calculator size={18} />
               Calculator
-            </NavLink>
-            <NavLink to="/help" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
-              <HelpCircle size={18} />
-              How it works
             </NavLink>
             <NavLink to="/faq" className={navLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
               <Lightbulb size={18} />

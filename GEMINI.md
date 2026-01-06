@@ -103,9 +103,8 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 ### Routing & Pages (Added 2026-01-03)
 
-- [x] **Client-side Routing**: Configured `react-router-dom` with `BrowserRouter` and defined routes for `/`, `/help`, and `/faq`.
+- [x] **Client-side Routing**: Configured `react-router-dom` with `BrowserRouter` and defined routes for `/` and `/faq`.
 - [x] **CalculatorPage**: Main route containing the pricing calculator logic and state management.
-- [x] **HelpPage**: Educational route explaining pricing strategies (Markup vs Margin) using the `PricingGuide` component.
 - [x] **FAQPage**: Information route for common pricing questions and tips.
 
 ### Components

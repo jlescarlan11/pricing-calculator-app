@@ -62,7 +62,7 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({ results, className
   return (
     <div className={`space-y-lg ${className}`}>
       {/* Batch Level Summary */}
-      <Card title="Batch Summary" className="bg-surface border-l-4 border-l-clay">
+      <Card title="Batch Summary" className="bg-surface">
         <div className="grid grid-cols-2 gap-md">
           <div>
             <p className="text-xs font-medium text-ink-500 uppercase tracking-widest mb-1">
