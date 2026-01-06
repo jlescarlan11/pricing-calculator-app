@@ -84,13 +84,13 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   return (
     <div
       className={`
-        grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_auto] gap-md items-start md:items-center py-md
+        grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_auto] gap-md items-start md:items-center py-md
         animate-in fade-in duration-400
         ${isDeleting ? 'opacity-0 -translate-y-4 transition-all duration-300 ease-in-out' : ''}
       `}
       onKeyDown={handleKeyDown}
     >
-      <div className="w-full">
+      <div className="w-full col-span-2 md:col-span-1">
         <Input
           ref={nameInputRef}
           label="Ingredient Name"
@@ -131,7 +131,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
         />
       </div>
 
-      <div className="flex justify-end md:justify-center md:pt-6">
+      <div className="col-span-2 md:col-span-1 flex justify-end md:justify-center md:pt-6">
         <Button
           variant="ghost"
           size="sm"

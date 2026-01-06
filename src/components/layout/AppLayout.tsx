@@ -28,8 +28,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content */}
           <main className="flex-1 overflow-y-auto focus:outline-none">
-            <div className="pt-2xl pb-3xl">
-              <div className="max-w-[1200px] mx-auto px-lg md:px-[40px] lg:px-[60px]">
+            <div className="pt-lg md:pt-2xl pb-3xl">
+              <div className="max-w-[1200px] mx-auto px-md md:px-[40px] lg:px-[60px]">
                 {children}
               </div>
             </div>

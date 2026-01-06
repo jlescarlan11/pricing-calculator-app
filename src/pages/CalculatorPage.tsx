@@ -125,12 +125,12 @@ export const CalculatorPage: React.FC = () => {
     <div className="animate-in fade-in duration-700 relative pb-2xl">
       {/* Intro Section (only when no results) */}
       {!showResults && (
-        <div className="space-y-lg mb-2xl">
-          <div className="p-lg md:p-xl bg-surface rounded-xl border border-border-subtle flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
-            <Info className="w-6 h-6 text-clay shrink-0 mt-xs" />
+        <div className="space-y-lg mb-lg md:mb-2xl">
+          <div className="p-md md:p-lg bg-clay/5 rounded-xl border border-clay/20 flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
+            <Info className="w-5 h-5 md:w-6 md:h-6 text-clay shrink-0 mt-0.5" />
             <div>
-              <p className="text-ink-900 font-medium mb-xs">Welcome to your profit partner.</p>
-              <p className="text-ink-700 text-sm leading-relaxed">
+              <p className="text-ink-900 font-medium mb-xs text-sm md:text-base">Welcome to your profit partner.</p>
+              <p className="text-ink-700 text-xs md:text-sm leading-relaxed">
                 Fill in your costs below. We&apos;ll help you find the perfect price to ensure your
                 business grows sustainably. Don&apos;t forget to include your labor—your time is
                 valuable.

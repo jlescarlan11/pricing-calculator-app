@@ -232,6 +232,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 
 - [x] **Migration Strategy**: Implemented `migrateGuestPresets` in `src/utils/migration.ts` to automatically assign anonymous local presets to the user upon login. Integrated into `AuthContext` to trigger on `SIGNED_IN` event.
 - [x] **Data Portability**: Implemented full Export/Import functionality with JSON schema validation, versioning, and "Merge/Replace" strategies in `src/utils/export.ts` and `src/utils/import.ts`. Added `ExportButton` and `ImportButton` to Account Page.
+- [x] **Mobile UI Polish**: Redesigned `SampleDemo` to be compact on mobile. Optimized `IngredientRow` grid layout. Fixed `StickySummary` safe-area. **Header Layout**: Restructured `CalculatorForm` header into a clean vertical stack (Title -> Status -> Action Toolbar) with fully visible labels for better usability and alignment with the user's requested flow. (Updated 2026-01-06)
 - [x] **Design System Consistency**: Verified all new components (DangerZone, AccountPage) adhere to the design tokens (colors, typography). Fixed `DangerZone` button variant to use `danger` (mapped to `rust` color).
 - [x] **Build & Verification**: Fixed all TypeScript build errors (type-only imports, unused variables, tsconfig exclusions) and verified that all 300 tests pass (`npm test`). Confirmed production build success (`npm run build`).
 

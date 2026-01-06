@@ -31,7 +31,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
   const hasVariants = results?.variantResults && results.variantResults.length > 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 p-md sm:hidden animate-in fade-in slide-in-from-bottom-full duration-500">
+    <div className="fixed bottom-0 left-0 right-0 z-40 p-md pb-[calc(var(--spacing-md)+env(safe-area-inset-bottom,0px))] sm:hidden animate-in fade-in slide-in-from-bottom-full duration-500">
       <div className="bg-white/95 backdrop-blur-md border border-border-base rounded-xl shadow-level-4 p-md flex items-center justify-between gap-md">
         {results ? (
           <div className="flex flex-col flex-1 min-w-0">
