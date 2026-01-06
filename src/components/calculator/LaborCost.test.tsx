@@ -22,13 +22,13 @@ describe('LaborCost', () => {
 
     expect(screen.queryByLabelText(/Hours Worked/i)).not.toBeInTheDocument();
 
-    const toggleBtn = screen.getByRole('button', { name: /Calculator/i });
+    const toggleBtn = screen.getAllByRole('button', { name: /Calculator/i })[0];
     fireEvent.click(toggleBtn);
 
     expect(screen.getByLabelText(/Hours Worked/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Hourly Rate/i)).toBeInTheDocument();
 
-    const hideBtn = screen.getByRole('button', { name: /Hide/i });
+    const hideBtn = screen.getAllByRole('button', { name: /Hide/i })[0];
     fireEvent.click(hideBtn);
 
     expect(screen.queryByLabelText(/Hours Worked/i)).not.toBeInTheDocument();
@@ -38,7 +38,7 @@ describe('LaborCost', () => {
     render(<LaborCost value={0} onChange={mockOnChange} />);
 
     // Open calculator
-    fireEvent.click(screen.getByRole('button', { name: /Calculator/i }));
+    fireEvent.click(screen.getAllByRole('button', { name: /Calculator/i })[0]);
 
     const hoursInput = screen.getByLabelText(/Hours Worked/i);
     const rateInput = screen.getByLabelText(/Hourly Rate/i);
@@ -52,7 +52,7 @@ describe('LaborCost', () => {
   it('applies calculated value', () => {
     render(<LaborCost value={0} onChange={mockOnChange} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Calculator/i }));
+    fireEvent.click(screen.getAllByRole('button', { name: /Calculator/i })[0]);
 
     fireEvent.change(screen.getByLabelText(/Hours Worked/i), { target: { value: '4' } });
     fireEvent.change(screen.getByLabelText(/Hourly Rate/i), { target: { value: '100' } });

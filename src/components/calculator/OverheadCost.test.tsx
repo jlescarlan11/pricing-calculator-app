@@ -31,14 +31,14 @@ describe('OverheadCost', () => {
 
     expect(screen.queryByLabelText(/Monthly Rent/i)).not.toBeInTheDocument();
 
-    const toggleBtn = screen.getByRole('button', { name: /Helper/i });
+    const toggleBtn = screen.getAllByRole('button', { name: /Helper/i })[0];
     fireEvent.click(toggleBtn);
 
     expect(screen.getByRole('spinbutton', { name: /Monthly Rent/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /Monthly Utilities/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /Batches per Month/i })).toBeInTheDocument();
 
-    const hideBtn = screen.getByRole('button', { name: /Hide/i });
+    const hideBtn = screen.getAllByRole('button', { name: /Hide/i })[0];
     fireEvent.click(hideBtn);
 
     expect(screen.queryByRole('spinbutton', { name: /Monthly Rent/i })).not.toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('OverheadCost', () => {
   it('calculates total overhead correctly in helper', () => {
     render(<OverheadCost value={0} batchSize={50} onChange={mockOnChange} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Helper/i }));
+    fireEvent.click(screen.getAllByRole('button', { name: /Helper/i })[0]);
 
     // Use spinbutton role to target inputs specifically
     fireEvent.change(screen.getByRole('spinbutton', { name: /Monthly Rent/i }), {
@@ -71,7 +71,7 @@ describe('OverheadCost', () => {
   it('applies calculated value to overhead', () => {
     render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Helper/i }));
+    fireEvent.click(screen.getAllByRole('button', { name: /Helper/i })[0]);
 
     fireEvent.change(screen.getByRole('spinbutton', { name: /Monthly Rent/i }), {
       target: { value: '200' },

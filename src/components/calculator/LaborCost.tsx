@@ -24,20 +24,43 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
 
   const calculatedTotal = (parseFloat(hours) || 0) * (parseFloat(rate) || 0);
 
+  const HelperButton = ({ className = '' }: { className?: string }) => (
+    <Button
+      variant="ghost"
+      onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
+      className={`text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto ${className}`}
+    >
+      <Calculator className="w-4 h-4 mr-sm shrink-0" />
+      <span className="whitespace-nowrap">
+        {isCalculatorOpen ? 'Hide Calculator' : 'Open Calculator'}
+      </span>
+      {isCalculatorOpen ? (
+        <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
+      ) : (
+        <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
+      )}
+    </Button>
+  );
+
   return (
     <Card>
       <div className="space-y-xl">
-        <div className="flex items-center gap-sm">
-          <h3 className="text-lg font-bold text-ink-900 leading-tight">{label || 'Labor Cost'}</h3>
-          <Tooltip content="Total cost of labor for this batch. You can enter a fixed amount or use the calculator below.">
-            <button
-              type="button"
-              className="text-ink-500 hover:text-clay cursor-help transition-colors shrink-0"
-              aria-label="More info about labor cost"
-            >
-              <HelpCircle className="w-4 h-4" />
-            </button>
-          </Tooltip>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-sm">
+            <h3 className="text-lg font-bold text-ink-900 leading-tight">
+              {label || 'Labor Cost'}
+            </h3>
+            <Tooltip content="Total cost of labor for this batch. You can enter a fixed amount or use the calculator below.">
+              <button
+                type="button"
+                className="text-ink-500 hover:text-clay cursor-help transition-colors shrink-0"
+                aria-label="More info about labor cost"
+              >
+                <HelpCircle className="w-4 h-4" />
+              </button>
+            </Tooltip>
+          </div>
+          <HelperButton className="hidden md:flex" />
         </div>
 
         <div className="space-y-sm">
@@ -52,22 +75,8 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
             min={0}
             step="0.01"
           />
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
-              className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto"
-            >
-              <Calculator className="w-4 h-4 mr-sm shrink-0" />
-              <span className="whitespace-nowrap">
-                {isCalculatorOpen ? 'Hide Calculator' : 'Open Calculator'}
-              </span>
-              {isCalculatorOpen ? (
-                <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
-              ) : (
-                <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
-              )}
-            </Button>
+          <div className="flex justify-end md:hidden">
+            <HelperButton />
           </div>
         </div>
 
