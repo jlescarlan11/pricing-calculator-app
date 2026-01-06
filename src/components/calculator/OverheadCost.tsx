@@ -78,7 +78,9 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
               </button>
             </Tooltip>
           </div>
-          <HelperButton className="hidden md:flex" />
+          <div className="hidden md:block">
+            <HelperButton />
+          </div>
         </div>
 
         <div className="space-y-sm">
