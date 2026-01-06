@@ -69,21 +69,23 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({
   return (
     <Card>
       <div className="space-y-xl">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-y-sm">
           <div className="flex items-center gap-sm">
-            <Tag className="w-5 h-5 text-clay" />
-            <h3 className="text-lg font-bold text-ink-900 tracking-tight">Current Price</h3>
+            <Tag className="w-5 h-5 text-clay shrink-0" />
+            <h3 className="text-lg font-bold text-ink-900 tracking-tight leading-tight">
+              Current Price
+            </h3>
           </div>
           <Button
             variant="ghost"
             onClick={toggleVisibility}
-            className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-lg transition-all duration-300"
+            className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md h-auto text-xs rounded-lg transition-all duration-300"
           >
-            {isVisible ? 'Hide' : 'Compare'}
+            <span className="whitespace-nowrap">{isVisible ? 'Hide' : 'Compare'}</span>
             {isVisible ? (
-              <ChevronUp className="w-4 h-4 ml-xs" />
+              <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
             ) : (
-              <ChevronDown className="w-4 h-4 ml-xs" />
+              <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
             )}
           </Button>
         </div>

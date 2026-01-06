@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
+import { APP_VERSION } from '../../constants/app';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -28,8 +29,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content */}
           <main className="flex-1 overflow-y-auto focus:outline-none">
-            <div className="pt-2xl pb-3xl">
-              <div className="max-w-[1200px] mx-auto px-lg md:px-[40px] lg:px-[60px]">
+            <div className="pt-lg md:pt-2xl pb-3xl">
+              <div className="max-w-[1200px] mx-auto px-md md:px-[40px] lg:px-[60px]">
                 {children}
               </div>
             </div>
@@ -57,7 +58,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </div>
               <div className="mt-xl md:mt-0 md:order-1 text-center md:text-left">
                 <p className="text-sm text-ink-700">
-                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version 0.1.0
+                  &copy; {new Date().getFullYear()} PriceCraft Calculator. Version {APP_VERSION}
                 </p>
               </div>
             </div>

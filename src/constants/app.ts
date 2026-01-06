@@ -1,6 +1,8 @@
 export const DEFAULT_MARKUP_PERCENT = 50;
 export const DEFAULT_MARGIN_PERCENT = 30;
 
+export const APP_VERSION = import.meta.env.VITE_APP_VERSION || '0.0.0';
+
 export const MIN_MARKUP_PERCENT = 10;
 export const MAX_MARKUP_PERCENT = 500;
 

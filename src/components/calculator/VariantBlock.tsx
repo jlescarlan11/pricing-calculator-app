@@ -75,7 +75,6 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
           </Button>
         </div>
       }
-      className="border-l-4 border-l-clay"
     >
       <div className="space-y-lg">
         {/* Allocation */}

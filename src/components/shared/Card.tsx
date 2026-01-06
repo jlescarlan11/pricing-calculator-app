@@ -28,7 +28,7 @@ export const Card: React.FC<CardProps> = ({
       {noPadding ? (
         <>
           {title && (
-            <div className="p-lg md:p-xl pb-0">
+            <div className="p-md sm:p-lg md:p-xl pb-0">
               {typeof title === 'string' ? (
                 <h3 className="font-serif text-xl font-semibold text-ink-900 mb-lg">{title}</h3>
               ) : (
@@ -38,11 +38,11 @@ export const Card: React.FC<CardProps> = ({
           )}
           {children}
           {footer && (
-            <div className="border-t border-border-subtle bg-bg-main/50 p-lg md:p-xl">{footer}</div>
+            <div className="border-t border-border-subtle bg-bg-main/50 p-md sm:p-lg md:p-xl">{footer}</div>
           )}
         </>
       ) : (
-        <div className="p-lg md:p-xl">
+        <div className="p-md sm:p-lg md:p-xl">
           {title && (
             <div className="mb-lg">
               {typeof title === 'string' ? (

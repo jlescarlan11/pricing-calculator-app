@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { AppLayout } from './components/layout';
-import { CalculatorPage, HelpPage, FAQPage, AuthPage, AccountPage } from './pages';
+import { CalculatorPage, FAQPage, AuthPage, AccountPage } from './pages';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { ToastProvider } from './components/shared';
@@ -12,7 +12,6 @@ function App() {
         <AppLayout>
           <Routes>
             <Route path="/" element={<CalculatorPage />} />
-            <Route path="/help" element={<HelpPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route

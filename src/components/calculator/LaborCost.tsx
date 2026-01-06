@@ -24,48 +24,63 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
 
   const calculatedTotal = (parseFloat(hours) || 0) * (parseFloat(rate) || 0);
 
+  const HelperButton = ({ className = '' }: { className?: string }) => (
+    <Button
+      variant="ghost"
+      onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
+      className={`text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto ${className}`}
+    >
+      <Calculator className="w-4 h-4 mr-sm shrink-0" />
+      <span className="whitespace-nowrap">
+        {isCalculatorOpen ? 'Hide Calculator' : 'Open Calculator'}
+      </span>
+      {isCalculatorOpen ? (
+        <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
+      ) : (
+        <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
+      )}
+    </Button>
+  );
+
   return (
     <Card>
       <div className="space-y-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-sm">
-            <h3 className="text-lg font-bold text-ink-900">{label || 'Labor Cost'}</h3>
+            <h3 className="text-lg font-bold text-ink-900 leading-tight">
+              {label || 'Labor Cost'}
+            </h3>
             <Tooltip content="Total cost of labor for this batch. You can enter a fixed amount or use the calculator below.">
               <button
                 type="button"
-                className="text-ink-500 hover:text-clay cursor-help transition-colors"
+                className="text-ink-500 hover:text-clay cursor-help transition-colors shrink-0"
                 aria-label="More info about labor cost"
               >
                 <HelpCircle className="w-4 h-4" />
               </button>
             </Tooltip>
           </div>
-          <Button
-            variant="ghost"
-            onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
-            className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm"
-          >
-            <Calculator className="w-4 h-4 mr-sm" />
-            {isCalculatorOpen ? 'Hide' : 'Calculator'}
-            {isCalculatorOpen ? (
-              <ChevronUp className="w-4 h-4 ml-xs" />
-            ) : (
-              <ChevronDown className="w-4 h-4 ml-xs" />
-            )}
-          </Button>
+          <div className="hidden md:block">
+            <HelperButton />
+          </div>
         </div>
 
-        <Input
-          label={label ? `Total ${label}` : 'Total Labor Cost'}
-          type="number"
-          value={value === 0 ? '' : value}
-          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-          currency
-          placeholder="0.00"
-          error={error}
-          min={0}
-          step="0.01"
-        />
+        <div className="space-y-sm">
+          <Input
+            label={label ? `Total ${label}` : 'Total Labor Cost'}
+            type="number"
+            value={value === 0 ? '' : value}
+            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+            currency
+            placeholder="0.00"
+            error={error}
+            min={0}
+            step="0.01"
+          />
+          <div className="flex justify-end md:hidden">
+            <HelperButton />
+          </div>
+        </div>
 
         {isCalculatorOpen && (
           <div className="bg-surface-hover rounded-xl p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">

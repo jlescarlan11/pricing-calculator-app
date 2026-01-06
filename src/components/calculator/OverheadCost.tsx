@@ -25,12 +25,32 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
     setIsHelperOpen(false);
   };
 
+  const HelperButton = ({ className = '' }: { className?: string }) => (
+    <Button
+      variant="ghost"
+      onClick={() => setIsHelperOpen(!isHelperOpen)}
+      className={`text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto ${className}`}
+    >
+      <Calculator className="w-4 h-4 mr-sm shrink-0" />
+      <span className="whitespace-nowrap">
+        {isHelperOpen ? 'Hide Helper' : 'Open Helper'}
+      </span>
+      {isHelperOpen ? (
+        <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
+      ) : (
+        <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
+      )}
+    </Button>
+  );
+
   return (
     <Card>
       <div className="space-y-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-sm">
-            <h3 className="text-lg font-bold text-ink-900">{label || 'Overhead Cost'}</h3>
+            <h3 className="text-lg font-bold text-ink-900 leading-tight">
+              {label || 'Overhead Cost'}
+            </h3>
             <Tooltip
               content={
                 <div className="space-y-sm p-xs">
@@ -51,26 +71,16 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
             >
               <button
                 type="button"
-                className="text-ink-500 hover:text-clay cursor-help transition-colors"
+                className="text-ink-500 hover:text-clay cursor-help transition-colors shrink-0"
                 aria-label="More info about overhead cost"
               >
                 <HelpCircle className="w-4 h-4" />
               </button>
             </Tooltip>
           </div>
-          <Button
-            variant="ghost"
-            onClick={() => setIsHelperOpen(!isHelperOpen)}
-            className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm"
-          >
-            <Calculator className="w-4 h-4 mr-sm" />
-            {isHelperOpen ? 'Hide' : 'Helper'}
-            {isHelperOpen ? (
-              <ChevronUp className="w-4 h-4 ml-xs" />
-            ) : (
-              <ChevronDown className="w-4 h-4 ml-xs" />
-            )}
-          </Button>
+          <div className="hidden md:block">
+            <HelperButton />
+          </div>
         </div>
 
         <div className="space-y-sm">
@@ -96,6 +106,9 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
               </Badge>
             </div>
           )}
+          <div className="flex justify-end md:hidden">
+            <HelperButton />
+          </div>
         </div>
 
         {isHelperOpen && (

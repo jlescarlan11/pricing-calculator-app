@@ -183,16 +183,16 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
   return (
     <Card
       title={
-        <div className="flex items-center justify-between w-full">
-          <h3 className="text-lg text-ink-900">Pricing Strategy</h3>
+        <div className="flex flex-wrap items-center justify-between gap-y-sm w-full">
+          <h3 className="text-lg text-ink-900 leading-tight">Pricing Strategy</h3>
           <button
             type="button"
             onClick={() => setIsHelpOpen(true)}
-            className="text-clay hover:text-clay/80 flex items-center gap-sm text-sm font-medium transition-colors group"
+            className="text-clay hover:text-clay/80 flex items-center gap-sm text-sm font-medium transition-colors group shrink-0"
             aria-label="Help with pricing strategies"
           >
-            <HelpCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
-            <span>Learn More</span>
+            <HelpCircle className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
+            <span className="whitespace-nowrap">Learn More</span>
           </button>
         </div>
       }
