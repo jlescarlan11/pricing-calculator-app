@@ -89,4 +89,23 @@ export interface Preset {
   createdAt: string;
   updatedAt: string;
   lastSyncedAt?: string | null;
+  snapshotMetadata?: SnapshotMetadata;
+  competitors?: Competitor[];
+}
+
+export interface SnapshotMetadata {
+  snapshotDate: string;
+  isTrackedVersion: boolean;
+  versionNumber: number;
+  parentPresetId?: string;
+}
+
+export interface Competitor {
+  id: string;
+  presetId: string;
+  competitorName: string;
+  competitorPrice: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
 }
