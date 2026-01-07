@@ -102,7 +102,18 @@ describe('Validation Utils', () => {
   });
 
   describe('validateIngredients', () => {
-    const validIngredient = { id: '1', name: 'Flour', amount: 1000, cost: 50 };
+    const validIngredient = { 
+      id: '1', 
+      name: 'Flour', 
+      amount: 1000, 
+      cost: 50,
+      purchaseQuantity: 1000,
+      purchaseUnit: 'g',
+      purchaseCost: 50,
+      recipeQuantity: 1000,
+      recipeUnit: 'g',
+      useFullQuantity: false
+    };
 
     it('should return empty array for valid ingredients', () => {
       expect(validateIngredients([validIngredient])).toEqual([]);
@@ -128,26 +139,26 @@ describe('Validation Utils', () => {
       ]);
     });
 
-    it('should return error for zero cost', () => {
-      const invalidIngredient = { ...validIngredient, cost: 0 };
+    it('should return error for zero purchase quantity', () => {
+      const invalidIngredient = { ...validIngredient, purchaseQuantity: 0 };
       expect(validateIngredients([invalidIngredient])).toEqual([
-        { field: 'ingredients[0].cost', message: 'Please provide a cost for ingredient #1.' },
+        { field: 'ingredients[0].purchaseQuantity', message: 'Enter quantity.' },
       ]);
     });
 
-    it('should return error for negative cost', () => {
-      const invalidIngredient = { ...validIngredient, cost: -10 };
+    it('should return error for zero recipe quantity when not using full quantity', () => {
+      const invalidIngredient = { ...validIngredient, recipeQuantity: 0, useFullQuantity: false };
       expect(validateIngredients([invalidIngredient])).toEqual([
-        { field: 'ingredients[0].cost', message: 'Please provide a cost for ingredient #1.' },
+        { field: 'ingredients[0].recipeQuantity', message: 'Enter usage.' },
       ]);
     });
 
     it('should collect multiple errors', () => {
       const invalid1 = { ...validIngredient, name: '' };
-      const invalid2 = { ...validIngredient, cost: 0 };
+      const invalid2 = { ...validIngredient, purchaseCost: -1 };
       expect(validateIngredients([invalid1, invalid2])).toEqual([
         { field: 'ingredients[0].name', message: 'Please name ingredient #1.' },
-        { field: 'ingredients[1].cost', message: 'Please provide a cost for ingredient #2.' },
+        { field: 'ingredients[1].purchaseCost', message: 'Enter cost.' },
       ]);
     });
   });

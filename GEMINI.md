@@ -226,6 +226,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Artisanal UI Touches**: Added a dashed ("chopped") border to the "Add Ingredient" button to match the handmade/artisanal theme. (Added 2026-01-03)
 - [x] **Variants Engine**: Implemented unified variant calculation logic with proportional cost allocation, validation, and comprehensive tests. (Added 2026-01-05)
 - [x] **Live Variant Pricing**: Enabled real-time "Recommended Price" preview within variant blocks by calculating costs on the fly and passing them to the embedded pricing strategy component. (Added 2026-01-05)
+- [x] **Margin Health Indicators**: Implemented `getMarginColor` utility for consistent color-coding of profit margins (Red < 15%, Orange 15-25%, Green > 25%). Integrated across badges, progress bars, and text indicators in `ResultsDisplay` and `StickySummary`. (Added 2026-01-07)
 
 ### Migration & Final Polish (Added 2026-01-05)
 

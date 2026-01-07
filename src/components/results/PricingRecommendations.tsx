@@ -3,7 +3,7 @@ import { CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
 import { Badge } from '../shared/Badge';
 import type { BadgeVariant } from '../shared/Badge';
 import type { CalculationResult } from '../../types/calculator';
-import { formatCurrency, formatPercent } from '../../utils/formatters';
+import { formatCurrency, formatPercent, getMarginColor } from '../../utils/formatters';
 
 interface PricingRecommendationsProps {
   results: CalculationResult;
@@ -24,16 +24,18 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
   const getMarginBadge = (
     margin: number
   ): { variant: BadgeVariant; label: string; icon: React.ReactNode } => {
-    if (margin < 15) {
+    const color = getMarginColor(margin);
+    
+    if (color === 'rust') {
       return {
         variant: 'error',
         label: 'Tight margin',
         icon: <AlertCircle className="w-3 h-3 mr-1" />,
       };
     }
-    if (margin <= 25) {
+    if (color === 'clay') {
       return {
-        variant: 'warning',
+        variant: 'info',
         label: 'Modest margin',
         icon: <AlertTriangle className="w-3 h-3 mr-1" />,
       };
@@ -50,19 +52,19 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
   return (
     <div className={`space-y-2xl ${className}`}>
       {/* Recommended Selling Price - Primary Focus */}
-      <div className="flex flex-col items-center px-2xl py-2xl bg-surface rounded-xl border border-border-subtle relative overflow-hidden group">
+      <div className="flex flex-col items-center px-2xl py-3xl bg-surface rounded-2xl border border-border-subtle shadow-sm relative overflow-hidden group">
         <div className="relative z-10 w-full text-center">
-          <p className="text-xs font-semibold text-ink-700 mb-xs">Recommended Selling Price</p>
+          <p className="text-sm font-semibold text-ink-500 uppercase tracking-widest mb-sm">Recommended Selling Price</p>
           <p
             key={recommendedPrice}
-            className="font-serif text-5xl sm:text-6xl text-ink-900 tracking-tight transition-transform duration-700 group-hover:scale-105 animate-pulse-once"
+            className="font-serif text-6xl sm:text-7xl text-ink-900 tracking-tighter transition-transform duration-700 group-hover:scale-105 animate-pulse-once"
           >
             {formatCurrency(recommendedPrice)}
           </p>
-          <div className="flex justify-center mt-lg">
+          <div className="flex justify-center mt-xl">
             <Badge
               variant={badgeDetails.variant}
-              className="py-1 px-3 flex items-center justify-center"
+              className="py-1.5 px-4 text-sm flex items-center justify-center shadow-sm"
             >
               {badgeDetails.icon}
               {badgeDetails.label}
@@ -70,13 +72,14 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
           </div>
         </div>
         {/* Subtle decorative element */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-clay/5 rounded-round -mr-16 -mt-16 blur-2xl transition-opacity group-hover:opacity-100 opacity-50" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-clay/5 rounded-round -mr-24 -mt-24 blur-3xl transition-opacity group-hover:opacity-100 opacity-50" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-moss/5 rounded-round -ml-16 -mb-16 blur-2xl transition-opacity group-hover:opacity-100 opacity-30" />
       </div>
 
       {/* Secondary Metrics - Clean List/Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3xl gap-y-xl">
-        <div className="flex justify-between items-center group py-sm">
-          <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3xl gap-y-xl opacity-90 group-hover:opacity-100 transition-opacity">
+        <div className="flex justify-between items-center group/item py-sm">
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
             Break-even Price
           </p>
           <p className="text-xl font-bold text-ink-900 tabular-nums">
@@ -84,17 +87,17 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
           </p>
         </div>
 
-        <div className="flex justify-between items-center group py-sm">
-          <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
+        <div className="flex justify-between items-center group/item py-sm">
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
             Profit Margin
           </p>
-          <p className="text-xl font-bold text-ink-900 tabular-nums">
+          <p className={`text-xl font-bold tabular-nums text-${getMarginColor(profitMarginPercent)}`}>
             {formatPercent(profitMarginPercent)}
           </p>
         </div>
 
-        <div className="flex justify-between items-center group py-sm">
-          <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
+        <div className="flex justify-between items-center group/item py-sm">
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
             Profit Per Unit
           </p>
           <p className="text-xl font-bold text-moss tabular-nums">
@@ -102,8 +105,8 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
           </p>
         </div>
 
-        <div className="flex justify-between items-center group py-sm">
-          <p className="text-xs font-medium text-ink-500 uppercase tracking-widest">
+        <div className="flex justify-between items-center group/item py-sm">
+          <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
             Total Batch Profit
           </p>
           <p className="text-xl font-bold text-moss tabular-nums">

@@ -9,7 +9,7 @@ describe('SampleDemo', () => {
     render(<SampleDemo onLoadSample={onLoadSample} />);
 
     expect(screen.getByText(/Artisan Cookie Case Study/i)).toBeInTheDocument();
-    expect(screen.getByText(/Explore/i)).toBeInTheDocument();
+    expect(screen.getByText(/Load Sample Data/i)).toBeInTheDocument();
     expect(screen.getByText(/Total Cost/i)).toBeInTheDocument();
     expect(screen.getByText(/Cost\/Unit/i)).toBeInTheDocument();
   });
@@ -17,7 +17,7 @@ describe('SampleDemo', () => {
   it('calls onLoadSample when button is clicked', () => {
     render(<SampleDemo onLoadSample={onLoadSample} />);
 
-    fireEvent.click(screen.getByText(/Explore/i));
+    fireEvent.click(screen.getByText(/Load Sample Data/i));
     expect(onLoadSample).toHaveBeenCalledTimes(1);
   });
 });

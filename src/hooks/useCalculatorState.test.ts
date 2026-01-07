@@ -88,6 +88,11 @@ describe('useCalculatorState', () => {
       });
       const id = result.current.input.ingredients[0].id;
       result.current.updateIngredient(id, 'name', 'Sugar');
+      result.current.updateIngredient(id, 'purchaseQuantity', 1);
+      result.current.updateIngredient(id, 'purchaseUnit', 'piece');
+      result.current.updateIngredient(id, 'purchaseCost', 50);
+      result.current.updateIngredient(id, 'recipeQuantity', 1);
+      result.current.updateIngredient(id, 'recipeUnit', 'piece');
       result.current.updateIngredient(id, 'cost', 50);
       result.current.updateIngredient(id, 'amount', 1);
     });
@@ -129,7 +134,17 @@ describe('useCalculatorState', () => {
       baseRecipe: {
         productName: 'Preset Product',
         batchSize: 5,
-        ingredients: [{ id: 'i1', name: 'Ing 1', amount: 1, cost: 10 }],
+        ingredients: [{ 
+          id: 'i1', 
+          name: 'Ing 1', 
+          amount: 1, 
+          cost: 10,
+          purchaseQuantity: 1,
+          purchaseUnit: 'piece',
+          purchaseCost: 10,
+          recipeQuantity: 1,
+          recipeUnit: 'piece'
+        }],
         laborCost: 20,
         overhead: 5,
       },

@@ -35,7 +35,7 @@ describe('PresetsList Regression', () => {
       },
     ] as unknown as Preset[];
 
-    (usePresets as any).mockReturnValue({
+    vi.mocked(usePresets).mockReturnValue({
       presets,
       deletePreset: vi.fn(),
     });

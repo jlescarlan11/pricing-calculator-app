@@ -25,33 +25,36 @@ describe('App Integration', () => {
     fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
 
     const nameInputs = screen.getAllByLabelText(/Ingredient Name/i);
-    const costInputs = screen.getAllByLabelText(/Cost/i);
+    const qtyInputs = screen.getAllByPlaceholderText('Qty');
+    const purchaseCostInputs = screen.getAllByPlaceholderText('Total Cost');
 
     fireEvent.change(nameInputs[0], { target: { value: 'Ingredient 1' } });
-    fireEvent.change(costInputs[0], { target: { value: '100' } });
+    fireEvent.change(qtyInputs[0], { target: { value: '10' } });
+    fireEvent.change(purchaseCostInputs[0], { target: { value: '100' } });
+    fireEvent.change(qtyInputs[1], { target: { value: '10' } });
 
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
 
     // Should show results
-    expect(await screen.findByText(/^Results$/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ })).toBeInTheDocument();
     expect(screen.getByText(/Analysis for/i)).toHaveTextContent('Test Product');
 
     // Check if results are displayed
-    expect(screen.getByText(/Recommended Price/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Recommended Price/i).length).toBeGreaterThan(0);
   });
 
   it('can edit results to go back to form', async () => {
     renderWithRouter(<App />);
 
     // Load sample to speed up
-    const loadSampleBtn = screen.getByText(/Explore Case Study/i);
+    const loadSampleBtn = screen.getByText(/Load Sample Data/i);
     fireEvent.click(loadSampleBtn);
 
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
 
-    expect(await screen.findByText(/^Results$/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ })).toBeInTheDocument();
 
     // Form is visible below results, so we can access inputs directly
     expect(screen.getByText(/Product Details/i)).toBeInTheDocument();
@@ -66,7 +69,7 @@ describe('App Integration', () => {
   it('loads sample data correctly', () => {
     renderWithRouter(<App />);
 
-    const loadSampleBtn = screen.getByText(/Explore Case Study/i);
+    const loadSampleBtn = screen.getByText(/Load Sample Data/i);
     fireEvent.click(loadSampleBtn);
 
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Chocolate Chip Cookies');

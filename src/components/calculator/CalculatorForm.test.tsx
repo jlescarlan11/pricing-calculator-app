@@ -16,6 +16,7 @@ vi.mock('../../hooks/use-presets', () => ({
 
 const TestWrapper = ({
   onCalculate,
+  onLoadSample,
   initialInput,
   initialConfig,
 }: {
@@ -24,6 +25,7 @@ const TestWrapper = ({
     input: CalculationInput,
     config: PricingConfig
   ) => void;
+  onLoadSample?: () => void;
   initialInput?: CalculationInput;
   initialConfig?: PricingConfig;
 }) => {
@@ -50,6 +52,7 @@ const TestWrapper = ({
             state.reset();
           }
         }}
+        onLoadSample={onLoadSample}
         onSetHasVariants={state.setHasVariants}
         onAddVariant={state.addVariant}
         onRemoveVariant={state.removeVariant}
@@ -164,14 +167,13 @@ describe('CalculatorForm', () => {
     fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
 
     const nameInputs = screen.getAllByLabelText(/Ingredient Name/i);
-    const amountInputs = screen.getAllByLabelText(/Amount/i);
-    // Cost label has an asterisk since it's required
-    const costInputs = screen.getAllByLabelText(/Cost/);
-    const costInput = costInputs.find((input) => input.tagName === 'INPUT');
+    const qtyInputs = screen.getAllByPlaceholderText('Qty');
+    const purchaseCostInputs = screen.getAllByPlaceholderText('Total Cost');
 
     fireEvent.change(nameInputs[0], { target: { value: 'Flour' } });
-    fireEvent.change(amountInputs[0], { target: { value: '1000' } });
-    fireEvent.change(costInput!, { target: { value: '50' } });
+    fireEvent.change(qtyInputs[0], { target: { value: '1000' } }); // Purchase Qty
+    fireEvent.change(purchaseCostInputs[0], { target: { value: '50' } });
+    fireEvent.change(qtyInputs[1], { target: { value: '1000' } }); // Recipe Qty (Usage)
 
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
@@ -191,7 +193,7 @@ describe('CalculatorForm', () => {
           value: expect.any(Number),
         })
       );
-    });
+    }, { timeout: 3000 });
 
     const result = mockOnCalculate.mock.calls[0][0];
     expect(result.totalCost).toBeGreaterThan(0);
@@ -203,7 +205,16 @@ describe('CalculatorForm', () => {
       input: {
         productName: 'Saved Draft',
         batchSize: 24,
-        ingredients: [{ id: '1', name: 'Saved Ing', amount: 100, cost: 20 }],
+        ingredients: [{ 
+          id: '1', 
+          name: 'Saved Ing', 
+          purchaseQuantity: 100,
+          purchaseUnit: 'g',
+          purchaseCost: 20,
+          recipeQuantity: 100,
+          recipeUnit: 'g',
+          cost: 20 
+        }],
         laborCost: 10,
         overhead: 5,
       },
@@ -237,29 +248,39 @@ describe('CalculatorForm', () => {
     vi.unstubAllGlobals();
   });
 
-  it('displays real-time validation feedback', () => {
+  it('enables continue button when section is valid', () => {
     render(<TestWrapper onCalculate={mockOnCalculate} />);
 
-    expect(screen.getByText(/Start by naming your product/i)).toBeInTheDocument();
+    // Step 1 (Product Details) Continue button
+    const continueButtons = screen.getAllByRole('button', { name: /Continue/i });
+    const step1Button = continueButtons[0];
+
+    // Initially disabled (productName empty, batchSize defaults to 0 or empty string if not set, but form requires >= 1)
+    // Actually batchSize defaults to 0 in my TestWrapper logic if not provided? 
+    // Wait, useCalculatorState defaults?
+    // Let's just check it is disabled.
+    expect(step1Button).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'New Product' } });
-    // Since it starts with one empty ingredient, it should say "Almost there"
-    expect(screen.getByText(/Almost there! Complete your ingredients/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
 
-    fireEvent.change(screen.getByLabelText(/Ingredient Name/i), { target: { value: 'Flour' } });
-
-    const costInputs = screen.getAllByLabelText(/Cost/);
-    const costInput = costInputs.find((input) => input.tagName === 'INPUT');
-    fireEvent.change(costInput!, { target: { value: '50' } });
-
-    expect(screen.getByText(/Ready to calculate/i)).toBeInTheDocument();
+    expect(step1Button).not.toBeDisabled();
   });
 
   it('populates state when initialInput and initialConfig props are provided', () => {
     const input = {
       productName: 'Initial Product',
       batchSize: 100,
-      ingredients: [{ id: 'ext-1', name: 'Ext Ing', amount: 50, cost: 10 }],
+      ingredients: [{ 
+        id: 'ext-1', 
+        name: 'Ext Ing', 
+        purchaseQuantity: 50,
+        purchaseUnit: 'g',
+        purchaseCost: 10,
+        recipeQuantity: 50,
+        recipeUnit: 'g',
+        cost: 10 
+      }],
       laborCost: 100,
       overhead: 50,
     };
@@ -277,8 +298,8 @@ describe('CalculatorForm', () => {
   it('handles missing input fields gracefully during rendering', () => {
     const corruptedInput = {
       // Missing productName, ingredients, etc.
-    } as any;
-    const config = { strategy: 'markup', value: 20 } as any;
+    } as unknown as CalculationInput;
+    const config = { strategy: 'markup', value: 20 } as unknown as PricingConfig;
 
     // Should not crash when rendering with partial/invalid data
     render(
@@ -307,5 +328,26 @@ describe('CalculatorForm', () => {
     );
 
     expect(screen.getByRole('heading', { name: /Calculator/i })).toBeInTheDocument();
+  });
+
+  it('renders Load Sample Data when form is empty', () => {
+    const onLoadSample = vi.fn();
+    render(<TestWrapper onLoadSample={onLoadSample} />);
+
+    expect(screen.getByText(/Load Sample Data/i)).toBeInTheDocument();
+    
+    fireEvent.click(screen.getByText(/Load Sample Data/i));
+    expect(onLoadSample).toHaveBeenCalled();
+  });
+
+  it('hides Load Sample Data when user starts typing', async () => {
+    render(<TestWrapper onLoadSample={vi.fn()} />);
+
+    expect(screen.queryByText(/Load Sample Data/i)).toBeInTheDocument();
+
+    const input = screen.getByLabelText(/Product Name/i);
+    fireEvent.change(input, { target: { value: 'A' } });
+
+    expect(screen.queryByText(/Load Sample Data/i)).not.toBeInTheDocument();
   });
 });

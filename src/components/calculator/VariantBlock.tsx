@@ -15,7 +15,7 @@ interface VariantBlockProps {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: string | number
+    value: string | number | boolean
   ) => void;
   onAddIngredient: (variantId: string) => void;
   onRemoveIngredient: (variantId: string, ingredientId: string) => void;
@@ -105,7 +105,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
           </div>
 
           <div className="space-y-md">
-            <div className="flex flex-col divide-y divide-[#E6E4E1]">
+            <div className="flex flex-col space-y-4 md:space-y-0 md:divide-y md:divide-border-subtle">
               {variant.ingredients.map((ing, idx) => (
                 <IngredientRow
                   key={ing.id}
@@ -117,7 +117,9 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
                   onAdd={() => onAddIngredient(variant.id)}
                   errors={{
                     name: errors[`variants.${variant.id}.ingredients.${ing.id}.name`],
-                    amount: errors[`variants.${variant.id}.ingredients.${ing.id}.amount`],
+                    purchaseQuantity: errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseQuantity`],
+                    purchaseCost: errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseCost`],
+                    recipeQuantity: errors[`variants.${variant.id}.ingredients.${ing.id}.recipeQuantity`],
                     cost: errors[`variants.${variant.id}.ingredients.${ing.id}.cost`],
                   }}
                 />

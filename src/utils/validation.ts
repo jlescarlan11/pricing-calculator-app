@@ -82,11 +82,37 @@ export const validateIngredients = (ingredients: Ingredient[]): ValidationError[
       });
     }
 
-    if (ing.cost === null || ing.cost === undefined || isNaN(ing.cost) || ing.cost <= 0) {
+    if (ing.purchaseQuantity === null || ing.purchaseQuantity === undefined || isNaN(ing.purchaseQuantity) || ing.purchaseQuantity <= 0) {
       errors.push({
-        field: `ingredients[${index}].cost`,
-        message: `Please provide a cost for ingredient #${index + 1}.`,
+        field: `ingredients[${index}].purchaseQuantity`,
+        message: 'Enter quantity.',
       });
+    }
+
+    if (ing.purchaseCost === null || ing.purchaseCost === undefined || isNaN(ing.purchaseCost) || ing.purchaseCost < 0) {
+      errors.push({
+        field: `ingredients[${index}].purchaseCost`,
+        message: 'Enter cost.',
+      });
+    }
+
+    if (!ing.useFullQuantity) {
+      if (ing.recipeQuantity === null || ing.recipeQuantity === undefined || isNaN(ing.recipeQuantity) || ing.recipeQuantity <= 0) {
+        errors.push({
+          field: `ingredients[${index}].recipeQuantity`,
+          message: 'Enter usage.',
+        });
+      }
+    }
+
+    if (ing.cost === null || ing.cost === undefined || isNaN(ing.cost) || ing.cost <= 0) {
+      // General cost error if the calculation failed but fields might have their own errors
+      if (!errors.some(e => e.field.startsWith(`ingredients[${index}]`))) {
+         errors.push({
+          field: `ingredients[${index}].cost`,
+          message: `Check details for ingredient #${index + 1}.`,
+        });
+      }
     }
   });
 

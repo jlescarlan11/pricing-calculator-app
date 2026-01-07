@@ -8,6 +8,7 @@ export interface SelectOption {
 
 interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
   label: string;
+  hideLabel?: boolean;
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: SelectOption[];
@@ -18,6 +19,7 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
 
 export const Select: React.FC<SelectProps> = ({
   label,
+  hideLabel = false,
   value,
   onChange,
   options,
@@ -39,7 +41,7 @@ export const Select: React.FC<SelectProps> = ({
     <div className={`flex flex-col gap-xs w-full ${className}`}>
       <label
         htmlFor={id}
-        className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center justify-between"
+        className={`text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center justify-between ${hideLabel ? 'sr-only' : ''}`}
       >
         <span>
           {label}

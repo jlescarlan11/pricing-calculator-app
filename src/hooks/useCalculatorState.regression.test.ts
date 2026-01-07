@@ -25,7 +25,7 @@ describe('useCalculatorState Regression', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     storageMock.clear();
-    (usePresets as any).mockReturnValue({
+    vi.mocked(usePresets).mockReturnValue({
       presets: [],
       addPreset: vi.fn(),
       deletePreset: vi.fn(),

@@ -28,7 +28,7 @@ describe('Header', () => {
     const menuButton = screen.getByRole('button', { name: /Open main menu/i });
     fireEvent.click(menuButton);
 
-    expect(screen.getByText(/Version 0\.1\.0/i)).toBeInTheDocument();
+    expect(screen.getByText(/Version 2\.0\.0/i)).toBeInTheDocument();
   });
 
   it('contains navigation links', () => {

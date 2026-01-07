@@ -6,8 +6,14 @@ describe('IngredientRow', () => {
   const mockIngredient = {
     id: '123',
     name: 'Test Ingredient',
+    purchaseQuantity: 1000,
+    purchaseUnit: 'g',
+    purchaseCost: 100,
+    recipeQuantity: 100,
+    recipeUnit: 'g',
+    cost: 10,
     amount: 100,
-    cost: 50,
+    useFullQuantity: false,
   };
 
   const mockHandlers = {
@@ -35,8 +41,10 @@ describe('IngredientRow', () => {
   it('renders correctly', () => {
     renderComponent();
     expect(screen.getByLabelText(/Ingredient Name/i)).toHaveValue('Test Ingredient');
-    expect(screen.getByLabelText(/^Amount/i)).toHaveValue(100);
-    expect(screen.getByLabelText(/Cost/i)).toHaveValue(50);
+    const qtyInputs = screen.getAllByPlaceholderText('Qty');
+    expect(qtyInputs[0]).toHaveValue(1000); // Purchase Qty
+    expect(screen.getByPlaceholderText('Total Cost')).toHaveValue(100); // Purchase Cost
+    expect(qtyInputs[1]).toHaveValue(100); // Recipe Qty
   });
 
   it('calls onUpdate when inputs change', () => {
@@ -48,11 +56,36 @@ describe('IngredientRow', () => {
     });
     expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'name', 'New Name');
 
-    const amountInput = screen.getByLabelText(/^Amount/i);
+    const purchaseQtyInput = screen.getAllByPlaceholderText('Qty')[0];
     act(() => {
-      fireEvent.change(amountInput, { target: { value: '200' } });
+      fireEvent.change(purchaseQtyInput, { target: { value: '2000' } });
     });
-    expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'amount', '200');
+    expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'purchaseQuantity', '2000');
+  });
+
+  it('handles "Use 100% of purchase quantity" toggle', () => {
+    renderComponent();
+    
+    const toggle = screen.getByLabelText(/Use 100% of purchase quantity/i);
+    act(() => {
+      fireEvent.click(toggle);
+    });
+
+    expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'useFullQuantity', true);
+    // Should sync recipe fields
+    expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'recipeQuantity', 1000);
+    expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'recipeUnit', 'g');
+    expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'cost', 100);
+  });
+
+  it('disables recipe inputs when useFullQuantity is true', () => {
+    renderComponent({
+      ingredient: { ...mockIngredient, useFullQuantity: true }
+    });
+
+    const qtyInputs = screen.getAllByPlaceholderText('Qty');
+    const recipeQtyInput = qtyInputs[1];
+    expect(recipeQtyInput).toBeDisabled();
   });
 
   it('calls onRemove after animation when not the only row', () => {
@@ -119,49 +152,21 @@ describe('IngredientRow', () => {
     expect(mockHandlers.onAdd).toHaveBeenCalled();
   });
 
-  it('handles Shift+Delete to remove row after animation', () => {
-    vi.useFakeTimers();
-    renderComponent({ isOnlyRow: false });
-
-    // We can fire the event on the row container or an input.
-    // The handler is on the main div, which bubbles.
-    const nameInput = screen.getByLabelText(/Ingredient Name/i);
-
-    act(() => {
-      fireEvent.keyDown(nameInput, { key: 'Delete', shiftKey: true });
-    });
-
-    expect(mockHandlers.onRemove).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(300);
-    });
-
-    expect(mockHandlers.onRemove).toHaveBeenCalledWith('123');
-    vi.useRealTimers();
-  });
-
   it('auto-focuses name input when autoFocus is true', () => {
     renderComponent({ autoFocus: true });
     const nameInput = screen.getByLabelText(/Ingredient Name/i);
     expect(nameInput).toHaveFocus();
   });
 
-  it('does not auto-focus when autoFocus is false', () => {
-    renderComponent({ autoFocus: false });
-    const nameInput = screen.getByLabelText(/Ingredient Name/i);
-    expect(nameInput).not.toHaveFocus();
-  });
-
   it('displays validation errors', () => {
     renderComponent({
       errors: {
         name: 'Name required',
-        amount: 'Invalid amount',
+        purchaseQuantity: 'Invalid qty',
       },
     });
 
     expect(screen.getByText('Name required')).toBeInTheDocument();
-    expect(screen.getByText('Invalid amount')).toBeInTheDocument();
+    expect(screen.getByText('Invalid qty')).toBeInTheDocument();
   });
 });

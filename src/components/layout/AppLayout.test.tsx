@@ -29,6 +29,6 @@ describe('AppLayout', () => {
   it('renders version information in the footer', () => {
     renderWithRouter(<AppLayout>Content</AppLayout>);
 
-    expect(screen.getByText(/Version 0\.1\.0/i)).toBeInTheDocument();
+    expect(screen.getByText(/Version 2\.0\.0/i)).toBeInTheDocument();
   });
 });

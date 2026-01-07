@@ -9,6 +9,30 @@ interface LaborCostProps {
   label?: string;
 }
 
+interface HelperButtonProps {
+  isOpen: boolean;
+  onClick: () => void;
+  className?: string;
+}
+
+const HelperButton: React.FC<HelperButtonProps> = ({ isOpen, onClick, className = '' }) => (
+  <Button
+    variant="ghost"
+    onClick={onClick}
+    className={`text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto ${className}`}
+  >
+    <Calculator className="w-4 h-4 mr-sm shrink-0" />
+    <span className="whitespace-nowrap">
+      {isOpen ? 'Hide Calculator' : 'Open Calculator'}
+    </span>
+    {isOpen ? (
+      <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
+    ) : (
+      <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
+    )}
+  </Button>
+);
+
 export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, label }) => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [hours, setHours] = useState<string>('');
@@ -23,24 +47,6 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
   };
 
   const calculatedTotal = (parseFloat(hours) || 0) * (parseFloat(rate) || 0);
-
-  const HelperButton = ({ className = '' }: { className?: string }) => (
-    <Button
-      variant="ghost"
-      onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
-      className={`text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto ${className}`}
-    >
-      <Calculator className="w-4 h-4 mr-sm shrink-0" />
-      <span className="whitespace-nowrap">
-        {isCalculatorOpen ? 'Hide Calculator' : 'Open Calculator'}
-      </span>
-      {isCalculatorOpen ? (
-        <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
-      ) : (
-        <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
-      )}
-    </Button>
-  );
 
   return (
     <Card>
@@ -61,7 +67,10 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
             </Tooltip>
           </div>
           <div className="hidden md:block">
-            <HelperButton />
+            <HelperButton 
+              isOpen={isCalculatorOpen} 
+              onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
+            />
           </div>
         </div>
 
@@ -78,7 +87,10 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
             step="0.01"
           />
           <div className="flex justify-end md:hidden">
-            <HelperButton />
+            <HelperButton 
+              isOpen={isCalculatorOpen} 
+              onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
+            />
           </div>
         </div>
 

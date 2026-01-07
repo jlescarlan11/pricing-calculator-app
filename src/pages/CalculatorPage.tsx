@@ -1,11 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Info, Package } from 'lucide-react';
-import { CalculatorForm, SampleDemo } from '../components/calculator';
+import { CalculatorForm } from '../components/calculator';
 import { ResultsDisplay, StickySummary } from '../components/results';
 import { PresetsList } from '../components/presets';
 import { Modal, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
+import { triggerHapticFeedback } from '../utils/haptics';
 import type { Preset } from '../types';
 
 export const CalculatorPage: React.FC = () => {
@@ -14,6 +15,8 @@ export const CalculatorPage: React.FC = () => {
     input,
     config,
     results,
+    liveResult,
+    isDirty,
     errors,
     isCalculating,
     updateInput,
@@ -43,26 +46,34 @@ export const CalculatorPage: React.FC = () => {
   // Handle sticky summary visibility
   useEffect(() => {
     const handleScroll = () => {
-      if (!resultsRef.current) {
-        setShowStickySummary(false);
+      // Case 1: Results exist (committed)
+      if (showResults && resultsRef.current) {
+        const resultsRect = resultsRef.current.getBoundingClientRect();
+        const isResultsVisible = resultsRect.top < window.innerHeight && resultsRect.bottom > 0;
+        setShowStickySummary(!isResultsVisible);
         return;
       }
 
-      const resultsRect = resultsRef.current.getBoundingClientRect();
-      const isResultsVisible = resultsRect.top < window.innerHeight && resultsRect.bottom > 0;
+      // Case 2: No results yet, but we have live data (user is typing)
+      if (!showResults && liveResult && liveResult.totalCost > 0) {
+        setShowStickySummary(true);
+        return;
+      }
 
-      // Show sticky summary if results exist but are not fully in view
-      // and we are currently in the form section
-      setShowStickySummary(showResults && !isResultsVisible);
+      setShowStickySummary(false);
     };
 
     window.addEventListener('scroll', handleScroll);
+    // Trigger once on mount/update to set initial state
+    handleScroll();
+    
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [showResults]);
+  }, [showResults, liveResult]);
 
   const handleCalculate = async () => {
     const res = await calculate();
     if (res) {
+      triggerHapticFeedback(50);
       addToast('✓ Calculation complete', 'success');
       // Scroll to results at the top
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -123,7 +134,7 @@ export const CalculatorPage: React.FC = () => {
 
   return (
     <div className="animate-in fade-in duration-700 relative pb-2xl">
-      {/* Intro Section (only when no results) */}
+      {/* Intro Section (only when no results and form is empty) */}
       {!showResults && (
         <div className="space-y-lg mb-lg md:mb-2xl">
           <div className="p-md md:p-lg bg-clay/5 rounded-xl border border-clay/20 flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
@@ -137,8 +148,6 @@ export const CalculatorPage: React.FC = () => {
               </p>
             </div>
           </div>
-
-          <SampleDemo onLoadSample={handleLoadSample} />
         </div>
       )}
 
@@ -181,11 +190,14 @@ export const CalculatorPage: React.FC = () => {
           onAddVariantIngredient={addVariantIngredient}
           onRemoveVariantIngredient={removeVariantIngredient}
           onOpenPresets={() => setIsPresetsModalOpen(true)}
+          onLoadSample={handleLoadSample}
         />
       </div>
 
       <StickySummary
-        results={results}
+        results={liveResult}
+        hasCommittedResults={showResults}
+        isStale={isDirty}
         onScrollToResults={handleScrollToResults}
         onCalculate={handleCalculate}
         isCalculating={isCalculating}

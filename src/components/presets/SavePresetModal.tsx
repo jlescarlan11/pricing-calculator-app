@@ -4,6 +4,7 @@ import { Modal, Input, Button, useToast } from '../shared';
 import { usePresets } from '../../hooks/use-presets';
 import { performFullCalculation } from '../../utils/calculations';
 import { formatCurrency } from '../../utils/formatters';
+import { triggerHapticFeedback } from '../../utils/haptics';
 import type { CalculationInput, PricingConfig } from '../../types/calculator';
 
 interface SavePresetModalProps {
@@ -85,6 +86,7 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
         variants: [],
       });
 
+      triggerHapticFeedback(50);
       addToast('✓ Preset saved', 'success');
       setIsSuccess(true);
       // Auto close after showing success message

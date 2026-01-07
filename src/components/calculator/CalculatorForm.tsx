@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Plus, Calculator, Trash2, RefreshCcw, Package } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Plus, Calculator, RefreshCcw, Package, ArrowRight, Trash2 } from 'lucide-react';
 import {
   ProductInfo,
   IngredientRow,
@@ -7,7 +7,9 @@ import {
   OverheadCost,
   PricingStrategy,
   CurrentPrice,
+  SampleDemo,
 } from './index';
+import { AccordionSection } from './AccordionSection';
 import { VariantBlock } from './VariantBlock';
 import { SavePresetButton } from '../presets/SavePresetButton';
 import { Button, Card, Switch } from '../shared';
@@ -20,13 +22,14 @@ interface CalculatorFormProps {
   errors: Record<string, string>;
   isCalculating: boolean;
   onUpdateInput: (updates: Partial<CalculationInput>) => void;
-  onUpdateIngredient: (id: string, field: keyof Ingredient, value: string | number) => void;
+  onUpdateIngredient: (id: string, field: keyof Ingredient, value: string | number | boolean) => void;
   onAddIngredient: () => void;
   onRemoveIngredient: (id: string) => void;
   onUpdateConfig: (updates: Partial<PricingConfig>) => void;
   onCalculate: () => void;
   onReset: () => void;
   onOpenPresets: () => void;
+  onLoadSample?: () => void;
 
   // Variant Actions
   onSetHasVariants: (enabled: boolean) => void;
@@ -37,7 +40,7 @@ interface CalculatorFormProps {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: string | number
+    value: string | number | boolean
   ) => void;
   onAddVariantIngredient: (variantId: string) => void;
   onRemoveVariantIngredient: (variantId: string, ingredientId: string) => void;
@@ -56,6 +59,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onCalculate,
   onReset,
   onOpenPresets,
+  onLoadSample,
   onSetHasVariants,
   onAddVariant,
   onRemoveVariant,
@@ -64,8 +68,54 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onAddVariantIngredient,
   onRemoveVariantIngredient,
 }) => {
-  // Local state for UI only (like which ingredient is being focused, or hover states)
-  // But business logic state is now passed as props.
+  // --- Empty State Logic ---
+  const isEmpty = useMemo(() => {
+    const hasName = (input.productName?.trim().length ?? 0) > 0;
+    const hasIngredients = (input.ingredients?.length ?? 0) > 1 || 
+      (input.ingredients?.[0]?.name?.trim().length ?? 0) > 0 ||
+      (input.ingredients?.[0]?.cost ?? 0) > 0;
+    const hasLabor = (input.laborCost ?? 0) > 0;
+    const hasOverhead = (input.overhead ?? 0) > 0;
+    
+    return !hasName && !hasIngredients && !hasLabor && !hasOverhead;
+  }, [input]);
+
+  // --- Completion Logic ---
+  const isInfoComplete =
+    (input.productName?.trim().length ?? 0) >= 3 && (input.batchSize ?? 0) >= 1;
+
+  const isIngredientsComplete =
+    (input.ingredients?.length ?? 0) > 0 &&
+    input.ingredients!.every(
+      (ing) => (ing.name?.trim() || '') !== '' && (ing.cost || 0) > 0
+    );
+
+  // Costs and Strategy are always considered "visitable/complete" as they have defaults or are optional
+  const isCostsComplete = true;
+  const isStrategyComplete = true;
+
+  // Variants are optional, so "complete" if valid or empty
+  const isVariantsComplete = true; 
+
+  const isFormValid = isInfoComplete && isIngredientsComplete;
+
+  // --- Accordion State ---
+  // Initialize to the first incomplete step
+  const [expandedSection, setExpandedSection] = useState<number>(() => {
+    if (!isInfoComplete) return 1;
+    if (!isIngredientsComplete) return 2;
+    return 3; 
+  });
+
+  // Helper to handle manual toggling
+  const toggleSection = (section: number) => {
+    setExpandedSection((prev) => (prev === section ? 0 : section));
+  };
+
+  // Helper to advance to next section
+  const nextSection = (currentSection: number) => {
+    setExpandedSection(currentSection + 1);
+  };
 
   const handleProductInfoChange = (
     field: 'productName' | 'batchSize' | 'businessName',
@@ -90,34 +140,6 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     onUpdateInput({ currentSellingPrice: value });
   };
 
-  const isFormValid =
-    (input?.productName?.trim()?.length || 0) >= 3 &&
-    (input?.batchSize || 0) >= 1 &&
-    (input?.ingredients?.length || 0) > 0 &&
-    input?.ingredients?.every((ing) => (ing?.name?.trim() || '') !== '' && (ing?.cost || 0) > 0);
-
-  const getValidationFeedback = () => {
-    if (isFormValid) return { message: 'Ready to calculate', color: 'text-moss' };
-
-    const hasName = (input?.productName?.trim()?.length || 0) >= 3;
-    const hasIngredients = (input?.ingredients?.length || 0) > 0;
-    const ingredientsComplete =
-      hasIngredients &&
-      input?.ingredients?.every((ing) => (ing?.name?.trim() || '') !== '' && (ing?.cost || 0) > 0);
-    const hasBatchSize = (input?.batchSize || 0) >= 1;
-
-    if (hasName && hasIngredients && !ingredientsComplete)
-      return { message: 'Almost there! Complete your ingredients', color: 'text-clay' };
-    if (hasName && !hasIngredients)
-      return { message: 'Looking good! Add some ingredients', color: 'text-clay' };
-    if (!hasName) return { message: 'Start by naming your product', color: 'text-ink-500' };
-    if (!hasBatchSize) return { message: 'Set your batch size', color: 'text-clay' };
-
-    return { message: 'Almost there...', color: 'text-ink-500' };
-  };
-
-  const feedback = getValidationFeedback();
-
   // Calculate remaining batch for variants
   const totalVariantBatch = input?.variants?.reduce((sum, v) => sum + v.batchSize, 0) || 0;
   const rawRemainingBatch = (input?.batchSize || 0) - totalVariantBatch;
@@ -126,15 +148,26 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   // Perform calculation to get live previews for variants
   const calculationResult = useMemo(() => performFullCalculation(input, config), [input, config]);
 
+  // Summaries for closed states
+  const infoSummary = isInfoComplete ? `${input.productName}, Batch: ${input.batchSize}` : 'Incomplete';
+  const ingredientsSummary = isIngredientsComplete 
+    ? `${input.ingredients?.length} Ingredients` 
+    : `${input.ingredients?.length || 0} items`;
+  const costsSummary = `Labor: ${input.laborCost || 0}, Overhead: ${input.overhead || 0}`;
+  const strategySummary = `${config.strategy === 'markup' ? 'Markup' : 'Margin'}: ${config.value}%`;
+
   return (
     <div className="flex flex-col gap-xl w-full pb-4xl">
       {/* Header with Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-y-xs md:gap-y-0">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-y-xs md:gap-y-0 items-center">
         {/* Title */}
-        <h2 className="text-2xl text-ink-900 font-serif tracking-tight">Calculator</h2>
+        <div className="flex flex-col">
+           <h2 className="text-2xl text-ink-900 font-serif tracking-tight">Calculator</h2>
+           <p className="text-sm text-ink-500">Step {Math.min(expandedSection || 1, 5)} of 5</p>
+        </div>
 
         {/* Action Bar */}
-        <div className="order-3 md:order-2 md:col-start-2 md:row-start-1 md:justify-self-end mt-sm md:mt-0 w-full md:w-auto">
+        <div className="md:col-start-2 md:justify-self-end mt-sm md:mt-0 w-full md:w-auto">
           <div className="flex items-center justify-between md:justify-start gap-xs sm:gap-sm bg-surface p-1 rounded-lg border border-border-subtle shadow-sm w-full md:w-fit">
             <Button
               variant="ghost"
@@ -171,60 +204,73 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             </Button>
           </div>
         </div>
-
-        {/* Status Message */}
-        <div className="order-2 md:order-3 md:col-start-1 md:row-start-2 flex items-center gap-sm">
-          <div
-            className={`w-2 h-2 rounded-full ${isFormValid ? 'bg-moss' : 'bg-border-base'} transition-colors duration-500 shrink-0`}
-          />
-          <p className={`text-sm font-medium transition-colors duration-500 ${feedback.color}`}>
-            {feedback.message}
-          </p>
-        </div>
       </div>
 
-      <div className="flex flex-col space-y-xl">
-        {/* Section 1: Product Info */}
-
-        <ProductInfo
-          businessName={input?.businessName}
-          productName={input?.productName || ''}
-          batchSize={input?.batchSize || 0}
-          onChange={handleProductInfoChange}
-          errors={{
-            businessName: errors.businessName,
-
-            productName: errors.productName,
-
-            batchSize: errors.batchSize,
-          }}
-        />
-
-        <div className="h-px bg-border-subtle" role="separator" />
-
-        {/* Section 2: Ingredients */}
-
-        <Card
-          title={
-            <div className="flex items-center justify-between w-full">
-              <h3 className="text-lg text-ink-900">Ingredients</h3>
-
-              <span className="text-xs font-bold text-ink-500 uppercase tracking-widest">
-                {input?.ingredients?.length || 0} item{input?.ingredients?.length !== 1 ? 's' : ''}
-              </span>
-            </div>
-          }
+      <div className="flex flex-col space-y-md">
+        {isEmpty && onLoadSample && (
+          <div className="animate-in fade-in slide-in-from-top-4 duration-500 pb-sm">
+             <SampleDemo onLoadSample={onLoadSample} />
+          </div>
+        )}
+        {/* Step 1: Product Info */}
+        <AccordionSection
+          title="Product Details"
+          stepNumber={1}
+          isOpen={expandedSection === 1}
+          isComplete={isInfoComplete}
+          onToggle={() => toggleSection(1)}
+          summary={infoSummary}
         >
           <div className="space-y-lg">
+            <ProductInfo
+              businessName={input?.businessName}
+              productName={input?.productName || ''}
+              batchSize={input?.batchSize || 0}
+              onChange={handleProductInfoChange}
+              errors={{
+                businessName: errors.businessName,
+                productName: errors.productName,
+                batchSize: errors.batchSize,
+              }}
+            />
+            <div className="flex justify-end">
+              <Button 
+                variant="primary" 
+                size="sm"
+                onClick={() => nextSection(1)} 
+                disabled={!isInfoComplete}
+                className="bg-clay text-white hover:bg-clay/90"
+              >
+                Continue <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </AccordionSection>
+
+        {/* Step 2: Ingredients */}
+        <AccordionSection
+          title="Ingredients"
+          stepNumber={2}
+          isOpen={expandedSection === 2}
+          isComplete={isIngredientsComplete}
+          onToggle={() => toggleSection(2)}
+          summary={ingredientsSummary}
+        >
+          <div className="space-y-lg">
+             <div className="bg-surface/50 rounded-lg p-sm border border-border-subtle/50">
+               <p className="text-sm text-ink-500 text-center">
+                 Add all ingredients used in your batch (e.g., 500g Flour, 2 Eggs).
+               </p>
+             </div>
+
             {errors.ingredients && (
               <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20 flex items-center gap-sm animate-in fade-in slide-in-from-left-2">
                 <Trash2 className="w-4 h-4" />
-
                 <span className="font-medium">{errors.ingredients}</span>
               </div>
             )}
 
-            <div className="flex flex-col divide-y divide-[#E6E4E1]">
+            <div className="flex flex-col space-y-4 md:space-y-0 md:divide-y md:divide-border-subtle">
               {input?.ingredients?.map((ing, index) => (
                 <IngredientRow
                   key={ing.id}
@@ -237,16 +283,16 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                   autoFocus={index === (input?.ingredients?.length || 0) - 1 && index > 0}
                   errors={{
                     name: errors[`ingredients.${ing.id}.name`],
-
-                    amount: errors[`ingredients.${ing.id}.amount`],
-
+                    purchaseQuantity: errors[`ingredients.${ing.id}.purchaseQuantity`],
+                    purchaseCost: errors[`ingredients.${ing.id}.purchaseCost`],
+                    recipeQuantity: errors[`ingredients.${ing.id}.recipeQuantity`],
                     cost: errors[`ingredients.${ing.id}.cost`],
                   }}
                 />
               ))}
             </div>
 
-            <div className="pt-lg">
+            <div className="pt-sm space-y-lg">
               <Button
                 variant="dashed"
                 onClick={onAddIngredient}
@@ -255,169 +301,237 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 <Plus className="w-5 h-5" />
                 Add Item
               </Button>
+              
+              <div className="flex justify-end">
+                 <Button 
+                  variant="primary"
+                  size="sm"
+                  onClick={() => nextSection(2)}
+                  disabled={!isIngredientsComplete}
+                  className="bg-clay text-white hover:bg-clay/90"
+                 >
+                   Continue <ArrowRight className="w-4 h-4 ml-2" />
+                 </Button>
+              </div>
             </div>
           </div>
-        </Card>
+        </AccordionSection>
 
-        <div className="h-px bg-border-subtle" role="separator" />
-
-        {/* Section 3: Costs */}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-          <LaborCost
-            value={input?.laborCost || 0}
-            onChange={handleLaborChange}
-            error={errors.laborCost}
-          />
-
-          <OverheadCost
-            value={input?.overhead || 0}
-            batchSize={input?.batchSize || 1}
-            onChange={handleOverheadChange}
-            error={errors.overhead}
-          />
-        </div>
-
-        <div className="h-px bg-border-subtle" role="separator" />
-
-        {/* Section 4: Base Pricing Strategy & Current Price (Always Visible) */}
-        <PricingStrategy
-          strategy={config.strategy}
-          value={config.value}
-          costPerUnit={calculationResult?.costPerUnit || 0}
-          onChange={handlePricingChange}
-        />
-
-        <div className="h-px bg-border-subtle" role="separator" />
-
-        <CurrentPrice value={input.currentSellingPrice} onChange={handleCurrentPriceChange} />
-
-        {/* Section 5: Variants */}
-        <div className="flex flex-col gap-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-medium text-ink-900">Variants</h3>
-              <p className="text-sm text-ink-500">
-                Create product variations from this base recipe
-              </p>
+        {/* Step 3: Costs */}
+        <AccordionSection
+          title="Labor & Overhead"
+          stepNumber={3}
+          isOpen={expandedSection === 3}
+          isComplete={isCostsComplete}
+          onToggle={() => toggleSection(3)}
+          summary={costsSummary}
+        >
+           <div className="space-y-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+              <LaborCost
+                value={input?.laborCost || 0}
+                onChange={handleLaborChange}
+                error={errors.laborCost}
+              />
+              <OverheadCost
+                value={input?.overhead || 0}
+                batchSize={input?.batchSize || 1}
+                onChange={handleOverheadChange}
+                error={errors.overhead}
+              />
             </div>
-            <Switch
-              checked={!!input.hasVariants}
-              onChange={onSetHasVariants}
-              label="Enable Variants"
-            />
+            <div className="flex justify-end">
+               <Button 
+                variant="primary"
+                size="sm"
+                onClick={() => nextSection(3)}
+                className="bg-clay text-white hover:bg-clay/90"
+               >
+                 Continue <ArrowRight className="w-4 h-4 ml-2" />
+               </Button>
+            </div>
           </div>
+        </AccordionSection>
 
-          {errors.variants && (
-            <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20 mb-lg">
-              {errors.variants}
-            </div>
-          )}
+        {/* Step 4: Pricing Strategy */}
+        <AccordionSection
+          title="Pricing Strategy"
+          stepNumber={4}
+          isOpen={expandedSection === 4}
+          isComplete={isStrategyComplete}
+          onToggle={() => toggleSection(4)}
+          summary={strategySummary}
+        >
+           <div className="space-y-lg">
+              <PricingStrategy
+                strategy={config.strategy}
+                value={config.value}
+                costPerUnit={calculationResult?.costPerUnit || 0}
+                onChange={handlePricingChange}
+              />
 
-          {input.hasVariants && (
-            <div className="space-y-xl animate-in fade-in slide-in-from-top-4 duration-300">
-              {/* Base Variant Block (Read Only) with Visual Allocation */}
-              <Card className="bg-surface/50 border-border-subtle ">
-                <div className="flex flex-col gap-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-ink-900">
-                        {input.productName || 'Base Product'} (Base)
-                      </h4>
-                      <p className="text-sm text-ink-500">Remaining Base Batch</p>
-                    </div>
-                    <div className="text-2xl font-bold text-ink-900 tabular-nums">
-                      {remainingBatch}{' '}
-                      <span className="text-sm font-normal text-ink-500">units</span>
-                    </div>
-                  </div>
+              <div className="h-px bg-border-subtle" role="separator" />
 
-                  {/* Visual Allocation Bar */}
-                  <div className="space-y-sm">
-                    <div className="flex justify-between text-[10px] font-bold text-ink-500 uppercase tracking-widest">
-                      <span>Batch Allocation</span>
-                      <span>
-                        {totalVariantBatch} / {input.batchSize} Units allocated
-                      </span>
-                    </div>
-                    <div className="h-4 w-full bg-border-subtle rounded-lg overflow-hidden flex border border-border-subtle shadow-inner">
-                      <div
-                        className="h-full bg-clay transition-all duration-500 flex items-center justify-center text-[8px] text-white font-bold"
-                        style={{ width: `${(remainingBatch / (input.batchSize || 1)) * 100}%` }}
-                      >
-                        {remainingBatch > 0 && 'BASE'}
-                      </div>
-                      {input.variants?.map((v, i) => (
-                        <div
-                          key={v.id}
-                          className={`h-full transition-all duration-500 flex items-center justify-center text-[8px] text-white font-bold border-l border-white/20 ${i % 2 === 0 ? 'bg-moss' : 'bg-ink-700'}`}
-                          style={{ width: `${(v.batchSize / (input.batchSize || 1)) * 100}%` }}
-                        >
-                          {v.batchSize > (input.batchSize || 0) * 0.1 && `V${i + 1}`}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-md items-center text-[10px] font-medium text-ink-500">
-                      <div className="flex items-center gap-xs">
-                        <div className="w-2 h-2 rounded-full bg-clay" />
-                        <span>Base ({remainingBatch})</span>
-                      </div>
-                      {input.variants?.map((v, i) => (
-                        <div key={v.id} className="flex items-center gap-xs">
-                          <div
-                            className={`w-2 h-2 rounded-full ${i % 2 === 0 ? 'bg-moss' : 'bg-ink-700'}`}
-                          />
-                          <span>
-                            {v.name || `Variant ${i + 1}`} ({v.batchSize})
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+              <CurrentPrice value={input.currentSellingPrice} onChange={handleCurrentPriceChange} />
+              
+              <div className="flex justify-end">
+                 <Button 
+                  variant="primary"
+                  size="sm"
+                  onClick={() => nextSection(4)}
+                  className="bg-clay text-white hover:bg-clay/90"
+                 >
+                   Continue <ArrowRight className="w-4 h-4 ml-2" />
+                 </Button>
+              </div>
+          </div>
+        </AccordionSection>
+
+         {/* Step 5: Variants (Optional) */}
+         <AccordionSection
+          title="Variants (Optional)"
+          stepNumber={5}
+          isOpen={expandedSection === 5}
+          isComplete={isVariantsComplete}
+          onToggle={() => toggleSection(5)}
+          summary={input.hasVariants ? `${input.variants?.length || 0} Variants` : 'Disabled'}
+        >
+          <div className="space-y-lg">
+             <div className="flex items-center justify-between bg-surface p-md rounded-lg border border-border-subtle">
+                <div>
+                  <h4 className="font-medium text-ink-900">Enable Variants</h4>
+                  <p className="text-sm text-ink-500">Create product variations (sizes, flavors) from this base recipe</p>
                 </div>
-              </Card>
+                <Switch
+                  checked={!!input.hasVariants}
+                  onChange={onSetHasVariants}
+                  label="Enable Variants"
+                />
+             </div>
 
-              {/* Variants List */}
-              {input.variants?.map((variant, index) => {
-                const variantResult = calculationResult.variantResults?.find(
-                  (r) => r.id === variant.id
-                );
-                const variantCostPerUnit = variantResult?.costPerUnit || 0;
+             {errors.variants && (
+                <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20 mb-lg">
+                  {errors.variants}
+                </div>
+             )}
 
-                return (
-                  <VariantBlock
-                    key={variant.id}
-                    variant={variant}
-                    index={index}
-                    remainingBatch={rawRemainingBatch}
-                    costPerUnit={variantCostPerUnit}
-                    onUpdate={onUpdateVariant}
-                    onRemove={onRemoveVariant}
-                    onUpdateIngredient={onUpdateVariantIngredient}
-                    onAddIngredient={onAddVariantIngredient}
-                    onRemoveIngredient={onRemoveVariantIngredient}
-                    errors={errors}
-                  />
-                );
-              })}
+             {input.hasVariants && (
+              <div className="space-y-xl animate-in fade-in slide-in-from-top-4 duration-300">
+                {/* Base Variant Block (Read Only) */}
+                <Card className="bg-surface/50 border-border-subtle ">
+                  <div className="flex flex-col gap-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-ink-900">
+                          {input.productName || 'Base Product'} (Base)
+                        </h4>
+                        <p className="text-sm text-ink-500">Remaining Base Batch</p>
+                      </div>
+                      <div className="text-2xl font-bold text-ink-900 tabular-nums">
+                        {remainingBatch}{' '}
+                        <span className="text-sm font-normal text-ink-500">units</span>
+                      </div>
+                    </div>
 
-              {/* Add Variant Button */}
-              <Button
-                variant="dashed"
-                onClick={onAddVariant}
-                disabled={remainingBatch <= 0}
-                className="w-full py-lg flex items-center justify-center gap-sm"
+                    {/* Visual Allocation Bar */}
+                    <div className="space-y-sm">
+                      <div className="flex justify-between text-[10px] font-bold text-ink-500 uppercase tracking-widest">
+                        <span>Batch Allocation</span>
+                        <span>
+                          {totalVariantBatch} / {input.batchSize} Units allocated
+                        </span>
+                      </div>
+                      <div className="h-4 w-full bg-border-subtle rounded-lg overflow-hidden flex border border-border-subtle shadow-inner">
+                        <div
+                          className="h-full bg-clay transition-all duration-500 flex items-center justify-center text-[8px] text-white font-bold"
+                          style={{ width: `${(remainingBatch / (input.batchSize || 1)) * 100}%` }}
+                        >
+                          {remainingBatch > 0 && 'BASE'}
+                        </div>
+                        {input.variants?.map((v, i) => (
+                          <div
+                            key={v.id}
+                            className={`h-full transition-all duration-500 flex items-center justify-center text-[8px] text-white font-bold border-l border-white/20 ${i % 2 === 0 ? 'bg-moss' : 'bg-ink-700'}`}
+                            style={{ width: `${(v.batchSize / (input.batchSize || 1)) * 100}%` }}
+                          >
+                            {v.batchSize > (input.batchSize || 0) * 0.1 && `V${i + 1}`}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap gap-md items-center text-[10px] font-medium text-ink-500">
+                        <div className="flex items-center gap-xs">
+                          <div className="w-2 h-2 rounded-full bg-clay" />
+                          <span>Base ({remainingBatch})</span>
+                        </div>
+                        {input.variants?.map((v, i) => (
+                          <div key={v.id} className="flex items-center gap-xs">
+                            <div
+                              className={`w-2 h-2 rounded-full ${i % 2 === 0 ? 'bg-moss' : 'bg-ink-700'}`}
+                            />
+                            <span>
+                              {v.name || `Variant ${i + 1}`} ({v.batchSize})
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Variants List */}
+                {input.variants?.map((variant, index) => {
+                  const variantResult = calculationResult.variantResults?.find(
+                    (r) => r.id === variant.id
+                  );
+                  const variantCostPerUnit = variantResult?.costPerUnit || 0;
+
+                  return (
+                    <VariantBlock
+                      key={variant.id}
+                      variant={variant}
+                      index={index}
+                      remainingBatch={rawRemainingBatch}
+                      costPerUnit={variantCostPerUnit}
+                      onUpdate={onUpdateVariant}
+                      onRemove={onRemoveVariant}
+                      onUpdateIngredient={onUpdateVariantIngredient}
+                      onAddIngredient={onAddVariantIngredient}
+                      onRemoveIngredient={onRemoveVariantIngredient}
+                      errors={errors}
+                    />
+                  );
+                })}
+
+                {/* Add Variant Button */}
+                <Button
+                  variant="dashed"
+                  onClick={onAddVariant}
+                  disabled={remainingBatch <= 0}
+                  className="w-full py-lg flex items-center justify-center gap-sm"
+                >
+                  <Plus className="w-5 h-5" />
+                  {remainingBatch > 0 ? 'Add Variant' : 'No Batch Capacity Remaining'}
+                </Button>
+              </div>
+            )}
+            
+            <div className="flex justify-end">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setExpandedSection(0)} // Close
+                className="text-ink-500 hover:text-ink-900"
               >
-                <Plus className="w-5 h-5" />
-                {remainingBatch > 0 ? 'Add Variant' : 'No Batch Capacity Remaining'}
+                Close Section
               </Button>
             </div>
-          )}
-        </div>
+          </div>
+        </AccordionSection>
+
       </div>
 
-      {/* Main Calculate Action - Bottom of Form */}
-      <div className="sticky bottom-0 bg-bg-main/95 backdrop-blur-sm p-4 -mx-4 sm:mx-0 sm:static sm:bg-transparent sm:p-0 z-20 mt-xl">
+      {/* Main Calculate Action - Bottom of Form (Desktop Only) */}
+      <div className="hidden sm:block mt-xl">
         <Button
           variant="primary"
           onClick={onCalculate}

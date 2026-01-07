@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { usePresets } from './use-presets';
 import { useSessionStorage } from './use-session-storage';
 import { performFullCalculation } from '../utils/calculations';
@@ -15,10 +15,24 @@ import type {
 
 const SESSION_STORAGE_KEY = 'pricing_calculator_draft';
 
+const initialIngredient: Ingredient = {
+  id: '',
+  name: '',
+  amount: 0,
+  cost: 0,
+  measurementMode: 'advanced',
+  purchaseQuantity: 0,
+  purchaseUnit: 'g',
+  purchaseCost: 0,
+  recipeQuantity: 0,
+  recipeUnit: 'g',
+  useFullQuantity: false,
+};
+
 const initialInput: CalculationInput = {
   productName: '',
   batchSize: 1,
-  ingredients: [{ id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }],
+  ingredients: [{ ...initialIngredient, id: crypto.randomUUID() }],
   laborCost: 0,
   overhead: 0,
   hasVariants: false,
@@ -50,13 +64,15 @@ export interface CalculatorState {
   input: CalculationInput;
   config: PricingConfig;
   results: CalculationResult | null;
+  liveResult: CalculationResult;
+  isDirty: boolean;
   errors: Record<string, string>;
   isCalculating: boolean;
   presets: Preset[];
 
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
-  updateIngredient: (id: string, field: keyof Ingredient, value: string | number) => void;
+  updateIngredient: (id: string, field: keyof Ingredient, value: string | number | boolean) => void;
   addIngredient: () => void;
   removeIngredient: (id: string) => void;
   updateConfig: (updates: Partial<PricingConfig>) => void;
@@ -72,7 +88,7 @@ export interface CalculatorState {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: string | number
+    value: string | number | boolean
   ) => void;
   addVariantIngredient: (variantId: string) => void;
   removeVariantIngredient: (variantId: string, ingredientId: string) => void;
@@ -107,6 +123,13 @@ export function useCalculatorState(initialValues?: {
   );
   const [config, setConfig] = useState<PricingConfig>(initialValues?.config || draft.config);
   const [results, setResults] = useState<CalculationResult | null>(null);
+  
+  // Track the input/config state used for the last successful calculation
+  const [lastCalculatedState, setLastCalculatedState] = useState<{
+    input: CalculationInput;
+    config: PricingConfig;
+  } | null>(null);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -117,6 +140,15 @@ export function useCalculatorState(initialValues?: {
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [input, config, setDraft]);
+
+  // Determine if current form state differs from the last calculated state
+  const isDirty = React.useMemo(() => {
+    if (!results || !lastCalculatedState) return true;
+    return (
+      JSON.stringify(input) !== JSON.stringify(lastCalculatedState.input) ||
+      JSON.stringify(config) !== JSON.stringify(lastCalculatedState.config)
+    );
+  }, [input, config, results, lastCalculatedState]);
 
   const updateInput = useCallback((updates: Partial<CalculationInput>) => {
     setInput((prev) => ({ ...prev, ...updates }));
@@ -132,7 +164,7 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const updateIngredient = useCallback(
-    (id: string, field: keyof Ingredient, value: string | number) => {
+    (id: string, field: keyof Ingredient, value: string | number | boolean) => {
       setInput((prev) => ({
         ...prev,
         ingredients: prev.ingredients.map((ing) =>
@@ -154,7 +186,7 @@ export function useCalculatorState(initialValues?: {
   const addIngredient = useCallback(() => {
     setInput((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }],
+      ingredients: [...prev.ingredients, { ...initialIngredient, id: crypto.randomUUID() }],
     }));
   }, []);
 
@@ -220,7 +252,7 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const updateVariantIngredient = useCallback(
-    (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => {
+    (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number | boolean) => {
       setInput((prev) => ({
         ...prev,
         variants: (prev.variants || []).map((v) => {
@@ -246,7 +278,7 @@ export function useCalculatorState(initialValues?: {
           ...v,
           ingredients: [
             ...v.ingredients,
-            { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 },
+            { ...initialIngredient, id: crypto.randomUUID() },
           ],
         };
       }),
@@ -357,14 +389,23 @@ export function useCalculatorState(initialValues?: {
 
     const result = performFullCalculation(input, config);
     setResults(result);
+    setLastCalculatedState({ input, config });
     setIsCalculating(false);
     return result;
   }, [input, config, validateForm]);
+
+  // Live calculation for preview (StickySummary)
+  // We use performFullCalculation directly as it handles incomplete inputs gracefully (returns 0s)
+  // This is memoized to avoid recalculating on every render if input/config hasn't changed
+  const liveResult = React.useMemo(() => {
+    return performFullCalculation(input, config);
+  }, [input, config]);
 
   const reset = useCallback(() => {
     setInput(initialInput);
     setConfig(initialConfig);
     setResults(null);
+    setLastCalculatedState(null);
     setErrors({});
     window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
   }, []);
@@ -392,6 +433,7 @@ export function useCalculatorState(initialValues?: {
 
     const result = performFullCalculation(sanitizedInput, preset.pricingConfig);
     setResults(result);
+    setLastCalculatedState({ input: sanitizedInput, config: preset.pricingConfig });
     setErrors({});
   }, []);
 
@@ -419,6 +461,8 @@ export function useCalculatorState(initialValues?: {
     input,
     config,
     results,
+    liveResult,
+    isDirty,
     errors,
     isCalculating,
     presets,

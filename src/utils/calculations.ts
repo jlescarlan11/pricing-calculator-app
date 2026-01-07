@@ -292,3 +292,79 @@ export const performFullCalculation = (
     variantResults,
   };
 };
+
+// --- Unit Conversion Logic ---
+
+export type UnitCategory = 'weight' | 'volume' | 'count';
+
+interface UnitDefinition {
+  value: string;
+  label: string;
+  category: UnitCategory;
+  toBase: number; // Factor to convert to base unit (g, ml, piece)
+}
+
+const UNITS: Record<string, UnitDefinition> = {
+  // Weight (Base: g)
+  g: { value: 'g', label: 'g', category: 'weight', toBase: 1 },
+  kg: { value: 'kg', label: 'kg', category: 'weight', toBase: 1000 },
+  oz: { value: 'oz', label: 'oz', category: 'weight', toBase: 28.3495 },
+  lb: { value: 'lb', label: 'lb', category: 'weight', toBase: 453.592 },
+
+  // Volume (Base: ml)
+  ml: { value: 'ml', label: 'ml', category: 'volume', toBase: 1 },
+  l: { value: 'l', label: 'L', category: 'volume', toBase: 1000 },
+  tsp: { value: 'tsp', label: 'tsp', category: 'volume', toBase: 4.92892 },
+  tbsp: { value: 'tbsp', label: 'tbsp', category: 'volume', toBase: 14.7868 },
+  cup: { value: 'cup', label: 'cup', category: 'volume', toBase: 236.588 },
+  fl_oz: { value: 'fl_oz', label: 'fl oz', category: 'volume', toBase: 29.5735 },
+
+  // Count (Base: piece)
+  piece: { value: 'piece', label: 'pcs', category: 'count', toBase: 1 },
+  dozen: { value: 'dozen', label: 'doz', category: 'count', toBase: 12 },
+};
+
+export const UNIT_OPTIONS = Object.values(UNITS).map((u) => ({
+  label: u.label,
+  value: u.value,
+}));
+
+/**
+ * Calculates the cost of the used ingredient portion based on purchase details.
+ * Handles unit conversions within the same category (weight -> weight, volume -> volume).
+ * Returns null if calculation is not possible (incompatible units, missing values).
+ */
+export const calculateIngredientCostFromPurchase = (
+  purchaseQuantity: number,
+  purchaseUnit: string,
+  purchaseCost: number,
+  recipeQuantity: number,
+  recipeUnit: string
+): number | null => {
+  if (
+    purchaseQuantity <= 0 ||
+    purchaseCost < 0 ||
+    recipeQuantity < 0 ||
+    !UNITS[purchaseUnit] ||
+    !UNITS[recipeUnit]
+  ) {
+    return null;
+  }
+
+  const pUnit = UNITS[purchaseUnit];
+  const rUnit = UNITS[recipeUnit];
+
+  // If categories don't match, we can't convert automatically (e.g. kg to L)
+  // unless we assume density=1, but for safety we return null (or 0)
+  // allowing the user to see the error/incompatibility.
+  if (pUnit.category !== rUnit.category) {
+    return null;
+  }
+
+  const purchaseAmountInBase = purchaseQuantity * pUnit.toBase;
+  const recipeAmountInBase = recipeQuantity * rUnit.toBase;
+  const costPerBaseUnit = purchaseCost / purchaseAmountInBase;
+
+  const finalCost = costPerBaseUnit * recipeAmountInBase;
+  return round(finalCost);
+};

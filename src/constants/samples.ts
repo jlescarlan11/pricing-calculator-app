@@ -5,13 +5,86 @@ export const COOKIE_SAMPLE: { input: CalculationInput; config: PricingConfig } =
     productName: 'Chocolate Chip Cookies',
     batchSize: 50,
     ingredients: [
-      { id: '1', name: 'All-Purpose Flour', amount: 500, cost: 45 },
-      { id: '2', name: 'Brown Sugar', amount: 200, cost: 35 },
-      { id: '3', name: 'White Sugar', amount: 150, cost: 25 },
-      { id: '4', name: 'Butter (Unsalted)', amount: 225, cost: 120 },
-      { id: '5', name: 'Chocolate Chips (Semi-sweet)', amount: 300, cost: 180 },
-      { id: '6', name: 'Eggs (Large)', amount: 2, cost: 18 },
-      { id: '7', name: 'Vanilla Extract & Baking Soda', amount: 1, cost: 10 },
+      { 
+        id: '1', 
+        name: 'All-Purpose Flour', 
+        purchaseQuantity: 1000, 
+        purchaseUnit: 'g', 
+        purchaseCost: 90, 
+        recipeQuantity: 500, 
+        recipeUnit: 'g', 
+        cost: 45,
+        amount: 500
+      },
+      { 
+        id: '2', 
+        name: 'Brown Sugar', 
+        purchaseQuantity: 500, 
+        purchaseUnit: 'g', 
+        purchaseCost: 87.5, 
+        recipeQuantity: 200, 
+        recipeUnit: 'g', 
+        cost: 35,
+        amount: 200
+      },
+      { 
+        id: '3', 
+        name: 'White Sugar', 
+        purchaseQuantity: 1000, 
+        purchaseUnit: 'g', 
+        purchaseCost: 166.67, 
+        recipeQuantity: 150, 
+        recipeUnit: 'g', 
+        cost: 25,
+        amount: 150
+      },
+      { 
+        id: '4', 
+        name: 'Butter (Unsalted)', 
+        purchaseQuantity: 225, 
+        purchaseUnit: 'g', 
+        purchaseCost: 120, 
+        recipeQuantity: 225, 
+        recipeUnit: 'g', 
+        cost: 120,
+        amount: 225,
+        useFullQuantity: true
+      },
+      { 
+        id: '5', 
+        name: 'Chocolate Chips (Semi-sweet)', 
+        purchaseQuantity: 300, 
+        purchaseUnit: 'g', 
+        purchaseCost: 180, 
+        recipeQuantity: 300, 
+        recipeUnit: 'g', 
+        cost: 180,
+        amount: 300,
+        useFullQuantity: true
+      },
+      { 
+        id: '6', 
+        name: 'Eggs (Large)', 
+        purchaseQuantity: 12, 
+        purchaseUnit: 'piece', 
+        purchaseCost: 108, 
+        recipeQuantity: 2, 
+        recipeUnit: 'piece', 
+        cost: 18,
+        amount: 2
+      },
+      { 
+        id: '7', 
+        name: 'Vanilla Extract & Baking Soda', 
+        purchaseQuantity: 1, 
+        purchaseUnit: 'piece', 
+        purchaseCost: 10, 
+        recipeQuantity: 1, 
+        recipeUnit: 'piece', 
+        cost: 10,
+        amount: 1,
+        useFullQuantity: true
+      },
     ],
     laborCost: 150, // 2 hours of work
     overhead: 50, // Electricity and packaging
