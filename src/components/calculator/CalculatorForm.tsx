@@ -326,21 +326,25 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           onToggle={() => toggleSection(3)}
           summary={costsSummary}
         >
-           <div className="space-y-lg">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-              <LaborCost
-                value={input?.laborCost || 0}
-                onChange={handleLaborChange}
-                error={errors.laborCost}
-              />
-              <OverheadCost
-                value={input?.overhead || 0}
-                batchSize={input?.batchSize || 1}
-                onChange={handleOverheadChange}
-                error={errors.overhead}
-              />
+           <div className="space-y-lg -mx-lg -mb-lg -mt-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:divide-x md:divide-border-subtle/50">
+              <div className="p-lg md:p-xl">
+                <LaborCost
+                  value={input?.laborCost || 0}
+                  onChange={handleLaborChange}
+                  error={errors.laborCost}
+                />
+              </div>
+              <div className="p-lg md:p-xl bg-surface/50">
+                <OverheadCost
+                  value={input?.overhead || 0}
+                  batchSize={input?.batchSize || 1}
+                  onChange={handleOverheadChange}
+                  error={errors.overhead}
+                />
+              </div>
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-end p-lg md:p-xl pt-0 md:pt-0">
                <Button 
                 variant="primary"
                 size="sm"

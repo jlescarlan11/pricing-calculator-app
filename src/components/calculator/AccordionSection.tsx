@@ -37,17 +37,17 @@ export const AccordionSection: React.FC<AccordionSectionProps> = ({
         <div className="flex items-center gap-md">
           {/* Step Indicator */}
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors duration-300 shrink-0 border
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 shrink-0 border
               ${
                 isComplete && !isOpen
-                  ? 'bg-moss border-moss text-white'
+                  ? 'bg-moss/10 border-moss/30 text-moss shadow-sm scale-95'
                   : isOpen
-                    ? 'bg-clay border-clay text-white'
-                    : 'bg-white border-border-base text-ink-500 group-hover:border-clay/50 group-hover:text-clay'
+                    ? 'bg-clay border-clay text-white shadow-md ring-4 ring-clay/10 scale-105'
+                    : 'bg-white border-border-base text-ink-500 group-hover:border-clay/30 group-hover:text-clay group-hover:bg-clay/5'
               }
             `}
           >
-            {isComplete && !isOpen ? <Check className="w-5 h-5" /> : stepNumber}
+            {isComplete && !isOpen ? <Check className="w-5 h-5" strokeWidth={3} /> : stepNumber}
           </div>
 
           <div className="flex flex-col">
