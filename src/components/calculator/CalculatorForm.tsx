@@ -508,8 +508,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
       </div>
 
-      {/* Main Calculate Action - Bottom of Form */}
-      <div className="sticky bottom-0 bg-bg-main/95 backdrop-blur-sm p-4 -mx-4 sm:mx-0 sm:static sm:bg-transparent sm:p-0 z-20 mt-xl border-t border-border-subtle sm:border-0">
+      {/* Main Calculate Action - Bottom of Form (Desktop Only) */}
+      <div className="hidden sm:block mt-xl">
         <Button
           variant="primary"
           onClick={onCalculate}

@@ -1,6 +1,5 @@
 import React from 'react';
-import { ArrowUp, RefreshCw, Activity } from 'lucide-react';
-import { Badge } from '../shared/Badge';
+import { ArrowUp, RefreshCw, Calculator, ChevronRight } from 'lucide-react';
 import { Button } from '../shared/Button';
 import type { CalculationResult } from '../../types/calculator';
 import { formatCurrency } from '../../utils/formatters';
@@ -12,7 +11,7 @@ interface StickySummaryProps {
   onScrollToResults: () => void;
   onCalculate: () => void;
   isCalculating: boolean;
-  isVisible: boolean;
+  isVisible: boolean; // Kept for interface compatibility, but we'll ignore it or use it for specific hide logic if needed.
 }
 
 export const StickySummary: React.FC<StickySummaryProps> = ({
@@ -22,95 +21,129 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
   onScrollToResults,
   onCalculate,
   isCalculating,
-  isVisible,
 }) => {
-  if (!isVisible) return null;
-
-  const getMarginBadge = (margin: number) => {
-    if (margin < 15) return { variant: 'error' as const, label: 'Tight' };
-    if (margin <= 25) return { variant: 'warning' as const, label: 'Modest' };
-    return { variant: 'success' as const, label: 'Healthy' };
+  // Determine margin health color
+  const getMarginColor = (margin: number) => {
+    if (margin < 15) return 'bg-rust';
+    if (margin <= 25) return 'bg-clay'; // Using clay for modest/warning to fit palette
+    return 'bg-moss';
   };
 
   const hasVariants = results?.variantResults && results.variantResults.length > 0;
 
+  // Placeholder content when no results exist
+  if (!results) {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-border-subtle pb-[env(safe-area-inset-bottom)] sm:hidden">
+        <div className="p-md flex items-center justify-between gap-md">
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-ink-900">Ready?</span>
+            <span className="text-xs text-ink-500">Calculate your profit</span>
+          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={onCalculate}
+            isLoading={isCalculating}
+            className="rounded-full px-lg"
+          >
+            Calculate
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 p-md pb-[calc(var(--spacing-md)+env(safe-area-inset-bottom,0px))] sm:hidden animate-in fade-in slide-in-from-bottom-full duration-500">
-      <div className="bg-white/95 backdrop-blur-md border border-border-base rounded-xl shadow-level-4 p-md flex items-center justify-between gap-md">
-        {results ? (
-          <div className="flex flex-col flex-1 min-w-0">
-            <div className="flex items-center gap-xs mb-0.5">
-              <span className="text-[10px] font-bold text-ink-500 uppercase tracking-widest truncate flex items-center gap-1.5">
-                {isStale && (
-                  <span className="flex items-center gap-1 text-clay animate-pulse">
-                    <Activity className="w-3 h-3" />
-                    <span>Live Estimate</span>
-                  </span>
-                )}
-                {!isStale && (hasVariants ? 'Recommended Prices' : 'Recommended Price')}
-              </span>
-              {!hasVariants && !isStale && (
-                <Badge
-                  variant={getMarginBadge(results.profitMarginPercent).variant}
-                  className="text-[8px] py-0 px-1 uppercase shrink-0"
-                >
-                  {getMarginBadge(results.profitMarginPercent).label}
-                </Badge>
-              )}
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-border-subtle shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)] sm:hidden transition-transform duration-300">
+      
+      {/* Main Content Area */}
+      <div className="flex items-center gap-md p-md h-[72px]">
+        
+        {/* Left Side: Stats (Single) or Scroll (Variants) */}
+        <div className="flex-1 min-w-0">
+          {hasVariants ? (
+            // VARIANT VIEW: Horizontal Scroll
+            <div className="flex gap-md overflow-x-auto no-scrollbar items-center mask-fade-right">
+              {results.variantResults?.map((vr) => (
+                <div key={vr.id} className="flex flex-col min-w-[100px] gap-0.5 shrink-0 border-r border-border-subtle pr-md last:border-0 last:pr-0">
+                   <div className="flex items-center justify-between w-full">
+                      <span className="text-[10px] font-bold text-ink-500 uppercase truncate max-w-[60px]">
+                        {vr.name.includes('(Base)') ? 'Base' : vr.name}
+                      </span>
+                   </div>
+                   <div className="flex items-baseline gap-xs">
+                      <span className={`text-sm font-bold tabular-nums ${isStale ? 'text-clay' : 'text-ink-900'}`}>
+                         {formatCurrency(vr.recommendedPrice)}
+                      </span>
+                   </div>
+                   {/* Mini Progress Bar for Variant */}
+                   <div className="h-1 w-full bg-border-subtle rounded-full overflow-hidden mt-0.5">
+                      <div 
+                        className={`h-full ${getMarginColor(vr.profitMarginPercent)}`} 
+                        style={{ width: `${Math.min(vr.profitMarginPercent, 100)}%` }}
+                      />
+                   </div>
+                </div>
+              ))}
             </div>
-
-            {hasVariants ? (
-              <div className="flex gap-md overflow-x-auto no-scrollbar pb-0.5">
-                {results?.variantResults?.map((vr) => (
-                  <div key={vr.id} className="flex flex-col min-w-max border-r border-border-subtle pr-md last:border-0 last:pr-0">
-                    <span className="text-[9px] font-bold text-ink-700 truncate max-w-[100px]">
-                      {vr.name.includes('(Base)') ? 'Base' : vr.name}
+          ) : (
+            // SINGLE VIEW: Side-by-Side Stats
+            <div className="flex flex-col gap-1.5 w-full">
+              <div className="flex items-baseline justify-between w-full text-sm">
+                 <div className="flex flex-col">
+                    <span className="text-[10px] text-ink-500 font-medium uppercase tracking-wide">Total Cost</span>
+                    <span className="font-semibold text-ink-700 tabular-nums">
+                      {formatCurrency(results.costPerUnit)}
                     </span>
-                    <span className={`text-base font-bold tabular-nums ${isStale ? 'text-clay' : 'text-ink-900'}`}>
-                      {formatCurrency(vr.recommendedPrice)}
+                 </div>
+                 
+                 <div className="flex flex-col items-end">
+                    <span className="text-[10px] text-ink-500 font-medium uppercase tracking-wide">
+                       {isStale ? 'Est. Price' : 'Sugg. Price'}
                     </span>
-                  </div>
-                ))}
+                    <span className={`font-bold tabular-nums text-lg leading-none ${isStale ? 'text-clay animate-pulse' : 'text-ink-900'}`}>
+                      {formatCurrency(results.recommendedPrice)}
+                    </span>
+                 </div>
               </div>
-            ) : (
-              <div className={`text-xl font-bold tabular-nums ${isStale ? 'text-clay' : 'text-ink-900'}`}>
-                {formatCurrency(results.recommendedPrice)}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-xs text-ink-500 font-medium italic">
-            Ready to calculate your profit?
-          </div>
-        )}
 
-        <div className="flex gap-sm">
+              {/* Progress Bar */}
+              <div className="relative w-full h-1.5 bg-surface-hover rounded-full overflow-hidden">
+                <div 
+                  className={`absolute left-0 top-0 h-full transition-all duration-500 ${getMarginColor(results.profitMarginPercent)}`}
+                  style={{ width: `${Math.min(Math.max(results.profitMarginPercent, 0), 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Side: Action Button */}
+        <div className="shrink-0 pl-xs">
           {hasCommittedResults && !isStale ? (
             <Button
               variant="secondary"
-              size="sm"
+              size="icon"
               onClick={onScrollToResults}
-              className="flex items-center gap-xs min-h-[40px]"
+              className="w-10 h-10 rounded-full bg-surface-hover hover:bg-border-subtle text-ink-900"
+              aria-label="View Details"
             >
-              <ArrowUp className="w-3.5 h-3.5" />
-              Results
+              <ChevronRight className="w-5 h-5" />
             </Button>
           ) : (
             <Button
               variant="primary"
-              size="sm"
+              size="sm" // Use sm but style it to be prominent
               onClick={onCalculate}
               isLoading={isCalculating}
-              className="flex items-center gap-xs min-h-[40px]"
+              className={`h-10 px-4 rounded-full shadow-sm transition-all ${isStale ? 'animate-pulse' : ''}`}
             >
-              {hasCommittedResults ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                  Update
-                </>
-              ) : (
-                'Calculate'
-              )}
+               {hasCommittedResults ? (
+                 <RefreshCw className="w-4 h-4" />
+               ) : (
+                 <Calculator className="w-4 h-4" />
+               )}
             </Button>
           )}
         </div>
