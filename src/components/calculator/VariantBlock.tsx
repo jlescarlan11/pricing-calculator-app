@@ -15,7 +15,7 @@ interface VariantBlockProps {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: any
+    value: string | number | boolean
   ) => void;
   onAddIngredient: (variantId: string) => void;
   onRemoveIngredient: (variantId: string, ingredientId: string) => void;

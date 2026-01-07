@@ -298,8 +298,8 @@ describe('CalculatorForm', () => {
   it('handles missing input fields gracefully during rendering', () => {
     const corruptedInput = {
       // Missing productName, ingredients, etc.
-    } as any;
-    const config = { strategy: 'markup', value: 20 } as any;
+    } as unknown as CalculationInput;
+    const config = { strategy: 'markup', value: 20 } as unknown as PricingConfig;
 
     // Should not crash when rendering with partial/invalid data
     render(

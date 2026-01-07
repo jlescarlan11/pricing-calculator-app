@@ -72,7 +72,7 @@ export interface CalculatorState {
 
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
-  updateIngredient: (id: string, field: keyof Ingredient, value: any) => void;
+  updateIngredient: (id: string, field: keyof Ingredient, value: string | number | boolean) => void;
   addIngredient: () => void;
   removeIngredient: (id: string) => void;
   updateConfig: (updates: Partial<PricingConfig>) => void;
@@ -88,7 +88,7 @@ export interface CalculatorState {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: any
+    value: string | number | boolean
   ) => void;
   addVariantIngredient: (variantId: string) => void;
   removeVariantIngredient: (variantId: string, ingredientId: string) => void;
@@ -164,7 +164,7 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const updateIngredient = useCallback(
-    (id: string, field: keyof Ingredient, value: any) => {
+    (id: string, field: keyof Ingredient, value: string | number | boolean) => {
       setInput((prev) => ({
         ...prev,
         ingredients: prev.ingredients.map((ing) =>
@@ -252,7 +252,7 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const updateVariantIngredient = useCallback(
-    (variantId: string, ingredientId: string, field: keyof Ingredient, value: any) => {
+    (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number | boolean) => {
       setInput((prev) => ({
         ...prev,
         variants: (prev.variants || []).map((v) => {

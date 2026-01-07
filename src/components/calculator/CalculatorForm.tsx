@@ -22,7 +22,7 @@ interface CalculatorFormProps {
   errors: Record<string, string>;
   isCalculating: boolean;
   onUpdateInput: (updates: Partial<CalculationInput>) => void;
-  onUpdateIngredient: (id: string, field: keyof Ingredient, value: any) => void;
+  onUpdateIngredient: (id: string, field: keyof Ingredient, value: string | number | boolean) => void;
   onAddIngredient: () => void;
   onRemoveIngredient: (id: string) => void;
   onUpdateConfig: (updates: Partial<PricingConfig>) => void;
@@ -40,7 +40,7 @@ interface CalculatorFormProps {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: any
+    value: string | number | boolean
   ) => void;
   onAddVariantIngredient: (variantId: string) => void;
   onRemoveVariantIngredient: (variantId: string, ingredientId: string) => void;

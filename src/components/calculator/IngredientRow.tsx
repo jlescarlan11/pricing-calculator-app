@@ -15,7 +15,7 @@ import type { Ingredient } from '../../types/calculator';
 interface IngredientRowProps {
   ingredient: Ingredient;
   index: number;
-  onUpdate: (id: string, field: keyof Ingredient, value: any) => void;
+  onUpdate: (id: string, field: keyof Ingredient, value: string | number | boolean) => void;
   onRemove: (id: string) => void;
   onAdd: () => void;
   errors?: {
@@ -71,7 +71,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
     }, 300);
   };
 
-  const handleChange = (field: keyof Ingredient, value: any) => {
+  const handleChange = (field: keyof Ingredient, value: string | number | boolean) => {
     // Basic update first
     onUpdate(ingredient.id, field, value);
 

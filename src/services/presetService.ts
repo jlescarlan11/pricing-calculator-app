@@ -13,8 +13,11 @@ interface SyncQueueItem {
 }
 
 // Helper to sanitize a preset to prevent crashes from missing fields
-function sanitizePreset(preset: any): Preset | null {
+function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | null {
   if (!preset || !preset.id || !preset.name) return null;
+
+  const baseRecipe = preset.baseRecipe as Record<string, unknown> | undefined;
+  const pricingConfig = preset.pricingConfig as Record<string, unknown> | undefined;
 
   return {
     id: preset.id,
@@ -22,22 +25,22 @@ function sanitizePreset(preset: any): Preset | null {
     name: preset.name,
     presetType: (preset.presetType || 'default') as 'default' | 'variant',
     baseRecipe: {
-      productName: preset.baseRecipe?.productName || '',
-      batchSize: typeof preset.baseRecipe?.batchSize === 'number' ? preset.baseRecipe.batchSize : 1,
-      ingredients: Array.isArray(preset.baseRecipe?.ingredients)
-        ? preset.baseRecipe.ingredients
+      productName: String(baseRecipe?.productName || ''),
+      batchSize: typeof baseRecipe?.batchSize === 'number' ? baseRecipe.batchSize : 1,
+      ingredients: Array.isArray(baseRecipe?.ingredients)
+        ? baseRecipe.ingredients
         : [],
-      laborCost: typeof preset.baseRecipe?.laborCost === 'number' ? preset.baseRecipe.laborCost : 0,
-      overhead: typeof preset.baseRecipe?.overhead === 'number' ? preset.baseRecipe.overhead : 0,
-      hasVariants: !!preset.baseRecipe?.hasVariants,
-      variants: Array.isArray(preset.baseRecipe?.variants) ? preset.baseRecipe.variants : [],
-      businessName: preset.baseRecipe?.businessName,
-      currentSellingPrice: preset.baseRecipe?.currentSellingPrice,
+      laborCost: typeof baseRecipe?.laborCost === 'number' ? baseRecipe.laborCost : 0,
+      overhead: typeof baseRecipe?.overhead === 'number' ? baseRecipe.overhead : 0,
+      hasVariants: !!baseRecipe?.hasVariants,
+      variants: Array.isArray(baseRecipe?.variants) ? baseRecipe.variants : [],
+      businessName: baseRecipe?.businessName as string | undefined,
+      currentSellingPrice: baseRecipe?.currentSellingPrice as number | undefined,
     },
     variants: Array.isArray(preset.variants) ? preset.variants : [],
     pricingConfig: {
-      strategy: (preset.pricingConfig?.strategy || 'markup') as 'markup' | 'margin',
-      value: typeof preset.pricingConfig?.value === 'number' ? preset.pricingConfig.value : 50,
+      strategy: (pricingConfig?.strategy || 'markup') as 'markup' | 'margin',
+      value: typeof pricingConfig?.value === 'number' ? pricingConfig.value : 50,
     },
     createdAt: preset.createdAt || new Date().toISOString(),
     updatedAt: preset.updatedAt || new Date().toISOString(),
