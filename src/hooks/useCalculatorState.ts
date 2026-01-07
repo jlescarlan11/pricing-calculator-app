@@ -51,6 +51,7 @@ export interface CalculatorState {
   config: PricingConfig;
   results: CalculationResult | null;
   liveResult: CalculationResult;
+  isDirty: boolean;
   errors: Record<string, string>;
   isCalculating: boolean;
   presets: Preset[];
@@ -108,6 +109,13 @@ export function useCalculatorState(initialValues?: {
   );
   const [config, setConfig] = useState<PricingConfig>(initialValues?.config || draft.config);
   const [results, setResults] = useState<CalculationResult | null>(null);
+  
+  // Track the input/config state used for the last successful calculation
+  const [lastCalculatedState, setLastCalculatedState] = useState<{
+    input: CalculationInput;
+    config: PricingConfig;
+  } | null>(null);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -118,6 +126,15 @@ export function useCalculatorState(initialValues?: {
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [input, config, setDraft]);
+
+  // Determine if current form state differs from the last calculated state
+  const isDirty = React.useMemo(() => {
+    if (!results || !lastCalculatedState) return true;
+    return (
+      JSON.stringify(input) !== JSON.stringify(lastCalculatedState.input) ||
+      JSON.stringify(config) !== JSON.stringify(lastCalculatedState.config)
+    );
+  }, [input, config, results, lastCalculatedState]);
 
   const updateInput = useCallback((updates: Partial<CalculationInput>) => {
     setInput((prev) => ({ ...prev, ...updates }));
@@ -358,6 +375,7 @@ export function useCalculatorState(initialValues?: {
 
     const result = performFullCalculation(input, config);
     setResults(result);
+    setLastCalculatedState({ input, config });
     setIsCalculating(false);
     return result;
   }, [input, config, validateForm]);
@@ -373,6 +391,7 @@ export function useCalculatorState(initialValues?: {
     setInput(initialInput);
     setConfig(initialConfig);
     setResults(null);
+    setLastCalculatedState(null);
     setErrors({});
     window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
   }, []);
@@ -400,6 +419,7 @@ export function useCalculatorState(initialValues?: {
 
     const result = performFullCalculation(sanitizedInput, preset.pricingConfig);
     setResults(result);
+    setLastCalculatedState({ input: sanitizedInput, config: preset.pricingConfig });
     setErrors({});
   }, []);
 
@@ -428,6 +448,7 @@ export function useCalculatorState(initialValues?: {
     config,
     results,
     liveResult,
+    isDirty,
     errors,
     isCalculating,
     presets,

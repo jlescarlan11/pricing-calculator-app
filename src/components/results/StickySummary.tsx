@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, RefreshCw, Activity } from 'lucide-react';
 import { Badge } from '../shared/Badge';
 import { Button } from '../shared/Button';
 import type { CalculationResult } from '../../types/calculator';
@@ -8,6 +8,7 @@ import { formatCurrency } from '../../utils/formatters';
 interface StickySummaryProps {
   results: CalculationResult | null;
   hasCommittedResults: boolean;
+  isStale: boolean;
   onScrollToResults: () => void;
   onCalculate: () => void;
   isCalculating: boolean;
@@ -17,6 +18,7 @@ interface StickySummaryProps {
 export const StickySummary: React.FC<StickySummaryProps> = ({
   results,
   hasCommittedResults,
+  isStale,
   onScrollToResults,
   onCalculate,
   isCalculating,
@@ -38,10 +40,16 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
         {results ? (
           <div className="flex flex-col flex-1 min-w-0">
             <div className="flex items-center gap-xs mb-0.5">
-              <span className="text-[10px] font-bold text-ink-500 uppercase tracking-widest truncate">
-                {hasVariants ? 'Recommended Prices' : 'Recommended Price'}
+              <span className="text-[10px] font-bold text-ink-500 uppercase tracking-widest truncate flex items-center gap-1.5">
+                {isStale && (
+                  <span className="flex items-center gap-1 text-clay animate-pulse">
+                    <Activity className="w-3 h-3" />
+                    <span>Live Estimate</span>
+                  </span>
+                )}
+                {!isStale && (hasVariants ? 'Recommended Prices' : 'Recommended Price')}
               </span>
-              {!hasVariants && (
+              {!hasVariants && !isStale && (
                 <Badge
                   variant={getMarginBadge(results.profitMarginPercent).variant}
                   className="text-[8px] py-0 px-1 uppercase shrink-0"
@@ -58,14 +66,14 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
                     <span className="text-[9px] font-bold text-ink-700 truncate max-w-[100px]">
                       {vr.name.includes('(Base)') ? 'Base' : vr.name}
                     </span>
-                    <span className="text-base font-bold text-ink-900 tabular-nums">
+                    <span className={`text-base font-bold tabular-nums ${isStale ? 'text-clay' : 'text-ink-900'}`}>
                       {formatCurrency(vr.recommendedPrice)}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-xl font-bold text-ink-900 tabular-nums">
+              <div className={`text-xl font-bold tabular-nums ${isStale ? 'text-clay' : 'text-ink-900'}`}>
                 {formatCurrency(results.recommendedPrice)}
               </div>
             )}
@@ -77,7 +85,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
         )}
 
         <div className="flex gap-sm">
-          {hasCommittedResults ? (
+          {hasCommittedResults && !isStale ? (
             <Button
               variant="secondary"
               size="sm"
@@ -95,7 +103,14 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
               isLoading={isCalculating}
               className="flex items-center gap-xs min-h-[40px]"
             >
-              Calculate
+              {hasCommittedResults ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                  Update
+                </>
+              ) : (
+                'Calculate'
+              )}
             </Button>
           )}
         </div>

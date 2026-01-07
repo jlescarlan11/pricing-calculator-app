@@ -15,6 +15,7 @@ export const CalculatorPage: React.FC = () => {
     config,
     results,
     liveResult,
+    isDirty,
     errors,
     isCalculating,
     updateInput,
@@ -195,6 +196,7 @@ export const CalculatorPage: React.FC = () => {
       <StickySummary
         results={liveResult}
         hasCommittedResults={showResults}
+        isStale={isDirty}
         onScrollToResults={handleScrollToResults}
         onCalculate={handleCalculate}
         isCalculating={isCalculating}
