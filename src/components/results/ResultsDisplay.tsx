@@ -99,14 +99,24 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           )}
         </div>
 
-        {/* Priority 2: Cost Breakdown */}
-        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+        {/* Priority 2: Cost Breakdown - De-emphasized */}
+        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 opacity-80 hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-sm mb-md px-md">
+            <div className="h-px flex-1 bg-border-subtle" />
+            <span className="text-[10px] font-bold text-ink-300 uppercase tracking-[0.2em]">Detailed Cost Breakdown</span>
+            <div className="h-px flex-1 bg-border-subtle" />
+          </div>
           <CostBreakdown results={results} />
         </div>
 
-        {/* Priority 3: Price Comparison (Single Only) */}
+        {/* Priority 3: Price Comparison (Single Only) - De-emphasized */}
         {!hasVariants && (
-          <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+          <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 opacity-80 hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-sm mb-md px-md">
+              <div className="h-px flex-1 bg-border-subtle" />
+              <span className="text-[10px] font-bold text-ink-300 uppercase tracking-[0.2em]">Current vs Recommended</span>
+              <div className="h-px flex-1 bg-border-subtle" />
+            </div>
             <PriceComparison
               currentPrice={input.currentSellingPrice}
               recommendedPrice={results.recommendedPrice}

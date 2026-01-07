@@ -76,10 +76,10 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
           </tbody>
           <tfoot className="bg-surface border-t border-border-base">
             <tr>
-              <td colSpan={4} className="px-md py-md font-bold text-ink-900 text-right">
+              <td colSpan={4} className="px-md py-xl font-bold text-ink-700 text-right uppercase tracking-widest text-xs">
                 Total Batch Profit (Target)
               </td>
-              <td colSpan={2} className="px-md py-md font-bold text-moss text-right text-lg">
+              <td colSpan={2} className="px-md py-xl font-bold text-moss text-right text-3xl tabular-nums tracking-tight">
                 {formatCurrency(results.profitPerBatch)}
               </td>
             </tr>
