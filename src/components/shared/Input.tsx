@@ -99,6 +99,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-describedby={describedBy}
             onKeyDown={handleKeyDown}
             min={type === 'number' ? 0 : undefined}
+            inputMode={type === 'number' ? 'decimal' : undefined}
             className={`
             block w-full rounded-xl border tabular-nums
             py-[14px] sm:text-sm transition-all duration-200

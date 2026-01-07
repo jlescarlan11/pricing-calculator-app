@@ -60,6 +60,20 @@ describe('Input Component', () => {
     expect(preventDefault).toHaveBeenCalled();
   });
 
+  it('sets default inputMode="decimal" for number inputs', () => {
+    render(<Input label="Number" value="" onChange={() => {}} type="number" />);
+    const input = screen.getByLabelText(/Number/i);
+    expect(input).toHaveAttribute('inputmode', 'decimal');
+  });
+
+  it('allows overriding default inputMode', () => {
+    render(
+      <Input label="Number" value="" onChange={() => {}} type="number" inputMode="numeric" />
+    );
+    const input = screen.getByLabelText(/Number/i);
+    expect(input).toHaveAttribute('inputmode', 'numeric');
+  });
+
   it('applies correct styling classes', () => {
     render(<Input label="Styled Input" value="" onChange={() => {}} />);
 
