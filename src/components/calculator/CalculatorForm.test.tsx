@@ -16,6 +16,7 @@ vi.mock('../../hooks/use-presets', () => ({
 
 const TestWrapper = ({
   onCalculate,
+  onLoadSample,
   initialInput,
   initialConfig,
 }: {
@@ -24,6 +25,7 @@ const TestWrapper = ({
     input: CalculationInput,
     config: PricingConfig
   ) => void;
+  onLoadSample?: () => void;
   initialInput?: CalculationInput;
   initialConfig?: PricingConfig;
 }) => {
@@ -50,6 +52,7 @@ const TestWrapper = ({
             state.reset();
           }
         }}
+        onLoadSample={onLoadSample}
         onSetHasVariants={state.setHasVariants}
         onAddVariant={state.addVariant}
         onRemoveVariant={state.removeVariant}
@@ -325,5 +328,26 @@ describe('CalculatorForm', () => {
     );
 
     expect(screen.getByRole('heading', { name: /Calculator/i })).toBeInTheDocument();
+  });
+
+  it('renders Load Sample Data when form is empty', () => {
+    const onLoadSample = vi.fn();
+    render(<TestWrapper onLoadSample={onLoadSample} />);
+
+    expect(screen.getByText(/Load Sample Data/i)).toBeInTheDocument();
+    
+    fireEvent.click(screen.getByText(/Load Sample Data/i));
+    expect(onLoadSample).toHaveBeenCalled();
+  });
+
+  it('hides Load Sample Data when user starts typing', async () => {
+    render(<TestWrapper onLoadSample={vi.fn()} />);
+
+    expect(screen.queryByText(/Load Sample Data/i)).toBeInTheDocument();
+
+    const input = screen.getByLabelText(/Product Name/i);
+    fireEvent.change(input, { target: { value: 'A' } });
+
+    expect(screen.queryByText(/Load Sample Data/i)).not.toBeInTheDocument();
   });
 });

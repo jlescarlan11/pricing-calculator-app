@@ -7,6 +7,7 @@ import {
   OverheadCost,
   PricingStrategy,
   CurrentPrice,
+  SampleDemo,
 } from './index';
 import { AccordionSection } from './AccordionSection';
 import { VariantBlock } from './VariantBlock';
@@ -28,6 +29,7 @@ interface CalculatorFormProps {
   onCalculate: () => void;
   onReset: () => void;
   onOpenPresets: () => void;
+  onLoadSample?: () => void;
 
   // Variant Actions
   onSetHasVariants: (enabled: boolean) => void;
@@ -57,6 +59,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onCalculate,
   onReset,
   onOpenPresets,
+  onLoadSample,
   onSetHasVariants,
   onAddVariant,
   onRemoveVariant,
@@ -65,6 +68,18 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onAddVariantIngredient,
   onRemoveVariantIngredient,
 }) => {
+  // --- Empty State Logic ---
+  const isEmpty = useMemo(() => {
+    const hasName = (input.productName?.trim().length ?? 0) > 0;
+    const hasIngredients = (input.ingredients?.length ?? 0) > 1 || 
+      (input.ingredients?.[0]?.name?.trim().length ?? 0) > 0 ||
+      (input.ingredients?.[0]?.cost ?? 0) > 0;
+    const hasLabor = (input.laborCost ?? 0) > 0;
+    const hasOverhead = (input.overhead ?? 0) > 0;
+    
+    return !hasName && !hasIngredients && !hasLabor && !hasOverhead;
+  }, [input]);
+
   // --- Completion Logic ---
   const isInfoComplete =
     (input.productName?.trim().length ?? 0) >= 3 && (input.batchSize ?? 0) >= 1;
@@ -192,6 +207,11 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       </div>
 
       <div className="flex flex-col space-y-md">
+        {isEmpty && onLoadSample && (
+          <div className="animate-in fade-in slide-in-from-top-4 duration-500 pb-sm">
+             <SampleDemo onLoadSample={onLoadSample} />
+          </div>
+        )}
         {/* Step 1: Product Info */}
         <AccordionSection
           title="Product Details"

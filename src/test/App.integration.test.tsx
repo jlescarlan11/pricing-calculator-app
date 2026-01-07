@@ -48,7 +48,7 @@ describe('App Integration', () => {
     renderWithRouter(<App />);
 
     // Load sample to speed up
-    const loadSampleBtn = screen.getByText(/Explore Case Study/i);
+    const loadSampleBtn = screen.getByText(/Load Sample Data/i);
     fireEvent.click(loadSampleBtn);
 
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
@@ -69,7 +69,7 @@ describe('App Integration', () => {
   it('loads sample data correctly', () => {
     renderWithRouter(<App />);
 
-    const loadSampleBtn = screen.getByText(/Explore Case Study/i);
+    const loadSampleBtn = screen.getByText(/Load Sample Data/i);
     fireEvent.click(loadSampleBtn);
 
     expect(screen.getByLabelText(/Product Name/i)).toHaveValue('Chocolate Chip Cookies');

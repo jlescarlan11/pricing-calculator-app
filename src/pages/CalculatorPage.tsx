@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Info, Package } from 'lucide-react';
-import { CalculatorForm, SampleDemo } from '../components/calculator';
+import { CalculatorForm } from '../components/calculator';
 import { ResultsDisplay, StickySummary } from '../components/results';
 import { PresetsList } from '../components/presets';
 import { Modal, useToast } from '../components/shared';
@@ -134,7 +134,7 @@ export const CalculatorPage: React.FC = () => {
 
   return (
     <div className="animate-in fade-in duration-700 relative pb-2xl">
-      {/* Intro Section (only when no results) */}
+      {/* Intro Section (only when no results and form is empty) */}
       {!showResults && (
         <div className="space-y-lg mb-lg md:mb-2xl">
           <div className="p-md md:p-lg bg-clay/5 rounded-xl border border-clay/20 flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
@@ -148,8 +148,6 @@ export const CalculatorPage: React.FC = () => {
               </p>
             </div>
           </div>
-
-          <SampleDemo onLoadSample={handleLoadSample} />
         </div>
       )}
 
@@ -192,6 +190,7 @@ export const CalculatorPage: React.FC = () => {
           onAddVariantIngredient={addVariantIngredient}
           onRemoveVariantIngredient={removeVariantIngredient}
           onOpenPresets={() => setIsPresetsModalOpen(true)}
+          onLoadSample={handleLoadSample}
         />
       </div>
 
