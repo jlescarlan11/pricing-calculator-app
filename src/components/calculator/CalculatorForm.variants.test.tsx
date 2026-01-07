@@ -72,7 +72,7 @@ describe('CalculatorForm Variants', () => {
     render(<TestWrapper onCalculate={mockOnCalculate} />);
 
     // Initially OFF
-    const toggle = screen.getByLabelText(/Enable Variants/i);
+    const toggle = screen.getByLabelText(/Variants/i);
     expect(toggle).not.toBeChecked();
 
     // Check Single Mode UI exists (Pricing Strategy section)

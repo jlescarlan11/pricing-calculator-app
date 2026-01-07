@@ -23,7 +23,7 @@ describe('OverheadCost', () => {
 
   it('shows warning when value is zero', () => {
     render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
-    expect(screen.getByText(/Zero overhead\? This is rare but possible/i)).toBeInTheDocument();
+    expect(screen.getByText(/Zero overhead\? Rare but possible/i)).toBeInTheDocument();
   });
 
   it('toggles helper section', () => {

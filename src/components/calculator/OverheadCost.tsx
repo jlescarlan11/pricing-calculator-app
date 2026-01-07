@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calculator, ChevronDown, ChevronUp, HelpCircle, AlertCircle } from 'lucide-react';
-import { Input, Button, Tooltip, Card, Badge } from '../shared';
+import { Input, Button, Tooltip, Badge } from '../shared';
 import { OverheadCalculator } from '../help';
 
 interface OverheadCostProps {
@@ -50,9 +50,9 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
   };
 
   return (
-    <Card>
-      <div className="space-y-xl">
-        <div className="flex items-center justify-between">
+    <div className="space-y-xl">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-xs">
           <div className="flex items-center gap-sm">
             <h3 className="text-lg font-bold text-ink-900 leading-tight">
               {label || 'Overhead Cost'}
@@ -84,51 +84,52 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
               </button>
             </Tooltip>
           </div>
-          <div className="hidden md:block">
-            <HelperButton 
-              isOpen={isHelperOpen} 
-              onClick={() => setIsHelperOpen(!isHelperOpen)} 
-            />
-          </div>
+          <p className="text-xs text-ink-500">Rent, utilities, and packaging costs.</p>
         </div>
-
-        <div className="space-y-sm">
-          <Input
-            label={label ? `Total ${label} per Batch` : 'Total Overhead Cost per Batch'}
-            type="number"
-            value={value === 0 ? '' : value}
-            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-            currency
-            placeholder="0.00"
-            error={error}
-            min={0}
-            step="0.01"
+        <div className="hidden md:block">
+          <HelperButton 
+            isOpen={isHelperOpen} 
+            onClick={() => setIsHelperOpen(!isHelperOpen)} 
           />
-          {value === 0 && (
-            <div className="flex items-center gap-sm mt-sm">
-              <Badge
-                variant="warning"
-                className="flex items-center gap-xs text-[10px] py-xs px-sm uppercase tracking-wide"
-              >
-                <AlertCircle className="w-3.5 h-3.5" />
-                Zero overhead? This is rare but possible.
-              </Badge>
-            </div>
-          )}
-          <div className="flex justify-end md:hidden">
-            <HelperButton 
-              isOpen={isHelperOpen} 
-              onClick={() => setIsHelperOpen(!isHelperOpen)} 
-            />
-          </div>
         </div>
+      </div>
 
-        {isHelperOpen && (
-          <div className="-mx-xl -mb-xl border-t border-border-subtle bg-surface-hover animate-in fade-in slide-in-from-top-2 duration-500">
-            <OverheadCalculator onApply={handleApplyOverhead} initialBatchSize={batchSize} />
+      <div className="space-y-sm">
+        <Input
+          label={label ? `Total ${label} per Batch` : 'Total Overhead Cost per Batch'}
+          type="number"
+          value={value === 0 ? '' : value}
+          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          currency
+          placeholder="0.00"
+          error={error}
+          min={0}
+          step="0.01"
+        />
+        {value === 0 && (
+          <div className="flex items-center gap-sm mt-sm">
+            <Badge
+              variant="warning"
+              className="flex items-center gap-xs text-[10px] py-xs px-sm uppercase tracking-wide"
+            >
+              <AlertCircle className="w-3.5 h-3.5" />
+              Zero overhead? Rare but possible.
+            </Badge>
           </div>
         )}
+        <div className="flex justify-end md:hidden">
+          <HelperButton 
+            isOpen={isHelperOpen} 
+            onClick={() => setIsHelperOpen(!isHelperOpen)} 
+          />
+        </div>
       </div>
-    </Card>
+
+      {isHelperOpen && (
+        <div className="-mx-lg md:-mx-xl -mb-lg md:-mb-xl border-t border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
+          <OverheadCalculator onApply={handleApplyOverhead} initialBatchSize={batchSize} />
+        </div>
+      )}
+    </div>
   );
 };
