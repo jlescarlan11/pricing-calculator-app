@@ -42,12 +42,19 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
     
+    // Create ResizeObserver to detect content size changes (e.g. accordion expansion)
+    const resizeObserver = new ResizeObserver(() => {
+      handleScroll();
+    });
+    resizeObserver.observe(document.body);
+    
     // Initial check
     handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
+      resizeObserver.disconnect();
     };
   }, []);
 
