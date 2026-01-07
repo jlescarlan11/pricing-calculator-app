@@ -397,16 +397,21 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           summary={input.hasVariants ? `${input.variants?.length || 0} Variants` : 'Disabled'}
         >
           <div className="space-y-lg">
-             <div className="flex items-center justify-between bg-surface p-md rounded-lg border border-border-subtle">
-                <div>
-                  <h4 className="font-medium text-ink-900">Enable Variants</h4>
-                  <p className="text-sm text-ink-500">Create product variations (sizes, flavors) from this base recipe</p>
+             <div className="flex items-center justify-between bg-surface-hover/30 px-lg py-md rounded-xl border border-border-subtle min-h-[56px] transition-colors hover:bg-surface-hover/50">
+                <div className="flex flex-col gap-0.5">
+                  <h4 id="variants-toggle-label" className="font-medium text-ink-900">Variants</h4>
+                  <p className="text-sm text-ink-500 leading-tight">
+                    Create product variations from this base recipe
+                  </p>
                 </div>
-                <Switch
-                  checked={!!input.hasVariants}
-                  onChange={onSetHasVariants}
-                  label="Enable Variants"
-                />
+                <div className="flex items-center">
+                  <Switch
+                    checked={!!input.hasVariants}
+                    onChange={onSetHasVariants}
+                    aria-labelledby="variants-toggle-label"
+                    className="p-3 -mr-3"
+                  />
+                </div>
              </div>
 
              {errors.variants && (
