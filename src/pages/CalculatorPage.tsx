@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Info, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { CalculatorForm } from '../components/calculator';
 import { ResultsDisplay, StickySummary } from '../components/results';
 import { PresetsList } from '../components/presets';
@@ -139,18 +139,15 @@ export const CalculatorPage: React.FC = () => {
         {/* Intro Section (only when no results and form is empty) */}
         {!showResults && (
           <div className="space-y-lg mb-lg md:mb-2xl">
-            <div className="p-md md:p-lg bg-clay/5 rounded-xl border border-clay/20 flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
-              <Info className="w-5 h-5 md:w-6 md:h-6 text-clay shrink-0 mt-0.5" />
-              <div>
-                <p className="text-ink-900 font-medium mb-xs text-sm md:text-base">
-                  Welcome to your profit partner.
-                </p>
-                <p className="text-ink-700 text-xs md:text-sm leading-relaxed">
-                  Fill in your costs below. We&apos;ll help you find the perfect price to ensure
-                  your business grows sustainably. Don&apos;t forget to include your labor—your time
-                  is valuable.
-                </p>
-              </div>
+            <div className="p-md md:p-lg bg-clay/5 rounded-xl border border-clay/20 animate-in fade-in slide-in-from-top-4 duration-700">
+              <p className="text-ink-900 font-medium mb-xs text-sm md:text-base">
+                Welcome to your profit partner.
+              </p>
+              <p className="text-ink-700 text-xs md:text-sm leading-relaxed">
+                Fill in your costs below. We&apos;ll help you find the perfect price to ensure your
+                business grows sustainably. Don&apos;t forget to include your labor—your time is
+                valuable.
+              </p>
             </div>
           </div>
         )}

@@ -27,12 +27,12 @@ export const DangerZone: React.FC = () => {
   if (presets.length === 0) return null;
 
   return (
-    <div className="border border-rust/20 rounded-xl p-xl bg-rust/5">
+    <div className="border-2 border-rust rounded-xl p-xl bg-[#fef2f2]">
       <h3 className="text-lg font-medium text-rust mb-sm flex items-center gap-sm">
         <AlertTriangle className="w-5 h-5" />
         Danger Zone
       </h3>
-      <p className="text-ink-700 mb-lg">Irreversible actions. Please proceed with caution.</p>
+      <p className="text-ink-700 mb-xl">Irreversible actions. Please proceed with caution.</p>
 
       <Button variant="danger" onClick={() => setIsModalOpen(true)}>
         <Trash2 className="w-4 h-4 mr-2" />

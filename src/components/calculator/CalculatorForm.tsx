@@ -172,22 +172,23 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             <Button
               variant="ghost"
               onClick={onOpenPresets}
-              className="flex-1 md:flex-none h-9 px-3 text-ink-700 hover:text-clay hover:bg-clay/5 min-w-0"
+              className="flex-1 md:flex-none h-auto py-1 md:h-9 md:py-0 px-1 md:px-3 text-ink-700 hover:text-clay hover:bg-clay/5 min-w-0 flex flex-col md:flex-row gap-0.5 md:gap-2 items-center justify-center"
               title="Saved Products"
             >
               <Package className="w-4 h-4 shrink-0" />
-              <span className="ml-2 truncate">Presets</span>
+              <span className="text-[10px] md:text-sm font-medium md:font-normal leading-none md:leading-normal truncate w-full md:w-auto text-center">Presets</span>
             </Button>
 
             <div className="h-4 w-px bg-border-subtle shrink-0" />
 
-            <div className="flex-1 md:flex-none flex justify-center min-w-0 [&>button]:h-9 [&>button]:px-3 [&>button]:text-ink-700 [&>button:hover]:text-clay [&>button:hover]:bg-clay/5 [&>button]:w-full [&>button]:md:w-auto [&>button]:min-w-0">
+            <div className="flex-1 md:flex-none flex justify-center min-w-0 [&>button]:h-auto [&>button]:py-1 [&>button]:md:h-9 [&>button]:md:py-0 [&>button]:px-1 [&>button]:md:px-3 [&>button]:text-ink-700 [&>button:hover]:text-clay [&>button:hover]:bg-clay/5 [&>button]:w-full [&>button]:md:w-auto [&>button]:min-w-0">
               <SavePresetButton
                 input={input}
                 config={config}
                 disabled={!isFormValid}
                 variant="ghost"
                 className="w-full justify-center"
+                mobileLabelLayout="vertical"
               />
             </div>
 
@@ -196,11 +197,11 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             <Button
               variant="ghost"
               onClick={onReset}
-              className="flex-1 md:flex-none h-9 px-3 text-ink-700 hover:text-rust hover:bg-rust/5 min-w-0"
+              className="flex-1 md:flex-none h-auto py-1 md:h-9 md:py-0 px-1 md:px-3 text-ink-700 hover:text-rust hover:bg-rust/5 min-w-0 flex flex-col md:flex-row gap-0.5 md:gap-2 items-center justify-center"
               title="Reset Form"
             >
               <RefreshCcw className="w-4 h-4 shrink-0" />
-              <span className="ml-2 truncate">Reset</span>
+              <span className="text-[10px] md:text-sm font-medium md:font-normal leading-none md:leading-normal truncate w-full md:w-auto text-center">Reset</span>
             </Button>
           </div>
         </div>

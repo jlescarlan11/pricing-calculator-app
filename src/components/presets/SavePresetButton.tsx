@@ -30,6 +30,14 @@ interface SavePresetButtonProps {
    * Button size
    */
   size?: ButtonSize;
+  /**
+   * Layout behavior on mobile screens.
+   * - 'default': Standard row layout (Icon + Text)
+   * - 'hidden': Text hidden (Icon only)
+   * - 'vertical': Vertical stack (Icon top, Text bottom, small)
+   * @default 'default'
+   */
+  mobileLabelLayout?: 'default' | 'hidden' | 'vertical';
 }
 
 /**
@@ -43,6 +51,7 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
   className = '',
   variant = 'secondary',
   size = 'md',
+  mobileLabelLayout = 'default',
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -60,6 +69,16 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
     ? 'Please complete the details above to save your progress.'
     : 'Keep this calculation for your future records.';
 
+  const containerClasses = mobileLabelLayout === 'vertical'
+    ? 'flex-col md:flex-row gap-0.5 md:gap-sm h-auto py-1 md:h-9 md:py-0 px-2 md:px-3'
+    : 'flex-row gap-sm';
+
+  const labelClasses = mobileLabelLayout === 'hidden'
+    ? 'hidden sm:inline'
+    : mobileLabelLayout === 'vertical'
+      ? 'text-[10px] md:text-sm leading-none md:leading-normal font-medium md:font-normal'
+      : '';
+
   return (
     <>
       <Tooltip content={tooltipContent} position="top">
@@ -68,12 +87,12 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
           size={size}
           onClick={handleOpenModal}
           disabled={disabled}
-          className={`flex items-center gap-sm ${className}`}
+          className={`flex items-center ${containerClasses} ${className}`}
           type="button"
           aria-label="Save current calculation as preset"
         >
           <Save className="w-4 h-4" />
-          <span>Save</span>
+          <span className={labelClasses}>Save</span>
         </Button>
       </Tooltip>
 

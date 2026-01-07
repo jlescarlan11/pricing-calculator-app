@@ -97,7 +97,7 @@ export const FAQ: React.FC = () => {
       className="w-full max-w-2xl mx-auto border-border-subtle shadow-none"
     >
       <div className="space-y-xl">
-        <div className="relative">
+        <div className="relative [&_input]:pr-14">
           <Input
             label="Search Knowledge"
             placeholder="Search for questions or keywords..."

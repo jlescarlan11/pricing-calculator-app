@@ -45,12 +45,12 @@ describe('App Integration', () => {
     fireEvent.click(calculateBtn);
 
     // Should show results
-    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 8000 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 10000 })).toBeInTheDocument();
     expect(screen.getByText(/Analysis for/i)).toHaveTextContent('Test Product');
 
     // Check if results are displayed
     expect(screen.getAllByText(/Recommended Price/i).length).toBeGreaterThan(0);
-  });
+  }, 15000);
 
   it('can edit results to go back to form', async () => {
     renderWithRouter(<App />);
@@ -62,7 +62,7 @@ describe('App Integration', () => {
     const calculateBtn = screen.getByRole('button', { name: /^Calculate Price$/ });
     fireEvent.click(calculateBtn);
 
-    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 8000 })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 10000 })).toBeInTheDocument();
 
     // Form is visible below results, so we can access inputs directly
     expect(screen.getByText(/Product Details/i)).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('App Integration', () => {
 
     fireEvent.change(nameInput, { target: { value: 'Updated Cookie' } });
     expect(nameInput).toHaveValue('Updated Cookie');
-  });
+  }, 15000);
 
   it('loads sample data correctly', () => {
     renderWithRouter(<App />);

@@ -21,7 +21,7 @@ export const ExportButton: React.FC = () => {
 
   return (
     <Button
-      variant="secondary"
+      variant="primary"
       onClick={handleExport}
       disabled={presets.length === 0}
       className="w-full sm:w-auto"
