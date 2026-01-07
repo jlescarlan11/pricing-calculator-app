@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Calculator, ChevronDown, ChevronUp, HelpCircle, AlertCircle } from 'lucide-react';
-import { Input, Button, Tooltip, Badge } from '../shared';
+import { Calculator, HelpCircle, AlertCircle, Info } from 'lucide-react';
+import { Input, Button, Badge, Modal } from '../shared';
 import { OverheadCalculator } from '../help';
 
 interface OverheadCostProps {
@@ -11,30 +11,6 @@ interface OverheadCostProps {
   label?: string;
 }
 
-interface HelperButtonProps {
-  isOpen: boolean;
-  onClick: () => void;
-  className?: string;
-}
-
-const HelperButton: React.FC<HelperButtonProps> = ({ isOpen, onClick, className = '' }) => (
-  <Button
-    variant="ghost"
-    onClick={onClick}
-    className={`text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto ${className}`}
-  >
-    <Calculator className="w-4 h-4 mr-sm shrink-0" />
-    <span className="whitespace-nowrap">
-      {isOpen ? 'Hide Helper' : 'Open Helper'}
-    </span>
-    {isOpen ? (
-      <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
-    ) : (
-      <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
-    )}
-  </Button>
-);
-
 export const OverheadCost: React.FC<OverheadCostProps> = ({
   value,
   batchSize,
@@ -42,61 +18,50 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
   error,
   label,
 }) => {
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isHelperOpen, setIsHelperOpen] = useState(false);
 
   const handleApplyOverhead = (calculatedTotal: number) => {
     onChange(calculatedTotal);
-    setIsHelperOpen(false);
+    setIsCalculatorOpen(false);
   };
 
   return (
-    <div className="space-y-xl">
+    <div className="space-y-lg">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-xs">
           <div className="flex items-center gap-sm">
             <h3 className="text-lg font-bold text-ink-900 leading-tight">
               {label || 'Overhead Cost'}
             </h3>
-            <Tooltip
-              content={
-                <div className="space-y-sm p-xs">
-                  <p className="font-medium text-ink-900">
-                    Overhead includes all indirect costs of running your business.
-                  </p>
-                  <p className="text-xs font-semibold text-ink-700 uppercase tracking-wider">
-                    Examples:
-                  </p>
-                  <ul className="text-xs list-disc pl-md space-y-xs text-ink-600">
-                    <li>Rent and Utilities (divided by batches)</li>
-                    <li>Packaging (pouches, jars, labels)</li>
-                    <li>Marketing (ads, flyers)</li>
-                    <li>Equipment maintenance</li>
-                  </ul>
-                </div>
-              }
-            >
-              <button
-                type="button"
-                className="text-ink-500 hover:text-clay cursor-help transition-colors shrink-0"
-                aria-label="More info about overhead cost"
-              >
-                <HelpCircle className="w-4 h-4" />
-              </button>
-            </Tooltip>
           </div>
-          <p className="text-xs text-ink-500">Rent, utilities, and packaging costs.</p>
+          <p className="text-xs text-ink-500">Rent, utilities, and packaging</p>
         </div>
-        <div className="hidden md:block">
-          <HelperButton 
-            isOpen={isHelperOpen} 
-            onClick={() => setIsHelperOpen(!isHelperOpen)} 
-          />
+        <div className="flex items-center gap-xs">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsHelperOpen(true)}
+            className="text-ink-400 hover:text-clay hover:bg-clay/5 p-xs h-auto"
+            title="Overhead Guide"
+          >
+            <HelpCircle className="w-4.5 h-4.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsCalculatorOpen(true)}
+            className="text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto flex items-center gap-sm"
+          >
+            <Calculator className="w-4 h-4 shrink-0" />
+            <span className="hidden sm:inline">Calculator</span>
+          </Button>
         </div>
       </div>
 
       <div className="space-y-sm">
         <Input
-          label={label ? `Total ${label} per Batch` : 'Total Overhead Cost per Batch'}
+          label={label ? `Total ${label}` : 'Total Overhead Cost'}
           type="number"
           value={value === 0 ? '' : value}
           onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
@@ -117,19 +82,76 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
             </Badge>
           </div>
         )}
-        <div className="flex justify-end md:hidden">
-          <HelperButton 
-            isOpen={isHelperOpen} 
-            onClick={() => setIsHelperOpen(!isHelperOpen)} 
-          />
-        </div>
       </div>
 
-      {isHelperOpen && (
-        <div className="-mx-lg md:-mx-xl -mb-lg md:-mb-xl border-t border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
+      {/* Helper Modal */}
+      <Modal
+        isOpen={isHelperOpen}
+        onClose={() => setIsHelperOpen(false)}
+        title="Overhead Cost Guide"
+        maxWidth="max-w-[500px]"
+      >
+        <div className="space-y-xl py-md">
+          <div className="flex gap-lg items-start">
+             <div className="w-10 h-10 rounded-full bg-clay/10 flex items-center justify-center shrink-0">
+                <Info className="w-6 h-6 text-clay" />
+             </div>
+             <div className="space-y-md">
+                <p className="text-ink-700 leading-relaxed">
+                  Overhead includes all indirect costs of running your business. These are bills you pay regardless of how many units you sell.
+                </p>
+                
+                <div className="space-y-lg">
+                  <div className="space-y-xs">
+                    <h5 className="font-bold text-ink-900 flex items-center gap-xs">
+                      Examples of Fixed Costs:
+                    </h5>
+                    <ul className="text-sm list-disc pl-md space-y-xs text-ink-600">
+                      <li>Rent for your workspace</li>
+                      <li>Electricity, water, and internet</li>
+                      <li>Marketing and advertisement fees</li>
+                      <li>Equipment maintenance and repairs</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-xs">
+                    <h5 className="font-bold text-ink-900 flex items-center gap-xs">
+                      Packaging & Supplies:
+                    </h5>
+                    <p className="text-sm text-ink-600">
+                      Don&apos;t forget individual packaging costs like boxes, jars, labels, and pouches which are often overlooked.
+                    </p>
+                  </div>
+                </div>
+             </div>
+          </div>
+          
+          <div className="bg-surface p-lg rounded-xl border border-border-subtle">
+             <p className="text-sm font-bold text-ink-900 mb-xs">Pro Tip:</p>
+             <p className="text-sm text-ink-600 italic">
+               &quot;Divide your monthly bills by the average number of batches you make to find the fair overhead share for each batch.&quot;
+             </p>
+          </div>
+
+          <div className="flex justify-end pt-md">
+            <Button variant="primary" onClick={() => setIsHelperOpen(false)}>
+              Got it
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Calculator Modal */}
+      <Modal
+        isOpen={isCalculatorOpen}
+        onClose={() => setIsCalculatorOpen(false)}
+        title="Overhead Calculator"
+        maxWidth="max-w-[600px]"
+      >
+        <div className="-mx-lg md:-mx-xl -mb-lg md:-mb-xl">
           <OverheadCalculator onApply={handleApplyOverhead} initialBatchSize={batchSize} />
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

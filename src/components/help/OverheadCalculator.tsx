@@ -53,13 +53,9 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
   ]);
 
   return (
-    <div className="space-y-xl p-xl">
+    <div className="space-y-xl py-md">
       {/* Header with Guide Button */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col">
-          <h4 className="text-sm font-bold text-ink-900">Overhead Breakdown</h4>
-          <p className="text-xs text-ink-500">Calculate indirect costs for this batch</p>
-        </div>
+      <div className="flex items-center justify-end">
         <Button
           variant="ghost"
           size="sm"
@@ -262,7 +258,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
           <div className="bg-surface p-lg rounded-xl border border-border-subtle">
              <p className="text-sm font-bold text-ink-900 mb-xs">Pro Tip:</p>
              <p className="text-sm text-ink-600 italic">
-               "Even if you work from home, try to allocate a small percentage of your electricity and water bills to your business to ensure your prices cover your true costs."
+               &quot;Even if you work from home, try to allocate a small percentage of your electricity and water bills to your business to ensure your prices cover your true costs.&quot;
              </p>
           </div>
 

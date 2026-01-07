@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Calculator, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
-import { Input, Button, Tooltip } from '../shared';
+import { Calculator, HelpCircle, Info } from 'lucide-react';
+import { Input, Button, Modal } from '../shared';
 
 interface LaborCostProps {
   value: number;
@@ -9,32 +9,9 @@ interface LaborCostProps {
   label?: string;
 }
 
-interface HelperButtonProps {
-  isOpen: boolean;
-  onClick: () => void;
-  className?: string;
-}
-
-const HelperButton: React.FC<HelperButtonProps> = ({ isOpen, onClick, className = '' }) => (
-  <Button
-    variant="ghost"
-    onClick={onClick}
-    className={`text-clay hover:text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto ${className}`}
-  >
-    <Calculator className="w-4 h-4 mr-sm shrink-0" />
-    <span className="whitespace-nowrap">
-      {isOpen ? 'Hide Calculator' : 'Open Calculator'}
-    </span>
-    {isOpen ? (
-      <ChevronUp className="w-4 h-4 ml-xs shrink-0" />
-    ) : (
-      <ChevronDown className="w-4 h-4 ml-xs shrink-0" />
-    )}
-  </Button>
-);
-
 export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, label }) => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [isHelperOpen, setIsHelperOpen] = useState(false);
   const [hours, setHours] = useState<string>('');
   const [rate, setRate] = useState<string>('');
 
@@ -43,36 +20,42 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
     const r = parseFloat(rate);
     if (!isNaN(h) && !isNaN(r)) {
       onChange(h * r);
+      setIsCalculatorOpen(false);
     }
   };
 
   const calculatedTotal = (parseFloat(hours) || 0) * (parseFloat(rate) || 0);
 
   return (
-    <div className="space-y-xl">
+    <div className="space-y-lg">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-xs">
           <div className="flex items-center gap-sm">
             <h3 className="text-lg font-bold text-ink-900 leading-tight">
               {label || 'Labor Cost'}
             </h3>
-            <Tooltip content="Total cost of labor for this batch. You can enter a fixed amount or use the calculator below.">
-              <button
-                type="button"
-                className="text-ink-500 hover:text-clay cursor-help transition-colors shrink-0"
-                aria-label="More info about labor cost"
-              >
-                <HelpCircle className="w-4 h-4" />
-              </button>
-            </Tooltip>
           </div>
-          <p className="text-xs text-ink-500">How much do you pay yourself or staff?</p>
+          <p className="text-xs text-ink-500">Pay yourself or your staff</p>
         </div>
-        <div className="hidden md:block">
-          <HelperButton 
-            isOpen={isCalculatorOpen} 
-            onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
-          />
+        <div className="flex items-center gap-xs">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsHelperOpen(true)}
+            className="text-ink-400 hover:text-clay hover:bg-clay/5 p-xs h-auto"
+            title="Labor Guide"
+          >
+            <HelpCircle className="w-4.5 h-4.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsCalculatorOpen(true)}
+            className="text-clay hover:bg-clay/10 py-xs px-md text-xs rounded-sm h-auto flex items-center gap-sm"
+          >
+            <Calculator className="w-4 h-4 shrink-0" />
+            <span className="hidden sm:inline">Calculator</span>
+          </Button>
         </div>
       </div>
 
@@ -88,26 +71,59 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
           min={0}
           step="0.01"
         />
-        <div className="flex justify-end md:hidden">
-          <HelperButton 
-            isOpen={isCalculatorOpen} 
-            onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
-          />
-        </div>
       </div>
 
-      {isCalculatorOpen && (
-        <div className="bg-white rounded-xl p-lg space-y-lg border border-border-subtle shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
-          <div className="space-y-sm text-sm text-ink-700">
-            <p className="font-medium text-ink-900">
-              Your time is valuable—include it in labor costs.
-            </p>
-            <p>Labor Cost = Time Spent × Hourly Rate</p>
-            <div className="bg-surface p-sm rounded-sm border border-border-subtle text-xs font-mono text-ink-500">
-              Example: 4 hours × ₱100/hour = ₱400
+      {/* Helper Modal */}
+      <Modal
+        isOpen={isHelperOpen}
+        onClose={() => setIsHelperOpen(false)}
+        title="Labor Cost Guide"
+        maxWidth="max-w-[450px]"
+      >
+        <div className="space-y-xl py-md">
+          <div className="flex gap-lg items-start">
+            <div className="w-10 h-10 rounded-full bg-clay/10 flex items-center justify-center shrink-0">
+              <Info className="w-6 h-6 text-clay" />
+            </div>
+            <div className="space-y-md">
+              <p className="text-ink-700 leading-relaxed">
+                Labor cost represents the value of time spent preparing this batch. Even if you are the only worker, you should pay yourself a fair hourly wage.
+              </p>
+              
+              <div className="space-y-lg">
+                <div className="space-y-xs">
+                  <h5 className="font-bold text-ink-900">Why calculate labor?</h5>
+                  <p className="text-sm text-ink-600">
+                    If you don&apos;t include labor, you&apos;re only covering your ingredients, not your effort. Proper labor pricing allows you to eventually hire staff.
+                  </p>
+                </div>
+                
+                <div className="space-y-xs">
+                  <h5 className="font-bold text-ink-900">How to calculate:</h5>
+                  <p className="text-sm text-ink-600 font-mono bg-surface p-sm rounded-md border border-border-subtle">
+                    Time Spent (hrs) × Hourly Rate = Labor Cost
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
+          
+          <div className="flex justify-end pt-md">
+            <Button variant="primary" onClick={() => setIsHelperOpen(false)}>
+              Got it
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
+      {/* Calculator Modal */}
+      <Modal
+        isOpen={isCalculatorOpen}
+        onClose={() => setIsCalculatorOpen(false)}
+        title="Labor Calculator"
+        maxWidth="max-w-[450px]"
+      >
+        <div className="space-y-xl py-md">
           <div className="grid grid-cols-2 gap-lg">
             <Input
               label="Hours Worked"
@@ -130,10 +146,12 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
             />
           </div>
 
-          <div className="flex items-center justify-between pt-lg border-t border-border-subtle">
-            <div className="text-sm">
-              <span className="text-ink-500 text-xs uppercase font-bold tracking-wider">Calculated</span>
-              <div className="font-bold text-ink-900 text-2xl tracking-tight">
+          <div className="bg-clay/5 rounded-xl p-lg border border-clay/20 space-y-md shadow-sm">
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-ink-500 uppercase tracking-wider">
+                Calculated Labor
+              </span>
+              <div className="font-bold text-clay text-3xl tracking-tight">
                 ₱
                 {calculatedTotal.toLocaleString('en-PH', {
                   minimumFractionDigits: 2,
@@ -141,17 +159,19 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
                 })}
               </div>
             </div>
-            <Button
-              variant="primary"
-              onClick={calculateAndApply}
-              disabled={!hours || !rate}
-              type="button"
-            >
-              Apply
-            </Button>
           </div>
+
+          <Button
+            variant="primary"
+            onClick={calculateAndApply}
+            disabled={!hours || !rate}
+            type="button"
+            className="w-full h-14 font-bold"
+          >
+            Apply to Labor Cost
+          </Button>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };
