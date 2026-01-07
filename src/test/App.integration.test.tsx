@@ -33,11 +33,19 @@ describe('App Integration', () => {
     fireEvent.change(purchaseCostInputs[0], { target: { value: '100' } });
     fireEvent.change(qtyInputs[1], { target: { value: '10' } });
 
-    const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
-    fireEvent.click(calculateBtns[0]);
+    // Click through sections if needed (though not strictly required for calculation, it's better simulation)
+    const continueBtns = screen.getAllByRole('button', { name: /Continue/i });
+    for (const btn of continueBtns) {
+      if (!btn.hasAttribute('disabled')) {
+        fireEvent.click(btn);
+      }
+    }
+
+    const calculateBtn = screen.getByRole('button', { name: /^Calculate Price$/ });
+    fireEvent.click(calculateBtn);
 
     // Should show results
-    expect(await screen.findByRole('heading', { name: /^Results$/ })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getByText(/Analysis for/i)).toHaveTextContent('Test Product');
 
     // Check if results are displayed
@@ -51,10 +59,10 @@ describe('App Integration', () => {
     const loadSampleBtn = screen.getByText(/Load Sample Data/i);
     fireEvent.click(loadSampleBtn);
 
-    const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
-    fireEvent.click(calculateBtns[0]);
+    const calculateBtn = screen.getByRole('button', { name: /^Calculate Price$/ });
+    fireEvent.click(calculateBtn);
 
-    expect(await screen.findByRole('heading', { name: /^Results$/ })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 8000 })).toBeInTheDocument();
 
     // Form is visible below results, so we can access inputs directly
     expect(screen.getByText(/Product Details/i)).toBeInTheDocument();

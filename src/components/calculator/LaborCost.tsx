@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, HelpCircle, Info } from 'lucide-react';
+import { Calculator, HelpCircle } from 'lucide-react';
 import { Input, Button, Modal } from '../shared';
 
 interface LaborCostProps {
@@ -81,29 +81,24 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
         maxWidth="max-w-[450px]"
       >
         <div className="space-y-xl py-md">
-          <div className="flex gap-lg items-start">
-            <div className="w-10 h-10 rounded-full bg-clay/10 flex items-center justify-center shrink-0">
-              <Info className="w-6 h-6 text-clay" />
-            </div>
-            <div className="space-y-md">
-              <p className="text-ink-700 leading-relaxed">
-                Labor cost represents the value of time spent preparing this batch. Even if you are the only worker, you should pay yourself a fair hourly wage.
-              </p>
+          <div className="space-y-md">
+            <p className="text-ink-700 leading-relaxed">
+              Labor cost represents the value of time spent preparing this batch. Even if you are the only worker, you should pay yourself a fair hourly wage.
+            </p>
+            
+            <div className="space-y-lg">
+              <div className="space-y-xs">
+                <h5 className="font-bold text-ink-900">Why calculate labor?</h5>
+                <p className="text-sm text-ink-600">
+                  If you don&apos;t include labor, you&apos;re only covering your ingredients, not your effort. Proper labor pricing allows you to eventually hire staff.
+                </p>
+              </div>
               
-              <div className="space-y-lg">
-                <div className="space-y-xs">
-                  <h5 className="font-bold text-ink-900">Why calculate labor?</h5>
-                  <p className="text-sm text-ink-600">
-                    If you don&apos;t include labor, you&apos;re only covering your ingredients, not your effort. Proper labor pricing allows you to eventually hire staff.
-                  </p>
-                </div>
-                
-                <div className="space-y-xs">
-                  <h5 className="font-bold text-ink-900">How to calculate:</h5>
-                  <p className="text-sm text-ink-600 font-mono bg-surface p-sm rounded-md border border-border-subtle">
-                    Time Spent (hrs) × Hourly Rate = Labor Cost
-                  </p>
-                </div>
+              <div className="space-y-xs">
+                <h5 className="font-bold text-ink-900">How to calculate:</h5>
+                <p className="text-sm text-ink-600 font-mono bg-surface p-sm rounded-md border border-border-subtle">
+                  Time Spent (hrs) × Hourly Rate = Labor Cost
+                </p>
               </div>
             </div>
           </div>

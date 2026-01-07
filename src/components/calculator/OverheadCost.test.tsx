@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OverheadCost } from './OverheadCost';
 
@@ -11,12 +11,12 @@ describe('OverheadCost', () => {
 
   it('renders with initial value', () => {
     render(<OverheadCost value={150} batchSize={10} onChange={mockOnChange} />);
-    expect(screen.getByLabelText(/Total Overhead Cost per Batch/i)).toHaveValue(150);
+    expect(screen.getByLabelText(/Total Overhead Cost/i)).toHaveValue(150);
   });
 
   it('calls onChange when input changes', () => {
     render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
-    const input = screen.getByLabelText(/Total Overhead Cost per Batch/i);
+    const input = screen.getByLabelText(/Total Overhead Cost/i);
     fireEvent.change(input, { target: { value: '250' } });
     expect(mockOnChange).toHaveBeenCalledWith(250);
   });
@@ -29,25 +29,42 @@ describe('OverheadCost', () => {
   it('toggles helper section', () => {
     render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
 
+    expect(screen.queryByText(/Overhead includes all indirect costs/i)).not.toBeInTheDocument();
+
+    const toggleBtn = screen.getByTitle(/Overhead Guide/i);
+    fireEvent.click(toggleBtn);
+
+    expect(screen.getByText(/Overhead includes all indirect costs/i)).toBeInTheDocument();
+
+    const closeBtn = screen.getByLabelText(/Close modal/i);
+    fireEvent.click(closeBtn);
+  });
+
+  it('toggles calculator modal', async () => {
+    render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
+
     expect(screen.queryByLabelText(/Monthly Rent/i)).not.toBeInTheDocument();
 
-    const toggleBtn = screen.getAllByRole('button', { name: /Helper/i })[0];
+    const toggleBtn = screen.getByRole('button', { name: /Calculator/i });
     fireEvent.click(toggleBtn);
 
     expect(screen.getByRole('spinbutton', { name: /Monthly Rent/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /Monthly Utilities/i })).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /Batches per Month/i })).toBeInTheDocument();
 
-    const hideBtn = screen.getAllByRole('button', { name: /Hide/i })[0];
-    fireEvent.click(hideBtn);
+    const closeBtn = screen.getByLabelText(/Close modal/i);
+    fireEvent.click(closeBtn);
 
-    expect(screen.queryByRole('spinbutton', { name: /Monthly Rent/i })).not.toBeInTheDocument();
+    // Wait for animation to finish and component to unmount
+    await waitFor(() => {
+      expect(screen.queryByRole('spinbutton', { name: /Monthly Rent/i })).not.toBeInTheDocument();
+    }, { timeout: 1000 });
   });
 
-  it('calculates total overhead correctly in helper', () => {
+  it('calculates total overhead correctly in calculator', () => {
     render(<OverheadCost value={0} batchSize={50} onChange={mockOnChange} />);
 
-    fireEvent.click(screen.getAllByRole('button', { name: /Helper/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Calculator/i }));
 
     // Use spinbutton role to target inputs specifically
     fireEvent.change(screen.getByRole('spinbutton', { name: /Monthly Rent/i }), {
@@ -71,7 +88,7 @@ describe('OverheadCost', () => {
   it('applies calculated value to overhead', () => {
     render(<OverheadCost value={0} batchSize={10} onChange={mockOnChange} />);
 
-    fireEvent.click(screen.getAllByRole('button', { name: /Helper/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Calculator/i }));
 
     fireEvent.change(screen.getByRole('spinbutton', { name: /Monthly Rent/i }), {
       target: { value: '200' },

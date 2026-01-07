@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, HelpCircle, AlertCircle, Info } from 'lucide-react';
+import { Calculator, HelpCircle, AlertCircle } from 'lucide-react';
 import { Input, Button, Badge, Modal } from '../shared';
 import { OverheadCalculator } from '../help';
 
@@ -92,38 +92,33 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
         maxWidth="max-w-[500px]"
       >
         <div className="space-y-xl py-md">
-          <div className="flex gap-lg items-start">
-             <div className="w-10 h-10 rounded-full bg-clay/10 flex items-center justify-center shrink-0">
-                <Info className="w-6 h-6 text-clay" />
-             </div>
-             <div className="space-y-md">
-                <p className="text-ink-700 leading-relaxed">
-                  Overhead includes all indirect costs of running your business. These are bills you pay regardless of how many units you sell.
-                </p>
-                
-                <div className="space-y-lg">
-                  <div className="space-y-xs">
-                    <h5 className="font-bold text-ink-900 flex items-center gap-xs">
-                      Examples of Fixed Costs:
-                    </h5>
-                    <ul className="text-sm list-disc pl-md space-y-xs text-ink-600">
-                      <li>Rent for your workspace</li>
-                      <li>Electricity, water, and internet</li>
-                      <li>Marketing and advertisement fees</li>
-                      <li>Equipment maintenance and repairs</li>
-                    </ul>
-                  </div>
+          <div className="space-y-md">
+            <p className="text-ink-700 leading-relaxed">
+              Overhead includes all indirect costs of running your business. These are bills you pay regardless of how many units you sell.
+            </p>
+            
+            <div className="space-y-lg">
+              <div className="space-y-xs">
+                <h5 className="font-bold text-ink-900 flex items-center gap-xs">
+                  Examples of Fixed Costs:
+                </h5>
+                <ul className="text-sm list-disc pl-md space-y-xs text-ink-600">
+                  <li>Rent for your workspace</li>
+                  <li>Electricity, water, and internet</li>
+                  <li>Marketing and advertisement fees</li>
+                  <li>Equipment maintenance and repairs</li>
+                </ul>
+              </div>
 
-                  <div className="space-y-xs">
-                    <h5 className="font-bold text-ink-900 flex items-center gap-xs">
-                      Packaging & Supplies:
-                    </h5>
-                    <p className="text-sm text-ink-600">
-                      Don&apos;t forget individual packaging costs like boxes, jars, labels, and pouches which are often overlooked.
-                    </p>
-                  </div>
-                </div>
-             </div>
+              <div className="space-y-xs">
+                <h5 className="font-bold text-ink-900 flex items-center gap-xs">
+                  Packaging & Supplies:
+                </h5>
+                <p className="text-sm text-ink-600">
+                  Don&apos;t forget individual packaging costs like boxes, jars, labels, and pouches which are often overlooked.
+                </p>
+              </div>
+            </div>
           </div>
           
           <div className="bg-surface p-lg rounded-xl border border-border-subtle">
@@ -148,9 +143,7 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
         title="Overhead Calculator"
         maxWidth="max-w-[600px]"
       >
-        <div className="-mx-lg md:-mx-xl -mb-lg md:-mb-xl">
-          <OverheadCalculator onApply={handleApplyOverhead} initialBatchSize={batchSize} />
-        </div>
+        <OverheadCalculator onApply={handleApplyOverhead} initialBatchSize={batchSize} />
       </Modal>
     </div>
   );

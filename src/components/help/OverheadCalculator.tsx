@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Info, HelpCircle, BookOpen } from 'lucide-react';
-import { Input, Button, Tooltip, Modal } from '../shared';
+import { Input, Button } from '../shared';
 
 interface OverheadCalculatorProps {
   onApply: (total: number) => void;
@@ -8,8 +7,8 @@ interface OverheadCalculatorProps {
 }
 
 /**
- * OverheadCalculator provides a guided way for users to determine their
- * total overhead costs by breaking down monthly expenses and packaging.
+ * OverheadCalculator focuses on calculator inputs and results by breaking down
+ * monthly expenses and packaging costs.
  */
 export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
   onApply,
@@ -21,7 +20,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
   const [maintenance, setMaintenance] = useState<string>('');
   const [batchesPerMonth, setBatchesPerMonth] = useState<string>('');
   const [packagingPerUnit, setPackagingPerUnit] = useState<string>('');
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const calculation = useMemo(() => {
     const r = parseFloat(rent) || 0;
@@ -53,20 +51,7 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
   ]);
 
   return (
-    <div className="space-y-xl py-md">
-      {/* Header with Guide Button */}
-      <div className="flex items-center justify-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsGuideOpen(true)}
-          className="text-clay hover:bg-clay/5 h-8 px-3"
-        >
-          <BookOpen className="w-4 h-4 mr-2" />
-          Guide
-        </Button>
-      </div>
-
+    <div className="space-y-xl">
       <div className="flex flex-col gap-lg">
         {/* Section 1: Monthly Costs */}
         <div className="bg-white/50 rounded-xl p-lg border border-border-subtle/60 space-y-lg shadow-sm">
@@ -74,9 +59,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
              <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">
               1. Monthly Fixed Costs
             </p>
-            <Tooltip content="Fixed bills you pay regardless of how many units you sell.">
-               <HelpCircle className="w-3.5 h-3.5 text-ink-400" />
-            </Tooltip>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
@@ -87,7 +69,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setRent(e.target.value)}
               currency
               placeholder="0"
-              tooltip="Space rental for kitchen, storage, or storefront."
             />
             <Input
               label="Monthly Utilities"
@@ -96,7 +77,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setUtilities(e.target.value)}
               currency
               placeholder="0"
-              tooltip="Electricity, water, gas, and internet used for the business."
             />
             <Input
               label="Marketing"
@@ -105,7 +85,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setMarketing(e.target.value)}
               currency
               placeholder="0"
-              tooltip="Social media ads, flyers, or website fees."
             />
             <Input
               label="Maintenance"
@@ -114,7 +93,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setMaintenance(e.target.value)}
               currency
               placeholder="0"
-              tooltip="Equipment repairs or cleaning supplies."
             />
           </div>
           <div className="pt-sm">
@@ -124,7 +102,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               value={batchesPerMonth}
               onChange={(e) => setBatchesPerMonth(e.target.value)}
               placeholder="e.g. 20"
-              helperText="Determines how fixed costs are divided."
             />
           </div>
         </div>
@@ -135,9 +112,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">
               2. Packaging & Supplies
             </p>
-             <Tooltip content="Variable costs that depend on your batch size.">
-               <HelpCircle className="w-3.5 h-3.5 text-ink-400" />
-            </Tooltip>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
@@ -148,7 +122,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={(e) => setPackagingPerUnit(e.target.value)}
               currency
               placeholder="0.00"
-              helperText="Box, jar, label, etc."
             />
             <Input
               label="Current Batch Size"
@@ -157,7 +130,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               onChange={() => {}}
               disabled
               placeholder="e.g. 50"
-              helperText="From Product Details."
             />
           </div>
         </div>
@@ -204,71 +176,6 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
       >
         Apply to Overhead Cost
       </Button>
-
-      {/* Guide Modal */}
-      <Modal
-        isOpen={isGuideOpen}
-        onClose={() => setIsGuideOpen(false)}
-        title="How to calculate your overhead"
-      >
-        <div className="space-y-xl py-md">
-          <div className="flex gap-lg items-start">
-             <div className="w-10 h-10 rounded-full bg-clay/10 flex items-center justify-center shrink-0">
-                <Info className="w-6 h-6 text-clay" />
-             </div>
-             <div className="space-y-md">
-                <p className="text-ink-700 leading-relaxed">
-                  Overhead includes all indirect costs of running your business. This helper automatically allocates a portion of your monthly bills to this specific batch.
-                </p>
-                
-                <div className="space-y-lg">
-                  <div className="space-y-xs">
-                    <h5 className="font-bold text-ink-900 flex items-center gap-xs">
-                      <span className="w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] flex items-center justify-center">1</span>
-                      Sum Monthly Expenses
-                    </h5>
-                    <p className="text-sm text-ink-600 ml-7">
-                      Combine fixed costs like rent, utilities (electricity for ovens), marketing, and maintenance.
-                    </p>
-                  </div>
-
-                  <div className="space-y-xs">
-                    <h5 className="font-bold text-ink-900 flex items-center gap-xs">
-                      <span className="w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] flex items-center justify-center">2</span>
-                      Estimate Monthly Volume
-                    </h5>
-                    <p className="text-sm text-ink-600 ml-7">
-                      Determine how many batches you typically produce in a month to distribute these fixed costs fairly.
-                    </p>
-                  </div>
-
-                  <div className="space-y-xs">
-                    <h5 className="font-bold text-ink-900 flex items-center gap-xs">
-                      <span className="w-5 h-5 rounded-full bg-ink-900 text-white text-[10px] flex items-center justify-center">3</span>
-                      Identify Packaging per Item
-                    </h5>
-                    <p className="text-sm text-ink-600 ml-7">
-                      Enter the cost of individual packaging (boxes, jars, labels) for a single unit. This is multiplied by your batch size.
-                    </p>
-                  </div>
-                </div>
-             </div>
-          </div>
-          
-          <div className="bg-surface p-lg rounded-xl border border-border-subtle">
-             <p className="text-sm font-bold text-ink-900 mb-xs">Pro Tip:</p>
-             <p className="text-sm text-ink-600 italic">
-               &quot;Even if you work from home, try to allocate a small percentage of your electricity and water bills to your business to ensure your prices cover your true costs.&quot;
-             </p>
-          </div>
-
-          <div className="flex justify-end pt-md">
-            <Button variant="primary" onClick={() => setIsGuideOpen(false)}>
-              Got it
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };

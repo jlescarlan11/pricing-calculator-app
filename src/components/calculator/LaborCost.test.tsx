@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { LaborCost } from './LaborCost';
 
@@ -17,7 +17,7 @@ describe('LaborCost', () => {
     expect(mockOnChange).toHaveBeenCalledWith(500);
   });
 
-  it('toggles calculator section', () => {
+  it('toggles calculator section', async () => {
     render(<LaborCost value={0} onChange={mockOnChange} />);
 
     expect(screen.queryByLabelText(/Hours Worked/i)).not.toBeInTheDocument();
@@ -28,10 +28,12 @@ describe('LaborCost', () => {
     expect(screen.getByLabelText(/Hours Worked/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Hourly Rate/i)).toBeInTheDocument();
 
-    const hideBtn = screen.getAllByRole('button', { name: /Hide/i })[0];
-    fireEvent.click(hideBtn);
+    const closeBtn = screen.getByLabelText(/Close modal/i);
+    fireEvent.click(closeBtn);
 
-    expect(screen.queryByLabelText(/Hours Worked/i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText(/Hours Worked/i)).not.toBeInTheDocument();
+    });
   });
 
   it('calculates and displays total', () => {
