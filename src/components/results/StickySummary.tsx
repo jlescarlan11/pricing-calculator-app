@@ -11,7 +11,7 @@ interface StickySummaryProps {
   onScrollToResults: () => void;
   onCalculate: () => void;
   isCalculating: boolean;
-  isVisible: boolean; // Kept for interface compatibility, but we'll ignore it or use it for specific hide logic if needed.
+  isVisible: boolean;
 }
 
 export const StickySummary: React.FC<StickySummaryProps> = ({
@@ -21,13 +21,20 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
   onScrollToResults,
   onCalculate,
   isCalculating,
+  isVisible,
 }) => {
   const hasVariants = results?.variantResults && results.variantResults.length > 0;
+
+  const containerClasses = `fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-border-subtle pb-[env(safe-area-inset-bottom)] sm:hidden transition-opacity duration-300 ${
+    isVisible 
+      ? 'opacity-100 border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]' 
+      : 'opacity-0 pointer-events-none border-t-transparent shadow-none'
+  }`;
 
   // Placeholder content when no results exist
   if (!results) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-border-subtle pb-[env(safe-area-inset-bottom)] sm:hidden">
+      <div className={containerClasses}>
         <div className="p-md flex items-center justify-between gap-md">
           <div className="flex flex-col">
             <span className="text-sm font-bold text-ink-900">Ready?</span>
@@ -48,7 +55,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-border-subtle shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)] sm:hidden transition-transform duration-300">
+    <div className={containerClasses}>
       
       {/* Main Content Area */}
       <div className="flex items-center gap-md p-md h-[72px]">

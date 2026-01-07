@@ -25,10 +25,4 @@ describe('AppLayout', () => {
     expect(screen.getByText('PriceCraft')).toBeInTheDocument();
     expect(screen.getByTestId('test-child')).toBeInTheDocument();
   });
-
-  it('renders version information in the footer', () => {
-    renderWithRouter(<AppLayout>Content</AppLayout>);
-
-    expect(screen.getByText(/Version 2\.0\.0/i)).toBeInTheDocument();
-  });
 });

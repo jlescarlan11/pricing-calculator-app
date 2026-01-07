@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Info, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { CalculatorForm } from '../components/calculator';
 import { ResultsDisplay, StickySummary } from '../components/results';
 import { PresetsList } from '../components/presets';
@@ -46,9 +46,11 @@ export const CalculatorPage: React.FC = () => {
   // Handle sticky summary visibility
   useEffect(() => {
     const handleScroll = () => {
+      // Handle Visibility Logic
       // Case 1: Results exist (committed)
       if (showResults && resultsRef.current) {
         const resultsRect = resultsRef.current.getBoundingClientRect();
+        // Results are visible if their top is within viewport
         const isResultsVisible = resultsRect.top < window.innerHeight && resultsRect.bottom > 0;
         setShowStickySummary(!isResultsVisible);
         return;
@@ -63,10 +65,9 @@ export const CalculatorPage: React.FC = () => {
       setShowStickySummary(false);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    // Trigger once on mount/update to set initial state
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, [showResults, liveResult]);
 
@@ -133,14 +134,15 @@ export const CalculatorPage: React.FC = () => {
   );
 
   return (
-    <div className="animate-in fade-in duration-700 relative pb-2xl">
-      {/* Intro Section (only when no results and form is empty) */}
-      {!showResults && (
-        <div className="space-y-lg mb-lg md:mb-2xl">
-          <div className="p-md md:p-lg bg-clay/5 rounded-xl border border-clay/20 flex gap-md items-start animate-in fade-in slide-in-from-top-4 duration-700">
-            <Info className="w-5 h-5 md:w-6 md:h-6 text-clay shrink-0 mt-0.5" />
-            <div>
-              <p className="text-ink-900 font-medium mb-xs text-sm md:text-base">Welcome to your profit partner.</p>
+    <>
+      <div className="animate-in fade-in duration-700 relative">
+        {/* Intro Section (only when no results and form is empty) */}
+        {!showResults && (
+          <div className="space-y-lg mb-lg md:mb-2xl">
+            <div className="p-md md:p-lg bg-clay/5 rounded-xl border border-clay/20 animate-in fade-in slide-in-from-top-4 duration-700">
+              <p className="text-ink-900 font-medium mb-xs text-sm md:text-base">
+                Welcome to your profit partner.
+              </p>
               <p className="text-ink-700 text-xs md:text-sm leading-relaxed">
                 Fill in your costs below. We&apos;ll help you find the perfect price to ensure your
                 business grows sustainably. Don&apos;t forget to include your labor—your time is
@@ -148,50 +150,50 @@ export const CalculatorPage: React.FC = () => {
               </p>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Results Section (Top Priority) */}
-      {showResults && (
-        <div
-          ref={resultsRef}
-          className="mb-4xl animate-in fade-in slide-in-from-top-8 duration-700"
-        >
-          <ResultsDisplay
-            results={results}
+        {/* Results Section (Top Priority) */}
+        {showResults && (
+          <div
+            ref={resultsRef}
+            className="mb-4xl animate-in fade-in slide-in-from-top-8 duration-700"
+          >
+            <ResultsDisplay
+              results={results}
+              input={input}
+              config={config}
+              onEdit={handleScrollToForm}
+            />
+
+            <div className="h-px bg-border-subtle my-3xl" role="separator" />
+          </div>
+        )}
+
+        {/* Input Form Section (Secondary Priority) */}
+        <div ref={formRef} id="calculator-form" className="min-h-[600px]">
+          <CalculatorForm
             input={input}
             config={config}
-            onEdit={handleScrollToForm}
+            errors={errors}
+            isCalculating={isCalculating}
+            onUpdateInput={updateInput}
+            onUpdateIngredient={updateIngredient}
+            onAddIngredient={addIngredient}
+            onRemoveIngredient={removeIngredient}
+            onUpdateConfig={updateConfig}
+            onCalculate={handleCalculate}
+            onReset={handleReset}
+            onSetHasVariants={setHasVariants}
+            onAddVariant={addVariant}
+            onRemoveVariant={removeVariant}
+            onUpdateVariant={updateVariant}
+            onUpdateVariantIngredient={updateVariantIngredient}
+            onAddVariantIngredient={addVariantIngredient}
+            onRemoveVariantIngredient={removeVariantIngredient}
+            onOpenPresets={() => setIsPresetsModalOpen(true)}
+            onLoadSample={handleLoadSample}
           />
-
-          <div className="h-px bg-border-subtle my-3xl" role="separator" />
         </div>
-      )}
-
-      {/* Input Form Section (Secondary Priority) */}
-      <div ref={formRef} id="calculator-form" className="min-h-[600px]">
-        <CalculatorForm
-          input={input}
-          config={config}
-          errors={errors}
-          isCalculating={isCalculating}
-          onUpdateInput={updateInput}
-          onUpdateIngredient={updateIngredient}
-          onAddIngredient={addIngredient}
-          onRemoveIngredient={removeIngredient}
-          onUpdateConfig={updateConfig}
-          onCalculate={handleCalculate}
-          onReset={handleReset}
-          onSetHasVariants={setHasVariants}
-          onAddVariant={addVariant}
-          onRemoveVariant={removeVariant}
-          onUpdateVariant={updateVariant}
-          onUpdateVariantIngredient={updateVariantIngredient}
-          onAddVariantIngredient={addVariantIngredient}
-          onRemoveVariantIngredient={removeVariantIngredient}
-          onOpenPresets={() => setIsPresetsModalOpen(true)}
-          onLoadSample={handleLoadSample}
-        />
       </div>
 
       <StickySummary
@@ -220,6 +222,6 @@ export const CalculatorPage: React.FC = () => {
           <PresetsList onLoad={handleLoadPreset} onEdit={handleEditPreset} />
         </div>
       </Modal>
-    </div>
+    </>
   );
 };

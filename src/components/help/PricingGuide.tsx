@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, X, Info, TrendingUp, BarChart3, ArrowRight } from 'lucide-react';
+import { Check, X, TrendingUp, BarChart3, ArrowRight } from 'lucide-react';
 import { Button } from '../shared/Button';
 import { Badge } from '../shared/Badge';
 
@@ -92,7 +92,6 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
             {/* When to use */}
             <section>
               <h4 className="font-bold text-ink-900 mb-md flex items-center gap-sm tracking-tight">
-                <Info className="h-4 w-4 text-clay" />
                 Use this when:
               </h4>
               <ul className="space-y-sm text-sm text-ink-700 font-medium">
@@ -179,7 +178,6 @@ export const PricingGuide: React.FC<PricingGuideProps> = ({
             {/* When to use */}
             <section>
               <h4 className="font-bold text-ink-900 mb-md flex items-center gap-sm tracking-tight">
-                <Info className="h-4 w-4 text-moss" />
                 Use this when:
               </h4>
               <ul className="space-y-sm text-sm text-ink-700 font-medium">
