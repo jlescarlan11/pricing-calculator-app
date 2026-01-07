@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import type { Preset } from '../types';
+import type { Preset, Competitor } from '../types';
 
 const STORAGE_KEY = 'pricing_calculator_presets';
 const SYNC_QUEUE_KEY = 'pricing_calculator_sync_queue';
@@ -18,6 +18,7 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
 
   const baseRecipe = preset.baseRecipe as Record<string, unknown> | undefined;
   const pricingConfig = preset.pricingConfig as Record<string, unknown> | undefined;
+  const snapshotMetadata = preset.snapshotMetadata;
 
   return {
     id: preset.id,
@@ -45,6 +46,14 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
     createdAt: preset.createdAt || new Date().toISOString(),
     updatedAt: preset.updatedAt || new Date().toISOString(),
     lastSyncedAt: preset.lastSyncedAt,
+    snapshotMetadata: snapshotMetadata
+      ? {
+          snapshotDate: snapshotMetadata.snapshotDate,
+          isTrackedVersion: snapshotMetadata.isTrackedVersion,
+          versionNumber: snapshotMetadata.versionNumber,
+          parentPresetId: snapshotMetadata.parentPresetId,
+        }
+      : undefined,
   };
 }
 
@@ -107,6 +116,10 @@ function mapFromDb(row: {
   created_at: string;
   updated_at: string;
   last_synced_at?: string | null;
+  snapshot_date?: string | null;
+  is_tracked_version?: boolean | null;
+  version_number?: number | null;
+  parent_preset_id?: string | null;
 }): Preset {
   const preset = {
     id: row.id,
@@ -119,6 +132,15 @@ function mapFromDb(row: {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     lastSyncedAt: row.last_synced_at,
+    snapshotMetadata:
+      row.is_tracked_version && row.snapshot_date && row.version_number
+        ? {
+            snapshotDate: row.snapshot_date,
+            isTrackedVersion: row.is_tracked_version,
+            versionNumber: row.version_number,
+            parentPresetId: row.parent_preset_id || undefined,
+          }
+        : undefined,
   };
 
   return sanitizePreset(preset) as Preset;
@@ -137,6 +159,10 @@ function mapToDb(preset: Preset) {
     created_at: preset.createdAt,
     updated_at: preset.updatedAt,
     last_synced_at: new Date().toISOString(),
+    snapshot_date: preset.snapshotMetadata?.snapshotDate,
+    is_tracked_version: preset.snapshotMetadata?.isTrackedVersion ?? false,
+    version_number: preset.snapshotMetadata?.versionNumber,
+    parent_preset_id: preset.snapshotMetadata?.parentPresetId,
   };
 }
 
@@ -275,10 +301,6 @@ export const presetService = {
         if (error) throw error;
       } catch (e) {
         console.error('Delete all from cloud failed', e);
-        // We can't easily queue "delete all", but since local is cleared,
-        // next sync/fetch might be messy.
-        // ideally we should track "reset" action.
-        // For now, let's just log error.
         throw e;
       }
     }
@@ -322,10 +344,6 @@ export const presetService = {
         if (error) throw error;
       } catch (e) {
         console.error('Import sync to cloud failed', e);
-        // Queue individual saves as fallback?
-        // Or just let next sync handle it?
-        // Since we updated local, next sync check might miss them if we don't queue.
-        // Let's queue them to be safe.
         presetsToSync.forEach((p) => addToSyncQueue('save', p));
       }
     } else {
@@ -335,5 +353,183 @@ export const presetService = {
         addToSyncQueue('save', presetToSave);
       });
     }
+  },
+
+  async createSnapshot(presetId: string): Promise<Preset | null> {
+    // 1. Fetch Source Preset (Local first for speed, then cloud if missing?)
+    // Actually, we should probably just use what's local or fetch fresh.
+    // Let's rely on fetchPresets or local cache.
+    let presets = getLocalPresets();
+    let sourcePreset = presets.find((p) => p.id === presetId);
+
+    if (!sourcePreset) {
+      // Try fetching specific preset from cloud if not local?
+      // But for now, we assume user is working with loaded presets.
+      // Let's force a fetch if not found and online?
+      // Simpler: Just fail if not found locally, assuming UI keeps state.
+      console.warn('Source preset not found for snapshot:', presetId);
+      return null;
+    }
+
+    // 2. Determine Version Number
+    // Check local snapshots for max version
+    const localSnapshots = presets.filter(
+      (p) =>
+        p.snapshotMetadata?.parentPresetId === presetId && p.snapshotMetadata?.isTrackedVersion
+    );
+
+    let nextVersion = 1;
+    if (localSnapshots.length > 0) {
+      const maxLocal = Math.max(...localSnapshots.map((p) => p.snapshotMetadata!.versionNumber));
+      nextVersion = maxLocal + 1;
+    }
+
+    // If online, double check DB for higher version to avoid conflict
+    if (navigator.onLine && sourcePreset.userId) {
+      const { data } = await supabase
+        .from('presets')
+        .select('version_number')
+        .eq('parent_preset_id', presetId)
+        .order('version_number', { ascending: false })
+        .limit(1);
+
+      if (data && data.length > 0 && data[0].version_number) {
+        nextVersion = Math.max(nextVersion, data[0].version_number + 1);
+      }
+    }
+
+    // 3. Create Snapshot Object
+    const snapshotId = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    const snapshotPreset: Preset = {
+      ...structuredClone(sourcePreset),
+      id: snapshotId,
+      createdAt: now,
+      updatedAt: now,
+      lastSyncedAt: undefined, // Needs sync
+      snapshotMetadata: {
+        snapshotDate: now,
+        isTrackedVersion: true,
+        versionNumber: nextVersion,
+        parentPresetId: sourcePreset.id,
+      },
+    };
+
+    // 4. Save Snapshot
+    return await this.savePreset(snapshotPreset);
+  },
+
+  async getSnapshots(parentPresetId: string): Promise<Preset[]> {
+    // 1. Local
+    const localPresets = getLocalPresets();
+    const localSnapshots = localPresets
+      .filter(
+        (p) =>
+          p.snapshotMetadata?.parentPresetId === parentPresetId &&
+          p.snapshotMetadata?.isTrackedVersion
+      )
+      .sort((a, b) => (a.snapshotMetadata!.versionNumber - b.snapshotMetadata!.versionNumber));
+
+    // 2. Cloud (if online)
+    if (navigator.onLine) {
+      try {
+        const { data, error } = await supabase
+          .from('presets')
+          .select('*')
+          .eq('parent_preset_id', parentPresetId)
+          .eq('is_tracked_version', true)
+          .order('version_number', { ascending: true });
+
+        if (error) throw error;
+
+        if (data) {
+          const cloudSnapshots = data.map(mapFromDb);
+          // Merge logic? Or just return cloud as truth?
+          // Since snapshots are immutable (mostly), cloud is authoritative.
+          // But we should update local cache.
+          
+          // Let's merge into local storage to keep it fresh
+          const allPresets = getLocalPresets();
+          const mergedMap = new Map(allPresets.map(p => [p.id, p]));
+          
+          cloudSnapshots.forEach(s => mergedMap.set(s.id, s));
+          setLocalPresets(Array.from(mergedMap.values()));
+
+          return cloudSnapshots;
+        }
+      } catch (e) {
+        console.error('Error fetching snapshots', e);
+      }
+    }
+
+    return localSnapshots;
+  },
+
+  async getCompetitors(presetId: string): Promise<Competitor[]> {
+    if (!navigator.onLine) return [];
+
+    const { data, error } = await supabase
+      .from('competitors')
+      .select('*')
+      .eq('preset_id', presetId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching competitors', error);
+      return [];
+    }
+
+    return data.map((row) => ({
+      id: row.id,
+      presetId: row.preset_id,
+      competitorName: row.competitor_name,
+      competitorPrice: Number(row.competitor_price),
+      notes: row.notes,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+  },
+
+  async upsertCompetitor(
+    presetId: string,
+    data: Omit<Competitor, 'id' | 'presetId' | 'createdAt' | 'updatedAt'> & { id?: string }
+  ): Promise<Competitor | null> {
+    if (!navigator.onLine) {
+      throw new Error('Cannot manage competitors while offline');
+    }
+
+    const payload = {
+      preset_id: presetId,
+      competitor_name: data.competitorName,
+      competitor_price: data.competitorPrice,
+      notes: data.notes,
+      ...(data.id ? { id: data.id } : {}),
+    };
+
+    const { data: result, error } = await supabase
+      .from('competitors')
+      .upsert(payload)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.message.includes('Maximum of 5 competitors')) {
+        throw new Error('Maximum of 5 competitors allowed per preset.');
+      }
+      throw error;
+    }
+
+    if (!result) return null;
+
+    return {
+      id: result.id,
+      presetId: result.preset_id,
+      competitorName: result.competitor_name,
+      competitorPrice: Number(result.competitor_price),
+      notes: result.notes,
+      createdAt: result.created_at,
+      updatedAt: result.updated_at,
+    };
   },
 };
