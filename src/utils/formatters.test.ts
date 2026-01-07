@@ -5,6 +5,7 @@ import {
   formatDate,
   truncateText,
   formatNumber,
+  getMarginColor,
 } from './formatters';
 
 describe('formatters', () => {
@@ -103,6 +104,26 @@ describe('formatters', () => {
 
     it('handles zero', () => {
       expect(formatNumber(0)).toBe('0');
+    });
+  });
+
+  describe('getMarginColor', () => {
+    it('should return rust for margin < 15', () => {
+      expect(getMarginColor(10)).toBe('rust');
+      expect(getMarginColor(14.9)).toBe('rust');
+      expect(getMarginColor(-5)).toBe('rust');
+    });
+
+    it('should return clay for margin between 15 and 25', () => {
+      expect(getMarginColor(15)).toBe('clay');
+      expect(getMarginColor(20)).toBe('clay');
+      expect(getMarginColor(25)).toBe('clay');
+    });
+
+    it('should return moss for margin > 25', () => {
+      expect(getMarginColor(25.1)).toBe('moss');
+      expect(getMarginColor(30)).toBe('moss');
+      expect(getMarginColor(100)).toBe('moss');
     });
   });
 });

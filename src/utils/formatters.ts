@@ -92,3 +92,20 @@ export const formatNumber = (num: number, decimals: number = 0): string => {
     maximumFractionDigits: decimals,
   }).format(num);
 };
+
+/**
+ * Returns a color token name based on profit margin thresholds.
+ * 
+ * Thresholds:
+ * - Below 15%: 'rust' (Red)
+ * - 15% to 25%: 'clay' (Orange)
+ * - Above 25%: 'moss' (Green)
+ * 
+ * @param margin - The profit margin percentage.
+ * @returns The color token name.
+ */
+export const getMarginColor = (margin: number): string => {
+  if (margin < 15) return 'rust';
+  if (margin <= 25) return 'clay';
+  return 'moss';
+};

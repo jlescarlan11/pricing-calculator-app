@@ -2,7 +2,7 @@ import React from 'react';
 import { RefreshCw, Calculator, ChevronRight } from 'lucide-react';
 import { Button } from '../shared/Button';
 import type { CalculationResult } from '../../types/calculator';
-import { formatCurrency } from '../../utils/formatters';
+import { formatCurrency, getMarginColor } from '../../utils/formatters';
 
 interface StickySummaryProps {
   results: CalculationResult | null;
@@ -22,13 +22,6 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
   onCalculate,
   isCalculating,
 }) => {
-  // Determine margin health color
-  const getMarginColor = (margin: number) => {
-    if (margin < 15) return 'bg-rust';
-    if (margin <= 25) return 'bg-clay'; // Using clay for modest/warning to fit palette
-    return 'bg-moss';
-  };
-
   const hasVariants = results?.variantResults && results.variantResults.length > 0;
 
   // Placeholder content when no results exist
@@ -80,7 +73,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
                    {/* Mini Progress Bar for Variant */}
                    <div className="h-1 w-full bg-border-subtle rounded-full overflow-hidden mt-0.5">
                       <div 
-                        className={`h-full ${getMarginColor(vr.profitMarginPercent)}`} 
+                        className={`h-full bg-${getMarginColor(vr.profitMarginPercent)}`} 
                         style={{ width: `${Math.min(vr.profitMarginPercent, 100)}%` }}
                       />
                    </div>
@@ -111,7 +104,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
               {/* Progress Bar */}
               <div className="relative w-full h-1.5 bg-surface-hover rounded-full overflow-hidden">
                 <div 
-                  className={`absolute left-0 top-0 h-full transition-all duration-500 ${getMarginColor(results.profitMarginPercent)}`}
+                  className={`absolute left-0 top-0 h-full transition-all duration-500 bg-${getMarginColor(results.profitMarginPercent)}`}
                   style={{ width: `${Math.min(Math.max(results.profitMarginPercent, 0), 100)}%` }}
                 />
               </div>

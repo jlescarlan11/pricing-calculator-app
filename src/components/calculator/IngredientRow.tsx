@@ -9,6 +9,7 @@ import {
   calculateIngredientCostFromPurchase,
   UNIT_OPTIONS,
 } from '../../utils/calculations';
+import { triggerHapticFeedback } from '../../utils/haptics';
 import type { Ingredient } from '../../types/calculator';
 
 interface IngredientRowProps {
@@ -53,6 +54,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
       setShowDeleteModal(true);
     } else {
       setIsDeleting(true);
+      triggerHapticFeedback(50);
       // Wait for animation to finish before removing
       setTimeout(() => {
         onRemove(ingredient.id);
@@ -63,6 +65,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   const confirmDelete = () => {
     setIsDeleting(true);
     setShowDeleteModal(false);
+    triggerHapticFeedback(50);
     setTimeout(() => {
       onRemove(ingredient.id);
     }, 300);

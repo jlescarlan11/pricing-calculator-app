@@ -6,6 +6,7 @@ import { PresetsList } from '../components/presets';
 import { Modal, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
+import { triggerHapticFeedback } from '../utils/haptics';
 import type { Preset } from '../types';
 
 export const CalculatorPage: React.FC = () => {
@@ -72,6 +73,7 @@ export const CalculatorPage: React.FC = () => {
   const handleCalculate = async () => {
     const res = await calculate();
     if (res) {
+      triggerHapticFeedback(50);
       addToast('✓ Calculation complete', 'success');
       // Scroll to results at the top
       window.scrollTo({ top: 0, behavior: 'smooth' });

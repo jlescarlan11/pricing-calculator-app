@@ -3,7 +3,7 @@ import { CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
 import { Badge } from '../shared/Badge';
 import type { BadgeVariant } from '../shared/Badge';
 import type { CalculationResult } from '../../types/calculator';
-import { formatCurrency, formatPercent } from '../../utils/formatters';
+import { formatCurrency, formatPercent, getMarginColor } from '../../utils/formatters';
 
 interface PricingRecommendationsProps {
   results: CalculationResult;
@@ -24,16 +24,18 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
   const getMarginBadge = (
     margin: number
   ): { variant: BadgeVariant; label: string; icon: React.ReactNode } => {
-    if (margin < 15) {
+    const color = getMarginColor(margin);
+    
+    if (color === 'rust') {
       return {
         variant: 'error',
         label: 'Tight margin',
         icon: <AlertCircle className="w-3 h-3 mr-1" />,
       };
     }
-    if (margin <= 25) {
+    if (color === 'clay') {
       return {
-        variant: 'warning',
+        variant: 'info',
         label: 'Modest margin',
         icon: <AlertTriangle className="w-3 h-3 mr-1" />,
       };
@@ -89,7 +91,7 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
           <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
             Profit Margin
           </p>
-          <p className="text-xl font-bold text-ink-900 tabular-nums">
+          <p className={`text-xl font-bold tabular-nums text-${getMarginColor(profitMarginPercent)}`}>
             {formatPercent(profitMarginPercent)}
           </p>
         </div>

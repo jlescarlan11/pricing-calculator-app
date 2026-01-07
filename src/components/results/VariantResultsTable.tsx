@@ -1,7 +1,7 @@
 import React from 'react';
 import type { CalculationResult } from '../../types/calculator';
 import { Card, Badge } from '../shared';
-import { formatCurrency, formatPercent } from '../../utils/formatters';
+import { formatCurrency, formatPercent, getMarginColor } from '../../utils/formatters';
 
 interface VariantResultsTableProps {
   results: CalculationResult;
@@ -10,10 +10,11 @@ interface VariantResultsTableProps {
 export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ results }) => {
   if (!results.variantResults || results.variantResults.length === 0) return null;
 
-  const getMarginVariant = (margin: number) => {
-    if (margin < 15) return 'error' as const;
-    if (margin <= 25) return 'warning' as const;
-    return 'success' as const;
+  const getMarginBadgeVariant = (margin: number) => {
+    const color = getMarginColor(margin);
+    if (color === 'rust') return 'error';
+    if (color === 'clay') return 'info';
+    return 'success';
   };
 
   return (
@@ -46,7 +47,7 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                   <td className="px-md py-md text-right tabular-nums font-semibold text-ink-900">
                     {formatCurrency(variant.recommendedPrice)}
                   </td>
-                  <td className="px-md py-md text-right tabular-nums text-moss font-semibold">
+                  <td className={`px-md py-md text-right tabular-nums font-semibold text-${getMarginColor(variant.profitMarginPercent)}`}>
                     {formatPercent(variant.profitMarginPercent)}
                   </td>
                   <td className="px-md py-md text-right tabular-nums border-l border-border-subtle">
@@ -61,7 +62,7 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                   <td className="px-md py-md text-right tabular-nums">
                     {hasCurrentPrice && variant.currentProfitMargin !== undefined ? (
                       <Badge
-                        variant={getMarginVariant(variant.currentProfitMargin)}
+                        variant={getMarginBadgeVariant(variant.currentProfitMargin)}
                         className="py-0 px-2"
                       >
                         {formatPercent(variant.currentProfitMargin)}

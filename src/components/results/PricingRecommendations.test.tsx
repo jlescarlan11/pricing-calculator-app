@@ -48,7 +48,7 @@ describe('PricingRecommendations', () => {
     render(<PricingRecommendations results={lowMarginResults} />);
     const badge = screen.getByText('Modest margin');
     expect(badge).toBeDefined();
-    expect(badge.className).toContain('bg-sakura');
+    expect(badge.className).toContain('bg-clay');
   });
 
   it('shows risky badge for < 15%', () => {

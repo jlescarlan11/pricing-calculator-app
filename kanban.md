@@ -49,8 +49,11 @@
     - **Files:** `src/components/results/ResultsDisplay.tsx`, `src/components/results/PricingRecommendations.tsx`
     - **Category:** UI Polish
 
-- [ ] **Implement Profit Margin Color Scale**
-    - **Description:** Create a utility function `getMarginColor(margin: number)` that returns specific Tailwind colors: Red (<15%), Orange (15-25%), Green (>25%). Apply this consistently to all margin badges and progress bars in `ResultsDisplay` and `StickySummary`.
+- [x] **Implement Profit Margin Color Scale**
+
+- **Description:** Create a utility function `getMarginColor(margin: number)` that returns specific Tailwind colors: Red (<15%), Orange (15-25%), Green (>25%). Apply this consistently to all margin badges and progress bars in `ResultsDisplay` and `StickySummary`.
+
+
     - **Files:** `src/utils/formatters.ts` (or similar), `src/components/results/*`
     - **Category:** UI Consistency
 
