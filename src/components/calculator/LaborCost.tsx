@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calculator, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
-import { Input, Button, Tooltip, Card } from '../shared';
+import { Input, Button, Tooltip } from '../shared';
 
 interface LaborCostProps {
   value: number;
@@ -49,9 +49,9 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
   const calculatedTotal = (parseFloat(hours) || 0) * (parseFloat(rate) || 0);
 
   return (
-    <Card>
-      <div className="space-y-xl">
-        <div className="flex items-center justify-between">
+    <div className="space-y-xl">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-xs">
           <div className="flex items-center gap-sm">
             <h3 className="text-lg font-bold text-ink-900 leading-tight">
               {label || 'Labor Cost'}
@@ -66,91 +66,92 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
               </button>
             </Tooltip>
           </div>
-          <div className="hidden md:block">
-            <HelperButton 
-              isOpen={isCalculatorOpen} 
-              onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
-            />
-          </div>
+          <p className="text-xs text-ink-500">How much do you pay yourself or staff?</p>
         </div>
-
-        <div className="space-y-sm">
-          <Input
-            label={label ? `Total ${label}` : 'Total Labor Cost'}
-            type="number"
-            value={value === 0 ? '' : value}
-            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-            currency
-            placeholder="0.00"
-            error={error}
-            min={0}
-            step="0.01"
+        <div className="hidden md:block">
+          <HelperButton 
+            isOpen={isCalculatorOpen} 
+            onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
           />
-          <div className="flex justify-end md:hidden">
-            <HelperButton 
-              isOpen={isCalculatorOpen} 
-              onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
+        </div>
+      </div>
+
+      <div className="space-y-sm">
+        <Input
+          label={label ? `Total ${label}` : 'Total Labor Cost'}
+          type="number"
+          value={value === 0 ? '' : value}
+          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          currency
+          placeholder="0.00"
+          error={error}
+          min={0}
+          step="0.01"
+        />
+        <div className="flex justify-end md:hidden">
+          <HelperButton 
+            isOpen={isCalculatorOpen} 
+            onClick={() => setIsCalculatorOpen(!isCalculatorOpen)} 
+          />
+        </div>
+      </div>
+
+      {isCalculatorOpen && (
+        <div className="bg-white rounded-xl p-lg space-y-lg border border-border-subtle shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="space-y-sm text-sm text-ink-700">
+            <p className="font-medium text-ink-900">
+              Your time is valuable—include it in labor costs.
+            </p>
+            <p>Labor Cost = Time Spent × Hourly Rate</p>
+            <div className="bg-surface p-sm rounded-sm border border-border-subtle text-xs font-mono text-ink-500">
+              Example: 4 hours × ₱100/hour = ₱400
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-lg">
+            <Input
+              label="Hours Worked"
+              type="number"
+              value={hours}
+              onChange={(e) => setHours(e.target.value)}
+              placeholder="e.g. 4"
+              min={0}
+              step="0.5"
+            />
+            <Input
+              label="Hourly Rate"
+              type="number"
+              value={rate}
+              onChange={(e) => setRate(e.target.value)}
+              currency
+              placeholder="e.g. 100"
+              min={0}
+              step="0.01"
             />
           </div>
-        </div>
 
-        {isCalculatorOpen && (
-          <div className="bg-surface-hover rounded-xl p-lg space-y-lg border border-border-subtle animate-in fade-in slide-in-from-top-2 duration-500">
-            <div className="space-y-sm text-sm text-ink-700">
-              <p className="font-medium text-ink-900">
-                Your time is valuable—include it in labor costs.
-              </p>
-              <p>Labor Cost = Time Spent × Hourly Rate</p>
-              <div className="bg-surface p-sm rounded-sm border border-border-subtle text-xs font-mono text-ink-500">
-                Example: 4 hours × ₱100/hour = ₱400
+          <div className="flex items-center justify-between pt-lg border-t border-border-subtle">
+            <div className="text-sm">
+              <span className="text-ink-500 text-xs uppercase font-bold tracking-wider">Calculated</span>
+              <div className="font-bold text-ink-900 text-2xl tracking-tight">
+                ₱
+                {calculatedTotal.toLocaleString('en-PH', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-lg">
-              <Input
-                label="Hours Worked"
-                type="number"
-                value={hours}
-                onChange={(e) => setHours(e.target.value)}
-                placeholder="e.g. 4"
-                min={0}
-                step="0.5"
-              />
-              <Input
-                label="Hourly Rate"
-                type="number"
-                value={rate}
-                onChange={(e) => setRate(e.target.value)}
-                currency
-                placeholder="e.g. 100"
-                min={0}
-                step="0.01"
-              />
-            </div>
-
-            <div className="flex items-center justify-between pt-lg border-t border-border-subtle">
-              <div className="text-sm">
-                <span className="text-ink-500">Calculated: </span>
-                <span className="font-bold text-ink-900 text-xl tracking-tight">
-                  ₱
-                  {calculatedTotal.toLocaleString('en-PH', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-              <Button
-                variant="primary"
-                onClick={calculateAndApply}
-                disabled={!hours || !rate}
-                type="button"
-              >
-                Apply
-              </Button>
-            </div>
+            <Button
+              variant="primary"
+              onClick={calculateAndApply}
+              disabled={!hours || !rate}
+              type="button"
+            >
+              Apply
+            </Button>
           </div>
-        )}
-      </div>
-    </Card>
+        </div>
+      )}
+    </div>
   );
 };
