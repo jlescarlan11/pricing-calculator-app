@@ -105,7 +105,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
           </div>
 
           <div className="space-y-md">
-            <div className="flex flex-col divide-y divide-[#E6E4E1]">
+            <div className="flex flex-col space-y-4 md:space-y-0 md:divide-y md:divide-border-subtle">
               {variant.ingredients.map((ing, idx) => (
                 <IngredientRow
                   key={ing.id}

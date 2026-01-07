@@ -3,6 +3,12 @@ export interface Ingredient {
   name: string;
   amount: number;
   cost: number;
+  measurementMode?: 'simple' | 'advanced';
+  purchaseQuantity?: number;
+  purchaseUnit?: string;
+  purchaseCost?: number;
+  recipeQuantity?: number;
+  recipeUnit?: string;
 }
 
 export interface Variant {

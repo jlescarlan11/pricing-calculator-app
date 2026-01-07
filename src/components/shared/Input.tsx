@@ -4,6 +4,7 @@ import { Tooltip } from './Tooltip';
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   label?: string;
+  hideLabel?: boolean;
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
@@ -17,6 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
       label,
+      hideLabel = false,
       value,
       onChange,
       type = 'text',
@@ -49,7 +51,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={`flex flex-col w-full ${className}`}>
         {label && (
-          <div className="flex items-center justify-between mb-2">
+          <div className={`flex items-center justify-between mb-2 ${hideLabel ? 'sr-only' : ''}`}>
             <label
               htmlFor={id}
               className="text-sm font-medium text-ink-700 flex items-center gap-xs tracking-[0.01em]"

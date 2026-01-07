@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, RefreshCw, Calculator, ChevronRight } from 'lucide-react';
+import { RefreshCw, Calculator, ChevronRight } from 'lucide-react';
 import { Button } from '../shared/Button';
 import type { CalculationResult } from '../../types/calculator';
 import { formatCurrency } from '../../utils/formatters';
@@ -124,9 +124,9 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
           {hasCommittedResults && !isStale ? (
             <Button
               variant="secondary"
-              size="icon"
+              size="sm"
               onClick={onScrollToResults}
-              className="w-10 h-10 rounded-full bg-surface-hover hover:bg-border-subtle text-ink-900"
+              className="w-10 h-10 p-0 rounded-full bg-surface-hover hover:bg-border-subtle text-ink-900"
               aria-label="View Details"
             >
               <ChevronRight className="w-5 h-5" />
