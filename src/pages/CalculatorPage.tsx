@@ -14,6 +14,7 @@ export const CalculatorPage: React.FC = () => {
     input,
     config,
     results,
+    liveResult,
     errors,
     isCalculating,
     updateInput,
@@ -43,22 +44,29 @@ export const CalculatorPage: React.FC = () => {
   // Handle sticky summary visibility
   useEffect(() => {
     const handleScroll = () => {
-      if (!resultsRef.current) {
-        setShowStickySummary(false);
+      // Case 1: Results exist (committed)
+      if (showResults && resultsRef.current) {
+        const resultsRect = resultsRef.current.getBoundingClientRect();
+        const isResultsVisible = resultsRect.top < window.innerHeight && resultsRect.bottom > 0;
+        setShowStickySummary(!isResultsVisible);
         return;
       }
 
-      const resultsRect = resultsRef.current.getBoundingClientRect();
-      const isResultsVisible = resultsRect.top < window.innerHeight && resultsRect.bottom > 0;
+      // Case 2: No results yet, but we have live data (user is typing)
+      if (!showResults && liveResult && liveResult.totalCost > 0) {
+        setShowStickySummary(true);
+        return;
+      }
 
-      // Show sticky summary if results exist but are not fully in view
-      // and we are currently in the form section
-      setShowStickySummary(showResults && !isResultsVisible);
+      setShowStickySummary(false);
     };
 
     window.addEventListener('scroll', handleScroll);
+    // Trigger once on mount/update to set initial state
+    handleScroll();
+    
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [showResults]);
+  }, [showResults, liveResult]);
 
   const handleCalculate = async () => {
     const res = await calculate();
@@ -185,7 +193,8 @@ export const CalculatorPage: React.FC = () => {
       </div>
 
       <StickySummary
-        results={results}
+        results={liveResult}
+        hasCommittedResults={showResults}
         onScrollToResults={handleScrollToResults}
         onCalculate={handleCalculate}
         isCalculating={isCalculating}

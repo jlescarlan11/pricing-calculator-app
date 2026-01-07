@@ -5,6 +5,7 @@ import { PricingExplainerModal } from '../help/PricingExplainerModal';
 import { FAQ } from '../help/FAQ';
 import { Modal } from '../shared/Modal';
 import { useAuth } from '../../context/AuthContext';
+import { APP_VERSION } from '@/constants';
 
 export const Header: React.FC = () => {
   const { user } = useAuth();
@@ -110,7 +111,7 @@ export const Header: React.FC = () => {
             )}
 
             <div className="pt-md flex items-center justify-between text-[10px] text-ink-500 px-md border-t border-border-subtle mt-md uppercase tracking-widest">
-              <span>Version 0.1.0</span>
+              <span>Version {APP_VERSION}</span>
               <span>Made with intention</span>
             </div>
           </div>

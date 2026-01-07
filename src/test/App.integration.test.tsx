@@ -34,11 +34,11 @@ describe('App Integration', () => {
     fireEvent.click(calculateBtns[0]);
 
     // Should show results
-    expect(await screen.findByText(/^Results$/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ })).toBeInTheDocument();
     expect(screen.getByText(/Analysis for/i)).toHaveTextContent('Test Product');
 
     // Check if results are displayed
-    expect(screen.getByText(/Recommended Price/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Recommended Price/i).length).toBeGreaterThan(0);
   });
 
   it('can edit results to go back to form', async () => {
@@ -51,7 +51,7 @@ describe('App Integration', () => {
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
 
-    expect(await screen.findByText(/^Results$/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /^Results$/ })).toBeInTheDocument();
 
     // Form is visible below results, so we can access inputs directly
     expect(screen.getByText(/Product Details/i)).toBeInTheDocument();

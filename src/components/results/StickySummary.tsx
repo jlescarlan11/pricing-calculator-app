@@ -7,6 +7,7 @@ import { formatCurrency } from '../../utils/formatters';
 
 interface StickySummaryProps {
   results: CalculationResult | null;
+  hasCommittedResults: boolean;
   onScrollToResults: () => void;
   onCalculate: () => void;
   isCalculating: boolean;
@@ -15,6 +16,7 @@ interface StickySummaryProps {
 
 export const StickySummary: React.FC<StickySummaryProps> = ({
   results,
+  hasCommittedResults,
   onScrollToResults,
   onCalculate,
   isCalculating,
@@ -75,7 +77,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
         )}
 
         <div className="flex gap-sm">
-          {results ? (
+          {hasCommittedResults ? (
             <Button
               variant="secondary"
               size="sm"

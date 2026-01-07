@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Plus, Calculator, RefreshCcw, Package, ArrowRight, Trash2 } from 'lucide-react';
 import {
   ProductInfo,

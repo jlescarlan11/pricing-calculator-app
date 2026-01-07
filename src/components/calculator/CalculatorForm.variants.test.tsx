@@ -126,7 +126,7 @@ describe('CalculatorForm Variants', () => {
 
     // Reduce variant batch size to 6
     // Find the variant card to scope search
-    const variantCard = variantNameInput.closest('.');
+    const variantCard = variantNameInput.closest('.bg-surface');
     expect(variantCard).not.toBeNull();
 
     // Find input with value 10 inside this card
@@ -197,7 +197,7 @@ describe('CalculatorForm Variants', () => {
     render(<TestWrapper initialInput={input} />);
 
     // Find the variant block
-    const variantBlock = screen.getByDisplayValue('Variant A').closest('.');
+    const variantBlock = screen.getByDisplayValue('Variant A').closest('.bg-surface');
     expect(variantBlock).not.toBeNull();
     const withinVariant = within(variantBlock as HTMLElement);
 
@@ -242,7 +242,7 @@ describe('CalculatorForm Variants', () => {
     render(<TestWrapper initialInput={input} />);
 
     // Find the variant block
-    const variantBlock = screen.getByDisplayValue('Variant A').closest('.');
+    const variantBlock = screen.getByDisplayValue('Variant A').closest('.bg-surface');
     expect(variantBlock).not.toBeNull();
 
     const withinVariant = within(variantBlock as HTMLElement);

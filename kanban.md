@@ -3,7 +3,7 @@
 ## Phase 1: High-Impact UX Restructuring
 *Focus: Reducing cognitive load and eliminating "scroll-to-see" friction.*
 
-- [ ] **Implement Accordion/Stepper for Calculator Sections**
+- [x] **Implement Accordion/Stepper for Calculator Sections**
     - **Description:** Refactor `CalculatorForm.tsx` to group `ProductInfo`, `Ingredients`, `Costs` (Labor/Overhead), and `PricingStrategy` into collapsible accordion sections. Use a "Stepper" visual to guide progress. By default, open the first incomplete section.
     - **Files:** `src/components/calculator/CalculatorForm.tsx`
     - **Category:** UX Flow / Cognitive Load

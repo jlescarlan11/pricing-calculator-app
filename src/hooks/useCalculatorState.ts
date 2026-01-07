@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { usePresets } from './use-presets';
 import { useSessionStorage } from './use-session-storage';
 import { performFullCalculation } from '../utils/calculations';
@@ -50,6 +50,7 @@ export interface CalculatorState {
   input: CalculationInput;
   config: PricingConfig;
   results: CalculationResult | null;
+  liveResult: CalculationResult;
   errors: Record<string, string>;
   isCalculating: boolean;
   presets: Preset[];
@@ -361,6 +362,13 @@ export function useCalculatorState(initialValues?: {
     return result;
   }, [input, config, validateForm]);
 
+  // Live calculation for preview (StickySummary)
+  // We use performFullCalculation directly as it handles incomplete inputs gracefully (returns 0s)
+  // This is memoized to avoid recalculating on every render if input/config hasn't changed
+  const liveResult = React.useMemo(() => {
+    return performFullCalculation(input, config);
+  }, [input, config]);
+
   const reset = useCallback(() => {
     setInput(initialInput);
     setConfig(initialConfig);
@@ -419,6 +427,7 @@ export function useCalculatorState(initialValues?: {
     input,
     config,
     results,
+    liveResult,
     errors,
     isCalculating,
     presets,
