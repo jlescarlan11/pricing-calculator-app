@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Trash2, Calculator, Scale } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from '../shared/Button';
 import { Input } from '../shared/Input';
 import { Select } from '../shared/Select';
 import { Modal } from '../shared/Modal';
+import { Switch } from '../shared/Switch';
 import {
   calculateIngredientCostFromPurchase,
   UNIT_OPTIONS,
@@ -13,13 +14,16 @@ import type { Ingredient } from '../../types/calculator';
 interface IngredientRowProps {
   ingredient: Ingredient;
   index: number;
-  onUpdate: (id: string, field: keyof Ingredient, value: string | number) => void;
+  onUpdate: (id: string, field: keyof Ingredient, value: any) => void;
   onRemove: (id: string) => void;
   onAdd: () => void;
   errors?: {
     name?: string;
     amount?: string;
     cost?: string;
+    purchaseQuantity?: string;
+    purchaseCost?: string;
+    recipeQuantity?: string;
   };
   isOnlyRow: boolean;
   autoFocus?: boolean;
@@ -37,9 +41,6 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-
-  // Derive mode from ingredient state or default to simple
-  const isAdvanced = ingredient.measurementMode === 'advanced';
 
   useEffect(() => {
     if (autoFocus && nameInputRef.current) {
@@ -67,59 +68,70 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
     }, 300);
   };
 
-  const handleChange = (field: keyof Ingredient, value: string | number) => {
+  const handleChange = (field: keyof Ingredient, value: any) => {
     // Basic update first
     onUpdate(ingredient.id, field, value);
 
-    // If in advanced mode and changing relevant fields, trigger recalculation
-    if (isAdvanced) {
-      // We need the *latest* values. The 'value' arg is the new value for 'field'.
-      // We merge it with existing ingredient props to get the full picture.
-      const updatedIngredient = { ...ingredient, [field]: value };
+    // Merge with existing ingredient props to get the full picture for calculation
+    const updatedIngredient = { ...ingredient, [field]: value };
 
-      if (
-        ['purchaseQuantity', 'purchaseUnit', 'purchaseCost', 'recipeQuantity', 'recipeUnit'].includes(
-          field
-        )
-      ) {
-        const cost = calculateIngredientCostFromPurchase(
-          Number(updatedIngredient.purchaseQuantity || 0),
-          updatedIngredient.purchaseUnit || '',
-          Number(updatedIngredient.purchaseCost || 0),
-          Number(updatedIngredient.recipeQuantity || 0),
-          updatedIngredient.recipeUnit || ''
-        );
-
-        if (cost !== null) {
-          onUpdate(ingredient.id, 'cost', cost);
-          // Also sync the main 'amount' field for display/consistency if needed,
-          // though the UI might use recipeQuantity in advanced mode.
-          // For compatibility, let's keep 'amount' synced with 'recipeQuantity'.
-          if (field === 'recipeQuantity') {
-            onUpdate(ingredient.id, 'amount', value);
-          }
-        } else {
-          // If calculation fails (incomplete/invalid), reset cost to 0 to avoid stale data
-          onUpdate(ingredient.id, 'cost', 0);
-        }
+    // If useFullQuantity is on, sync recipe fields when purchase fields change
+    if (updatedIngredient.useFullQuantity) {
+      if (field === 'purchaseQuantity') {
+        onUpdate(ingredient.id, 'recipeQuantity', value);
+        updatedIngredient.recipeQuantity = Number(value);
       }
-    } else {
-       // In Simple Mode, specific validation for numeric fields
-        if (field === 'amount' || field === 'cost') {
-             // Allow empty string or numbers
-            if (value === '' || /^\d*\.?\d*$/.test(String(value))) {
-                onUpdate(ingredient.id, field, value);
-            }
-        }
+      if (field === 'purchaseUnit') {
+        onUpdate(ingredient.id, 'recipeUnit', value);
+        updatedIngredient.recipeUnit = String(value);
+      }
+    }
+
+    if (
+      ['purchaseQuantity', 'purchaseUnit', 'purchaseCost', 'recipeQuantity', 'recipeUnit'].includes(
+        field
+      )
+    ) {
+      const cost = calculateIngredientCostFromPurchase(
+        Number(updatedIngredient.purchaseQuantity || 0),
+        updatedIngredient.purchaseUnit || '',
+        Number(updatedIngredient.purchaseCost || 0),
+        Number(updatedIngredient.recipeQuantity || 0),
+        updatedIngredient.recipeUnit || ''
+      );
+
+      if (cost !== null) {
+        onUpdate(ingredient.id, 'cost', cost);
+        // Sync 'amount' field for compatibility
+        onUpdate(ingredient.id, 'amount', updatedIngredient.recipeQuantity || 0);
+      } else {
+        onUpdate(ingredient.id, 'cost', 0);
+      }
     }
   };
-  
-  const handleModeToggle = () => {
-    const newMode = isAdvanced ? 'simple' : 'advanced';
-    onUpdate(ingredient.id, 'measurementMode', newMode);
+
+  const handleToggleFullQuantity = (checked: boolean) => {
+    onUpdate(ingredient.id, 'useFullQuantity', checked);
     
-    // If switching to Advanced for the first time, maybe init values?
-    // For now, we leave them blank or let the user fill them.
+    if (checked) {
+      // Sync immediately
+      const newRecipeQuantity = ingredient.purchaseQuantity || 0;
+      const newRecipeUnit = ingredient.purchaseUnit || '';
+      
+      onUpdate(ingredient.id, 'recipeQuantity', newRecipeQuantity);
+      onUpdate(ingredient.id, 'recipeUnit', newRecipeUnit);
+      onUpdate(ingredient.id, 'amount', newRecipeQuantity);
+
+      // Recalculate cost
+      const cost = calculateIngredientCostFromPurchase(
+        Number(ingredient.purchaseQuantity || 0),
+        ingredient.purchaseUnit || '',
+        Number(ingredient.purchaseCost || 0),
+        Number(newRecipeQuantity),
+        newRecipeUnit
+      );
+      onUpdate(ingredient.id, 'cost', cost || 0);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -156,22 +168,8 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
             placeholder="e.g. Flour"
             error={errors?.name}
             required
-            className="flex-1 h-11 md:h-10"
+            className="flex-1"
           />
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleModeToggle}
-            className={`
-                mb-1 h-11 md:h-9 px-3 transition-colors
-                ${isAdvanced ? 'text-clay bg-clay/10' : 'text-ink-500 hover:text-ink-700'}
-            `}
-            title={isAdvanced ? "Switch to Simple Mode" : "Switch to Unit Conversion Mode"}
-          >
-            {isAdvanced ? <Scale className="w-5 h-5 md:w-4 md:h-4 mr-1" /> : <Calculator className="w-5 h-5 md:w-4 md:h-4 mr-1" />}
-            <span className="text-sm md:text-xs font-medium">{isAdvanced ? 'Smart' : 'Simple'}</span>
-          </Button>
         </div>
 
         {/* Delete Button (Desktop Position) */}
@@ -190,133 +188,112 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className={`
-          rounded-lg transition-all duration-300 overflow-hidden
-          ${isAdvanced ? 'md:bg-surface/50 md:border md:border-border-subtle md:p-md' : ''}
-      `}>
-        {isAdvanced ? (
-          // --- ADVANCED MODE ---
-          <div className="grid grid-cols-1 gap-6 md:gap-md animate-in fade-in slide-in-from-top-2">
-             {/* Purchase Row */}
-             <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
-                <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
-                  Purchase Details
-                </span>
-                
-                <div className="col-span-1 md:col-span-3">
-                    <Input
-                        type="number"
-                        placeholder="Qty"
-                        value={ingredient.purchaseQuantity || ''}
-                        onChange={(e) => handleChange('purchaseQuantity', e.target.value)}
-                        min={0}
-                        step="any"
-                        className="h-11 md:h-9 text-sm"
-                        label="Quantity"
-                        hideLabel
-                    />
-                </div>
-                
-                <div className="col-span-1 md:col-span-3">
-                     <Select
-                        label="Unit" // Hidden visually but good for a11y
-                        hideLabel
-                        options={UNIT_OPTIONS}
-                        value={ingredient.purchaseUnit || ''}
-                        onChange={(e) => handleChange('purchaseUnit', e.target.value)}
-                        placeholder="Unit"
-                        className="h-11 md:h-9 text-sm"
-                    />
-                </div>
-                
-                <div className="col-span-2 md:col-span-4 md:pl-xs">
-                     <Input
-                        type="number"
-                        placeholder="Total Cost"
-                        value={ingredient.purchaseCost || ''}
-                        onChange={(e) => handleChange('purchaseCost', e.target.value)}
-                        min={0}
-                        step="0.01"
-                        currency
-                        className="h-11 md:h-9 text-sm"
-                        label="Cost"
-                        hideLabel
-                    />
-                </div>
-             </div>
-             
-             {/* Usage Row */}
-             <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
-                <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
-                  Recipe Details
-                </span>
-                
-                <div className="col-span-1 md:col-span-3">
-                    <Input
-                        type="number"
-                        placeholder="Qty"
-                        value={ingredient.recipeQuantity || ''}
-                        onChange={(e) => handleChange('recipeQuantity', e.target.value)}
-                        min={0}
-                        step="any"
-                        className="h-11 md:h-9 text-sm"
-                        label="Quantity"
-                        hideLabel
-                    />
-                </div>
-                
-                <div className="col-span-1 md:col-span-3">
+      <div className="rounded-lg transition-all duration-300 overflow-hidden md:bg-surface/50 md:border md:border-border-subtle md:p-md">
+        <div className="grid grid-cols-1 gap-6 md:gap-md animate-in fade-in slide-in-from-top-2">
+            {/* Purchase Row */}
+            <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
+              <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
+                Purchase Details
+              </span>
+              
+              <div className="col-span-1 md:col-span-3">
+                  <Input
+                      type="number"
+                      placeholder="Qty"
+                      value={ingredient.purchaseQuantity || ''}
+                      onChange={(e) => handleChange('purchaseQuantity', e.target.value)}
+                      min={0}
+                      step="any"
+                      className="text-sm"
+                      label="Quantity"
+                      hideLabel
+                      error={errors?.purchaseQuantity}
+                  />
+              </div>
+              
+              <div className="col-span-1 md:col-span-3">
                     <Select
-                        label="Unit"
-                        hideLabel
-                        options={UNIT_OPTIONS}
-                        value={ingredient.recipeUnit || ''}
-                        onChange={(e) => handleChange('recipeUnit', e.target.value)}
-                        placeholder="Unit"
-                        className="h-11 md:h-9 text-sm"
-                    />
-                </div>
+                      label="Unit"
+                      hideLabel
+                      options={UNIT_OPTIONS}
+                      value={ingredient.purchaseUnit || ''}
+                      onChange={(e) => handleChange('purchaseUnit', e.target.value)}
+                      placeholder="Unit"
+                      className="text-sm"
+                  />
+              </div>
+              
+              <div className="col-span-2 md:col-span-4 md:pl-xs">
+                    <Input
+                      type="number"
+                      placeholder="Total Cost"
+                      value={ingredient.purchaseCost || ''}
+                      onChange={(e) => handleChange('purchaseCost', e.target.value)}
+                      min={0}
+                      step="0.01"
+                      currency
+                      className="text-sm"
+                      label="Cost"
+                      hideLabel
+                      error={errors?.purchaseCost}
+                  />
+              </div>
+            </div>
 
-                <div className="col-span-2 md:col-span-4 md:pl-xs mt-2 md:mt-0">
-                    <div className="flex items-center gap-xs px-3 py-2 bg-surface md:bg-white rounded border border-border-subtle shadow-sm h-11 md:h-auto">
-                        <span className="text-xs text-ink-500 font-medium uppercase">Cost:</span>
-                        <span className="font-mono font-medium text-ink-900 ml-auto">
-                            {ingredient.cost ? `₱${Number(ingredient.cost).toFixed(2)}` : '---'}
-                        </span>
-                    </div>
-                </div>
-             </div>
-          </div>
-        ) : (
-          // --- SIMPLE MODE ---
-          <div className="grid grid-cols-2 gap-md animate-in fade-in">
-            <Input
-                label="Amount"
-                type="number"
-                value={ingredient.amount || ''}
-                onChange={(e) => handleChange('amount', e.target.value)}
-                placeholder="0"
-                error={errors?.amount}
-                required
-                min={0}
-                step="any"
-                className="h-11 md:h-10"
-            />
-            <Input
-                label="Cost"
-                type="number"
-                value={ingredient.cost || ''}
-                onChange={(e) => handleChange('cost', e.target.value)}
-                placeholder="0.00"
-                currency
-                error={errors?.cost}
-                required
-                min={0}
-                step="0.01"
-                className="h-11 md:h-10"
-            />
-          </div>
-        )}
+            {/* Toggle Row */}
+            <div className="md:ml-[16.666%] flex items-center">
+              <Switch
+                checked={!!ingredient.useFullQuantity}
+                onChange={handleToggleFullQuantity}
+                label="Use 100% of purchase quantity"
+              />
+            </div>
+            
+            {/* Usage Row */}
+            <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
+              <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
+                Recipe Details
+              </span>
+              
+              <div className="col-span-1 md:col-span-3">
+                  <Input
+                      type="number"
+                      placeholder="Qty"
+                      value={ingredient.recipeQuantity || ''}
+                      onChange={(e) => handleChange('recipeQuantity', e.target.value)}
+                      min={0}
+                      step="any"
+                      className="text-sm"
+                      label="Quantity"
+                      hideLabel
+                      disabled={ingredient.useFullQuantity}
+                      error={errors?.recipeQuantity}
+                  />
+              </div>
+              
+              <div className="col-span-1 md:col-span-3">
+                  <Select
+                      label="Unit"
+                      hideLabel
+                      options={UNIT_OPTIONS}
+                      value={ingredient.recipeUnit || ''}
+                      onChange={(e) => handleChange('recipeUnit', e.target.value)}
+                      placeholder="Unit"
+                      className="text-sm"
+                      disabled={ingredient.useFullQuantity}
+                  />
+              </div>
+
+              <div className="col-span-2 md:col-span-4 md:pl-xs mt-2 md:mt-0">
+                  <div className="flex items-center gap-xs px-3 py-2 bg-surface md:bg-white rounded border border-border-subtle shadow-sm">
+                      <span className="text-xs text-ink-500 font-medium uppercase">Cost:</span>
+                      <span className="font-mono font-medium text-ink-900 ml-auto">
+                          {ingredient.cost ? `₱${Number(ingredient.cost).toFixed(2)}` : '---'}
+                      </span>
+                  </div>
+              </div>
+            </div>
+        </div>
       </div>
 
        {/* Mobile Delete (Bottom) */}
@@ -324,7 +301,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            className="text-rust hover:bg-rust/5 w-full justify-center h-11"
+            className="text-rust hover:bg-rust/5 w-full justify-center"
             onClick={handleDeleteClick}
           >
             <Trash2 className="w-4 h-4 mr-2" />

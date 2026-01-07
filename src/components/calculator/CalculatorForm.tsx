@@ -21,7 +21,7 @@ interface CalculatorFormProps {
   errors: Record<string, string>;
   isCalculating: boolean;
   onUpdateInput: (updates: Partial<CalculationInput>) => void;
-  onUpdateIngredient: (id: string, field: keyof Ingredient, value: string | number) => void;
+  onUpdateIngredient: (id: string, field: keyof Ingredient, value: any) => void;
   onAddIngredient: () => void;
   onRemoveIngredient: (id: string) => void;
   onUpdateConfig: (updates: Partial<PricingConfig>) => void;
@@ -38,7 +38,7 @@ interface CalculatorFormProps {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: string | number
+    value: any
   ) => void;
   onAddVariantIngredient: (variantId: string) => void;
   onRemoveVariantIngredient: (variantId: string, ingredientId: string) => void;
@@ -263,7 +263,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                   autoFocus={index === (input?.ingredients?.length || 0) - 1 && index > 0}
                   errors={{
                     name: errors[`ingredients.${ing.id}.name`],
-                    amount: errors[`ingredients.${ing.id}.amount`],
+                    purchaseQuantity: errors[`ingredients.${ing.id}.purchaseQuantity`],
+                    purchaseCost: errors[`ingredients.${ing.id}.purchaseCost`],
+                    recipeQuantity: errors[`ingredients.${ing.id}.recipeQuantity`],
                     cost: errors[`ingredients.${ing.id}.cost`],
                   }}
                 />

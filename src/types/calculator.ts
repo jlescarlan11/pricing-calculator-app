@@ -9,6 +9,7 @@ export interface Ingredient {
   purchaseCost?: number;
   recipeQuantity?: number;
   recipeUnit?: string;
+  useFullQuantity?: boolean;
 }
 
 export interface Variant {

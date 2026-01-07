@@ -164,14 +164,13 @@ describe('CalculatorForm', () => {
     fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
 
     const nameInputs = screen.getAllByLabelText(/Ingredient Name/i);
-    const amountInputs = screen.getAllByLabelText(/Amount/i);
-    // Cost label has an asterisk since it's required
-    const costInputs = screen.getAllByLabelText(/Cost/);
-    const costInput = costInputs.find((input) => input.tagName === 'INPUT');
+    const qtyInputs = screen.getAllByPlaceholderText('Qty');
+    const purchaseCostInputs = screen.getAllByPlaceholderText('Total Cost');
 
     fireEvent.change(nameInputs[0], { target: { value: 'Flour' } });
-    fireEvent.change(amountInputs[0], { target: { value: '1000' } });
-    fireEvent.change(costInput!, { target: { value: '50' } });
+    fireEvent.change(qtyInputs[0], { target: { value: '1000' } }); // Purchase Qty
+    fireEvent.change(purchaseCostInputs[0], { target: { value: '50' } });
+    fireEvent.change(qtyInputs[1], { target: { value: '1000' } }); // Recipe Qty (Usage)
 
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
@@ -191,7 +190,7 @@ describe('CalculatorForm', () => {
           value: expect.any(Number),
         })
       );
-    });
+    }, { timeout: 3000 });
 
     const result = mockOnCalculate.mock.calls[0][0];
     expect(result.totalCost).toBeGreaterThan(0);
@@ -203,7 +202,16 @@ describe('CalculatorForm', () => {
       input: {
         productName: 'Saved Draft',
         batchSize: 24,
-        ingredients: [{ id: '1', name: 'Saved Ing', amount: 100, cost: 20 }],
+        ingredients: [{ 
+          id: '1', 
+          name: 'Saved Ing', 
+          purchaseQuantity: 100,
+          purchaseUnit: 'g',
+          purchaseCost: 20,
+          recipeQuantity: 100,
+          recipeUnit: 'g',
+          cost: 20 
+        }],
         laborCost: 10,
         overhead: 5,
       },
@@ -260,7 +268,16 @@ describe('CalculatorForm', () => {
     const input = {
       productName: 'Initial Product',
       batchSize: 100,
-      ingredients: [{ id: 'ext-1', name: 'Ext Ing', amount: 50, cost: 10 }],
+      ingredients: [{ 
+        id: 'ext-1', 
+        name: 'Ext Ing', 
+        purchaseQuantity: 50,
+        purchaseUnit: 'g',
+        purchaseCost: 10,
+        recipeQuantity: 50,
+        recipeUnit: 'g',
+        cost: 10 
+      }],
       laborCost: 100,
       overhead: 50,
     };

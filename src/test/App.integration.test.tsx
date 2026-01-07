@@ -25,10 +25,13 @@ describe('App Integration', () => {
     fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
 
     const nameInputs = screen.getAllByLabelText(/Ingredient Name/i);
-    const costInputs = screen.getAllByLabelText(/Cost/i);
+    const qtyInputs = screen.getAllByPlaceholderText('Qty');
+    const purchaseCostInputs = screen.getAllByPlaceholderText('Total Cost');
 
     fireEvent.change(nameInputs[0], { target: { value: 'Ingredient 1' } });
-    fireEvent.change(costInputs[0], { target: { value: '100' } });
+    fireEvent.change(qtyInputs[0], { target: { value: '10' } });
+    fireEvent.change(purchaseCostInputs[0], { target: { value: '100' } });
+    fireEvent.change(qtyInputs[1], { target: { value: '10' } });
 
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);

@@ -15,10 +15,24 @@ import type {
 
 const SESSION_STORAGE_KEY = 'pricing_calculator_draft';
 
+const initialIngredient: Ingredient = {
+  id: '',
+  name: '',
+  amount: 0,
+  cost: 0,
+  measurementMode: 'advanced',
+  purchaseQuantity: 0,
+  purchaseUnit: 'g',
+  purchaseCost: 0,
+  recipeQuantity: 0,
+  recipeUnit: 'g',
+  useFullQuantity: false,
+};
+
 const initialInput: CalculationInput = {
   productName: '',
   batchSize: 1,
-  ingredients: [{ id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }],
+  ingredients: [{ ...initialIngredient, id: crypto.randomUUID() }],
   laborCost: 0,
   overhead: 0,
   hasVariants: false,
@@ -58,7 +72,7 @@ export interface CalculatorState {
 
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
-  updateIngredient: (id: string, field: keyof Ingredient, value: string | number) => void;
+  updateIngredient: (id: string, field: keyof Ingredient, value: any) => void;
   addIngredient: () => void;
   removeIngredient: (id: string) => void;
   updateConfig: (updates: Partial<PricingConfig>) => void;
@@ -74,7 +88,7 @@ export interface CalculatorState {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: string | number
+    value: any
   ) => void;
   addVariantIngredient: (variantId: string) => void;
   removeVariantIngredient: (variantId: string, ingredientId: string) => void;
@@ -150,7 +164,7 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const updateIngredient = useCallback(
-    (id: string, field: keyof Ingredient, value: string | number) => {
+    (id: string, field: keyof Ingredient, value: any) => {
       setInput((prev) => ({
         ...prev,
         ingredients: prev.ingredients.map((ing) =>
@@ -172,7 +186,7 @@ export function useCalculatorState(initialValues?: {
   const addIngredient = useCallback(() => {
     setInput((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 }],
+      ingredients: [...prev.ingredients, { ...initialIngredient, id: crypto.randomUUID() }],
     }));
   }, []);
 
@@ -238,7 +252,7 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const updateVariantIngredient = useCallback(
-    (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number) => {
+    (variantId: string, ingredientId: string, field: keyof Ingredient, value: any) => {
       setInput((prev) => ({
         ...prev,
         variants: (prev.variants || []).map((v) => {
@@ -264,7 +278,7 @@ export function useCalculatorState(initialValues?: {
           ...v,
           ingredients: [
             ...v.ingredients,
-            { id: crypto.randomUUID(), name: '', amount: 0, cost: 0 },
+            { ...initialIngredient, id: crypto.randomUUID() },
           ],
         };
       }),

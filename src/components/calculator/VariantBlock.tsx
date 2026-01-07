@@ -15,7 +15,7 @@ interface VariantBlockProps {
     variantId: string,
     ingredientId: string,
     field: keyof Ingredient,
-    value: string | number
+    value: any
   ) => void;
   onAddIngredient: (variantId: string) => void;
   onRemoveIngredient: (variantId: string, ingredientId: string) => void;
@@ -117,7 +117,9 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
                   onAdd={() => onAddIngredient(variant.id)}
                   errors={{
                     name: errors[`variants.${variant.id}.ingredients.${ing.id}.name`],
-                    amount: errors[`variants.${variant.id}.ingredients.${ing.id}.amount`],
+                    purchaseQuantity: errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseQuantity`],
+                    purchaseCost: errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseCost`],
+                    recipeQuantity: errors[`variants.${variant.id}.ingredients.${ing.id}.recipeQuantity`],
                     cost: errors[`variants.${variant.id}.ingredients.${ing.id}.cost`],
                   }}
                 />
