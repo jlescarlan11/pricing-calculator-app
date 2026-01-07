@@ -8,7 +8,7 @@
     - **Files:** `src/components/calculator/CalculatorForm.tsx`
     - **Category:** UX Flow / Cognitive Load
 
-- [ ] **Enable Live Results in Sticky Summary**
+- [x] **Enable Live Results in Sticky Summary**
     - **Description:** Update `useCalculatorState` to expose a "live" calculation result (calculated on-the-fly from current inputs) independent of the committed `results` state. Pass this to `StickySummary` so the footer shows real-time `Total Cost` and `Suggested Price` even before the user clicks "Calculate".
     - **Files:** `src/hooks/useCalculatorState.ts`, `src/pages/CalculatorPage.tsx`, `src/components/results/StickySummary.tsx`
     - **Category:** UX Flow / Mobile
