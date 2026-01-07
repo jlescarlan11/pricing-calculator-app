@@ -335,7 +335,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                   error={errors.laborCost}
                 />
               </div>
-              <div className="p-lg md:p-xl bg-surface/50">
+              <div className="p-lg md:p-xl">
                 <OverheadCost
                   value={input?.overhead || 0}
                   batchSize={input?.batchSize || 1}
