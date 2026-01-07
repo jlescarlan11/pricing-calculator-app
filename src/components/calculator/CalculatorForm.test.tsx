@@ -237,22 +237,23 @@ describe('CalculatorForm', () => {
     vi.unstubAllGlobals();
   });
 
-  it('displays real-time validation feedback', () => {
+  it('enables continue button when section is valid', () => {
     render(<TestWrapper onCalculate={mockOnCalculate} />);
 
-    expect(screen.getByText(/Start by naming your product/i)).toBeInTheDocument();
+    // Step 1 (Product Details) Continue button
+    const continueButtons = screen.getAllByRole('button', { name: /Continue/i });
+    const step1Button = continueButtons[0];
+
+    // Initially disabled (productName empty, batchSize defaults to 0 or empty string if not set, but form requires >= 1)
+    // Actually batchSize defaults to 0 in my TestWrapper logic if not provided? 
+    // Wait, useCalculatorState defaults?
+    // Let's just check it is disabled.
+    expect(step1Button).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText(/Product Name/i), { target: { value: 'New Product' } });
-    // Since it starts with one empty ingredient, it should say "Almost there"
-    expect(screen.getByText(/Almost there! Complete your ingredients/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/Batch Size/i), { target: { value: '10' } });
 
-    fireEvent.change(screen.getByLabelText(/Ingredient Name/i), { target: { value: 'Flour' } });
-
-    const costInputs = screen.getAllByLabelText(/Cost/);
-    const costInput = costInputs.find((input) => input.tagName === 'INPUT');
-    fireEvent.change(costInput!, { target: { value: '50' } });
-
-    expect(screen.getByText(/Ready to calculate/i)).toBeInTheDocument();
+    expect(step1Button).not.toBeDisabled();
   });
 
   it('populates state when initialInput and initialConfig props are provided', () => {
