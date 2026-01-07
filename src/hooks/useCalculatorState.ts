@@ -11,6 +11,7 @@ import type {
   Ingredient,
   Preset,
   Variant,
+  DraftCompetitor,
 } from '../types/calculator';
 
 const SESSION_STORAGE_KEY = 'pricing_calculator_draft';
@@ -63,6 +64,7 @@ const sanitizeInput = (input: Partial<CalculationInput>): CalculationInput => {
 export interface CalculatorState {
   input: CalculationInput;
   config: PricingConfig;
+  competitors: DraftCompetitor[];
   results: CalculationResult | null;
   liveResult: CalculationResult;
   isDirty: boolean;
@@ -93,6 +95,11 @@ export interface CalculatorState {
   addVariantIngredient: (variantId: string) => void;
   removeVariantIngredient: (variantId: string, ingredientId: string) => void;
 
+  // Competitor Actions
+  addCompetitor: (competitor: DraftCompetitor) => void;
+  removeCompetitor: (index: number) => void; // Using index for draft items without ID
+  updateCompetitor: (index: number, updates: Partial<DraftCompetitor>) => void;
+
   // Preset Actions
   loadPreset: (preset: Preset) => void;
   saveAsPreset: (name: string) => Promise<Preset>;
@@ -113,15 +120,18 @@ export function useCalculatorState(initialValues?: {
   const [draft, setDraft] = useSessionStorage<{
     input: CalculationInput;
     config: PricingConfig;
+    competitors?: DraftCompetitor[];
   }>(SESSION_STORAGE_KEY, {
     input: initialValues?.input || initialInput,
     config: initialValues?.config || initialConfig,
+    competitors: [],
   });
 
   const [input, setInput] = useState<CalculationInput>(
     sanitizeInput(initialValues?.input || draft.input)
   );
   const [config, setConfig] = useState<PricingConfig>(initialValues?.config || draft.config);
+  const [competitors, setCompetitors] = useState<DraftCompetitor[]>(draft.competitors || []);
   const [results, setResults] = useState<CalculationResult | null>(null);
   
   // Track the input/config state used for the last successful calculation
@@ -136,10 +146,10 @@ export function useCalculatorState(initialValues?: {
   // Auto-save to sessionStorage
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setDraft({ input, config });
+      setDraft({ input, config, competitors });
     }, 1000);
     return () => clearTimeout(timeoutId);
-  }, [input, config, setDraft]);
+  }, [input, config, competitors, setDraft]);
 
   // Determine if current form state differs from the last calculated state
   const isDirty = React.useMemo(() => {
@@ -298,6 +308,22 @@ export function useCalculatorState(initialValues?: {
     }));
   }, []);
 
+  // Competitor Actions
+  const addCompetitor = useCallback((competitor: DraftCompetitor) => {
+    setCompetitors((prev) => {
+      if (prev.length >= 5) return prev; // Max 5 limit
+      return [...prev, competitor];
+    });
+  }, []);
+
+  const removeCompetitor = useCallback((index: number) => {
+    setCompetitors((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const updateCompetitor = useCallback((index: number, updates: Partial<DraftCompetitor>) => {
+    setCompetitors((prev) => prev.map((c, i) => (i === index ? { ...c, ...updates } : c)));
+  }, []);
+
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -353,11 +379,6 @@ export function useCalculatorState(initialValues?: {
             `Allocation exceeds available units (Max: ${maxAllowed}).`;
         }
 
-        // Variant ingredients validation
-        /* 
-           Technically variant ingredients are optional (e.g. just a smaller size pack),
-           but if added, must be valid.
-        */
         const vIngErrs = validateIngredients(variant.ingredients);
         vIngErrs.forEach((err) => {
           const match = err.field.match(/ingredients\[(\d+)\]\.(\w+)/);
@@ -404,6 +425,7 @@ export function useCalculatorState(initialValues?: {
   const reset = useCallback(() => {
     setInput(initialInput);
     setConfig(initialConfig);
+    setCompetitors([]);
     setResults(null);
     setLastCalculatedState(null);
     setErrors({});
@@ -430,6 +452,19 @@ export function useCalculatorState(initialValues?: {
 
     setInput(sanitizedInput);
     setConfig(preset.pricingConfig);
+    
+    // Load competitors
+    if (preset.competitors) {
+      setCompetitors(preset.competitors.map(c => ({
+        competitorName: c.competitorName,
+        competitorPrice: c.competitorPrice,
+        notes: c.notes,
+        id: c.id, // Keep ID for potential updates? Actually DraftCompetitor makes id optional.
+        presetId: c.presetId
+      })));
+    } else {
+      setCompetitors([]);
+    }
 
     const result = performFullCalculation(sanitizedInput, preset.pricingConfig);
     setResults(result);
@@ -439,15 +474,67 @@ export function useCalculatorState(initialValues?: {
 
   const saveAsPreset = useCallback(
     async (name: string) => {
+      // Create the preset. Note: addPreset internally generates ID and calls service.
+      // But addPreset in usePresets just accepts fields.
+      // We need to pass competitors to addPreset somehow.
+      // The `Preset` type includes `competitors`.
+      // So we can pass it in the object we send to addPreset.
+      
+      // We need to map DraftCompetitor to Competitor (minus the ID/dates which service handles?)
+      // Actually, addPreset takes Omit<Preset, 'id' | ...>.
+      // We can pass `competitors` as `any` and let it be handled, but TypeScript will complain.
+      // We should cast or ensure the type matches.
+      // Competitor in Preset is the full DB type.
+      // But when creating, we don't have IDs yet.
+      // Let's coerce it to the expected type for the Service, which expects full Preset shape generally,
+      // but the service logic I updated iterates `preset.competitors`.
+      // The `Competitor` type requires `id`, `presetId`, `createdAt`, `updatedAt`.
+      // Since we are creating a NEW preset, these competitors are technically new too.
+      // We should assign temporary IDs or let the backend handle it.
+      // But `upsertCompetitor` expects `id` to be optional for inserts.
+      // The `Preset` type requires strict `Competitor` array.
+      
+      // Workaround: We'll construct full objects with placeholders that get overwritten/ignored or used as new IDs.
+      const mappedCompetitors = competitors.map(c => ({
+        id: c.id || crypto.randomUUID(), // Generate new ID if missing
+        presetId: '', // Will be filled by service? No, service uses preset.id.
+                      // Wait, my service change: `if (comp.presetId === preset.id)`
+                      // So I need to ensure I set this correctly.
+                      // But `addPreset` generates the preset ID. I don't know it here.
+        competitorName: c.competitorName,
+        competitorPrice: c.competitorPrice,
+        notes: c.notes,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }));
+
+      // NOTE: There is a chicken-and-egg problem here with IDs.
+      // `usePresets.addPreset` generates the ID.
+      // But we can't easily inject the ID into competitors *before* calling addPreset.
+      // However, `usePresets.addPreset` creates `newPreset` with `crypto.randomUUID()`.
+      // If I pass `competitors` with empty presetId, my service check `comp.presetId === preset.id` will fail.
+      
+      // SOLUTION: I should modify `usePresets.addPreset` to attach the new ID to any competitors passed in.
+      // But I can't modify `usePresets` easily from here.
+      
+      // ALTERNATIVE: Don't rely on `addPreset` from `usePresets` to save competitors.
+      // Just save the preset, get the ID back, and then save competitors?
+      // `saveAsPreset` returns Promise<Preset>.
+      // `addPreset` returns the new preset.
+      
+      // Let's update `usePresets.addPreset` to handle this. It's the cleanest way.
+      // I'll leave this `saveAsPreset` logic simple for now and update `usePresets` next.
+      
       return addPreset({
         name,
         baseRecipe: input,
         pricingConfig: config,
         presetType: input.hasVariants ? 'variant' : 'default',
         variants: input.variants || [],
+        competitors: mappedCompetitors as any, // Cast for now, will fix in usePresets
       });
     },
-    [addPreset, input, config]
+    [addPreset, input, config, competitors]
   );
 
   const deletePreset = useCallback(
@@ -460,6 +547,7 @@ export function useCalculatorState(initialValues?: {
   return {
     input,
     config,
+    competitors,
     results,
     liveResult,
     isDirty,
@@ -485,5 +573,10 @@ export function useCalculatorState(initialValues?: {
     updateVariantIngredient,
     addVariantIngredient,
     removeVariantIngredient,
+
+    // Competitor Actions Export
+    addCompetitor,
+    removeCompetitor,
+    updateCompetitor,
   };
 }

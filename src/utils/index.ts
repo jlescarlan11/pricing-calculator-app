@@ -4,3 +4,4 @@ export * from './formatters';
 export * from './print';
 export * from './copy-to-clipboard';
 export * from './haptics';
+export * from './presetComparison';

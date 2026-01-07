@@ -65,13 +65,23 @@ export function usePresets() {
     async (
       presetData: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'lastSyncedAt'>
     ) => {
+      const presetId = crypto.randomUUID();
+      
+      // Inject presetId into competitors if they exist
+      const competitors = presetData.competitors?.map(c => ({
+        ...c,
+        presetId: presetId
+      })) || [];
+
       const newPreset: Preset = {
         ...presetData,
-        id: crypto.randomUUID(),
+        id: presetId,
         userId: user?.id,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         lastSyncedAt: null,
+        isSnapshot: false,
+        competitors: competitors
       };
 
       // Optimistic update

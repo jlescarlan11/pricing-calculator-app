@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import type { Preset, Competitor } from '../types';
+import type { Preset, Competitor, SnapshotMetadata } from '../types';
 
 const STORAGE_KEY = 'pricing_calculator_presets';
 const SYNC_QUEUE_KEY = 'pricing_calculator_sync_queue';
@@ -20,7 +20,14 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
   const pricingConfig = preset.pricingConfig as Record<string, unknown> | undefined;
   const snapshotMetadata = preset.snapshotMetadata;
 
-  return {
+  // Infer isSnapshot from metadata presence if not explicitly set
+  // This handles migration from old data that didn't have isSnapshot
+  const isSnapshot =
+    typeof preset.isSnapshot === 'boolean'
+      ? preset.isSnapshot
+      : !!(snapshotMetadata && snapshotMetadata.isTrackedVersion);
+
+  const common = {
     id: preset.id,
     userId: preset.userId,
     name: preset.name,
@@ -28,9 +35,7 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
     baseRecipe: {
       productName: String(baseRecipe?.productName || ''),
       batchSize: typeof baseRecipe?.batchSize === 'number' ? baseRecipe.batchSize : 1,
-      ingredients: Array.isArray(baseRecipe?.ingredients)
-        ? baseRecipe.ingredients
-        : [],
+      ingredients: Array.isArray(baseRecipe?.ingredients) ? baseRecipe.ingredients : [],
       laborCost: typeof baseRecipe?.laborCost === 'number' ? baseRecipe.laborCost : 0,
       overhead: typeof baseRecipe?.overhead === 'number' ? baseRecipe.overhead : 0,
       hasVariants: !!baseRecipe?.hasVariants,
@@ -46,15 +51,34 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
     createdAt: preset.createdAt || new Date().toISOString(),
     updatedAt: preset.updatedAt || new Date().toISOString(),
     lastSyncedAt: preset.lastSyncedAt,
-    snapshotMetadata: snapshotMetadata
-      ? {
-          snapshotDate: snapshotMetadata.snapshotDate,
-          isTrackedVersion: snapshotMetadata.isTrackedVersion,
-          versionNumber: snapshotMetadata.versionNumber,
-          parentPresetId: snapshotMetadata.parentPresetId,
-        }
-      : undefined,
+    competitors: Array.isArray(preset.competitors) ? preset.competitors : [],
   };
+
+  if (isSnapshot) {
+    return {
+      ...common,
+      isSnapshot: true,
+      snapshotMetadata: snapshotMetadata
+        ? {
+            snapshotDate: snapshotMetadata.snapshotDate,
+            isTrackedVersion: snapshotMetadata.isTrackedVersion,
+            versionNumber: snapshotMetadata.versionNumber,
+            parentPresetId: snapshotMetadata.parentPresetId,
+          }
+        : {
+            // Fallback if metadata is missing but isSnapshot was true (shouldn't happen)
+            snapshotDate: common.createdAt,
+            isTrackedVersion: true,
+            versionNumber: 1,
+          },
+    } as Preset;
+  } else {
+    return {
+      ...common,
+      isSnapshot: false,
+      snapshotMetadata: undefined,
+    } as Preset;
+  }
 }
 
 // Helper to get local presets
@@ -121,7 +145,19 @@ function mapFromDb(row: {
   version_number?: number | null;
   parent_preset_id?: string | null;
 }): Preset {
-  const preset = {
+  const snapshotMetadata: SnapshotMetadata | undefined =
+    row.is_tracked_version && row.snapshot_date && row.version_number
+      ? {
+          snapshotDate: row.snapshot_date,
+          isTrackedVersion: row.is_tracked_version,
+          versionNumber: row.version_number,
+          parentPresetId: row.parent_preset_id || undefined,
+        }
+      : undefined;
+
+  const isSnapshot = !!snapshotMetadata;
+
+  const presetPart = {
     id: row.id,
     userId: row.user_id,
     name: row.name,
@@ -132,18 +168,11 @@ function mapFromDb(row: {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     lastSyncedAt: row.last_synced_at,
-    snapshotMetadata:
-      row.is_tracked_version && row.snapshot_date && row.version_number
-        ? {
-            snapshotDate: row.snapshot_date,
-            isTrackedVersion: row.is_tracked_version,
-            versionNumber: row.version_number,
-            parentPresetId: row.parent_preset_id || undefined,
-          }
-        : undefined,
+    isSnapshot,
+    snapshotMetadata,
   };
 
-  return sanitizePreset(preset) as Preset;
+  return sanitizePreset(presetPart) as Preset;
 }
 
 // Mapper: App -> DB
@@ -258,6 +287,17 @@ export const presetService = {
       try {
         const { error } = await supabase.from('presets').upsert(mapToDb(preset));
         if (error) throw error;
+
+        // 3. Save Competitors if present
+        if (preset.competitors && preset.competitors.length > 0) {
+          for (const comp of preset.competitors) {
+            // Only sync if it has a presetId (which it should if it's attached)
+            if (comp.presetId === preset.id) {
+               await this.upsertCompetitor(preset.id, comp);
+            }
+          }
+        }
+
       } catch (e) {
         console.error('Save to cloud failed, queuing', e);
         addToSyncQueue('save', preset);
@@ -356,18 +396,18 @@ export const presetService = {
   },
 
   async createSnapshot(presetId: string): Promise<Preset | null> {
-    // 1. Fetch Source Preset (Local first for speed, then cloud if missing?)
-    // Actually, we should probably just use what's local or fetch fresh.
-    // Let's rely on fetchPresets or local cache.
-    let presets = getLocalPresets();
-    let sourcePreset = presets.find((p) => p.id === presetId);
+    // 1. Fetch Source Preset
+    const presets = getLocalPresets();
+    const sourcePreset = presets.find((p) => p.id === presetId);
 
     if (!sourcePreset) {
-      // Try fetching specific preset from cloud if not local?
-      // But for now, we assume user is working with loaded presets.
-      // Let's force a fetch if not found and online?
-      // Simpler: Just fail if not found locally, assuming UI keeps state.
-      console.warn('Source preset not found for snapshot:', presetId);
+      console.error('Snapshot creation failed: Base preset not found locally', presetId);
+      return null;
+    }
+
+    // Validation: Ensure we don't snapshot a snapshot
+    if (sourcePreset.isSnapshot) {
+      console.error('Snapshot creation failed: Cannot create a snapshot from a snapshot');
       return null;
     }
 
@@ -375,7 +415,8 @@ export const presetService = {
     // Check local snapshots for max version
     const localSnapshots = presets.filter(
       (p) =>
-        p.snapshotMetadata?.parentPresetId === presetId && p.snapshotMetadata?.isTrackedVersion
+        p.isSnapshot &&
+        p.snapshotMetadata?.parentPresetId === presetId
     );
 
     let nextVersion = 1;
@@ -384,17 +425,21 @@ export const presetService = {
       nextVersion = maxLocal + 1;
     }
 
-    // If online, double check DB for higher version to avoid conflict
+    // If online, double check DB for higher version to ensure consistency
     if (navigator.onLine && sourcePreset.userId) {
-      const { data } = await supabase
-        .from('presets')
-        .select('version_number')
-        .eq('parent_preset_id', presetId)
-        .order('version_number', { ascending: false })
-        .limit(1);
+      try {
+        const { data } = await supabase
+          .from('presets')
+          .select('version_number')
+          .eq('parent_preset_id', presetId)
+          .order('version_number', { ascending: false })
+          .limit(1);
 
-      if (data && data.length > 0 && data[0].version_number) {
-        nextVersion = Math.max(nextVersion, data[0].version_number + 1);
+        if (data && data.length > 0 && data[0].version_number) {
+          nextVersion = Math.max(nextVersion, data[0].version_number + 1);
+        }
+      } catch (e) {
+        console.warn('Could not fetch latest version from cloud, using local version', e);
       }
     }
 
@@ -408,6 +453,7 @@ export const presetService = {
       createdAt: now,
       updatedAt: now,
       lastSyncedAt: undefined, // Needs sync
+      isSnapshot: true,
       snapshotMetadata: {
         snapshotDate: now,
         isTrackedVersion: true,
@@ -416,7 +462,21 @@ export const presetService = {
       },
     };
 
-    // 4. Save Snapshot
+    // 4. Handle Competitors (Deep Clone)
+    // If the source preset has competitors, we need to clone them as new records linked to the snapshot
+    if (Array.isArray(snapshotPreset.competitors) && snapshotPreset.competitors.length > 0) {
+      snapshotPreset.competitors = snapshotPreset.competitors.map((comp) => ({
+        ...comp,
+        id: crypto.randomUUID(), // New ID
+        presetId: snapshotId, // Link to snapshot
+        createdAt: now,
+        updatedAt: now,
+      }));
+    } else {
+      snapshotPreset.competitors = [];
+    }
+
+    // 5. Save Snapshot
     return await this.savePreset(snapshotPreset);
   },
 
@@ -426,8 +486,8 @@ export const presetService = {
     const localSnapshots = localPresets
       .filter(
         (p) =>
-          p.snapshotMetadata?.parentPresetId === parentPresetId &&
-          p.snapshotMetadata?.isTrackedVersion
+          p.isSnapshot &&
+          p.snapshotMetadata?.parentPresetId === parentPresetId
       )
       .sort((a, b) => (a.snapshotMetadata!.versionNumber - b.snapshotMetadata!.versionNumber));
 
@@ -445,11 +505,8 @@ export const presetService = {
 
         if (data) {
           const cloudSnapshots = data.map(mapFromDb);
-          // Merge logic? Or just return cloud as truth?
-          // Since snapshots are immutable (mostly), cloud is authoritative.
-          // But we should update local cache.
           
-          // Let's merge into local storage to keep it fresh
+          // Merge into local storage
           const allPresets = getLocalPresets();
           const mergedMap = new Map(allPresets.map(p => [p.id, p]));
           

@@ -78,21 +78,6 @@ export interface CalculationResult {
   variantResults?: VariantResult[];
 }
 
-export interface Preset {
-  id: string;
-  userId?: string;
-  name: string;
-  presetType: 'default' | 'variant';
-  baseRecipe: CalculationInput;
-  variants: Variant[];
-  pricingConfig: PricingConfig;
-  createdAt: string;
-  updatedAt: string;
-  lastSyncedAt?: string | null;
-  snapshotMetadata?: SnapshotMetadata;
-  competitors?: Competitor[];
-}
-
 export interface SnapshotMetadata {
   snapshotDate: string;
   isTrackedVersion: boolean;
@@ -109,3 +94,34 @@ export interface Competitor {
   createdAt: string;
   updatedAt: string;
 }
+
+export type DraftCompetitor = Omit<Competitor, 'id' | 'presetId' | 'createdAt' | 'updatedAt'> & {
+  id?: string; // Optional for local tracking before save
+  presetId?: string;
+};
+
+interface PresetBase {
+  id: string;
+  userId?: string;
+  name: string;
+  presetType: 'default' | 'variant';
+  baseRecipe: CalculationInput;
+  variants: Variant[];
+  pricingConfig: PricingConfig;
+  createdAt: string;
+  updatedAt: string;
+  lastSyncedAt?: string | null;
+  competitors?: Competitor[];
+}
+
+export interface ActivePreset extends PresetBase {
+  isSnapshot: false;
+  snapshotMetadata?: never;
+}
+
+export interface Snapshot extends PresetBase {
+  isSnapshot: true;
+  snapshotMetadata: SnapshotMetadata;
+}
+
+export type Preset = ActivePreset | Snapshot;
