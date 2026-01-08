@@ -59,13 +59,6 @@ describe('Calculation Utils', () => {
       expect(values).not.toContain('kg');
     });
 
-    it('excludes the specific unit if excludeValue is provided', () => {
-      const units = getCompatibleUnits('kg', 'kg');
-      const values = units.map((u) => u.value);
-      expect(values).toContain('g');
-      expect(values).not.toContain('kg');
-    });
-
     it('returns all units for invalid or empty input', () => {
       const units = getCompatibleUnits('');
       expect(units.length).toBeGreaterThan(10);

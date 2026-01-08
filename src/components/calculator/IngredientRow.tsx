@@ -174,10 +174,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   // Purchase unit shows ALL units so user can switch categories.
   // Recipe unit is strictly filtered by the selected Purchase unit.
   const purchaseUnitOptions = UNIT_OPTIONS;
-  const recipeUnitOptions = getCompatibleUnits(
-    ingredient.purchaseUnit || '',
-    ingredient.purchaseUnit
-  );
+  const recipeUnitOptions = getCompatibleUnits(ingredient.purchaseUnit || '');
 
   return (
     <div
