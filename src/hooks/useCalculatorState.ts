@@ -105,6 +105,7 @@ export interface CalculatorState {
   loadPreset: (preset: Preset) => void;
   saveAsPreset: (name: string) => Promise<Preset>;
   deletePreset: (id: string) => void;
+  createSnapshot: (presetId: string) => Promise<Preset | null>;
 }
 
 /**
@@ -115,7 +116,7 @@ export function useCalculatorState(initialValues?: {
   input?: CalculationInput;
   config?: PricingConfig;
 }): CalculatorState {
-  const { presets, addPreset, deletePreset: removePreset } = usePresets();
+  const { presets, addPreset, deletePreset: removePreset, createSnapshot } = usePresets();
 
   // Persistence using sessionStorage
   const [draft, setDraft] = useSessionStorage<{
@@ -573,6 +574,7 @@ export function useCalculatorState(initialValues?: {
     loadPreset,
     saveAsPreset,
     deletePreset,
+    createSnapshot,
 
     // Variant Actions Export
     setHasVariants,

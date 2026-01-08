@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Package } from 'lucide-react';
 import { CalculatorForm, PriceHistory } from '../components/calculator';
 import { ResultsDisplay, StickySummary, PriceTrendChart } from '../components/results';
@@ -38,6 +38,7 @@ export const CalculatorPage: React.FC = () => {
     updateVariantIngredient,
     addVariantIngredient,
     removeVariantIngredient,
+    createSnapshot,
   } = useCalculatorState();
 
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
@@ -46,6 +47,42 @@ export const CalculatorPage: React.FC = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const showResults = !!results;
+
+  // Derive snapshots for the current preset (including fallback for v1)
+  const historySnapshots = useMemo(() => {
+    if (!currentPresetId) return [];
+
+    const explicitSnapshots = presets
+      .filter((p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === currentPresetId)
+      .sort(
+        (a, b) =>
+          new Date(b.snapshotMetadata!.snapshotDate).getTime() -
+          new Date(a.snapshotMetadata!.snapshotDate).getTime()
+      );
+
+    // If explicit snapshots exist, use them
+    if (explicitSnapshots.length > 0) return explicitSnapshots;
+
+    // Fallback: Use the saved preset as Version 1 if available
+    // This ensures "Earliest saved preset (automatically considered version 1)"
+    const savedPreset = presets.find((p) => p.id === currentPresetId);
+    if (savedPreset) {
+      // Mock a snapshot structure for display
+      const virtualSnapshot: Preset = {
+        ...savedPreset,
+        isSnapshot: true,
+        snapshotMetadata: {
+          snapshotDate: savedPreset.createdAt,
+          isTrackedVersion: true,
+          versionNumber: 1,
+          parentPresetId: currentPresetId,
+        },
+      };
+      return [virtualSnapshot];
+    }
+
+    return [];
+  }, [currentPresetId, presets]);
 
   // Handle sticky summary visibility
   useEffect(() => {
@@ -98,6 +135,14 @@ export const CalculatorPage: React.FC = () => {
       reset();
       // Scroll to top to see fresh form
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePinVersion = async () => {
+    if (currentPresetId) {
+      await createSnapshot(currentPresetId);
+      triggerHapticFeedback(50);
+      addToast('✓ Version pinned', 'success');
     }
   };
 
@@ -176,14 +221,15 @@ export const CalculatorPage: React.FC = () => {
             {currentPresetId && results && (
               <div className="mt-4xl space-y-4xl animate-in fade-in duration-1000 delay-300">
                 <PriceTrendChart
-                  snapshots={presets.filter(
-                    (p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === currentPresetId
-                  )}
+                  snapshots={historySnapshots}
                 />
                 <PriceHistory
                   presetId={currentPresetId}
                   currentResult={results}
                   isUnsaved={isDirty}
+                  onRestore={handleLoadPreset}
+                  snapshots={historySnapshots}
+                  onPin={handlePinVersion}
                 />
               </div>
             )}

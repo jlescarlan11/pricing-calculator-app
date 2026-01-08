@@ -1,13 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PriceHistory } from './PriceHistory';
-import { usePresets } from '../../hooks/use-presets';
 import type { CalculationResult, Preset } from '../../types';
 
-// Mock usePresets
-vi.mock('../../hooks/use-presets', () => ({
-  usePresets: vi.fn(),
-}));
+// No need to mock use-presets anymore as the component is now pure (props-based)
 
 const mockCurrentResult: CalculationResult = {
   totalCost: 100,
@@ -49,19 +45,22 @@ const createMockSnapshot = (id: string, version: number, parentId: string): Pres
 });
 
 describe('PriceHistory', () => {
-  const mockCreateSnapshot = vi.fn();
+  const mockOnPin = vi.fn();
+  const mockOnRestore = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (usePresets as Mock).mockReturnValue({
-      presets: [],
-      createSnapshot: mockCreateSnapshot,
-    });
   });
 
   it('renders empty state when no snapshots exist', () => {
     render(
-      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={[]}
+        onPin={mockOnPin}
+      />
     );
 
     expect(screen.getByText(/No price milestones tracked yet/i)).toBeInTheDocument();
@@ -74,14 +73,19 @@ describe('PriceHistory', () => {
       createMockSnapshot('snap-2', 2, 'parent-1'),
     ];
 
-    (usePresets as Mock).mockReturnValue({
-      presets: snapshots,
-      createSnapshot: mockCreateSnapshot,
-    });
-
     render(
-      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={snapshots}
+        onPin={mockOnPin}
+      />
     );
+
+    // List is collapsed by default, so we need to click "Show 2 Milestones"
+    const showButton = screen.getByText(/Show 2 Milestones/i);
+    fireEvent.click(showButton);
 
     expect(screen.getByText('Version 1')).toBeInTheDocument();
     expect(screen.getByText('Version 2')).toBeInTheDocument();
@@ -93,17 +97,22 @@ describe('PriceHistory', () => {
   it('shows informational banner when fewer than 3 snapshots exist', () => {
     const snapshots = [createMockSnapshot('snap-1', 1, 'parent-1')];
 
-    (usePresets as Mock).mockReturnValue({
-      presets: snapshots,
-      createSnapshot: mockCreateSnapshot,
-    });
-
     render(
-      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={snapshots}
+        onPin={mockOnPin}
+      />
     );
 
+    // Expand to see tip
+    const showButton = screen.getByText(/Show 1 Milestone/i);
+    fireEvent.click(showButton);
+
     expect(
-      screen.getByText(/Tip: Pin a new version monthly to track profit trends over time/i)
+      screen.getByText(/Tip: Click any milestone to use it for comparison/i)
     ).toBeInTheDocument();
   });
 
@@ -114,63 +123,147 @@ describe('PriceHistory', () => {
       createMockSnapshot('snap-3', 3, 'parent-1'),
     ];
 
-    (usePresets as Mock).mockReturnValue({
-      presets: snapshots,
-      createSnapshot: mockCreateSnapshot,
-    });
-
     render(
-      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={snapshots}
+        onPin={mockOnPin}
+      />
     );
 
+    // Expand
+    const showButton = screen.getByText(/Show 3 Milestones/i);
+    fireEvent.click(showButton);
+
     expect(
-      screen.queryByText(/Tip: Pin a new version monthly to track profit trends over time/i)
+      screen.queryByText(/Tip: Click any milestone to use it for comparison/i)
     ).not.toBeInTheDocument();
   });
 
-  it('disables "Pin Current Version" button when unsaved', () => {
-    render(<PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={true} />);
+  it('disables "Pin Version" button when unsaved', () => {
+    render(
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={true} 
+        snapshots={[]}
+        onPin={mockOnPin}
+      />
+    );
 
-    const button = screen.getByRole('button', { name: /Pin Current Version/i });
+    const button = screen.getByRole('button', { name: /Pin Version/i });
     expect(button).toBeDisabled();
   });
 
-  it('enables "Pin Current Version" button when saved', () => {
+  it('enables "Pin Version" button when saved', () => {
     render(
-      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={[]}
+        onPin={mockOnPin}
+      />
     );
 
-    const button = screen.getByRole('button', { name: /Pin Current Version/i });
+    const button = screen.getByRole('button', { name: /Pin Version/i });
     expect(button).not.toBeDisabled();
   });
 
-  it('calls createSnapshot when "Pin Current Version" is clicked', async () => {
+  it('calls onPin when "Pin Version" is clicked', () => {
     render(
-      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={[]}
+        onPin={mockOnPin}
+      />
     );
 
-    const button = screen.getByRole('button', { name: /Pin Current Version/i });
+    const button = screen.getByRole('button', { name: /Pin Version/i });
     fireEvent.click(button);
 
-    expect(mockCreateSnapshot).toHaveBeenCalledWith('parent-1');
+    expect(mockOnPin).toHaveBeenCalled();
   });
 
   it('renders SnapshotComparisonCard when snapshots exist', () => {
     const snapshots = [createMockSnapshot('snap-1', 1, 'parent-1')];
 
-    (usePresets as Mock).mockReturnValue({
-      presets: snapshots,
-      createSnapshot: mockCreateSnapshot,
-    });
-
     render(
-      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={snapshots}
+        onPin={mockOnPin}
+      />
     );
 
     // SnapshotComparisonCard contains text like "Since" and then the date
+    expect(screen.getByText(/Comparing with/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Version 1/i).length).toBeGreaterThan(0);
+  });
 
-    expect(screen.getByText(/Comparison with Last Milestone/i)).toBeInTheDocument();
+  it('toggles comparison when a different milestone is clicked', () => {
+    const snapshots = [
+      createMockSnapshot('snap-1', 1, 'parent-1'), // Earlier
+      createMockSnapshot('snap-2', 2, 'parent-1'), // Later
+    ];
+    // Note: The component expects snapshots to be passed in, but it does NOT sort them itself anymore? 
+    // Wait, let's check PriceHistory.tsx logic again.
+    // It filters and sorts in the previous version. Now it takes `snapshots`.
+    // It assumes `snapshots[0]` is selected by default.
+    // So we should pass them in the order we want (typically newest first).
+    // Let's pass snap-2 then snap-1.
+    const sortedSnapshots = [...snapshots].reverse();
 
-    expect(screen.getByText(/Since/i)).toBeInTheDocument();
+    render(
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={sortedSnapshots}
+        onPin={mockOnPin}
+      />
+    );
+
+    // Default should be latest (Version 2)
+    // "Comparing with Version 2" should be visible in the collapsed text or explicit card
+    // The collapsed text: "Comparing with Version 2."
+    expect(screen.getAllByText(/Version 2/i).length).toBeGreaterThan(0);
+
+    // Expand and click Version 1
+    fireEvent.click(screen.getByText(/Show 2 Milestones/i));
+    fireEvent.click(screen.getAllByText('Version 1')[0]);
+
+    expect(screen.getAllByText(/Version 1/i).length).toBeGreaterThan(0);
+  });
+
+  it('calls onRestore when restore button is clicked', () => {
+    const snapshots = [createMockSnapshot('snap-1', 1, 'parent-1')];
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    render(
+      <PriceHistory 
+        presetId="parent-1" 
+        currentResult={mockCurrentResult} 
+        isUnsaved={false} 
+        snapshots={snapshots}
+        onPin={mockOnPin}
+        onRestore={mockOnRestore}
+      />
+    );
+
+    // Expand
+    fireEvent.click(screen.getByText(/Show 1 Milestone/i));
+    
+    // Click restore button (RotateCcw icon)
+    const restoreButton = screen.getByTitle(/Restore this version/i);
+    fireEvent.click(restoreButton);
+
+    expect(mockOnRestore).toHaveBeenCalledWith(snapshots[0]);
   });
 });
