@@ -30,6 +30,10 @@ export function usePresets() {
 
     const initialLoad = async () => {
       if (isMounted) {
+        // Try to sync pending items first if online
+        if (navigator.onLine) {
+          await presetService.syncPendingItems().catch(console.error);
+        }
         await loadPresets();
       }
     };
@@ -63,7 +67,10 @@ export function usePresets() {
 
   const addPreset = useCallback(
     async (
-      presetData: Omit<Preset, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'lastSyncedAt'>
+      presetData: Omit<
+        Preset,
+        'id' | 'userId' | 'createdAt' | 'updatedAt' | 'lastSyncedAt' | 'isSnapshot' | 'snapshotMetadata'
+      >
     ) => {
       const presetId = crypto.randomUUID();
       
@@ -81,6 +88,7 @@ export function usePresets() {
         updatedAt: new Date().toISOString(),
         lastSyncedAt: null,
         isSnapshot: false,
+        snapshotMetadata: undefined,
         competitors: competitors
       };
 
@@ -111,7 +119,7 @@ export function usePresets() {
         ...oldPreset,
         ...updates,
         updatedAt: new Date().toISOString(),
-      };
+      } as Preset;
 
       // Trigger save (fire and forget for UI responsiveness)
       presetService
@@ -155,6 +163,31 @@ export function usePresets() {
     return presets;
   }, [presets]);
 
+  const createSnapshot = useCallback(async (presetId: string) => {
+    setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+    try {
+      const snapshot = await presetService.createSnapshot(presetId);
+      if (snapshot) {
+        setPresets((prev) => [...prev, snapshot]);
+        setSyncStatus(navigator.onLine ? 'synced' : 'offline');
+      }
+      return snapshot;
+    } catch (err) {
+      console.error(err);
+      setSyncStatus('error');
+      throw err;
+    }
+  }, []);
+
+  const getSnapshots = useCallback(async (presetId: string) => {
+    try {
+      return await presetService.getSnapshots(presetId);
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  }, []);
+
   return {
     presets,
     addPreset,
@@ -162,6 +195,8 @@ export function usePresets() {
     deletePreset,
     getPreset,
     getAllPresets,
+    createSnapshot,
+    getSnapshots,
     syncStatus,
     error,
     refresh: loadPresets,

@@ -7,3 +7,4 @@ export * from './PricingStrategy';
 export * from './CalculatorForm';
 export * from './SampleDemo';
 export * from './VariantBlock';
+export * from './PriceHistory';

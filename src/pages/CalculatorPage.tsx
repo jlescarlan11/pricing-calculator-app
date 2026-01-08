@@ -1,16 +1,18 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Package } from 'lucide-react';
-import { CalculatorForm } from '../components/calculator';
-import { ResultsDisplay, StickySummary } from '../components/results';
+import { CalculatorForm, PriceHistory } from '../components/calculator';
+import { ResultsDisplay, StickySummary, PriceTrendChart } from '../components/results';
 import { PresetsList } from '../components/presets';
 import { Modal, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
 import { useCalculatorState } from '../hooks';
+import { useAuth } from '../context/AuthContext';
 import { triggerHapticFeedback } from '../utils/haptics';
 import type { Preset } from '../types';
 
 export const CalculatorPage: React.FC = () => {
   const { addToast } = useToast();
+  const { user } = useAuth();
   const {
     input,
     config,
@@ -19,6 +21,8 @@ export const CalculatorPage: React.FC = () => {
     isDirty,
     errors,
     isCalculating,
+    presets,
+    currentPresetId,
     updateInput,
     updateIngredient,
     addIngredient,
@@ -100,13 +104,14 @@ export const CalculatorPage: React.FC = () => {
   const handleLoadSample = useCallback(() => {
     loadPreset({
       id: 'sample',
-      name: 'Sample Cookie',
+      name: 'Sample Product',
       presetType: 'default',
       baseRecipe: COOKIE_SAMPLE.input,
       pricingConfig: COOKIE_SAMPLE.config,
       variants: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      isSnapshot: false,
     });
 
     // Smooth scroll to form area
@@ -163,7 +168,24 @@ export const CalculatorPage: React.FC = () => {
               input={input}
               config={config}
               onEdit={handleScrollToForm}
+              presetId={currentPresetId}
+              userId={user?.id}
             />
+
+            {currentPresetId && (
+              <div className="mt-4xl space-y-4xl animate-in fade-in duration-1000 delay-300">
+                <PriceTrendChart
+                  snapshots={presets.filter(
+                    (p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === currentPresetId
+                  )}
+                />
+                <PriceHistory
+                  presetId={currentPresetId}
+                  currentResult={results}
+                  isUnsaved={isDirty}
+                />
+              </div>
+            )}
 
             <div className="h-px bg-border-subtle my-3xl" role="separator" />
           </div>
