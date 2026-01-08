@@ -5,3 +5,4 @@ export * from './print';
 export * from './copy-to-clipboard';
 export * from './haptics';
 export * from './presetComparison';
+export * from './featureFlags';

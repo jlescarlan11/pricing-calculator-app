@@ -3,3 +3,4 @@
  * All calculator-related types are managed in calculator.ts and exported here.
  */
 export * from './calculator';
+export * from './analytics';

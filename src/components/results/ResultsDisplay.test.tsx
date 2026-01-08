@@ -3,6 +3,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ResultsDisplay } from './ResultsDisplay';
 import { ToastProvider } from '../shared/Toast';
 import type { CalculationResult, CalculationInput, PricingConfig } from '../../types/calculator';
+import { analyticsService } from '../../services/analyticsService';
+import { shouldEnableLLM } from '../../utils/featureFlags';
+import { supabase } from '../../lib/supabase';
 
 // Mock usePresets
 vi.mock('../../hooks/use-presets', () => ({
@@ -12,6 +15,37 @@ vi.mock('../../hooks/use-presets', () => ({
     deletePreset: vi.fn(),
   })),
 }));
+
+// Mock supabase
+vi.mock('../../lib/supabase', () => ({
+  supabase: {
+    functions: {
+      invoke: vi.fn(),
+    },
+  },
+}));
+
+// Mock analyticsService
+vi.mock('../../services/analyticsService', () => ({
+  analyticsService: {
+    trackAnalysisClick: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+// Mock featureFlags
+vi.mock('../../utils/featureFlags', () => ({
+  shouldEnableLLM: vi.fn().mockResolvedValue(false),
+}));
+
+// Mock AnalyzePriceCard helpers
+vi.mock('./AnalyzePriceCard', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
+    incrementUsage: vi.fn(),
+    checkRateLimit: vi.fn(() => ({ allowed: true, remaining: 5 })),
+  };
+});
 
 const mockInput: CalculationInput = {
   productName: 'Test Product',
@@ -59,6 +93,10 @@ describe('ResultsDisplay', () => {
     document.execCommand = vi.fn().mockReturnValue(true);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   const renderWithProviders = (ui: React.ReactElement) => {
     return render(<ToastProvider>{ui}</ToastProvider>);
   };
@@ -87,6 +125,20 @@ describe('ResultsDisplay', () => {
     // Check if sub-components are rendered (by checking for their specific text)
     expect(screen.getByText(/Recommended Selling Price/i)).toBeInTheDocument();
     expect(screen.getByText(/Cost Analysis/i)).toBeInTheDocument();
+  });
+
+  it('renders AnalyzePriceCard when results are provided', () => {
+    renderWithProviders(
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        onEdit={() => {}}
+      />
+    );
+
+    expect(screen.getByText(/Want a deeper look\?/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Analyze My Pricing/i })).toBeInTheDocument();
   });
 
   it('renders business name and date in print header', () => {
@@ -151,5 +203,72 @@ describe('ResultsDisplay', () => {
     fireEvent.click(saveButton);
 
     expect(screen.getByText(/Save calculation/i)).toBeInTheDocument();
+  });
+
+  it('performs analysis when Analyze My Pricing is clicked', async () => {
+    renderWithProviders(
+      <ResultsDisplay 
+        results={mockResults} 
+        input={mockInput} 
+        config={mockConfig} 
+        presetId="test-preset" 
+        userId="test-user" 
+      />
+    );
+
+    const analyzeButton = screen.getByRole('button', { name: /Analyze My Pricing/i });
+    fireEvent.click(analyzeButton);
+
+    // Wait for analysis to complete (handles the 1200ms delay)
+    expect(await screen.findByRole('heading', { name: /Analysis Complete/i }, { timeout: 3000 })).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(/Analysis complete/i);
+  });
+
+  it('shows error toast when analysis fails', async () => {
+    vi.mocked(analyticsService.trackAnalysisClick).mockRejectedValueOnce(new Error('Failed'));
+
+    renderWithProviders(
+      <ResultsDisplay 
+        results={mockResults} 
+        input={mockInput} 
+        config={mockConfig} 
+        presetId="test-preset" 
+        userId="test-user" 
+      />
+    );
+
+    const analyzeButton = screen.getByRole('button', { name: /Analyze My Pricing/i });
+    fireEvent.click(analyzeButton);
+
+    const { waitFor } = await import('@testing-library/react');
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to perform analysis/i)).toBeInTheDocument();
+    });
+  });
+
+  it('uses LLM analysis when feature flag is enabled', async () => {
+    vi.mocked(shouldEnableLLM).mockResolvedValueOnce(true);
+    vi.mocked(supabase.functions.invoke).mockResolvedValueOnce({
+      data: { recommendations: ['LLM Rec 1', 'LLM Rec 2', 'LLM Rec 3'] },
+      error: null,
+    } as any);
+
+    renderWithProviders(
+      <ResultsDisplay 
+        results={mockResults} 
+        input={mockInput} 
+        config={mockConfig} 
+        presetId="test-preset" 
+        userId="test-user" 
+      />
+    );
+
+    const analyzeButton = screen.getByRole('button', { name: /Analyze My Pricing/i });
+    fireEvent.click(analyzeButton);
+
+    await screen.findByRole('heading', { name: /Analysis Complete/i });
+    
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('analyze-pricing', expect.any(Object));
+    expect(screen.getByText(/LLM Rec 1/i)).toBeInTheDocument();
   });
 });

@@ -78,7 +78,7 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
                 <div className="flex items-start p-md bg-sakura/10 border border-sakura/30 rounded-lg text-sm text-ink-700">
                   <AlertCircle className="w-5 h-5 mr-sm text-sakura shrink-0" />
                   <p>
-                    Tip: Pin new versions monthly or after significant ingredient price changes to track your profit trends over time.
+                    💡 Tip: Pin a new version monthly to track profit trends over time.
                   </p>
                 </div>
               )}

@@ -172,7 +172,8 @@ export const CalculatorPage: React.FC = () => {
               userId={user?.id}
             />
 
-            {currentPresetId && (
+            {/* Price History & Milestones (Only for saved products) */}
+            {currentPresetId && results && (
               <div className="mt-4xl space-y-4xl animate-in fade-in duration-1000 delay-300">
                 <PriceTrendChart
                   snapshots={presets.filter(

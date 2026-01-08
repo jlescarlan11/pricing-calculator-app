@@ -16,8 +16,8 @@ interface SyncQueueItem {
 function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | null {
   if (!preset || !preset.id || !preset.name) return null;
 
-  const baseRecipe = preset.baseRecipe as Record<string, unknown> | undefined;
-  const pricingConfig = preset.pricingConfig as Record<string, unknown> | undefined;
+  const baseRecipe = preset.baseRecipe as unknown as Record<string, unknown> | undefined;
+  const pricingConfig = preset.pricingConfig as unknown as Record<string, unknown> | undefined;
   const snapshotMetadata = preset.snapshotMetadata;
 
   // Infer isSnapshot from metadata presence if not explicitly set
@@ -27,23 +27,31 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
       ? preset.isSnapshot
       : !!(snapshotMetadata && snapshotMetadata.isTrackedVersion);
 
+  const presetType = (preset.presetType || 'default') as 'default' | 'variant';
+  const variants = Array.isArray(preset.variants) ? preset.variants : [];
+
   const common = {
     id: preset.id,
     userId: preset.userId,
     name: preset.name,
-    presetType: (preset.presetType || 'default') as 'default' | 'variant',
+    presetType,
     baseRecipe: {
       productName: String(baseRecipe?.productName || ''),
       batchSize: typeof baseRecipe?.batchSize === 'number' ? baseRecipe.batchSize : 1,
       ingredients: Array.isArray(baseRecipe?.ingredients) ? baseRecipe.ingredients : [],
       laborCost: typeof baseRecipe?.laborCost === 'number' ? baseRecipe.laborCost : 0,
       overhead: typeof baseRecipe?.overhead === 'number' ? baseRecipe.overhead : 0,
-      hasVariants: !!baseRecipe?.hasVariants,
-      variants: Array.isArray(baseRecipe?.variants) ? baseRecipe.variants : [],
+      // Prefer presetType and top-level variants for source of truth
+      hasVariants: baseRecipe?.hasVariants !== undefined 
+        ? !!baseRecipe.hasVariants 
+        : presetType === 'variant',
+      variants: variants.length > 0 
+        ? variants 
+        : (Array.isArray(baseRecipe?.variants) ? baseRecipe.variants : []),
       businessName: baseRecipe?.businessName as string | undefined,
       currentSellingPrice: baseRecipe?.currentSellingPrice as number | undefined,
     },
-    variants: Array.isArray(preset.variants) ? preset.variants : [],
+    variants,
     pricingConfig: {
       strategy: (pricingConfig?.strategy || 'markup') as 'markup' | 'margin',
       value: typeof pricingConfig?.value === 'number' ? pricingConfig.value : 50,
@@ -172,17 +180,25 @@ function mapFromDb(row: {
     snapshotMetadata,
   };
 
-  return sanitizePreset(presetPart) as Preset;
+  return sanitizePreset(presetPart as any) as Preset;
 }
 
 // Mapper: App -> DB
 function mapToDb(preset: Preset) {
+  // Strip variants and hasVariants from baseRecipe to avoid duplication in DB
+  // They are stored in their own columns: 'variants' and 'preset_type'
+  const { 
+    variants: _v, 
+    hasVariants: _hv, 
+    ...baseRecipeData 
+  } = preset.baseRecipe as any;
+
   return {
     id: preset.id,
     user_id: preset.userId,
     name: preset.name,
     preset_type: preset.presetType,
-    base_recipe: preset.baseRecipe,
+    base_recipe: baseRecipeData,
     variants: preset.variants,
     pricing_config: preset.pricingConfig,
     created_at: preset.createdAt,
@@ -207,8 +223,23 @@ export const presetService = {
     for (const item of queue) {
       try {
         if (item.action === 'save') {
+          if (!item.preset.userId) {
+            console.warn('Dropping sync item with missing userId:', item.preset.id);
+            continue;
+          }
+
           const { error } = await supabase.from('presets').upsert(mapToDb(item.preset));
           if (error) throw error;
+
+          // Sync Competitors
+          if (item.preset.competitors && item.preset.competitors.length > 0) {
+            for (const comp of item.preset.competitors) {
+              // Only sync if it has a presetId (which it should if it's attached)
+              if (comp.presetId === item.preset.id) {
+                await this.upsertCompetitor(item.preset.id, comp);
+              }
+            }
+          }
         } else if (item.action === 'delete') {
           const { error } = await supabase.from('presets').delete().eq('id', item.preset.id);
           if (error) throw error;
@@ -234,32 +265,54 @@ export const presetService = {
 
         if (data) {
           const cloudPresets = data.map(mapFromDb);
+          const cloudMap = new Map<string, Preset>(cloudPresets.map(p => [p.id, p]));
 
-          // 3. Merge Strategy (Last Write Wins based on updatedAt)
-          const mergedMap = new Map<string, Preset>();
+          // 3. Sync-aware Merge Strategy
+          const finalPresets: Preset[] = [];
 
-          // Add local first
-          localPresets.forEach((p) => mergedMap.set(p.id, p));
+          // Process Local Presets
+          for (const localP of localPresets) {
+            // Case 1: Preset belongs to a different user or is a guest preset (no userId)
+            // We keep these to avoid data loss / handle migration later
+            if (localP.userId !== userId) {
+              finalPresets.push(localP);
+              continue;
+            }
 
-          // Merge cloud
-          cloudPresets.forEach((cloudP) => {
-            const localP = mergedMap.get(cloudP.id);
-            if (!localP) {
-              mergedMap.set(cloudP.id, cloudP);
-            } else {
-              // Compare timestamps
+            const cloudP = cloudMap.get(localP.id);
+
+            if (cloudP) {
+              // Case 2: Preset exists in both. Use Last Write Wins.
               const localTime = new Date(localP.updatedAt).getTime();
               const cloudTime = new Date(cloudP.updatedAt).getTime();
-              if (cloudTime > localTime) {
-                mergedMap.set(cloudP.id, cloudP);
+              
+              if (cloudTime >= localTime) {
+                finalPresets.push(cloudP);
+              } else {
+                finalPresets.push(localP);
+                // Note: localP will be synced back to cloud in next sync cycle or on next save
+              }
+              // Remove from cloud map so we know what's left
+              cloudMap.delete(localP.id);
+            } else {
+              // Case 3: Preset is local-only for this user.
+              // If it has been synced before (lastSyncedAt is set), it means it was deleted elsewhere.
+              if (localP.lastSyncedAt) {
+                console.log(`[Sync] Deleting locally removed cloud preset: ${localP.name}`);
+                continue; // Discard (Delete locally)
+              } else {
+                // It's a new local creation that hasn't synced yet. Keep it.
+                finalPresets.push(localP);
               }
             }
-          });
+          }
 
-          const merged = Array.from(mergedMap.values());
-          // Update local storage with merged data
-          setLocalPresets(merged);
-          return merged;
+          // Case 4: Any remaining cloud presets are new to this device.
+          cloudMap.forEach((p) => finalPresets.push(p));
+
+          // Update local storage with the synchronized list
+          setLocalPresets(finalPresets);
+          return finalPresets;
         }
       } catch (e) {
         console.error('Error fetching presets from cloud', e);

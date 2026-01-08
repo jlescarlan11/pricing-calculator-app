@@ -71,6 +71,7 @@ export interface CalculatorState {
   errors: Record<string, string>;
   isCalculating: boolean;
   presets: Preset[];
+  currentPresetId: string | null;
 
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
@@ -133,6 +134,7 @@ export function useCalculatorState(initialValues?: {
   const [config, setConfig] = useState<PricingConfig>(initialValues?.config || draft.config);
   const [competitors, setCompetitors] = useState<DraftCompetitor[]>(draft.competitors || []);
   const [results, setResults] = useState<CalculationResult | null>(null);
+  const [currentPresetId, setCurrentPresetId] = useState<string | null>(null);
   
   // Track the input/config state used for the last successful calculation
   const [lastCalculatedState, setLastCalculatedState] = useState<{
@@ -427,6 +429,7 @@ export function useCalculatorState(initialValues?: {
     setConfig(initialConfig);
     setCompetitors([]);
     setResults(null);
+    setCurrentPresetId(null);
     setLastCalculatedState(null);
     setErrors({});
     window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
@@ -452,6 +455,7 @@ export function useCalculatorState(initialValues?: {
 
     setInput(sanitizedInput);
     setConfig(preset.pricingConfig);
+    setCurrentPresetId(preset.id);
     
     // Load competitors
     if (preset.competitors) {
@@ -522,10 +526,7 @@ export function useCalculatorState(initialValues?: {
       // `saveAsPreset` returns Promise<Preset>.
       // `addPreset` returns the new preset.
       
-      // Let's update `usePresets.addPreset` to handle this. It's the cleanest way.
-      // I'll leave this `saveAsPreset` logic simple for now and update `usePresets` next.
-      
-      return addPreset({
+      const newPreset = await addPreset({
         name,
         baseRecipe: input,
         pricingConfig: config,
@@ -533,6 +534,9 @@ export function useCalculatorState(initialValues?: {
         variants: input.variants || [],
         competitors: mappedCompetitors as any, // Cast for now, will fix in usePresets
       });
+
+      setCurrentPresetId(newPreset.id);
+      return newPreset;
     },
     [addPreset, input, config, competitors]
   );
@@ -554,6 +558,7 @@ export function useCalculatorState(initialValues?: {
     errors,
     isCalculating,
     presets,
+    currentPresetId,
     updateInput,
     updateIngredient,
     addIngredient,

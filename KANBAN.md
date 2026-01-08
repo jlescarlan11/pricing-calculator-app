@@ -6,31 +6,31 @@ _Implementation of the relational schema to support versioning and benchmarking.
 
 ### **1.1 Database Schema Migration \[CRITICAL PATH\]**
 
-- \[ \] **Migration Strategy**: Create three separate migration files in order:
+- \[x\] **Migration Strategy**: Create three separate migration files in order:
   - File 1: migrations/20250107120000_extend_presets_versioning.sql (All presets metadata extensions).
   - File 2: migrations/20250107120100_create_competitors_table.sql (Competitors table with CHECK constraint).
   - File 3: migrations/20250107120200_create_analytics_table.sql (Analytics tracking table with referential integrity).
-- \[ \] **Rollback Procedure**: Document reversal steps in migrations/README.md (Order: Analytics → Competitors → Presets).
-- \[ \] **Presets Table Extension**: Implement metadata fields: snapshot_date (TIMESTAMPTZ), is_tracked_version (BOOLEAN), version_number (INTEGER), parent_preset_id (UUID, self-referencing FK).
-- \[ \] **Competitors Table Creation**: Define id, preset_id (FK), competitor_name, competitor_price, notes, created_at, updated_at.
-- \[ \] **Analytics Table Creation**: Define schema with ON DELETE CASCADE.
+- \[x\] **Rollback Procedure**: Document reversal steps in migrations/README.md (Order: Analytics → Competitors → Presets).
+- \[x\] **Presets Table Extension**: Implement metadata fields: snapshot_date (TIMESTAMPTZ), is_tracked_version (BOOLEAN), version_number (INTEGER), parent_preset_id (UUID, self-referencing FK).
+- \[x\] **Competitors Table Creation**: Define id, preset_id (FK), competitor_name, competitor_price, notes, created_at, updated_at.
+- \[x\] **Analytics Table Creation**: Define schema with ON DELETE CASCADE.
   - Subtask: user_id (FK to auth.users ON DELETE CASCADE).
   - Subtask: preset_id (FK to presets ON DELETE CASCADE).
   - Subtask: Add index on (user_id, clicked_at) and (clicked_at DESC) for optimized threshold queries.
 
 ### **1.2 Type Definitions & Service Layer \[REQUIRED BY: Task 3.1, Task 4.1\]**
 
-- \[ \] **Type Updates**: Update src/types/calculator.ts and src/types/index.ts.
+- \[x\] **Type Updates**: Update src/types/calculator.ts and src/types/index.ts.
   - Subtask: Add SnapshotMetadata and Competitor interfaces.
   - Subtask: **Discriminated Unions**: Add ActivePreset and Snapshot types to prevent creating snapshots of existing snapshots.
-- \[ \] **Preset Service Enhancements**: Update src/services/presetService.ts.
+- \[x\] **Preset Service Enhancements**: Update src/services/presetService.ts.
   - Subtask: **Pull-Model Snapshotting**: Implement manual createSnapshot(presetId: string). Remove any auto-snapshot logic to maintain intentional tracking.
   - Subtask: **Validation**: Ensure presetId exists and base preset is already saved before creating snapshot.
   - Subtask: Implement createSnapshot logic: Deep clone, set is_tracked_version \= true, link via parent_preset_id, assign new_version \= (max_version ?? 0\) \+ 1\.
   - Subtask: Implement getSnapshots(parentPresetId: string) and getCompetitors(presetId: string).
-- \[ \] **Foundation Validation**: Create tests/integration/foundationValidation.test.ts.
+- \[x\] **Foundation Validation**: Create tests/integration/foundationValidation.test.ts.
   - Subtask: Verify snapshot creation, retrieval via parent_preset_id, and version auto-increment logic.
-- \[ \] **Simplified Comparison Logic**: Implement compareTotals utility \[CONSUMED BY: Task 3.1\].
+- \[x\] **Simplified Comparison Logic**: Implement compareTotals utility \[CONSUMED BY: Task 3.1\].
   - Subtask: Create src/utils/presetComparison.ts.
   - Subtask: Implement logic to calculate deltas for totalCost, suggestedPrice, and profitMargin only.
 
@@ -40,18 +40,18 @@ _Staged deployment starting with a cost-controlled rules-based engine._
 
 ### **2.1 Rules-Based MVP (Phase 3.1a)**
 
-- \[ \] **Logic Engine**: Create src/utils/aiAnalysis.ts.
-  - Subtask: Implement calculateRiskScore(margin: number) and generateStaticRecommendations.
-- \[ \] **Analytics Foundation**: Implement usage tracking for metric-based decisions.
-  - Subtask: \[DEPENDS ON: Task 1.1 analytics table migration\].
-  - Subtask: Implement trackAnalysisClick(userId, presetId) in src/services/analyticsService.ts.
-  - Subtask: **Privacy Compliance**: Add disclosure: "We collect usage data to improve the tool. Data is automatically deleted if the product or account is removed."
-- \[ \] **UI Implementation**: Create src/components/results/AnalyzePriceCard.tsx.
-  - Subtask: Build card with "Analyze My Pricing" button.
-  - Subtask: **Integration**: Place AnalyzePriceCard in src/components/results/ResultsDisplay.tsx, positioned exactly above CostBreakdown.
-- \[ \] **Simplified LLM Gate**: Replace complex evaluation with a simple threshold check.
-  - Subtask: Create src/utils/featureFlags.ts with shouldEnableLLM().
-  - Subtask: Logic: Enable if ≥25 unique users clicked "Analyze" in the last 42 days (6 weeks).
+- [x] **Logic Engine**: Create src/utils/aiAnalysis.ts.
+  - [x] Subtask: Implement calculateRiskScore(margin: number) and generateStaticRecommendations.
+- [x] **Analytics Foundation**: Implement usage tracking for metric-based decisions.
+  - [x] Subtask: [DEPENDS ON: Task 1.1 analytics table migration].
+  - [x] Subtask: Implement trackAnalysisClick(userId, presetId) in src/services/analyticsService.ts.
+  - [x] Subtask: **Privacy Compliance**: Add disclosure: "We collect usage data to improve the tool. Data is automatically deleted if the product or account is removed."
+- [x] **UI Implementation**: Create src/components/results/AnalyzePriceCard.tsx.
+  - [x] Subtask: Build card with "Analyze My Pricing" button.
+  - [x] Subtask: **Integration**: Place AnalyzePriceCard in src/components/results/ResultsDisplay.tsx, positioned exactly above CostBreakdown.
+- [x] **Simplified LLM Gate**: Replace complex evaluation with a simple threshold check.
+  - [x] Subtask: Create src/utils/featureFlags.ts with shouldEnableLLM().
+  - [x] Subtask: Logic: Enable if ≥25 unique users clicked "Analyze" in the last 42 days (6 weeks).
 
 ### **2.2 LLM Integration (Phase 3.1b) \[CONDITIONAL DEPLOYMENT\]**
 
@@ -77,8 +77,8 @@ _Pull-based model for intentional business milestones._
 - \[ \] **Simple Delta Card (MVP)**: Create src/components/results/SnapshotComparisonCard.tsx.
   - Subtask: Show totals comparison: Total Cost delta, Suggested Price delta, and Margin % point change.
   - Subtask: **Integration**: Place below the snapshot list in PriceHistory, conditionally rendered when snapshots.length \> 0\.
-- \[ \] **Page Integration**: Add the PriceHistory component to src/pages/CalculatorPage.tsx.
-  - Subtask: **Conditional Rendering**: Only display PriceHistory when presetId exists.
+ - [x] **Page Integration**: Add the PriceHistory component to src/pages/CalculatorPage.tsx.
+ - Subtask: [x] **Conditional Rendering**: Only display PriceHistory when presetId exists.
 
 ### **3.2 Trend Visualization**
 

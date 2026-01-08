@@ -5,16 +5,25 @@ import { CostBreakdown } from './CostBreakdown';
 import { PriceComparison } from './PriceComparison';
 import { VariantResultsTable } from './VariantResultsTable';
 import { ShareResults } from './ShareResults';
+import { AnalyzePriceCard } from './AnalyzePriceCard';
 import { Button } from '../shared/Button';
+import { useToast } from '../shared/Toast';
 import { SavePresetButton } from '../presets/SavePresetButton';
 import { Share2, Calculator, Edit2 } from 'lucide-react';
 import { getPrintDate, getPrintTitle } from '../../utils';
+import { analyticsService } from '../../services/analyticsService';
+import { calculateRiskScore, generateStaticRecommendations } from '../../utils/aiAnalysis';
+import { shouldEnableLLM } from '../../utils/featureFlags';
+import { incrementUsage, checkRateLimit } from './AnalyzePriceCard';
+import { supabase } from '../../lib/supabase';
 
 interface ResultsDisplayProps {
   results: CalculationResult | null | undefined;
   input: CalculationInput;
   config: PricingConfig;
   onEdit?: () => void;
+  presetId?: string | null;
+  userId?: string | null;
 }
 
 /**
@@ -27,7 +36,73 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   input,
   config,
   onEdit,
+  presetId,
+  userId,
 }) => {
+  const { addToast } = useToast();
+  const [isAnalyzed, setIsAnalyzed] = React.useState(false);
+  const [recommendations, setRecommendations] = React.useState<string[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+
+  const handleAnalyze = async () => {
+    if (!presetId || !userId) {
+      addToast('Please save this product first to enable advanced analysis.', 'info');
+      return;
+    }
+
+    // Check rate limit first
+    const rateLimit = checkRateLimit();
+    if (!rateLimit.allowed) {
+      addToast('Daily analysis limit reached. Please try again tomorrow.', 'warning');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      // Track the click first (analytics)
+      await analyticsService.trackAnalysisClick(userId, presetId);
+
+      const isLLMEnabled = await shouldEnableLLM();
+
+      if (isLLMEnabled) {
+        // Advanced AI Analysis via Supabase Edge Function
+        const { data, error } = await supabase.functions.invoke('analyze-pricing', {
+          body: { 
+            results, 
+            input 
+          }
+        });
+
+        if (error || !data?.recommendations) {
+          console.error('AI Analysis failed:', error);
+          throw new Error('AI analysis failed');
+        }
+
+        setRecommendations(data.recommendations);
+      } else {
+        // Fallback to Rules-Based MVP
+        // Artificial delay for UX
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        
+        const margin = results?.profitMarginPercent || 0;
+        const risk = calculateRiskScore(margin);
+        const recs = generateStaticRecommendations(margin, risk);
+        
+        setRecommendations(recs);
+      }
+      
+      // Successfully performed analysis (either LLM or fallback)
+      incrementUsage();
+      setIsAnalyzed(true);
+      addToast('✓ Analysis complete.', 'success');
+    } catch (err) {
+      console.error('Failed to perform analysis:', err);
+      addToast('Failed to perform analysis. Please try again.', 'error');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   // Placeholder for when no results are available
   if (!results) {
     return (
@@ -97,6 +172,16 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           ) : (
             <PricingRecommendations results={results} />
           )}
+        </div>
+
+        {/* Analyze Pricing CTA */}
+        <div className="print:hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+          <AnalyzePriceCard 
+            onAnalyze={handleAnalyze} 
+            isAnalyzed={isAnalyzed}
+            recommendations={recommendations}
+            isLoading={isAnalyzing}
+          />
         </div>
 
         {/* Priority 2: Cost Breakdown - De-emphasized */}

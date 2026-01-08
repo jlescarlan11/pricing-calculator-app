@@ -82,8 +82,8 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
         name: trimmedName,
         baseRecipe: input,
         pricingConfig: config,
-        presetType: 'default',
-        variants: [],
+        presetType: input.hasVariants ? 'variant' : 'default',
+        variants: input.variants || [],
       });
 
       triggerHapticFeedback(50);

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FileEdit, Trash2, Play, Calendar, Package, MoreVertical } from 'lucide-react';
 import type { Preset } from '../../types';
 import { formatDate } from '../../utils/formatters';
+import { analyticsService } from '../../services/analyticsService';
 import { Button, Card, Badge, Tooltip } from '../shared';
 
 interface PresetListItemProps {
@@ -78,6 +79,9 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
               <div className="py-xs">
                 <button
                   onClick={() => {
+                    if (preset.userId) {
+                      analyticsService.trackAnalysisClick(preset.userId, preset.id);
+                    }
                     onLoad(preset);
                     setIsActionsOpen(false);
                   }}
@@ -170,7 +174,12 @@ export const PresetListItem: React.FC<PresetListItemProps> = ({
         <Button
           variant="primary"
           size="sm"
-          onClick={() => onLoad(preset)}
+          onClick={() => {
+            if (preset.userId) {
+              analyticsService.trackAnalysisClick(preset.userId, preset.id);
+            }
+            onLoad(preset);
+          }}
           className="flex-1 flex items-center justify-center gap-sm h-10 px-md font-bold text-[11px]"
         >
           <Play className="w-3.5 h-3.5 fill-current" />
