@@ -25,10 +25,7 @@ export const calculateRiskScore = (margin: number): RiskLevel => {
  * @param riskScore The calculated risk level.
  * @returns An array of recommendation strings.
  */
-export const generateStaticRecommendations = (
-  margin: number,
-  riskScore: RiskLevel
-): string[] => {
+export const generateStaticRecommendations = (margin: number, riskScore: RiskLevel): string[] => {
   const formattedMargin = margin.toFixed(1) + '%';
   switch (riskScore) {
     case 'high':

@@ -5,10 +5,7 @@ import { Input } from '../shared/Input';
 import { Select } from '../shared/Select';
 import { Modal } from '../shared/Modal';
 import { Switch } from '../shared/Switch';
-import {
-  calculateIngredientCostFromPurchase,
-  UNIT_OPTIONS,
-} from '../../utils/calculations';
+import { calculateIngredientCostFromPurchase, UNIT_OPTIONS } from '../../utils/calculations';
 import { triggerHapticFeedback } from '../../utils/haptics';
 import type { Ingredient } from '../../types/calculator';
 
@@ -115,12 +112,12 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 
   const handleToggleFullQuantity = (checked: boolean) => {
     onUpdate(ingredient.id, 'useFullQuantity', checked);
-    
+
     if (checked) {
       // Sync immediately
       const newRecipeQuantity = ingredient.purchaseQuantity || 0;
       const newRecipeUnit = ingredient.purchaseUnit || '';
-      
+
       onUpdate(ingredient.id, 'recipeQuantity', newRecipeQuantity);
       onUpdate(ingredient.id, 'recipeUnit', newRecipeUnit);
       onUpdate(ingredient.id, 'amount', newRecipeQuantity);
@@ -140,7 +137,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       // Only add on Enter if not in a textarea/select (standard form behavior)
-      e.preventDefault(); 
+      e.preventDefault();
       onAdd();
     } else if (e.key === 'Delete' && e.shiftKey) {
       e.preventDefault();
@@ -177,7 +174,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 
         {/* Delete Button (Desktop Position) */}
         <div className="hidden md:block pt-6">
-           <Button
+          <Button
             variant="ghost"
             size="sm"
             className="w-10 h-10 p-0 text-ink-500 hover:text-rust hover:bg-rust/5"
@@ -193,124 +190,124 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
       {/* Input Area */}
       <div className="rounded-lg transition-all duration-300 overflow-hidden md:bg-surface/50 md:border md:border-border-subtle md:p-md">
         <div className="grid grid-cols-1 gap-6 md:gap-md animate-in fade-in slide-in-from-top-2">
-            {/* Purchase Row */}
-            <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
-              <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
-                Purchase Details
-              </span>
-              
-              <div className="col-span-1 md:col-span-3">
-                  <Input
-                      type="number"
-                      placeholder="Qty"
-                      value={ingredient.purchaseQuantity || ''}
-                      onChange={(e) => handleChange('purchaseQuantity', e.target.value)}
-                      min={0}
-                      step="any"
-                      className="text-sm"
-                      label="Quantity"
-                      hideLabel
-                      error={errors?.purchaseQuantity}
-                  />
-              </div>
-              
-              <div className="col-span-1 md:col-span-3">
-                    <Select
-                      label="Unit"
-                      hideLabel
-                      options={UNIT_OPTIONS}
-                      value={ingredient.purchaseUnit || ''}
-                      onChange={(e) => handleChange('purchaseUnit', e.target.value)}
-                      placeholder="Unit"
-                      className="text-sm"
-                  />
-              </div>
-              
-              <div className="col-span-2 md:col-span-4 md:pl-xs">
-                    <Input
-                      type="number"
-                      placeholder="Total Cost"
-                      value={ingredient.purchaseCost || ''}
-                      onChange={(e) => handleChange('purchaseCost', e.target.value)}
-                      min={0}
-                      step="0.01"
-                      currency
-                      className="text-sm"
-                      label="Cost"
-                      hideLabel
-                      error={errors?.purchaseCost}
-                  />
-              </div>
-            </div>
+          {/* Purchase Row */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
+            <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
+              Purchase Details
+            </span>
 
-            {/* Toggle Row */}
-            <div className="md:ml-[16.666%] flex items-center">
-              <Switch
-                checked={!!ingredient.useFullQuantity}
-                onChange={handleToggleFullQuantity}
-                label="Use 100% of purchase quantity"
+            <div className="col-span-1 md:col-span-3">
+              <Input
+                type="number"
+                placeholder="Qty"
+                value={ingredient.purchaseQuantity || ''}
+                onChange={(e) => handleChange('purchaseQuantity', e.target.value)}
+                min={0}
+                step="any"
+                className="text-sm"
+                label="Quantity"
+                hideLabel
+                error={errors?.purchaseQuantity}
               />
             </div>
-            
-            {/* Usage Row */}
-            <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
-              <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
-                Recipe Details
-              </span>
-              
-              <div className="col-span-1 md:col-span-3">
-                  <Input
-                      type="number"
-                      placeholder="Qty"
-                      value={ingredient.recipeQuantity || ''}
-                      onChange={(e) => handleChange('recipeQuantity', e.target.value)}
-                      min={0}
-                      step="any"
-                      className="text-sm"
-                      label="Quantity"
-                      hideLabel
-                      disabled={ingredient.useFullQuantity}
-                      error={errors?.recipeQuantity}
-                  />
-              </div>
-              
-              <div className="col-span-1 md:col-span-3">
-                  <Select
-                      label="Unit"
-                      hideLabel
-                      options={UNIT_OPTIONS}
-                      value={ingredient.recipeUnit || ''}
-                      onChange={(e) => handleChange('recipeUnit', e.target.value)}
-                      placeholder="Unit"
-                      className="text-sm"
-                      disabled={ingredient.useFullQuantity}
-                  />
-              </div>
 
-              <div className="col-span-2 md:col-span-4 md:pl-xs mt-2 md:mt-0">
-                  <div className="flex items-center gap-xs px-3 py-2 bg-surface md:bg-white rounded border border-border-subtle shadow-sm">
-                      <span className="text-xs text-ink-500 font-medium uppercase">Cost:</span>
-                      <span className="font-mono font-medium text-ink-900 ml-auto">
-                          {ingredient.cost ? `₱${Number(ingredient.cost).toFixed(2)}` : '---'}
-                      </span>
-                  </div>
+            <div className="col-span-1 md:col-span-3">
+              <Select
+                label="Unit"
+                hideLabel
+                options={UNIT_OPTIONS}
+                value={ingredient.purchaseUnit || ''}
+                onChange={(e) => handleChange('purchaseUnit', e.target.value)}
+                placeholder="Unit"
+                className="text-sm"
+              />
+            </div>
+
+            <div className="col-span-2 md:col-span-4 md:pl-xs">
+              <Input
+                type="number"
+                placeholder="Total Cost"
+                value={ingredient.purchaseCost || ''}
+                onChange={(e) => handleChange('purchaseCost', e.target.value)}
+                min={0}
+                step="0.01"
+                currency
+                className="text-sm"
+                label="Cost"
+                hideLabel
+                error={errors?.purchaseCost}
+              />
+            </div>
+          </div>
+
+          {/* Toggle Row */}
+          <div className="md:ml-[16.666%] flex items-center">
+            <Switch
+              checked={!!ingredient.useFullQuantity}
+              onChange={handleToggleFullQuantity}
+              label="Use 100% of purchase quantity"
+            />
+          </div>
+
+          {/* Usage Row */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-sm items-center">
+            <span className="col-span-2 md:col-span-2 text-xs font-bold text-ink-500 uppercase tracking-wider mb-1 md:mb-0">
+              Recipe Details
+            </span>
+
+            <div className="col-span-1 md:col-span-3">
+              <Input
+                type="number"
+                placeholder="Qty"
+                value={ingredient.recipeQuantity || ''}
+                onChange={(e) => handleChange('recipeQuantity', e.target.value)}
+                min={0}
+                step="any"
+                className="text-sm"
+                label="Quantity"
+                hideLabel
+                disabled={ingredient.useFullQuantity}
+                error={errors?.recipeQuantity}
+              />
+            </div>
+
+            <div className="col-span-1 md:col-span-3">
+              <Select
+                label="Unit"
+                hideLabel
+                options={UNIT_OPTIONS}
+                value={ingredient.recipeUnit || ''}
+                onChange={(e) => handleChange('recipeUnit', e.target.value)}
+                placeholder="Unit"
+                className="text-sm"
+                disabled={ingredient.useFullQuantity}
+              />
+            </div>
+
+            <div className="col-span-2 md:col-span-4 md:pl-xs mt-2 md:mt-0">
+              <div className="flex items-center gap-xs px-3 py-2 bg-surface md:bg-white rounded border border-border-subtle shadow-sm">
+                <span className="text-xs text-ink-500 font-medium uppercase">Cost:</span>
+                <span className="font-mono font-medium text-ink-900 ml-auto">
+                  {ingredient.cost ? `₱${Number(ingredient.cost).toFixed(2)}` : '---'}
+                </span>
               </div>
             </div>
+          </div>
         </div>
       </div>
 
-       {/* Mobile Delete (Bottom) */}
-       <div className="md:hidden flex justify-end mt-2 pt-4 border-t border-border-subtle">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-rust hover:bg-rust/5 w-full justify-center"
-            onClick={handleDeleteClick}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Remove Ingredient
-          </Button>
-       </div>
+      {/* Mobile Delete (Bottom) */}
+      <div className="md:hidden flex justify-end mt-2 pt-4 border-t border-border-subtle">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-rust hover:bg-rust/5 w-full justify-center"
+          onClick={handleDeleteClick}
+        >
+          <Trash2 className="w-4 h-4 mr-2" />
+          Remove Ingredient
+        </Button>
+      </div>
 
       <Modal
         isOpen={showDeleteModal}

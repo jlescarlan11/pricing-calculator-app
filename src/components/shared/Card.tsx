@@ -38,7 +38,9 @@ export const Card: React.FC<CardProps> = ({
           )}
           {children}
           {footer && (
-            <div className="border-t border-border-subtle bg-bg-main/50 p-md sm:p-lg md:p-xl">{footer}</div>
+            <div className="border-t border-border-subtle bg-bg-main/50 p-md sm:p-lg md:p-xl">
+              {footer}
+            </div>
           )}
         </>
       ) : (

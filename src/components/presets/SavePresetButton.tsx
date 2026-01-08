@@ -69,15 +69,17 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
     ? 'Please complete the details above to save your progress.'
     : 'Keep this calculation for your future records.';
 
-  const containerClasses = mobileLabelLayout === 'vertical'
-    ? 'flex-col md:flex-row gap-0.5 md:gap-sm h-auto py-1 md:h-9 md:py-0 px-2 md:px-3'
-    : 'flex-row gap-sm';
+  const containerClasses =
+    mobileLabelLayout === 'vertical'
+      ? 'flex-col md:flex-row gap-0.5 md:gap-sm h-auto py-1 md:h-9 md:py-0 px-2 md:px-3'
+      : 'flex-row gap-sm';
 
-  const labelClasses = mobileLabelLayout === 'hidden'
-    ? 'hidden sm:inline'
-    : mobileLabelLayout === 'vertical'
-      ? 'text-[10px] md:text-sm leading-none md:leading-normal font-medium md:font-normal'
-      : '';
+  const labelClasses =
+    mobileLabelLayout === 'hidden'
+      ? 'hidden sm:inline'
+      : mobileLabelLayout === 'vertical'
+        ? 'text-[10px] md:text-sm leading-none md:leading-normal font-medium md:font-normal'
+        : '';
 
   return (
     <>

@@ -51,7 +51,9 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, cla
         {!hasSnapshots ? (
           <div className="flex flex-col items-center justify-center h-full bg-surface/30 rounded-xl border border-dashed border-border-base px-xl text-center">
             <div className="w-12 h-12 bg-bg-main rounded-round flex items-center justify-center mb-md border border-border-subtle">
-              <span className="text-2xl" role="img" aria-label="Chart">📊</span>
+              <span className="text-2xl" role="img" aria-label="Chart">
+                📊
+              </span>
             </div>
             <p className="text-ink-500 text-sm font-medium leading-relaxed max-w-[200px]">
               Pin milestones to visualize your price and cost history over time.
@@ -59,15 +61,8 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, cla
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-            >
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="#E6E4E1" 
-                vertical={false} 
-              />
+            <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E6E4E1" vertical={false} />
               <XAxis
                 dataKey="formattedDate"
                 stroke="#8B8680"

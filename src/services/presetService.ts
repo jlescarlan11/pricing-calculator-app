@@ -42,12 +42,14 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
       laborCost: typeof baseRecipe?.laborCost === 'number' ? baseRecipe.laborCost : 0,
       overhead: typeof baseRecipe?.overhead === 'number' ? baseRecipe.overhead : 0,
       // Prefer presetType and top-level variants for source of truth
-      hasVariants: baseRecipe?.hasVariants !== undefined 
-        ? !!baseRecipe.hasVariants 
-        : presetType === 'variant',
-      variants: variants.length > 0 
-        ? variants 
-        : (Array.isArray(baseRecipe?.variants) ? baseRecipe.variants : []),
+      hasVariants:
+        baseRecipe?.hasVariants !== undefined ? !!baseRecipe.hasVariants : presetType === 'variant',
+      variants:
+        variants.length > 0
+          ? variants
+          : Array.isArray(baseRecipe?.variants)
+            ? baseRecipe.variants
+            : [],
       businessName: baseRecipe?.businessName as string | undefined,
       currentSellingPrice: baseRecipe?.currentSellingPrice as number | undefined,
     },
@@ -180,18 +182,16 @@ function mapFromDb(row: {
     snapshotMetadata,
   };
 
-  return sanitizePreset(presetPart as any) as Preset;
+  return sanitizePreset(presetPart as Partial<Preset>) as Preset;
 }
 
 // Mapper: App -> DB
 function mapToDb(preset: Preset) {
   // Strip variants and hasVariants from baseRecipe to avoid duplication in DB
   // They are stored in their own columns: 'variants' and 'preset_type'
-  const { 
-    variants: _v, 
-    hasVariants: _hv, 
-    ...baseRecipeData 
-  } = preset.baseRecipe as any;
+  const baseRecipe = preset.baseRecipe as Partial<Preset['baseRecipe']>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { variants, hasVariants, ...baseRecipeData } = baseRecipe;
 
   return {
     id: preset.id,
@@ -265,7 +265,7 @@ export const presetService = {
 
         if (data) {
           const cloudPresets = data.map(mapFromDb);
-          const cloudMap = new Map<string, Preset>(cloudPresets.map(p => [p.id, p]));
+          const cloudMap = new Map<string, Preset>(cloudPresets.map((p) => [p.id, p]));
 
           // 3. Sync-aware Merge Strategy
           const finalPresets: Preset[] = [];
@@ -285,7 +285,7 @@ export const presetService = {
               // Case 2: Preset exists in both. Use Last Write Wins.
               const localTime = new Date(localP.updatedAt).getTime();
               const cloudTime = new Date(cloudP.updatedAt).getTime();
-              
+
               if (cloudTime >= localTime) {
                 finalPresets.push(cloudP);
               } else {
@@ -346,11 +346,10 @@ export const presetService = {
           for (const comp of preset.competitors) {
             // Only sync if it has a presetId (which it should if it's attached)
             if (comp.presetId === preset.id) {
-               await this.upsertCompetitor(preset.id, comp);
+              await this.upsertCompetitor(preset.id, comp);
             }
           }
         }
-
       } catch (e) {
         console.error('Save to cloud failed, queuing', e);
         addToSyncQueue('save', preset);
@@ -467,9 +466,7 @@ export const presetService = {
     // 2. Determine Version Number
     // Check local snapshots for max version
     const localSnapshots = presets.filter(
-      (p) =>
-        p.isSnapshot &&
-        p.snapshotMetadata?.parentPresetId === presetId
+      (p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === presetId
     );
 
     let nextVersion = 1;
@@ -537,12 +534,8 @@ export const presetService = {
     // 1. Local
     const localPresets = getLocalPresets();
     const localSnapshots = localPresets
-      .filter(
-        (p) =>
-          p.isSnapshot &&
-          p.snapshotMetadata?.parentPresetId === parentPresetId
-      )
-      .sort((a, b) => (a.snapshotMetadata!.versionNumber - b.snapshotMetadata!.versionNumber));
+      .filter((p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === parentPresetId)
+      .sort((a, b) => a.snapshotMetadata!.versionNumber - b.snapshotMetadata!.versionNumber);
 
     // 2. Cloud (if online)
     if (navigator.onLine) {
@@ -558,12 +551,12 @@ export const presetService = {
 
         if (data) {
           const cloudSnapshots = data.map(mapFromDb);
-          
+
           // Merge into local storage
           const allPresets = getLocalPresets();
-          const mergedMap = new Map(allPresets.map(p => [p.id, p]));
-          
-          cloudSnapshots.forEach(s => mergedMap.set(s.id, s));
+          const mergedMap = new Map(allPresets.map((p) => [p.id, p]));
+
+          cloudSnapshots.forEach((s) => mergedMap.set(s.id, s));
           setLocalPresets(Array.from(mergedMap.values()));
 
           return cloudSnapshots;

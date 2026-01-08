@@ -68,6 +68,31 @@ const FAQS = [
     answer:
       "Focus on better quality rather than the lowest price. Many customers will gladly pay ₱20 more for a product that tastes better, uses cleaner ingredients, or has nicer packaging. Don't lower your price if it means you stop earning a fair profit.",
   },
+  {
+    question: 'How do I research competitor prices accurately?',
+    answer:
+      "Look at similar products in your local area. Visit 3-5 nearby shops or check social media marketplaces (like FB Marketplace). Note their prices and quality. Remember to compare 'apples to apples'—if they use premium butter and you use margarine, their price will naturally be higher.",
+  },
+  {
+    question: 'How many competitors should I track?',
+    answer:
+      'Focus on 3 to 5 direct competitors. Tracking too many can be overwhelming, while too few might not give you a clear picture of the market. Aim for a mix of similar small businesses and one or two slightly larger ones for perspective.',
+  },
+  {
+    question: 'What details should I record during price research?',
+    answer:
+      "Beyond the selling price, note the product weight/size, packaging quality, and any unique selling points (like 'organic' or 'homemade'). This helps you understand if their price is higher because they offer more value, or if you're underpricing your own premium features.",
+  },
+  {
+    question: 'How often should I update my competitor data?',
+    answer:
+      "Markets change quickly. Try to refresh your competitor benchmarks every 3-6 months, or whenever you notice a major shift in ingredient costs. Data older than 90 days is often considered 'stale' and may no longer reflect current market rates.",
+  },
+  {
+    question: 'My price is much higher than my competitors. What should I do?',
+    answer:
+      "Don't panic! A higher price is fine if you can justify it. Highlight your use of premium ingredients, larger portions, or better service. If you can't justify the gap, look for ways to reduce costs or consider if you're targeting a different customer group that values quality over price.",
+  },
 ];
 
 export const FAQ: React.FC = () => {

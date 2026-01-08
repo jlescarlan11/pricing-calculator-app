@@ -17,7 +17,7 @@ export interface ComparisonDeltas {
 /**
  * Calculates the differences (deltas) between two sets of pricing totals.
  * Returns current - previous for each field.
- * 
+ *
  * @param current - The newer pricing totals
  * @param previous - The older pricing totals to compare against
  * @returns An object containing the deltas for each key field

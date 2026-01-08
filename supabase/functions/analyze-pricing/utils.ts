@@ -29,8 +29,10 @@ export async function fetchWithBackoff(
       }
 
       const delay = Math.pow(2, retries) * baseDelay;
-      console.log(`Transient error (${response.status}). Retrying in ${delay}ms... (Attempt ${retries + 1}/${maxRetries})`);
-      
+      console.log(
+        `Transient error (${response.status}). Retrying in ${delay}ms... (Attempt ${retries + 1}/${maxRetries})`
+      );
+
       await sleep(delay);
       retries++;
     } catch (error) {
@@ -40,16 +42,16 @@ export async function fetchWithBackoff(
 
       const delay = Math.pow(2, retries) * baseDelay;
       console.log(`Fetch error. Retrying in ${delay}ms... (Attempt ${retries + 1}/${maxRetries})`);
-      
+
       await sleep(delay);
       retries++;
     }
   }
 
-  throw new Error("Max retries reached");
+  throw new Error('Max retries reached');
 }
 
 export const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };

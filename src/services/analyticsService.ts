@@ -10,7 +10,7 @@ export const analyticsService = {
     userId: string,
     presetId: string,
     eventType: AnalyticsEventType,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
   ): Promise<void> {
     if (!navigator.onLine || !userId) return;
 

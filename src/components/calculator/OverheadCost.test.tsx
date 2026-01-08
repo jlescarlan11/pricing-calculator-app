@@ -56,9 +56,12 @@ describe('OverheadCost', () => {
     fireEvent.click(closeBtn);
 
     // Wait for animation to finish and component to unmount
-    await waitFor(() => {
-      expect(screen.queryByRole('spinbutton', { name: /Monthly Rent/i })).not.toBeInTheDocument();
-    }, { timeout: 1000 });
+    await waitFor(
+      () => {
+        expect(screen.queryByRole('spinbutton', { name: /Monthly Rent/i })).not.toBeInTheDocument();
+      },
+      { timeout: 1000 }
+    );
   });
 
   it('calculates total overhead correctly in calculator', () => {

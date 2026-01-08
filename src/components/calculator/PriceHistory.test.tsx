@@ -1,5 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { PriceHistory } from './PriceHistory';
 import { usePresets } from '../../hooks/use-presets';
 import type { CalculationResult, Preset } from '../../types';
@@ -53,7 +53,7 @@ describe('PriceHistory', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (usePresets as any).mockReturnValue({
+    (usePresets as Mock).mockReturnValue({
       presets: [],
       createSnapshot: mockCreateSnapshot,
     });
@@ -61,11 +61,7 @@ describe('PriceHistory', () => {
 
   it('renders empty state when no snapshots exist', () => {
     render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={false}
-      />
+      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
     );
 
     expect(screen.getByText(/No price milestones tracked yet/i)).toBeInTheDocument();
@@ -78,17 +74,13 @@ describe('PriceHistory', () => {
       createMockSnapshot('snap-2', 2, 'parent-1'),
     ];
 
-    (usePresets as any).mockReturnValue({
+    (usePresets as Mock).mockReturnValue({
       presets: snapshots,
       createSnapshot: mockCreateSnapshot,
     });
 
     render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={false}
-      />
+      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
     );
 
     expect(screen.getByText('Version 1')).toBeInTheDocument();
@@ -101,20 +93,18 @@ describe('PriceHistory', () => {
   it('shows informational banner when fewer than 3 snapshots exist', () => {
     const snapshots = [createMockSnapshot('snap-1', 1, 'parent-1')];
 
-    (usePresets as any).mockReturnValue({
+    (usePresets as Mock).mockReturnValue({
       presets: snapshots,
       createSnapshot: mockCreateSnapshot,
     });
 
     render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={false}
-      />
+      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
     );
 
-    expect(screen.getByText(/Tip: Pin a new version monthly to track profit trends over time/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Tip: Pin a new version monthly to track profit trends over time/i)
+    ).toBeInTheDocument();
   });
 
   it('hides informational banner when 3 or more snapshots exist', () => {
@@ -124,30 +114,22 @@ describe('PriceHistory', () => {
       createMockSnapshot('snap-3', 3, 'parent-1'),
     ];
 
-    (usePresets as any).mockReturnValue({
+    (usePresets as Mock).mockReturnValue({
       presets: snapshots,
       createSnapshot: mockCreateSnapshot,
     });
 
     render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={false}
-      />
+      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
     );
 
-    expect(screen.queryByText(/Tip: Pin a new version monthly to track profit trends over time/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Tip: Pin a new version monthly to track profit trends over time/i)
+    ).not.toBeInTheDocument();
   });
 
   it('disables "Pin Current Version" button when unsaved', () => {
-    render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={true}
-      />
-    );
+    render(<PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={true} />);
 
     const button = screen.getByRole('button', { name: /Pin Current Version/i });
     expect(button).toBeDisabled();
@@ -155,11 +137,7 @@ describe('PriceHistory', () => {
 
   it('enables "Pin Current Version" button when saved', () => {
     render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={false}
-      />
+      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
     );
 
     const button = screen.getByRole('button', { name: /Pin Current Version/i });
@@ -168,11 +146,7 @@ describe('PriceHistory', () => {
 
   it('calls createSnapshot when "Pin Current Version" is clicked', async () => {
     render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={false}
-      />
+      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
     );
 
     const button = screen.getByRole('button', { name: /Pin Current Version/i });
@@ -184,27 +158,19 @@ describe('PriceHistory', () => {
   it('renders SnapshotComparisonCard when snapshots exist', () => {
     const snapshots = [createMockSnapshot('snap-1', 1, 'parent-1')];
 
-    (usePresets as any).mockReturnValue({
+    (usePresets as Mock).mockReturnValue({
       presets: snapshots,
       createSnapshot: mockCreateSnapshot,
     });
 
     render(
-      <PriceHistory
-        presetId="parent-1"
-        currentResult={mockCurrentResult}
-        isUnsaved={false}
-      />
+      <PriceHistory presetId="parent-1" currentResult={mockCurrentResult} isUnsaved={false} />
     );
 
-        // SnapshotComparisonCard contains text like "Since" and then the date
+    // SnapshotComparisonCard contains text like "Since" and then the date
 
-        expect(screen.getByText(/Comparison with Last Milestone/i)).toBeInTheDocument();
+    expect(screen.getByText(/Comparison with Last Milestone/i)).toBeInTheDocument();
 
-        expect(screen.getByText(/Since/i)).toBeInTheDocument();
-
-      });
-
-    });
-
-    
+    expect(screen.getByText(/Since/i)).toBeInTheDocument();
+  });
+});

@@ -13,10 +13,13 @@ export const SampleDemo: React.FC<SampleDemoProps> = ({ onLoadSample }) => {
   const sampleResults = performFullCalculation(COOKIE_SAMPLE.input, COOKIE_SAMPLE.config);
 
   return (
-    <Card noPadding className="bg-surface border-clay/30 relative shadow-md hover:shadow-lg transition-shadow duration-500 overflow-visible group">
+    <Card
+      noPadding
+      className="bg-surface border-clay/30 relative shadow-md hover:shadow-lg transition-shadow duration-500 overflow-visible group"
+    >
       {/* Decorative background element */}
       <div className="absolute inset-0 bg-gradient-to-br from-clay/5 via-transparent to-moss/5 rounded-xl pointer-events-none" />
-      
+
       <div className="absolute -top-4 -right-4 md:top-0 md:right-0 p-lg opacity-10 pointer-events-none group-hover:scale-110 group-hover:rotate-12 transition-transform duration-1000">
         <PieChart className="w-24 h-24 md:w-32 md:h-32 text-clay" />
       </div>
@@ -32,7 +35,9 @@ export const SampleDemo: React.FC<SampleDemoProps> = ({ onLoadSample }) => {
             </h3>
           </div>
           <p className="text-ink-700 text-sm md:text-base mb-lg leading-relaxed font-medium max-w-xl">
-            Not sure where to start? Load our <span className="text-clay font-bold">Artisan Cookie Case Study</span> to see a perfectly balanced calculation for a batch of 50 cookies.
+            Not sure where to start? Load our{' '}
+            <span className="text-clay font-bold">Artisan Cookie Case Study</span> to see a
+            perfectly balanced calculation for a batch of 50 cookies.
           </p>
 
           <div className="hidden md:grid grid-cols-2 sm:grid-cols-4 gap-sm md:gap-md">

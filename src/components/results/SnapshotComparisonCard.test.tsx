@@ -27,7 +27,7 @@ describe('SnapshotComparisonCard', () => {
 
     // Cost increased by 50 (Positive delta for cost is red/rust)
     expect(screen.getByText('+₱50.00')).toBeInTheDocument();
-    
+
     // Price increased by 100
     expect(screen.getByText('+₱100.00')).toBeInTheDocument();
 
@@ -57,8 +57,8 @@ describe('SnapshotComparisonCard', () => {
       ...defaultProps,
       currentTotalCost: 80, // Decrease (good)
     };
-    const { container } = render(<SnapshotComparisonCard {...props} />);
-    
+    render(<SnapshotComparisonCard {...props} />);
+
     const costDelta = screen.getByText('-₱20.00');
     expect(costDelta).toHaveClass('text-moss');
   });
@@ -69,7 +69,7 @@ describe('SnapshotComparisonCard', () => {
       currentTotalCost: 120, // Increase (bad)
     };
     render(<SnapshotComparisonCard {...props} />);
-    
+
     const costDelta = screen.getByText('+₱20.00');
     expect(costDelta).toHaveClass('text-rust');
   });

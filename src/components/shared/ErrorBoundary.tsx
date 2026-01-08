@@ -62,11 +62,19 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-md">
-              <Button onClick={this.handleReload} variant="secondary" className="w-full sm:w-auto gap-sm">
+              <Button
+                onClick={this.handleReload}
+                variant="secondary"
+                className="w-full sm:w-auto gap-sm"
+              >
                 <RefreshCcw className="w-4 h-4" />
                 Try Refreshing
               </Button>
-              <Button onClick={this.handleReset} variant="primary" className="w-full sm:w-auto gap-sm">
+              <Button
+                onClick={this.handleReset}
+                variant="primary"
+                className="w-full sm:w-auto gap-sm"
+              >
                 <Home className="w-4 h-4" />
                 Back to Home
               </Button>

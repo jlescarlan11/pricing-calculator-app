@@ -27,11 +27,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
         <main className="flex-1 focus:outline-none">
           <div className="pt-lg md:pt-2xl pb-xl md:pb-3xl">
-            <div className="max-w-[1200px] mx-auto px-md md:px-[40px] lg:px-[60px]">
-              {children}
-            </div>
+            <div className="max-w-[1200px] mx-auto px-md md:px-[40px] lg:px-[60px]">{children}</div>
           </div>
-
         </main>
       </div>
     </div>

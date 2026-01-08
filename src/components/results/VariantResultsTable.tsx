@@ -47,7 +47,9 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                   <td className="px-md py-md text-right tabular-nums font-semibold text-ink-900">
                     {formatCurrency(variant.recommendedPrice)}
                   </td>
-                  <td className={`px-md py-md text-right tabular-nums font-semibold text-${getMarginColor(variant.profitMarginPercent)}`}>
+                  <td
+                    className={`px-md py-md text-right tabular-nums font-semibold text-${getMarginColor(variant.profitMarginPercent)}`}
+                  >
                     {formatPercent(variant.profitMarginPercent)}
                   </td>
                   <td className="px-md py-md text-right tabular-nums border-l border-border-subtle">
@@ -77,10 +79,16 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
           </tbody>
           <tfoot className="bg-surface border-t border-border-base">
             <tr>
-              <td colSpan={4} className="px-md py-xl font-bold text-ink-700 text-right uppercase tracking-widest text-xs">
+              <td
+                colSpan={4}
+                className="px-md py-xl font-bold text-ink-700 text-right uppercase tracking-widest text-xs"
+              >
                 Total Batch Profit (Target)
               </td>
-              <td colSpan={2} className="px-md py-xl font-bold text-moss text-right text-3xl tabular-nums tracking-tight">
+              <td
+                colSpan={2}
+                className="px-md py-xl font-bold text-moss text-right text-3xl tabular-nums tracking-tight"
+              >
                 {formatCurrency(results.profitPerBatch)}
               </td>
             </tr>

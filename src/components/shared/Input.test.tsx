@@ -67,9 +67,7 @@ describe('Input Component', () => {
   });
 
   it('allows overriding default inputMode', () => {
-    render(
-      <Input label="Number" value="" onChange={() => {}} type="number" inputMode="numeric" />
-    );
+    render(<Input label="Number" value="" onChange={() => {}} type="number" inputMode="numeric" />);
     const input = screen.getByLabelText(/Number/i);
     expect(input).toHaveAttribute('inputmode', 'numeric');
   });

@@ -37,10 +37,7 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
   const lastSnapshot = snapshots[0];
   let lastResult: CalculationResult | null = null;
   if (lastSnapshot) {
-    lastResult = performFullCalculation(
-      lastSnapshot.baseRecipe,
-      lastSnapshot.pricingConfig
-    );
+    lastResult = performFullCalculation(lastSnapshot.baseRecipe, lastSnapshot.pricingConfig);
   }
 
   return (
@@ -57,7 +54,11 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
               size="sm"
               onClick={handlePin}
               disabled={isUnsaved}
-              title={isUnsaved ? 'Save the preset first to pin a version' : 'Pin current costs as a milestone'}
+              title={
+                isUnsaved
+                  ? 'Save the preset first to pin a version'
+                  : 'Pin current costs as a milestone'
+              }
             >
               <Plus className="w-4 h-4 mr-1" />
               Pin Current Version
@@ -69,7 +70,8 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
           {snapshots.length === 0 ? (
             <div className="text-center py-xl bg-surface/30 rounded-lg border border-dashed border-border-base">
               <p className="text-ink-500 max-w-sm mx-auto">
-                📊 No price milestones tracked yet. Pin a version when you review costs monthly or adjust prices to see trends.
+                📊 No price milestones tracked yet. Pin a version when you review costs monthly or
+                adjust prices to see trends.
               </p>
             </div>
           ) : (
@@ -77,9 +79,7 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
               {snapshots.length < 3 && (
                 <div className="flex items-start p-md bg-sakura/10 border border-sakura/30 rounded-lg text-sm text-ink-700">
                   <AlertCircle className="w-5 h-5 mr-sm text-sakura shrink-0" />
-                  <p>
-                    💡 Tip: Pin a new version monthly to track profit trends over time.
-                  </p>
+                  <p>💡 Tip: Pin a new version monthly to track profit trends over time.</p>
                 </div>
               )}
 
@@ -90,7 +90,10 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
                     snapshot.pricingConfig
                   );
                   return (
-                    <div key={snapshot.id} className="p-md flex justify-between items-center bg-white/40">
+                    <div
+                      key={snapshot.id}
+                      className="p-md flex justify-between items-center bg-white/40"
+                    >
                       <div>
                         <p className="font-medium text-ink-900">
                           Version {snapshot.snapshotMetadata?.versionNumber}

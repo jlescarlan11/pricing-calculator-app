@@ -135,7 +135,7 @@ export function useCalculatorState(initialValues?: {
   const [competitors, setCompetitors] = useState<DraftCompetitor[]>(draft.competitors || []);
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [currentPresetId, setCurrentPresetId] = useState<string | null>(null);
-  
+
   // Track the input/config state used for the last successful calculation
   const [lastCalculatedState, setLastCalculatedState] = useState<{
     input: CalculationInput;
@@ -264,7 +264,12 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const updateVariantIngredient = useCallback(
-    (variantId: string, ingredientId: string, field: keyof Ingredient, value: string | number | boolean) => {
+    (
+      variantId: string,
+      ingredientId: string,
+      field: keyof Ingredient,
+      value: string | number | boolean
+    ) => {
       setInput((prev) => ({
         ...prev,
         variants: (prev.variants || []).map((v) => {
@@ -288,10 +293,7 @@ export function useCalculatorState(initialValues?: {
         if (v.id !== variantId) return v;
         return {
           ...v,
-          ingredients: [
-            ...v.ingredients,
-            { ...initialIngredient, id: crypto.randomUUID() },
-          ],
+          ingredients: [...v.ingredients, { ...initialIngredient, id: crypto.randomUUID() }],
         };
       }),
     }));
@@ -456,16 +458,18 @@ export function useCalculatorState(initialValues?: {
     setInput(sanitizedInput);
     setConfig(preset.pricingConfig);
     setCurrentPresetId(preset.id);
-    
+
     // Load competitors
     if (preset.competitors) {
-      setCompetitors(preset.competitors.map(c => ({
-        competitorName: c.competitorName,
-        competitorPrice: c.competitorPrice,
-        notes: c.notes,
-        id: c.id, // Keep ID for potential updates? Actually DraftCompetitor makes id optional.
-        presetId: c.presetId
-      })));
+      setCompetitors(
+        preset.competitors.map((c) => ({
+          competitorName: c.competitorName,
+          competitorPrice: c.competitorPrice,
+          notes: c.notes,
+          id: c.id, // Keep ID for potential updates? Actually DraftCompetitor makes id optional.
+          presetId: c.presetId,
+        }))
+      );
     } else {
       setCompetitors([]);
     }
@@ -483,7 +487,7 @@ export function useCalculatorState(initialValues?: {
       // We need to pass competitors to addPreset somehow.
       // The `Preset` type includes `competitors`.
       // So we can pass it in the object we send to addPreset.
-      
+
       // We need to map DraftCompetitor to Competitor (minus the ID/dates which service handles?)
       // Actually, addPreset takes Omit<Preset, 'id' | ...>.
       // We can pass `competitors` as `any` and let it be handled, but TypeScript will complain.
@@ -497,19 +501,19 @@ export function useCalculatorState(initialValues?: {
       // We should assign temporary IDs or let the backend handle it.
       // But `upsertCompetitor` expects `id` to be optional for inserts.
       // The `Preset` type requires strict `Competitor` array.
-      
+
       // Workaround: We'll construct full objects with placeholders that get overwritten/ignored or used as new IDs.
-      const mappedCompetitors = competitors.map(c => ({
+      const mappedCompetitors = competitors.map((c) => ({
         id: c.id || crypto.randomUUID(), // Generate new ID if missing
         presetId: '', // Will be filled by service? No, service uses preset.id.
-                      // Wait, my service change: `if (comp.presetId === preset.id)`
-                      // So I need to ensure I set this correctly.
-                      // But `addPreset` generates the preset ID. I don't know it here.
+        // Wait, my service change: `if (comp.presetId === preset.id)`
+        // So I need to ensure I set this correctly.
+        // But `addPreset` generates the preset ID. I don't know it here.
         competitorName: c.competitorName,
         competitorPrice: c.competitorPrice,
         notes: c.notes,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       }));
 
       // NOTE: There is a chicken-and-egg problem here with IDs.
@@ -517,22 +521,22 @@ export function useCalculatorState(initialValues?: {
       // But we can't easily inject the ID into competitors *before* calling addPreset.
       // However, `usePresets.addPreset` creates `newPreset` with `crypto.randomUUID()`.
       // If I pass `competitors` with empty presetId, my service check `comp.presetId === preset.id` will fail.
-      
+
       // SOLUTION: I should modify `usePresets.addPreset` to attach the new ID to any competitors passed in.
       // But I can't modify `usePresets` easily from here.
-      
+
       // ALTERNATIVE: Don't rely on `addPreset` from `usePresets` to save competitors.
       // Just save the preset, get the ID back, and then save competitors?
       // `saveAsPreset` returns Promise<Preset>.
       // `addPreset` returns the new preset.
-      
+
       const newPreset = await addPreset({
         name,
         baseRecipe: input,
         pricingConfig: config,
         presetType: input.hasVariants ? 'variant' : 'default',
         variants: input.variants || [],
-        competitors: mappedCompetitors as any, // Cast for now, will fix in usePresets
+        competitors: mappedCompetitors,
       });
 
       setCurrentPresetId(newPreset.id);

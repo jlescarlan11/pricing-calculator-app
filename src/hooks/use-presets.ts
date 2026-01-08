@@ -69,16 +69,23 @@ export function usePresets() {
     async (
       presetData: Omit<
         Preset,
-        'id' | 'userId' | 'createdAt' | 'updatedAt' | 'lastSyncedAt' | 'isSnapshot' | 'snapshotMetadata'
+        | 'id'
+        | 'userId'
+        | 'createdAt'
+        | 'updatedAt'
+        | 'lastSyncedAt'
+        | 'isSnapshot'
+        | 'snapshotMetadata'
       >
     ) => {
       const presetId = crypto.randomUUID();
-      
+
       // Inject presetId into competitors if they exist
-      const competitors = presetData.competitors?.map(c => ({
-        ...c,
-        presetId: presetId
-      })) || [];
+      const competitors =
+        presetData.competitors?.map((c) => ({
+          ...c,
+          presetId: presetId,
+        })) || [];
 
       const newPreset: Preset = {
         ...presetData,
@@ -89,7 +96,7 @@ export function usePresets() {
         lastSyncedAt: null,
         isSnapshot: false,
         snapshotMetadata: undefined,
-        competitors: competitors
+        competitors: competitors,
       };
 
       // Optimistic update

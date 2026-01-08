@@ -51,9 +51,9 @@ describe('aiAnalysis', () => {
     });
 
     it('should return empty array for invalid risk score (if type safety is bypassed)', () => {
-        // @ts-expect-error Testing invalid input
-        const recommendations = generateStaticRecommendations(30, 'unknown');
-        expect(recommendations).toEqual([]);
+      // @ts-expect-error Testing invalid input
+      const recommendations = generateStaticRecommendations(30, 'unknown');
+      expect(recommendations).toEqual([]);
     });
   });
 });

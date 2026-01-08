@@ -94,9 +94,10 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
         <div className="space-y-xl py-md">
           <div className="space-y-md">
             <p className="text-ink-700 leading-relaxed">
-              Overhead includes all indirect costs of running your business. These are bills you pay regardless of how many units you sell.
+              Overhead includes all indirect costs of running your business. These are bills you pay
+              regardless of how many units you sell.
             </p>
-            
+
             <div className="space-y-lg">
               <div className="space-y-xs">
                 <h5 className="font-bold text-ink-900 flex items-center gap-xs">
@@ -115,17 +116,19 @@ export const OverheadCost: React.FC<OverheadCostProps> = ({
                   Packaging & Supplies:
                 </h5>
                 <p className="text-sm text-ink-600">
-                  Don&apos;t forget individual packaging costs like boxes, jars, labels, and pouches which are often overlooked.
+                  Don&apos;t forget individual packaging costs like boxes, jars, labels, and pouches
+                  which are often overlooked.
                 </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-surface p-lg rounded-xl border border-border-subtle">
-             <p className="text-sm font-bold text-ink-900 mb-xs">Pro Tip:</p>
-             <p className="text-sm text-ink-600 italic">
-               &quot;Divide your monthly bills by the average number of batches you make to find the fair overhead share for each batch.&quot;
-             </p>
+            <p className="text-sm font-bold text-ink-900 mb-xs">Pro Tip:</p>
+            <p className="text-sm text-ink-600 italic">
+              &quot;Divide your monthly bills by the average number of batches you make to find the
+              fair overhead share for each batch.&quot;
+            </p>
           </div>
 
           <div className="flex justify-end pt-md">

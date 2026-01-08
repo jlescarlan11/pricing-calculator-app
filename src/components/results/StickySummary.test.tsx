@@ -58,14 +58,18 @@ describe('StickySummary', () => {
   });
 
   it('renders single result stats', () => {
-    render(<StickySummary {...defaultProps} results={mockSingleResult} hasCommittedResults={true} />);
+    render(
+      <StickySummary {...defaultProps} results={mockSingleResult} hasCommittedResults={true} />
+    );
     expect(screen.getByText('Total Cost')).toBeInTheDocument();
     expect(screen.getByText('₱10.00')).toBeInTheDocument(); // Cost per unit
     expect(screen.getByText('₱20.00')).toBeInTheDocument(); // Price
   });
 
   it('renders variant results list', () => {
-    render(<StickySummary {...defaultProps} results={mockVariantResult} hasCommittedResults={true} />);
+    render(
+      <StickySummary {...defaultProps} results={mockVariantResult} hasCommittedResults={true} />
+    );
     expect(screen.getByText('Variant 1')).toBeInTheDocument();
     expect(screen.getByText('Base')).toBeInTheDocument(); // Mapped name
     expect(screen.getByText('₱15.00')).toBeInTheDocument();

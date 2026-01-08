@@ -8,3 +8,5 @@ export * from './StickySummary';
 export * from './AnalyzePriceCard';
 export * from './SnapshotComparisonCard';
 export * from './PriceTrendChart';
+export * from './CompetitorModal';
+export * from './MarketPositionSpectrum';

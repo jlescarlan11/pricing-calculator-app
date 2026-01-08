@@ -98,6 +98,8 @@ export interface Competitor {
 export type DraftCompetitor = Omit<Competitor, 'id' | 'presetId' | 'createdAt' | 'updatedAt'> & {
   id?: string; // Optional for local tracking before save
   presetId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 interface PresetBase {

@@ -45,7 +45,9 @@ describe('App Integration', () => {
     fireEvent.click(calculateBtn);
 
     // Should show results
-    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 10000 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 10000 })
+    ).toBeInTheDocument();
     expect(screen.getByText(/Analysis for/i)).toHaveTextContent('Test Product');
 
     // Check if results are displayed
@@ -62,7 +64,9 @@ describe('App Integration', () => {
     const calculateBtn = screen.getByRole('button', { name: /^Calculate Price$/ });
     fireEvent.click(calculateBtn);
 
-    expect(await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 10000 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /^Results$/ }, { timeout: 10000 })
+    ).toBeInTheDocument();
 
     // Form is visible below results, so we can access inputs directly
     expect(screen.getByText(/Product Details/i)).toBeInTheDocument();

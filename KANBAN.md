@@ -77,8 +77,8 @@ _Pull-based model for intentional business milestones._
 - \[ \] **Simple Delta Card (MVP)**: Create src/components/results/SnapshotComparisonCard.tsx.
   - Subtask: Show totals comparison: Total Cost delta, Suggested Price delta, and Margin % point change.
   - Subtask: **Integration**: Place below the snapshot list in PriceHistory, conditionally rendered when snapshots.length \> 0\.
- - [x] **Page Integration**: Add the PriceHistory component to src/pages/CalculatorPage.tsx.
- - Subtask: [x] **Conditional Rendering**: Only display PriceHistory when presetId exists.
+- [x] **Page Integration**: Add the PriceHistory component to src/pages/CalculatorPage.tsx.
+- Subtask: [x] **Conditional Rendering**: Only display PriceHistory when presetId exists.
 
 ### **3.2 Trend Visualization**
 

@@ -134,17 +134,19 @@ describe('useCalculatorState', () => {
       baseRecipe: {
         productName: 'Preset Product',
         batchSize: 5,
-        ingredients: [{ 
-          id: 'i1', 
-          name: 'Ing 1', 
-          amount: 1, 
-          cost: 10,
-          purchaseQuantity: 1,
-          purchaseUnit: 'piece',
-          purchaseCost: 10,
-          recipeQuantity: 1,
-          recipeUnit: 'piece'
-        }],
+        ingredients: [
+          {
+            id: 'i1',
+            name: 'Ing 1',
+            amount: 1,
+            cost: 10,
+            purchaseQuantity: 1,
+            purchaseUnit: 'piece',
+            purchaseCost: 10,
+            recipeQuantity: 1,
+            recipeUnit: 'piece',
+          },
+        ],
         laborCost: 20,
         overhead: 5,
       },
@@ -164,7 +166,7 @@ describe('useCalculatorState', () => {
 
   it('should handle loading a corrupted preset gracefully', () => {
     const { result } = renderHook(() => useCalculatorState());
-    
+
     // Preset with missing fields in baseRecipe
     const corruptedPreset = {
       id: 'corrupted',

@@ -178,22 +178,25 @@ describe('CalculatorForm', () => {
     const calculateBtns = screen.getAllByRole('button', { name: /Calculate/i });
     fireEvent.click(calculateBtns[0]);
 
-    await waitFor(() => {
-      expect(mockOnCalculate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          totalCost: expect.any(Number),
-          recommendedPrice: expect.any(Number),
-        }),
-        expect.objectContaining({
-          productName: 'Valid Product',
-          batchSize: 10,
-        }),
-        expect.objectContaining({
-          strategy: expect.any(String),
-          value: expect.any(Number),
-        })
-      );
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(mockOnCalculate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            totalCost: expect.any(Number),
+            recommendedPrice: expect.any(Number),
+          }),
+          expect.objectContaining({
+            productName: 'Valid Product',
+            batchSize: 10,
+          }),
+          expect.objectContaining({
+            strategy: expect.any(String),
+            value: expect.any(Number),
+          })
+        );
+      },
+      { timeout: 3000 }
+    );
 
     const result = mockOnCalculate.mock.calls[0][0];
     expect(result.totalCost).toBeGreaterThan(0);
@@ -205,16 +208,18 @@ describe('CalculatorForm', () => {
       input: {
         productName: 'Saved Draft',
         batchSize: 24,
-        ingredients: [{ 
-          id: '1', 
-          name: 'Saved Ing', 
-          purchaseQuantity: 100,
-          purchaseUnit: 'g',
-          purchaseCost: 20,
-          recipeQuantity: 100,
-          recipeUnit: 'g',
-          cost: 20 
-        }],
+        ingredients: [
+          {
+            id: '1',
+            name: 'Saved Ing',
+            purchaseQuantity: 100,
+            purchaseUnit: 'g',
+            purchaseCost: 20,
+            recipeQuantity: 100,
+            recipeUnit: 'g',
+            cost: 20,
+          },
+        ],
         laborCost: 10,
         overhead: 5,
       },
@@ -256,7 +261,7 @@ describe('CalculatorForm', () => {
     const step1Button = continueButtons[0];
 
     // Initially disabled (productName empty, batchSize defaults to 0 or empty string if not set, but form requires >= 1)
-    // Actually batchSize defaults to 0 in my TestWrapper logic if not provided? 
+    // Actually batchSize defaults to 0 in my TestWrapper logic if not provided?
     // Wait, useCalculatorState defaults?
     // Let's just check it is disabled.
     expect(step1Button).toBeDisabled();
@@ -271,16 +276,18 @@ describe('CalculatorForm', () => {
     const input = {
       productName: 'Initial Product',
       batchSize: 100,
-      ingredients: [{ 
-        id: 'ext-1', 
-        name: 'Ext Ing', 
-        purchaseQuantity: 50,
-        purchaseUnit: 'g',
-        purchaseCost: 10,
-        recipeQuantity: 50,
-        recipeUnit: 'g',
-        cost: 10 
-      }],
+      ingredients: [
+        {
+          id: 'ext-1',
+          name: 'Ext Ing',
+          purchaseQuantity: 50,
+          purchaseUnit: 'g',
+          purchaseCost: 10,
+          recipeQuantity: 50,
+          recipeUnit: 'g',
+          cost: 10,
+        },
+      ],
       laborCost: 100,
       overhead: 50,
     };
@@ -335,7 +342,7 @@ describe('CalculatorForm', () => {
     render(<TestWrapper onLoadSample={onLoadSample} />);
 
     expect(screen.getByText(/Load Sample Data/i)).toBeInTheDocument();
-    
+
     fireEvent.click(screen.getByText(/Load Sample Data/i));
     expect(onLoadSample).toHaveBeenCalled();
   });

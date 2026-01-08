@@ -6,12 +6,15 @@ import type { CalculationResult, CalculationInput, PricingConfig } from '../../t
 import { analyticsService } from '../../services/analyticsService';
 import { shouldEnableLLM } from '../../utils/featureFlags';
 import { supabase } from '../../lib/supabase';
+import { usePresets } from '../../hooks/use-presets';
 
 // Mock usePresets
 vi.mock('../../hooks/use-presets', () => ({
   usePresets: vi.fn(() => ({
     presets: [],
+    getPreset: vi.fn((id) => ({ id, name: 'Test Preset', competitors: [] })),
     addPreset: vi.fn(),
+    updatePreset: vi.fn(),
     deletePreset: vi.fn(),
   })),
 }));
@@ -39,7 +42,7 @@ vi.mock('../../utils/featureFlags', () => ({
 
 // Mock AnalyzePriceCard helpers
 vi.mock('./AnalyzePriceCard', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
     incrementUsage: vi.fn(),
@@ -207,12 +210,12 @@ describe('ResultsDisplay', () => {
 
   it('performs analysis when Analyze My Pricing is clicked', async () => {
     renderWithProviders(
-      <ResultsDisplay 
-        results={mockResults} 
-        input={mockInput} 
-        config={mockConfig} 
-        presetId="test-preset" 
-        userId="test-user" 
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        presetId="test-preset"
+        userId="test-user"
       />
     );
 
@@ -220,7 +223,9 @@ describe('ResultsDisplay', () => {
     fireEvent.click(analyzeButton);
 
     // Wait for analysis to complete (handles the 1200ms delay)
-    expect(await screen.findByRole('heading', { name: /Analysis Complete/i }, { timeout: 3000 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /Analysis Complete/i }, { timeout: 3000 })
+    ).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent(/Analysis complete/i);
   });
 
@@ -228,12 +233,12 @@ describe('ResultsDisplay', () => {
     vi.mocked(analyticsService.trackAnalysisClick).mockRejectedValueOnce(new Error('Failed'));
 
     renderWithProviders(
-      <ResultsDisplay 
-        results={mockResults} 
-        input={mockInput} 
-        config={mockConfig} 
-        presetId="test-preset" 
-        userId="test-user" 
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        presetId="test-preset"
+        userId="test-user"
       />
     );
 
@@ -251,15 +256,15 @@ describe('ResultsDisplay', () => {
     vi.mocked(supabase.functions.invoke).mockResolvedValueOnce({
       data: { recommendations: ['LLM Rec 1', 'LLM Rec 2', 'LLM Rec 3'] },
       error: null,
-    } as any);
+    } as { data: { recommendations: string[] }; error: null });
 
     renderWithProviders(
-      <ResultsDisplay 
-        results={mockResults} 
-        input={mockInput} 
-        config={mockConfig} 
-        presetId="test-preset" 
-        userId="test-user" 
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        presetId="test-preset"
+        userId="test-user"
       />
     );
 
@@ -267,8 +272,102 @@ describe('ResultsDisplay', () => {
     fireEvent.click(analyzeButton);
 
     await screen.findByRole('heading', { name: /Analysis Complete/i });
-    
+
     expect(supabase.functions.invoke).toHaveBeenCalledWith('analyze-pricing', expect.any(Object));
     expect(screen.getByText(/LLM Rec 1/i)).toBeInTheDocument();
+  });
+
+  it('renders Track Competitors button and opens modal', () => {
+    renderWithProviders(
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        onEdit={() => {}}
+      />
+    );
+
+    const trackButton = screen.getByRole('button', { name: /Track Competitors/i });
+    expect(trackButton).toBeInTheDocument();
+
+    fireEvent.click(trackButton);
+    expect(screen.getByText(/Market Benchmarking/i)).toBeInTheDocument();
+  });
+
+  it('shows generic "Track Competitors" when 0 competitors exist', () => {
+    vi.mocked(usePresets).mockReturnValue({
+      presets: [],
+      getPreset: vi.fn().mockReturnValue({ id: '1', competitors: [] }),
+      addPreset: vi.fn(),
+      updatePreset: vi.fn(),
+      deletePreset: vi.fn(),
+    } as any);
+
+    renderWithProviders(
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        presetId="1"
+      />
+    );
+
+    expect(screen.getByText(/Add competitor prices to see if your product/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Track Competitors/i })).toBeInTheDocument();
+  });
+
+  it('shows "Track 2+ Competitors" when exactly 1 competitor exists', () => {
+    vi.mocked(usePresets).mockReturnValue({
+      presets: [],
+      getPreset: vi.fn().mockReturnValue({
+        id: '1',
+        competitors: [{ id: 'c1', competitorName: 'C1', competitorPrice: 10 }],
+      }),
+      addPreset: vi.fn(),
+      updatePreset: vi.fn(),
+      deletePreset: vi.fn(),
+    } as any);
+
+    renderWithProviders(
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        presetId="1"
+      />
+    );
+
+    expect(screen.getByText(/Add at least two competitors to see/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Track 2\+ Competitors/i })).toBeInTheDocument();
+  });
+
+  it('shows spectrum UI when 2+ competitors exist', () => {
+    vi.mocked(usePresets).mockReturnValue({
+      presets: [],
+      getPreset: vi.fn().mockReturnValue({
+        id: '1',
+        competitors: [
+          { id: 'c1', competitorName: 'C1', competitorPrice: 10 },
+          { id: 'c2', competitorName: 'C2', competitorPrice: 50 },
+        ],
+      }),
+      addPreset: vi.fn(),
+      updatePreset: vi.fn(),
+      deletePreset: vi.fn(),
+    } as any);
+
+    renderWithProviders(
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        presetId="1"
+      />
+    );
+
+    expect(screen.getByText(/How your recommended price compares to competitors/i)).toBeInTheDocument();
+    expect(screen.getByText(/Market Avg/i)).toBeInTheDocument();
+    // In active state, button says "Update Data"
+    expect(screen.getByRole('button', { name: /Update Data/i })).toBeInTheDocument();
   });
 });

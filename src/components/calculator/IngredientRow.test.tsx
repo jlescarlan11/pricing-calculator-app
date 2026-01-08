@@ -65,7 +65,7 @@ describe('IngredientRow', () => {
 
   it('handles "Use 100% of purchase quantity" toggle', () => {
     renderComponent();
-    
+
     const toggle = screen.getByLabelText(/Use 100% of purchase quantity/i);
     act(() => {
       fireEvent.click(toggle);
@@ -80,7 +80,7 @@ describe('IngredientRow', () => {
 
   it('disables recipe inputs when useFullQuantity is true', () => {
     renderComponent({
-      ingredient: { ...mockIngredient, useFullQuantity: true }
+      ingredient: { ...mockIngredient, useFullQuantity: true },
     });
 
     const qtyInputs = screen.getAllByPlaceholderText('Qty');

@@ -56,11 +56,11 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
         {/* Section 1: Monthly Costs */}
         <div className="bg-white/50 rounded-xl p-lg border border-border-subtle/60 space-y-lg shadow-sm">
           <div className="flex items-center justify-between border-b border-border-subtle pb-sm">
-             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">
+            <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">
               1. Monthly Fixed Costs
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
             <Input
               label="Monthly Rent"
@@ -108,12 +108,12 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
 
         {/* Section 2: Packaging Costs */}
         <div className="bg-white/50 rounded-xl p-lg border border-border-subtle/60 space-y-lg shadow-sm">
-           <div className="flex items-center justify-between border-b border-border-subtle pb-sm">
+          <div className="flex items-center justify-between border-b border-border-subtle pb-sm">
             <p className="text-[10px] font-bold text-ink-500 uppercase tracking-[0.2em] font-sans">
               2. Packaging & Supplies
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-lg">
             <Input
               label="Packaging per Unit"
@@ -141,20 +141,28 @@ export const OverheadCalculator: React.FC<OverheadCalculatorProps> = ({
               3. Allocation Results
             </p>
           </div>
-          
+
           <div className="space-y-sm">
             <div className="flex justify-between text-sm">
               <span className="text-ink-500">Fixed Cost / Batch</span>
-              <span className="font-mono text-ink-900">₱{calculation.fixedPerBatch.toFixed(2)}</span>
+              <span className="font-mono text-ink-900">
+                ₱{calculation.fixedPerBatch.toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-ink-500">Packaging / Batch</span>
-              <span className="font-mono text-ink-900">₱{calculation.packagingTotal.toFixed(2)}</span>
+              <span className="font-mono text-ink-900">
+                ₱{calculation.packagingTotal.toFixed(2)}
+              </span>
             </div>
             <div className="pt-md mt-sm border-t border-clay/10 flex justify-between items-end">
               <div className="flex flex-col">
-                <span className="text-xs font-bold text-ink-500 uppercase tracking-wider">Total Overhead</span>
-                <span className="text-xs text-ink-400 italic font-medium">for this entire batch</span>
+                <span className="text-xs font-bold text-ink-500 uppercase tracking-wider">
+                  Total Overhead
+                </span>
+                <span className="text-xs text-ink-400 italic font-medium">
+                  for this entire batch
+                </span>
               </div>
               <span className="text-3xl font-bold text-clay tabular-nums leading-none">
                 ₱

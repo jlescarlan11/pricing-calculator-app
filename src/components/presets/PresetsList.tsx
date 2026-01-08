@@ -141,7 +141,8 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
 
       <div className="pt-xl border-t border-border-subtle">
         <p className="text-[10px] text-ink-500 font-medium leading-relaxed text-center italic">
-          We collect usage data to improve the tool. Data is automatically deleted if the product or account is removed.
+          We collect usage data to improve the tool. Data is automatically deleted if the product or
+          account is removed.
         </p>
       </div>
     </div>

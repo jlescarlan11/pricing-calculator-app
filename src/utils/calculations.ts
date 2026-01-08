@@ -293,6 +293,83 @@ export const performFullCalculation = (
   };
 };
 
+/**
+ * Market positioning types and calculation.
+ */
+export type MarketPosition = 'budget' | 'mid' | 'premium';
+
+export interface MarketPositionResult {
+  position: MarketPosition;
+  percentile: number;
+  minPrice: number;
+  maxPrice: number;
+  avgPrice: number;
+}
+
+/**
+ * Calculates where a price sits relative to competitors.
+ * Returns an error if fewer than 2 valid competitors are provided.
+ */
+export const calculateMarketPosition = (
+  currentPrice: number,
+  competitors: { competitorPrice: number }[]
+): MarketPositionResult | { error: 'NEEDS_TWO_COMPETITORS' } => {
+  if (!competitors || !Array.isArray(competitors)) {
+    return { error: 'NEEDS_TWO_COMPETITORS' };
+  }
+
+  // Filter out invalid or non-numeric prices
+  const prices = competitors
+    .map((c) => Number(c.competitorPrice))
+    .filter((p) => !isNaN(p) && p > 0)
+    .sort((a, b) => a - b);
+
+  if (prices.length < 2) {
+    return { error: 'NEEDS_TWO_COMPETITORS' };
+  }
+
+  const minPrice = prices[0];
+  const maxPrice = prices[prices.length - 1];
+  const avgPrice = round(prices.reduce((sum, p) => sum + p, 0) / prices.length);
+
+  let percentile: number;
+  if (maxPrice === minPrice) {
+    // If all competitors have the same price
+    if (currentPrice < minPrice) {
+      percentile = 0;
+    } else if (currentPrice > maxPrice) {
+      percentile = 100;
+    } else {
+      percentile = 50; // Exactly matches the market price
+    }
+  } else {
+    if (currentPrice <= minPrice) {
+      percentile = 0;
+    } else if (currentPrice >= maxPrice) {
+      percentile = 100;
+    } else {
+      percentile = round(((currentPrice - minPrice) / (maxPrice - minPrice)) * 100);
+    }
+  }
+
+  let position: MarketPosition;
+  if (percentile < 33.33) {
+    position = 'budget';
+  } else if (percentile < 66.66) {
+    position = 'mid';
+  } else {
+    position = 'premium';
+  }
+
+  return {
+    position,
+    percentile,
+    minPrice,
+    maxPrice,
+    avgPrice,
+  };
+};
+
 // --- Unit Conversion Logic ---
 
 export type UnitCategory = 'weight' | 'volume' | 'count';

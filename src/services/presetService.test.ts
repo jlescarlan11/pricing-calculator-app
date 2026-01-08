@@ -6,19 +6,19 @@ import type { Preset } from '../types';
 const mockUpsert = vi.fn();
 // Make upsert return a Promise that also has a select() method
 mockUpsert.mockImplementation(() => {
-  const p: any = Promise.resolve({ error: null });
-  p.select = vi.fn(() => ({
-    single: vi.fn().mockResolvedValue({ 
-      data: { 
-        id: 'mock-comp-id', 
+  const promise = Promise.resolve({ error: null }) as Promise<{ error: unknown }> & { select: unknown };
+  promise.select = vi.fn(() => ({
+    single: vi.fn().mockResolvedValue({
+      data: {
+        id: 'mock-comp-id',
         preset_id: 'new-uuid-123',
         competitor_name: 'Rival',
-        competitor_price: 100 
-      }, 
-      error: null 
-    })
+        competitor_price: 100,
+      },
+      error: null,
+    }),
   }));
-  return p;
+  return promise;
 });
 
 vi.mock('../lib/supabase', () => ({
@@ -37,25 +37,41 @@ vi.mock('../lib/supabase', () => ({
 describe('presetService.createSnapshot', () => {
   const mockDate = '2026-01-08T12:00:00.000Z';
   const basePresetId = 'base-123';
-  
+
   const basePreset: Preset = {
     id: basePresetId,
     name: 'Base Product',
     userId: 'user-1',
     presetType: 'default',
-    baseRecipe: { productName: 'Base', batchSize: 1, ingredients: [], laborCost: 0, overhead: 0, hasVariants: false, variants: [] },
+    baseRecipe: {
+      productName: 'Base',
+      batchSize: 1,
+      ingredients: [],
+      laborCost: 0,
+      overhead: 0,
+      hasVariants: false,
+      variants: [],
+    },
     variants: [],
     pricingConfig: { strategy: 'markup', value: 50 },
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     competitors: [
-      { id: 'comp-1', presetId: basePresetId, competitorName: 'Rival', competitorPrice: 100, notes: '', createdAt: '', updatedAt: '' }
-    ]
+      {
+        id: 'comp-1',
+        presetId: basePresetId,
+        competitorName: 'Rival',
+        competitorPrice: 100,
+        notes: '',
+        createdAt: '',
+        updatedAt: '',
+      },
+    ],
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock Date
     vi.useFakeTimers();
     vi.setSystemTime(new Date(mockDate));
@@ -64,8 +80,12 @@ describe('presetService.createSnapshot', () => {
     const store: Record<string, string> = {};
     vi.stubGlobal('localStorage', {
       getItem: vi.fn((key) => store[key] || null),
-      setItem: vi.fn((key, value) => { store[key] = value; }),
-      removeItem: vi.fn((key) => { delete store[key]; }),
+      setItem: vi.fn((key, value) => {
+        store[key] = value;
+      }),
+      removeItem: vi.fn((key) => {
+        delete store[key];
+      }),
     });
 
     // Mock crypto.randomUUID
@@ -101,16 +121,16 @@ describe('presetService.createSnapshot', () => {
       versionNumber: 1, // First snapshot
       parentPresetId: basePresetId,
     });
-    
+
     // Check competitors cloned with new IDs
     expect(snapshot?.competitors).toHaveLength(1);
     expect(snapshot?.competitors?.[0].id).toBe('new-uuid-123'); // Our mock UUID
     expect(snapshot?.competitors?.[0].presetId).toBe('new-uuid-123');
-    
+
     // Ensure savePreset was called (via local storage update)
     const stored = JSON.parse(localStorage.getItem('pricing_calculator_presets') || '[]');
     expect(stored).toHaveLength(2); // Base + Snapshot
-    
+
     // Ensure competitors upsert was called for the snapshot
     expect(mockUpsert).toHaveBeenCalledTimes(2); // 1 for preset, 1 for competitor
   });
@@ -124,7 +144,7 @@ describe('presetService.createSnapshot', () => {
   it('should return null if base preset is already a snapshot', async () => {
     const snapshotPreset = { ...basePreset, isSnapshot: true };
     localStorage.setItem('pricing_calculator_presets', JSON.stringify([snapshotPreset]));
-    
+
     const result = await presetService.createSnapshot(basePresetId);
     expect(result).toBeNull();
   });
@@ -138,14 +158,17 @@ describe('presetService.createSnapshot', () => {
         snapshotDate: 'old-date',
         isTrackedVersion: true,
         versionNumber: 2,
-        parentPresetId: basePresetId
-      }
+        parentPresetId: basePresetId,
+      },
     };
 
-    localStorage.setItem('pricing_calculator_presets', JSON.stringify([basePreset, existingSnapshot]));
+    localStorage.setItem(
+      'pricing_calculator_presets',
+      JSON.stringify([basePreset, existingSnapshot])
+    );
 
     const result = await presetService.createSnapshot(basePresetId);
-    
+
     expect(result?.snapshotMetadata?.versionNumber).toBe(3);
   });
 });

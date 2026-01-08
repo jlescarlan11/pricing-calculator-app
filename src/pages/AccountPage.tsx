@@ -57,7 +57,8 @@ export const AccountPage: React.FC = () => {
       <section className="bg-white p-xl rounded-xl border border-border-base shadow-sm">
         <h2 className="text-xl font-medium text-ink-900 mb-md">Privacy & Data Usage</h2>
         <p className="text-sm text-ink-500 leading-relaxed italic">
-          We collect usage data to improve the tool. Data is automatically deleted if the product or account is removed.
+          We collect usage data to improve the tool. Data is automatically deleted if the product or
+          account is removed.
         </p>
       </section>
 

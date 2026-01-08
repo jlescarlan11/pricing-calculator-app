@@ -43,14 +43,13 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
     const colorClass = isGood ? 'text-moss' : 'text-rust';
     const Icon = isPositive ? TrendingUp : TrendingDown;
 
-    const formatted = isPercent
-      ? formatPercent(Math.abs(delta))
-      : formatCurrency(Math.abs(delta));
+    const formatted = isPercent ? formatPercent(Math.abs(delta)) : formatCurrency(Math.abs(delta));
 
     return (
       <span className={`flex items-center font-medium ${colorClass}`}>
         <Icon className="w-4 h-4 mr-1" />
-        {isPositive ? '+' : '-'}{formatted}
+        {isPositive ? '+' : '-'}
+        {formatted}
       </span>
     );
   };

@@ -22,7 +22,11 @@ interface CalculatorFormProps {
   errors: Record<string, string>;
   isCalculating: boolean;
   onUpdateInput: (updates: Partial<CalculationInput>) => void;
-  onUpdateIngredient: (id: string, field: keyof Ingredient, value: string | number | boolean) => void;
+  onUpdateIngredient: (
+    id: string,
+    field: keyof Ingredient,
+    value: string | number | boolean
+  ) => void;
   onAddIngredient: () => void;
   onRemoveIngredient: (id: string) => void;
   onUpdateConfig: (updates: Partial<PricingConfig>) => void;
@@ -71,12 +75,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   // --- Empty State Logic ---
   const isEmpty = useMemo(() => {
     const hasName = (input.productName?.trim().length ?? 0) > 0;
-    const hasIngredients = (input.ingredients?.length ?? 0) > 1 || 
+    const hasIngredients =
+      (input.ingredients?.length ?? 0) > 1 ||
       (input.ingredients?.[0]?.name?.trim().length ?? 0) > 0 ||
       (input.ingredients?.[0]?.cost ?? 0) > 0;
     const hasLabor = (input.laborCost ?? 0) > 0;
     const hasOverhead = (input.overhead ?? 0) > 0;
-    
+
     return !hasName && !hasIngredients && !hasLabor && !hasOverhead;
   }, [input]);
 
@@ -86,16 +91,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
   const isIngredientsComplete =
     (input.ingredients?.length ?? 0) > 0 &&
-    input.ingredients!.every(
-      (ing) => (ing.name?.trim() || '') !== '' && (ing.cost || 0) > 0
-    );
+    input.ingredients!.every((ing) => (ing.name?.trim() || '') !== '' && (ing.cost || 0) > 0);
 
   // Costs and Strategy are always considered "visitable/complete" as they have defaults or are optional
   const isCostsComplete = true;
   const isStrategyComplete = true;
 
   // Variants are optional, so "complete" if valid or empty
-  const isVariantsComplete = true; 
+  const isVariantsComplete = true;
 
   const isFormValid = isInfoComplete && isIngredientsComplete;
 
@@ -104,7 +107,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   const [expandedSection, setExpandedSection] = useState<number>(() => {
     if (!isInfoComplete) return 1;
     if (!isIngredientsComplete) return 2;
-    return 3; 
+    return 3;
   });
 
   // Helper to handle manual toggling
@@ -149,9 +152,11 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   const calculationResult = useMemo(() => performFullCalculation(input, config), [input, config]);
 
   // Summaries for closed states
-  const infoSummary = isInfoComplete ? `${input.productName}, Batch: ${input.batchSize}` : 'Incomplete';
-  const ingredientsSummary = isIngredientsComplete 
-    ? `${input.ingredients?.length} Ingredients` 
+  const infoSummary = isInfoComplete
+    ? `${input.productName}, Batch: ${input.batchSize}`
+    : 'Incomplete';
+  const ingredientsSummary = isIngredientsComplete
+    ? `${input.ingredients?.length} Ingredients`
     : `${input.ingredients?.length || 0} items`;
   const costsSummary = `Labor: ${input.laborCost || 0}, Overhead: ${input.overhead || 0}`;
   const strategySummary = `${config.strategy === 'markup' ? 'Markup' : 'Margin'}: ${config.value}%`;
@@ -162,8 +167,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-y-xs md:gap-y-0 items-center">
         {/* Title */}
         <div className="flex flex-col">
-           <h2 className="text-2xl text-ink-900 font-serif tracking-tight">Calculator</h2>
-           <p className="text-sm text-ink-500">Step {Math.min(expandedSection || 1, 5)} of 5</p>
+          <h2 className="text-2xl text-ink-900 font-serif tracking-tight">Calculator</h2>
+          <p className="text-sm text-ink-500">Step {Math.min(expandedSection || 1, 5)} of 5</p>
         </div>
 
         {/* Action Bar */}
@@ -176,7 +181,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               title="Saved Products"
             >
               <Package className="w-4 h-4 shrink-0" />
-              <span className="text-[10px] md:text-sm font-medium md:font-normal leading-none md:leading-normal truncate w-full md:w-auto text-center">Presets</span>
+              <span className="text-[10px] md:text-sm font-medium md:font-normal leading-none md:leading-normal truncate w-full md:w-auto text-center">
+                Presets
+              </span>
             </Button>
 
             <div className="h-4 w-px bg-border-subtle shrink-0" />
@@ -201,7 +208,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               title="Reset Form"
             >
               <RefreshCcw className="w-4 h-4 shrink-0" />
-              <span className="text-[10px] md:text-sm font-medium md:font-normal leading-none md:leading-normal truncate w-full md:w-auto text-center">Reset</span>
+              <span className="text-[10px] md:text-sm font-medium md:font-normal leading-none md:leading-normal truncate w-full md:w-auto text-center">
+                Reset
+              </span>
             </Button>
           </div>
         </div>
@@ -210,7 +219,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       <div className="flex flex-col space-y-md">
         {isEmpty && onLoadSample && (
           <div className="animate-in fade-in slide-in-from-top-4 duration-500 pb-sm">
-             <SampleDemo onLoadSample={onLoadSample} />
+            <SampleDemo onLoadSample={onLoadSample} />
           </div>
         )}
         {/* Step 1: Product Info */}
@@ -235,10 +244,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               }}
             />
             <div className="flex justify-end">
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 size="sm"
-                onClick={() => nextSection(1)} 
+                onClick={() => nextSection(1)}
                 disabled={!isInfoComplete}
                 className="bg-clay text-white hover:bg-clay/90"
               >
@@ -258,11 +267,11 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           summary={ingredientsSummary}
         >
           <div className="space-y-lg">
-             <div className="bg-surface/50 rounded-lg p-sm border border-border-subtle/50">
-               <p className="text-sm text-ink-500 text-center">
-                 Add all ingredients used in your batch (e.g., 500g Flour, 2 Eggs).
-               </p>
-             </div>
+            <div className="bg-surface/50 rounded-lg p-sm border border-border-subtle/50">
+              <p className="text-sm text-ink-500 text-center">
+                Add all ingredients used in your batch (e.g., 500g Flour, 2 Eggs).
+              </p>
+            </div>
 
             {errors.ingredients && (
               <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20 flex items-center gap-sm animate-in fade-in slide-in-from-left-2">
@@ -302,17 +311,17 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 <Plus className="w-5 h-5" />
                 Add Item
               </Button>
-              
+
               <div className="flex justify-end">
-                 <Button 
+                <Button
                   variant="primary"
                   size="sm"
                   onClick={() => nextSection(2)}
                   disabled={!isIngredientsComplete}
                   className="bg-clay text-white hover:bg-clay/90"
-                 >
-                   Continue <ArrowRight className="w-4 h-4 ml-2" />
-                 </Button>
+                >
+                  Continue <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </div>
             </div>
           </div>
@@ -327,7 +336,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           onToggle={() => toggleSection(3)}
           summary={costsSummary}
         >
-           <div className="space-y-lg -mx-lg -mb-lg -mt-sm">
+          <div className="space-y-lg -mx-lg -mb-lg -mt-sm">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:divide-x md:divide-border-subtle/50">
               <div className="p-lg md:p-xl">
                 <LaborCost
@@ -346,14 +355,14 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               </div>
             </div>
             <div className="flex justify-end p-lg md:p-xl pt-0 md:pt-0">
-               <Button 
+              <Button
                 variant="primary"
                 size="sm"
                 onClick={() => nextSection(3)}
                 className="bg-clay text-white hover:bg-clay/90"
-               >
-                 Continue <ArrowRight className="w-4 h-4 ml-2" />
-               </Button>
+              >
+                Continue <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
           </div>
         </AccordionSection>
@@ -367,33 +376,33 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           onToggle={() => toggleSection(4)}
           summary={strategySummary}
         >
-           <div className="space-y-lg">
-              <PricingStrategy
-                strategy={config.strategy}
-                value={config.value}
-                costPerUnit={calculationResult?.costPerUnit || 0}
-                onChange={handlePricingChange}
-              />
+          <div className="space-y-lg">
+            <PricingStrategy
+              strategy={config.strategy}
+              value={config.value}
+              costPerUnit={calculationResult?.costPerUnit || 0}
+              onChange={handlePricingChange}
+            />
 
-              <div className="h-px bg-border-subtle" role="separator" />
+            <div className="h-px bg-border-subtle" role="separator" />
 
-              <CurrentPrice value={input.currentSellingPrice} onChange={handleCurrentPriceChange} />
-              
-              <div className="flex justify-end">
-                 <Button 
-                  variant="primary"
-                  size="sm"
-                  onClick={() => nextSection(4)}
-                  className="bg-clay text-white hover:bg-clay/90"
-                 >
-                   Continue <ArrowRight className="w-4 h-4 ml-2" />
-                 </Button>
-              </div>
+            <CurrentPrice value={input.currentSellingPrice} onChange={handleCurrentPriceChange} />
+
+            <div className="flex justify-end">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => nextSection(4)}
+                className="bg-clay text-white hover:bg-clay/90"
+              >
+                Continue <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
           </div>
         </AccordionSection>
 
-         {/* Step 5: Variants (Optional) */}
-         <AccordionSection
+        {/* Step 5: Variants (Optional) */}
+        <AccordionSection
           title="Variants (Optional)"
           stepNumber={5}
           isOpen={expandedSection === 5}
@@ -402,30 +411,32 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           summary={input.hasVariants ? `${input.variants?.length || 0} Variants` : 'Disabled'}
         >
           <div className="space-y-lg">
-             <div className="flex items-center justify-between bg-surface-hover/30 px-lg py-md rounded-xl border border-border-subtle min-h-[56px] transition-colors hover:bg-surface-hover/50">
-                <div className="flex flex-col gap-0.5">
-                  <h4 id="variants-toggle-label" className="font-medium text-ink-900">Variants</h4>
-                  <p className="text-sm text-ink-500 leading-tight">
-                    Create product variations from this base recipe
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <Switch
-                    checked={!!input.hasVariants}
-                    onChange={onSetHasVariants}
-                    aria-labelledby="variants-toggle-label"
-                    className="p-3 -mr-3"
-                  />
-                </div>
-             </div>
+            <div className="flex items-center justify-between bg-surface-hover/30 px-lg py-md rounded-xl border border-border-subtle min-h-[56px] transition-colors hover:bg-surface-hover/50">
+              <div className="flex flex-col gap-0.5">
+                <h4 id="variants-toggle-label" className="font-medium text-ink-900">
+                  Variants
+                </h4>
+                <p className="text-sm text-ink-500 leading-tight">
+                  Create product variations from this base recipe
+                </p>
+              </div>
+              <div className="flex items-center">
+                <Switch
+                  checked={!!input.hasVariants}
+                  onChange={onSetHasVariants}
+                  aria-labelledby="variants-toggle-label"
+                  className="p-3 -mr-3"
+                />
+              </div>
+            </div>
 
-             {errors.variants && (
-                <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20 mb-lg">
-                  {errors.variants}
-                </div>
-             )}
+            {errors.variants && (
+              <div className="p-md bg-rust/10 text-rust text-sm rounded-md border border-rust/20 mb-lg">
+                {errors.variants}
+              </div>
+            )}
 
-             {input.hasVariants && (
+            {input.hasVariants && (
               <div className="space-y-xl animate-in fade-in slide-in-from-top-4 duration-300">
                 {/* Base Variant Block (Read Only) */}
                 <Card className="bg-surface/50 border-border-subtle ">
@@ -524,10 +535,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 </Button>
               </div>
             )}
-            
+
             <div className="flex justify-end">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={() => setExpandedSection(0)} // Close
                 className="text-ink-500 hover:text-ink-900"
@@ -537,7 +548,6 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             </div>
           </div>
         </AccordionSection>
-
       </div>
 
       {/* Main Calculate Action - Bottom of Form (Desktop Only) */}

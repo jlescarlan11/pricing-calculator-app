@@ -117,9 +117,12 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
                   onAdd={() => onAddIngredient(variant.id)}
                   errors={{
                     name: errors[`variants.${variant.id}.ingredients.${ing.id}.name`],
-                    purchaseQuantity: errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseQuantity`],
-                    purchaseCost: errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseCost`],
-                    recipeQuantity: errors[`variants.${variant.id}.ingredients.${ing.id}.recipeQuantity`],
+                    purchaseQuantity:
+                      errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseQuantity`],
+                    purchaseCost:
+                      errors[`variants.${variant.id}.ingredients.${ing.id}.purchaseCost`],
+                    recipeQuantity:
+                      errors[`variants.${variant.id}.ingredients.${ing.id}.recipeQuantity`],
                     cost: errors[`variants.${variant.id}.ingredients.${ing.id}.cost`],
                   }}
                 />

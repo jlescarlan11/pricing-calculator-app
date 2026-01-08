@@ -113,17 +113,17 @@ describe('SavePresetButton', () => {
 
   it('hides label on mobile when mobileLabelLayout is hidden', () => {
     render(<SavePresetButton input={mockInput} config={mockConfig} mobileLabelLayout="hidden" />);
-    
+
     const labelSpan = screen.getByText('Save');
     expect(labelSpan).toHaveClass('hidden', 'sm:inline');
   });
 
   it('applies vertical layout classes when mobileLabelLayout is vertical', () => {
     render(<SavePresetButton input={mockInput} config={mockConfig} mobileLabelLayout="vertical" />);
-    
+
     const labelSpan = screen.getByText('Save');
     expect(labelSpan).toHaveClass('text-[10px]');
-    
+
     const button = screen.getByRole('button', { name: /save current calculation as preset/i });
     expect(button).toHaveClass('flex-col');
   });

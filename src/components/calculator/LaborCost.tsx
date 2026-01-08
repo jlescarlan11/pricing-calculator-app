@@ -83,17 +83,19 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
         <div className="space-y-xl py-md">
           <div className="space-y-md">
             <p className="text-ink-700 leading-relaxed">
-              Labor cost represents the value of time spent preparing this batch. Even if you are the only worker, you should pay yourself a fair hourly wage.
+              Labor cost represents the value of time spent preparing this batch. Even if you are
+              the only worker, you should pay yourself a fair hourly wage.
             </p>
-            
+
             <div className="space-y-lg">
               <div className="space-y-xs">
                 <h5 className="font-bold text-ink-900">Why calculate labor?</h5>
                 <p className="text-sm text-ink-600">
-                  If you don&apos;t include labor, you&apos;re only covering your ingredients, not your effort. Proper labor pricing allows you to eventually hire staff.
+                  If you don&apos;t include labor, you&apos;re only covering your ingredients, not
+                  your effort. Proper labor pricing allows you to eventually hire staff.
                 </p>
               </div>
-              
+
               <div className="space-y-xs">
                 <h5 className="font-bold text-ink-900">How to calculate:</h5>
                 <p className="text-sm text-ink-600 font-mono bg-surface p-sm rounded-md border border-border-subtle">
@@ -102,7 +104,7 @@ export const LaborCost: React.FC<LaborCostProps> = ({ value, onChange, error, la
               </div>
             </div>
           </div>
-          
+
           <div className="flex justify-end pt-md">
             <Button variant="primary" onClick={() => setIsHelperOpen(false)}>
               Got it

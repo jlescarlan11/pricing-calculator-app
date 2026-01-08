@@ -1,5 +1,10 @@
-import React from 'react';
-import type { CalculationResult, CalculationInput, PricingConfig } from '../../types/calculator';
+import React, { useState } from 'react';
+import type {
+  CalculationResult,
+  CalculationInput,
+  PricingConfig,
+  DraftCompetitor,
+} from '../../types/calculator';
 import { PricingRecommendations } from './PricingRecommendations';
 import { CostBreakdown } from './CostBreakdown';
 import { PriceComparison } from './PriceComparison';
@@ -9,13 +14,18 @@ import { AnalyzePriceCard } from './AnalyzePriceCard';
 import { Button } from '../shared/Button';
 import { useToast } from '../shared/Toast';
 import { SavePresetButton } from '../presets/SavePresetButton';
-import { Share2, Calculator, Edit2 } from 'lucide-react';
+import { Share2, Calculator, Edit2, TrendingUp } from 'lucide-react';
 import { getPrintDate, getPrintTitle } from '../../utils';
 import { analyticsService } from '../../services/analyticsService';
 import { calculateRiskScore, generateStaticRecommendations } from '../../utils/aiAnalysis';
 import { shouldEnableLLM } from '../../utils/featureFlags';
-import { incrementUsage, checkRateLimit } from './AnalyzePriceCard';
+import { incrementUsage, checkRateLimit } from '../../utils/analysisRateLimit';
 import { supabase } from '../../lib/supabase';
+import { usePresets } from '../../hooks/use-presets';
+import { calculateMarketPosition } from '../../utils/calculations';
+import { CompetitorModal } from './CompetitorModal';
+import { MarketPositionSpectrum } from './MarketPositionSpectrum';
+import { formatCurrency } from '../../utils/formatters';
 
 interface ResultsDisplayProps {
   results: CalculationResult | null | undefined;
@@ -40,9 +50,37 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   userId,
 }) => {
   const { addToast } = useToast();
+  const { getPreset, updatePreset } = usePresets();
   const [isAnalyzed, setIsAnalyzed] = React.useState(false);
   const [recommendations, setRecommendations] = React.useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [isCompetitorModalOpen, setIsCompetitorModalOpen] = useState(false);
+
+  // Get current preset and its competitors
+  const currentPreset = presetId ? getPreset(presetId) : null;
+  const competitors = currentPreset?.competitors || [];
+
+  const marketPosition = results
+    ? calculateMarketPosition(results.recommendedPrice, competitors)
+    : null;
+
+  const handleSaveCompetitors = async (updatedCompetitors: DraftCompetitor[]) => {
+    if (!presetId) {
+      addToast('Please save this product first to track competitors.', 'info');
+      return;
+    }
+
+    try {
+      // Competitors already have IDs or will be handled by updatePreset -> service
+      await updatePreset(presetId, {
+        competitors: updatedCompetitors,
+      });
+      addToast('✓ Competitors updated.', 'success');
+    } catch (err) {
+      console.error('Failed to update competitors:', err);
+      throw err;
+    }
+  };
 
   const handleAnalyze = async () => {
     if (!presetId || !userId) {
@@ -67,10 +105,10 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       if (isLLMEnabled) {
         // Advanced AI Analysis via Supabase Edge Function
         const { data, error } = await supabase.functions.invoke('analyze-pricing', {
-          body: { 
-            results, 
-            input 
-          }
+          body: {
+            results,
+            input,
+          },
         });
 
         if (error || !data?.recommendations) {
@@ -82,15 +120,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       } else {
         // Fallback to Rules-Based MVP
         // Artificial delay for UX
-        await new Promise(resolve => setTimeout(resolve, 1200));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+
         const margin = results?.profitMarginPercent || 0;
         const risk = calculateRiskScore(margin);
         const recs = generateStaticRecommendations(margin, risk);
-        
+
         setRecommendations(recs);
       }
-      
+
       // Successfully performed analysis (either LLM or fallback)
       incrementUsage();
       setIsAnalyzed(true);
@@ -176,30 +214,22 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
         {/* Analyze Pricing CTA */}
         <div className="print:hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-          <AnalyzePriceCard 
-            onAnalyze={handleAnalyze} 
+          <AnalyzePriceCard
+            onAnalyze={handleAnalyze}
             isAnalyzed={isAnalyzed}
             recommendations={recommendations}
             isLoading={isAnalyzing}
           />
         </div>
 
-        {/* Priority 2: Cost Breakdown - De-emphasized */}
-        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 opacity-80 hover:opacity-100 transition-opacity">
-          <div className="flex items-center gap-sm mb-md px-md">
-            <div className="h-px flex-1 bg-border-subtle" />
-            <span className="text-[10px] font-bold text-ink-300 uppercase tracking-[0.2em]">Detailed Cost Breakdown</span>
-            <div className="h-px flex-1 bg-border-subtle" />
-          </div>
-          <CostBreakdown results={results} />
-        </div>
-
-        {/* Priority 3: Price Comparison (Single Only) - De-emphasized */}
+        {/* Priority 2: Price Comparison (Single Only) - De-emphasized */}
         {!hasVariants && (
-          <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 opacity-80 hover:opacity-100 transition-opacity">
+          <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 opacity-80 hover:opacity-100 transition-opacity">
             <div className="flex items-center gap-sm mb-md px-md">
               <div className="h-px flex-1 bg-border-subtle" />
-              <span className="text-[10px] font-bold text-ink-300 uppercase tracking-[0.2em]">Current vs Recommended</span>
+              <span className="text-[10px] font-bold text-ink-300 uppercase tracking-[0.2em]">
+                Current vs Recommended
+              </span>
               <div className="h-px flex-1 bg-border-subtle" />
             </div>
             <PriceComparison
@@ -210,6 +240,98 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             />
           </div>
         )}
+
+        {/* Competitive Benchmarker Section */}
+        <div className="print:hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-250">
+          {competitors.length >= 2 && marketPosition && !('error' in marketPosition) ? (
+            <div className="bg-surface p-xl rounded-xl border border-border-subtle space-y-lg">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-sm font-bold text-ink-900 mb-xs uppercase tracking-wider">
+                    Market Positioning
+                  </h4>
+                  <p className="text-xs text-ink-500">
+                    How your recommended price compares to competitors.
+                  </p>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsCompetitorModalOpen(true)}
+                >
+                  Update Data
+                </Button>
+              </div>
+
+              {/* Spectrum UI */}
+              <MarketPositionSpectrum percentile={marketPosition.percentile} />
+
+              <div className="grid grid-cols-3 gap-md pt-md border-t border-border-subtle/50">
+                <div className="text-center">
+                  <p className="text-[10px] text-ink-500 uppercase font-bold tracking-widest mb-1">
+                    Min Market
+                  </p>
+                  <p className="text-sm font-bold text-ink-900">
+                    {formatCurrency(marketPosition.minPrice)}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-ink-500 uppercase font-bold tracking-widest mb-1">
+                    Market Avg
+                  </p>
+                  <p className="text-sm font-bold text-ink-900">
+                    {formatCurrency(marketPosition.avgPrice)}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] text-ink-500 uppercase font-bold tracking-widest mb-1">
+                    Max Market
+                  </p>
+                  <p className="text-sm font-bold text-ink-900">
+                    {formatCurrency(marketPosition.maxPrice)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-surface/30 p-xl rounded-xl border border-dashed border-border-base">
+              <div className="max-w-md mx-auto text-center">
+                <h4 className="text-sm font-bold text-ink-900 mb-xs uppercase tracking-wider opacity-60">
+                  Market Positioning
+                </h4>
+                <p className="text-xs text-ink-500 mb-xl">
+                  {competitors.length > 0
+                    ? 'Add at least two competitors to see where your product sits in the market.'
+                    : 'Add competitor prices to see if your product is Budget, Mid-Market, or Premium.'}
+                </p>
+
+                <MarketPositionSpectrum percentile={null} className="opacity-30 mb-xl" />
+
+                <Button
+                  variant="secondary"
+                  size="md"
+                  className="gap-sm group"
+                  onClick={() => setIsCompetitorModalOpen(true)}
+                >
+                  <TrendingUp className="w-4 h-4 text-ink-300 group-hover:text-clay transition-colors" />
+                  {competitors.length > 0 ? 'Track 2+ Competitors' : 'Track Competitors'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Priority 3: Cost Breakdown - De-emphasized */}
+        <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 opacity-80 hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-sm mb-md px-md">
+            <div className="h-px flex-1 bg-border-subtle" />
+            <span className="text-[10px] font-bold text-ink-300 uppercase tracking-[0.2em]">
+              Detailed Cost Breakdown
+            </span>
+            <div className="h-px flex-1 bg-border-subtle" />
+          </div>
+          <CostBreakdown results={results} />
+        </div>
 
         {/* Pro Tip - Low visual weight */}
         <div className="p-xl bg-surface/50 rounded-xl border border-border-subtle print:hidden flex items-start gap-md">
@@ -228,6 +350,14 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </div>
         </div>
       </div>
+
+      <CompetitorModal
+        isOpen={isCompetitorModalOpen}
+        onClose={() => setIsCompetitorModalOpen(false)}
+        presetId={presetId}
+        competitors={competitors}
+        onSave={handleSaveCompetitors}
+      />
 
       {/* Print Footer */}
       <div className="hidden print:block mt-2xl pt-xl border-t border-border-subtle text-center text-ink-500 text-xs font-medium">

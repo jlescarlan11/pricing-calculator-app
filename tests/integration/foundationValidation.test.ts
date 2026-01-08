@@ -31,7 +31,8 @@ const resetMocks = () => {
     eq: vi.fn(),
     order: vi.fn(),
     limit: vi.fn(),
-    then: (resolve: any) => Promise.resolve({ data: [], error: null }).then(resolve),
+    then: (resolve: (value: { data: unknown[]; error: null }) => void) =>
+      Promise.resolve({ data: [], error: null }).then(resolve),
   };
 
   // Wire up the chain to return itself
@@ -174,26 +175,23 @@ describe('Foundation Validation Integration Tests', () => {
     // Now test retrieval
     // Mock Supabase returning these snapshots (simulating sync)
     // The service merges cloud data.
-    const mockCloudSnapshots = [
-        { ...s1 },
-        { ...s2 }
-    ];
-    
+    const mockCloudSnapshots = [{ ...s1 }, { ...s2 }];
+
     // We need to map these to DB format because service maps `fromDb`
-    const dbSnapshots = mockCloudSnapshots.map(s => ({
-        id: s?.id,
-        user_id: s?.userId,
-        name: s?.name,
-        preset_type: s?.presetType,
-        base_recipe: s?.baseRecipe,
-        variants: s?.variants,
-        pricing_config: s?.pricingConfig,
-        created_at: s?.createdAt,
-        updated_at: s?.updatedAt,
-        snapshot_date: s?.snapshotMetadata?.snapshotDate,
-        is_tracked_version: true,
-        version_number: s?.snapshotMetadata?.versionNumber,
-        parent_preset_id: s?.snapshotMetadata?.parentPresetId
+    const dbSnapshots = mockCloudSnapshots.map((s) => ({
+      id: s?.id,
+      user_id: s?.userId,
+      name: s?.name,
+      preset_type: s?.presetType,
+      base_recipe: s?.baseRecipe,
+      variants: s?.variants,
+      pricing_config: s?.pricingConfig,
+      created_at: s?.createdAt,
+      updated_at: s?.updatedAt,
+      snapshot_date: s?.snapshotMetadata?.snapshotDate,
+      is_tracked_version: true,
+      version_number: s?.snapshotMetadata?.versionNumber,
+      parent_preset_id: s?.snapshotMetadata?.parentPresetId,
     }));
 
     // Mock the getSnapshots DB call

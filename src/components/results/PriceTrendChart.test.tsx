@@ -8,8 +8,10 @@ vi.mock('recharts', () => {
   const OriginalModule = vi.importActual('recharts');
   return {
     ...OriginalModule,
-    ResponsiveContainer: ({ children }: any) => <div style={{ width: '100%', height: '100%' }}>{children}</div>,
-    LineChart: ({ children }: any) => <div data-testid="line-chart">{children}</div>,
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+      <div style={{ width: '100%', height: '100%' }}>{children}</div>
+    ),
+    LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
     Line: () => <div />,
     XAxis: () => <div />,
     YAxis: () => <div />,
@@ -76,7 +78,9 @@ describe('PriceTrendChart', () => {
 
   it('renders the empty state when no snapshots provided', () => {
     render(<PriceTrendChart snapshots={[]} />);
-    expect(screen.getByText(/Pin milestones to visualize your price and cost history/i)).toBeDefined();
+    expect(
+      screen.getByText(/Pin milestones to visualize your price and cost history/i)
+    ).toBeDefined();
     expect(screen.queryByTestId('line-chart')).toBeNull();
   });
 

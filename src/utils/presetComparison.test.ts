@@ -12,7 +12,7 @@ describe('compareTotals', () => {
     const current: ComparisonInput = {
       totalCost: 120,
       suggestedPrice: 180,
-      profitMargin: 35.00,
+      profitMargin: 35.0,
     };
 
     const result = compareTotals(current, previous);
@@ -32,7 +32,7 @@ describe('compareTotals', () => {
     const current: ComparisonInput = {
       totalCost: 90,
       suggestedPrice: 140,
-      profitMargin: 30.00,
+      profitMargin: 30.0,
     };
 
     const result = compareTotals(current, previous);

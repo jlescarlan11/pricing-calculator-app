@@ -5,6 +5,6 @@ export interface AnalyticsEvent {
   userId: string;
   presetId: string;
   eventType: AnalyticsEventType;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   clickedAt?: string;
 }

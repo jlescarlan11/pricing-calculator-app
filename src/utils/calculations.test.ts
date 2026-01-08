@@ -7,10 +7,93 @@ import {
   calculateRecommendedPrice,
   calculateProfitMargin,
   performFullCalculation,
+  calculateMarketPosition,
 } from './calculations';
 import type { Ingredient } from '../types/calculator';
 
 describe('Calculation Utils', () => {
+  describe('calculateMarketPosition', () => {
+    it('returns error if fewer than 2 competitors', () => {
+      expect(calculateMarketPosition(100, [])).toEqual({ error: 'NEEDS_TWO_COMPETITORS' });
+      expect(calculateMarketPosition(100, [{ competitorPrice: 100 }])).toEqual({
+        error: 'NEEDS_TWO_COMPETITORS',
+      });
+    });
+
+    it('filters out invalid competitor prices', () => {
+      const result = calculateMarketPosition(150, [
+        { competitorPrice: 100 },
+        { competitorPrice: NaN },
+        { competitorPrice: -50 },
+        { competitorPrice: 200 },
+      ]);
+      
+      if ('error' in result) throw new Error('Should not return error');
+      
+      expect(result.minPrice).toBe(100);
+      expect(result.maxPrice).toBe(200);
+      expect(result.avgPrice).toBe(150);
+    });
+
+    it('correctly identifies budget position', () => {
+      const result = calculateMarketPosition(100, [
+        { competitorPrice: 120 },
+        { competitorPrice: 200 },
+      ]);
+      
+      if ('error' in result) throw new Error('Should not return error');
+      
+      expect(result.position).toBe('budget');
+      expect(result.percentile).toBe(0);
+    });
+
+    it('correctly identifies mid position', () => {
+      const result = calculateMarketPosition(150, [
+        { competitorPrice: 100 },
+        { competitorPrice: 200 },
+      ]);
+      
+      if ('error' in result) throw new Error('Should not return error');
+      
+      expect(result.position).toBe('mid');
+      expect(result.percentile).toBe(50);
+    });
+
+    it('correctly identifies premium position', () => {
+      const result = calculateMarketPosition(250, [
+        { competitorPrice: 100 },
+        { competitorPrice: 200 },
+      ]);
+      
+      if ('error' in result) throw new Error('Should not return error');
+      
+      expect(result.position).toBe('premium');
+      expect(result.percentile).toBe(100);
+    });
+
+    it('handles all competitors having the same price', () => {
+      const competitors = [{ competitorPrice: 100 }, { competitorPrice: 100 }];
+
+      // Price matches exactly
+      let result = calculateMarketPosition(100, competitors);
+      if ('error' in result) throw new Error('Should not return error');
+      expect(result.position).toBe('mid');
+      expect(result.percentile).toBe(50);
+
+      // Price is lower
+      result = calculateMarketPosition(90, competitors);
+      if ('error' in result) throw new Error('Should not return error');
+      expect(result.position).toBe('budget');
+      expect(result.percentile).toBe(0);
+
+      // Price is higher
+      result = calculateMarketPosition(110, competitors);
+      if ('error' in result) throw new Error('Should not return error');
+      expect(result.position).toBe('premium');
+      expect(result.percentile).toBe(100);
+    });
+  });
+
   describe('calculateTotalIngredientCost', () => {
     it('should sum the costs of all ingredients', () => {
       const ingredients: Ingredient[] = [

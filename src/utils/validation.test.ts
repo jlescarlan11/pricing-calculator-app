@@ -102,17 +102,17 @@ describe('Validation Utils', () => {
   });
 
   describe('validateIngredients', () => {
-    const validIngredient = { 
-      id: '1', 
-      name: 'Flour', 
-      amount: 1000, 
+    const validIngredient = {
+      id: '1',
+      name: 'Flour',
+      amount: 1000,
       cost: 50,
       purchaseQuantity: 1000,
       purchaseUnit: 'g',
       purchaseCost: 50,
       recipeQuantity: 1000,
       recipeUnit: 'g',
-      useFullQuantity: false
+      useFullQuantity: false,
     };
 
     it('should return empty array for valid ingredients', () => {

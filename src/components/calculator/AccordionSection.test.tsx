@@ -18,7 +18,7 @@ describe('AccordionSection', () => {
 
     const stepIndicator = screen.getByText('1');
     expect(stepIndicator).toBeInTheDocument();
-    
+
     // Check for active classes (clay background)
     expect(stepIndicator).toHaveClass('bg-clay');
     expect(stepIndicator).toHaveClass('ring-4');
@@ -40,7 +40,7 @@ describe('AccordionSection', () => {
     // Should show checkmark instead of number
     const checkmark = container.querySelector('svg');
     expect(checkmark).toBeInTheDocument();
-    
+
     // Check for muted green classes - checkmark is inside the indicator div
     expect(checkmark?.parentElement).toHaveClass('bg-moss/10');
     expect(checkmark?.parentElement).toHaveClass('text-moss');
@@ -61,7 +61,7 @@ describe('AccordionSection', () => {
 
     const stepIndicator = screen.getByText('1');
     expect(stepIndicator).toBeInTheDocument();
-    
+
     // Check for default classes
     expect(stepIndicator).toHaveClass('bg-white');
     expect(stepIndicator).toHaveClass('text-ink-500');

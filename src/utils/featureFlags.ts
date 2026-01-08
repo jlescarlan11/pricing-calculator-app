@@ -3,9 +3,9 @@ import { supabase } from '../lib/supabase';
 /**
  * Feature flag logic for staged deployment of LLM features.
  * Enable if ≥25 unique users clicked "Analyze" in the last 42 days (6 weeks).
- * 
+ *
  * NOTE: Due to RLS, this client-side check will only see the current user's clicks
- * unless an RPC is provided. For the MVP, we check the threshold but it acts as 
+ * unless an RPC is provided. For the MVP, we check the threshold but it acts as
  * a gate for individual engagement or until global metrics are available.
  */
 export async function shouldEnableLLM(): Promise<boolean> {
@@ -26,8 +26,8 @@ export async function shouldEnableLLM(): Promise<boolean> {
     }
 
     // Get unique users from data
-    const uniqueUsers = new Set(data?.map(row => row.user_id));
-    
+    const uniqueUsers = new Set(data?.map((row) => row.user_id));
+
     // For MVP, we use the 25 unique users threshold.
     // In a real production environment, this would call a public metric or RPC.
     return uniqueUsers.size >= 25;

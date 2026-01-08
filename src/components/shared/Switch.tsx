@@ -9,13 +9,13 @@ interface SwitchProps {
   'aria-labelledby'?: string;
 }
 
-export const Switch: React.FC<SwitchProps> = ({ 
-  checked, 
-  onChange, 
-  label, 
+export const Switch: React.FC<SwitchProps> = ({
+  checked,
+  onChange,
+  label,
   className = '',
   'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy
+  'aria-labelledby': ariaLabelledBy,
 }) => {
   return (
     <label className={`inline-flex items-center cursor-pointer ${className}`}>

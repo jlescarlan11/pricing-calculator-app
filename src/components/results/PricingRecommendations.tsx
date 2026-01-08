@@ -25,7 +25,7 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
     margin: number
   ): { variant: BadgeVariant; label: string; icon: React.ReactNode } => {
     const color = getMarginColor(margin);
-    
+
     if (color === 'rust') {
       return {
         variant: 'error',
@@ -54,7 +54,9 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
       {/* Recommended Selling Price - Primary Focus */}
       <div className="flex flex-col items-center px-2xl py-3xl bg-surface rounded-2xl border border-border-subtle shadow-sm relative overflow-hidden group">
         <div className="relative z-10 w-full text-center">
-          <p className="text-sm font-semibold text-ink-500 uppercase tracking-widest mb-sm">Recommended Selling Price</p>
+          <p className="text-sm font-semibold text-ink-500 uppercase tracking-widest mb-sm">
+            Recommended Selling Price
+          </p>
           <p
             key={recommendedPrice}
             className="font-serif text-6xl sm:text-7xl text-ink-900 tracking-tighter transition-transform duration-700 group-hover:scale-105 animate-pulse-once"
@@ -91,7 +93,9 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
           <p className="text-[10px] font-bold text-ink-500 uppercase tracking-widest">
             Profit Margin
           </p>
-          <p className={`text-xl font-bold tabular-nums text-${getMarginColor(profitMarginPercent)}`}>
+          <p
+            className={`text-xl font-bold tabular-nums text-${getMarginColor(profitMarginPercent)}`}
+          >
             {formatPercent(profitMarginPercent)}
           </p>
         </div>

@@ -94,13 +94,44 @@ export const formatNumber = (num: number, decimals: number = 0): string => {
 };
 
 /**
+ * Formats a Date object as a relative time string (e.g., "2 days ago", "just now").
+ *
+ * @param date - The Date object or timestamp to format.
+ * @returns A user-friendly relative time string.
+ */
+export const formatTimeAgo = (date: Date | number | string): string => {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return 'unknown';
+
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - d.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return 'just now';
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) return `${diffInDays}d ago`;
+
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) return `${diffInMonths}mo ago`;
+
+  const diffInYears = Math.floor(diffInDays / 365);
+  return `${diffInYears}y ago`;
+};
+
+/**
  * Returns a color token name based on profit margin thresholds.
- * 
+ *
  * Thresholds:
  * - Below 15%: 'rust' (Red)
  * - 15% to 25%: 'clay' (Orange)
  * - Above 25%: 'moss' (Green)
- * 
+ *
  * @param margin - The profit margin percentage.
  * @returns The color token name.
  */
