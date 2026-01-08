@@ -204,41 +204,12 @@ describe('IngredientRow', () => {
       const purchaseUnitSelect = selects[0];
 
       act(() => {
-        fireEvent.focus(purchaseUnitSelect);
-      });
-      act(() => {
         fireEvent.change(purchaseUnitSelect, { target: { value: 'l' } });
-      });
-      act(() => {
-        fireEvent.blur(purchaseUnitSelect);
       });
 
       // Should update both purchaseUnit and recipeUnit because they were incompatible
       expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'purchaseUnit', 'l');
       expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'recipeUnit', 'l');
-    });
-
-    it('ensures bidirectional consistency via auto-sync when recipe unit is changed', () => {
-      renderComponent({
-        ingredient: { ...mockIngredient, purchaseUnit: 'kg', recipeUnit: 'g' },
-      });
-
-      const selects = screen.getAllByRole('combobox');
-      const recipeUnitSelect = selects[1];
-
-      act(() => {
-        fireEvent.focus(recipeUnitSelect);
-      });
-      act(() => {
-        fireEvent.change(recipeUnitSelect, { target: { value: 'ml' } });
-      });
-      act(() => {
-        fireEvent.blur(recipeUnitSelect);
-      });
-
-      // Should update both because purchaseUnit (kg) is weight and recipeUnit (ml) is volume
-      expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'recipeUnit', 'ml');
-      expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'purchaseUnit', 'ml');
     });
   });
 });

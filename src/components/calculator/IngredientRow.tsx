@@ -43,7 +43,6 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [activeUnitField, setActiveUnitField] = useState<'purchase' | 'recipe' | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -172,14 +171,13 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
     }
   };
 
-  const purchaseUnitOptions =
-    activeUnitField === 'purchase'
-      ? UNIT_OPTIONS
-      : getCompatibleUnits(ingredient.recipeUnit || '', ingredient.recipeUnit);
-  const recipeUnitOptions =
-    activeUnitField === 'recipe'
-      ? UNIT_OPTIONS
-      : getCompatibleUnits(ingredient.purchaseUnit || '', ingredient.purchaseUnit);
+  // Purchase unit shows ALL units so user can switch categories.
+  // Recipe unit is strictly filtered by the selected Purchase unit.
+  const purchaseUnitOptions = UNIT_OPTIONS;
+  const recipeUnitOptions = getCompatibleUnits(
+    ingredient.purchaseUnit || '',
+    ingredient.purchaseUnit
+  );
 
   return (
     <div
@@ -254,8 +252,6 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
                 options={purchaseUnitOptions}
                 value={ingredient.purchaseUnit || ''}
                 onChange={(e) => handleChange('purchaseUnit', e.target.value)}
-                onFocus={() => setActiveUnitField('purchase')}
-                onBlur={() => setActiveUnitField(null)}
                 placeholder="Unit"
                 className="text-sm"
               />
@@ -316,8 +312,6 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
                 options={recipeUnitOptions}
                 value={ingredient.recipeUnit || ''}
                 onChange={(e) => handleChange('recipeUnit', e.target.value)}
-                onFocus={() => setActiveUnitField('recipe')}
-                onBlur={() => setActiveUnitField(null)}
                 placeholder="Unit"
                 className="text-sm"
                 disabled={ingredient.useFullQuantity}
