@@ -463,20 +463,39 @@ export const presetService = {
       return null;
     }
 
-    // 2. Determine Version Number
-    // Check local snapshots for max version
-    const localSnapshots = presets.filter(
-      (p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === presetId
-    );
+    // 2. Determine Version Number & Check for Same-Day Snapshot
+    const localSnapshots = presets
+      .filter((p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === presetId)
+      .sort((a, b) => (a.snapshotMetadata?.versionNumber || 0) - (b.snapshotMetadata?.versionNumber || 0));
 
+    const latestSnapshot = localSnapshots.length > 0 ? localSnapshots[localSnapshots.length - 1] : null;
+    const now = new Date();
+    
+    let snapshotId: string = crypto.randomUUID();
     let nextVersion = 1;
-    if (localSnapshots.length > 0) {
-      const maxLocal = Math.max(...localSnapshots.map((p) => p.snapshotMetadata!.versionNumber));
-      nextVersion = maxLocal + 1;
+    let shouldUpdateExisting = false;
+
+    if (latestSnapshot && latestSnapshot.snapshotMetadata) {
+      const latestDate = new Date(latestSnapshot.snapshotMetadata.snapshotDate);
+      
+      // Check if same day (local time)
+      const isSameDay = 
+        latestDate.getFullYear() === now.getFullYear() &&
+        latestDate.getMonth() === now.getMonth() &&
+        latestDate.getDate() === now.getDate();
+
+      if (isSameDay) {
+        shouldUpdateExisting = true;
+        snapshotId = latestSnapshot.id;
+        nextVersion = latestSnapshot.snapshotMetadata.versionNumber;
+        console.log(`[Snapshot] Updating existing snapshot (Version ${nextVersion}) from today.`);
+      } else {
+        nextVersion = latestSnapshot.snapshotMetadata.versionNumber + 1;
+      }
     }
 
-    // If online, double check DB for higher version to ensure consistency
-    if (navigator.onLine && sourcePreset.userId) {
+    // If online and NOT updating existing, check DB for higher version to ensure consistency
+    if (!shouldUpdateExisting && navigator.onLine && sourcePreset.userId) {
       try {
         const { data } = await supabase
           .from('presets')
@@ -494,18 +513,19 @@ export const presetService = {
     }
 
     // 3. Create Snapshot Object
-    const snapshotId = crypto.randomUUID();
-    const now = new Date().toISOString();
+    // If updating existing, we still want to clone the source state as the new state for this snapshot.
+    // We reuse the snapshotId and versionNumber.
+    const snapshotTimestamp = now.toISOString();
 
     const snapshotPreset: Preset = {
       ...structuredClone(sourcePreset),
       id: snapshotId,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: shouldUpdateExisting && latestSnapshot ? latestSnapshot.createdAt : snapshotTimestamp, // Keep original creation time if updating
+      updatedAt: snapshotTimestamp,
       lastSyncedAt: undefined, // Needs sync
       isSnapshot: true,
       snapshotMetadata: {
-        snapshotDate: now,
+        snapshotDate: snapshotTimestamp,
         isTrackedVersion: true,
         versionNumber: nextVersion,
         parentPresetId: sourcePreset.id,
@@ -513,14 +533,23 @@ export const presetService = {
     };
 
     // 4. Handle Competitors (Deep Clone)
-    // If the source preset has competitors, we need to clone them as new records linked to the snapshot
+    // If updating existing, we should try to clear old competitors to avoid orphans (best effort)
+    if (shouldUpdateExisting && navigator.onLine && snapshotPreset.userId) {
+      try {
+        await supabase.from('competitors').delete().eq('preset_id', snapshotId);
+      } catch (e) {
+        console.error('Failed to clear old competitors for snapshot update', e);
+      }
+    }
+
+    // Clone competitors from source
     if (Array.isArray(snapshotPreset.competitors) && snapshotPreset.competitors.length > 0) {
       snapshotPreset.competitors = snapshotPreset.competitors.map((comp) => ({
         ...comp,
         id: crypto.randomUUID(), // New ID
         presetId: snapshotId, // Link to snapshot
-        createdAt: now,
-        updatedAt: now,
+        createdAt: snapshotTimestamp,
+        updatedAt: snapshotTimestamp,
       }));
     } else {
       snapshotPreset.competitors = [];

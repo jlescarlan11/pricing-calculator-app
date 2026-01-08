@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { History, Plus, AlertCircle, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { performFullCalculation } from '../../utils/calculations';
@@ -18,7 +18,6 @@ interface PriceHistoryProps {
 }
 
 export const PriceHistory: React.FC<PriceHistoryProps> = ({
-  presetId,
   currentResult,
   isUnsaved,
   onRestore,
@@ -29,18 +28,14 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<string | null>(null);
 
   // Default to the latest snapshot if none selected
-  useEffect(() => {
-    if (snapshots.length > 0 && !selectedSnapshotId) {
-      setSelectedSnapshotId(snapshots[0].id);
-    }
-  }, [snapshots, selectedSnapshotId]);
+  const activeSnapshotId = selectedSnapshotId || snapshots[0]?.id;
 
   const handlePin = async () => {
     if (isUnsaved) return;
     onPin();
   };
 
-  const selectedSnapshot = snapshots.find((s) => s.id === selectedSnapshotId) || snapshots[0];
+  const selectedSnapshot = snapshots.find((s) => s.id === activeSnapshotId) || snapshots[0];
   let comparisonResult: CalculationResult | null = null;
   if (selectedSnapshot) {
     comparisonResult = performFullCalculation(
@@ -131,7 +126,7 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
                     snapshot.baseRecipe,
                     snapshot.pricingConfig
                   );
-                  const isSelected = snapshot.id === selectedSnapshotId;
+                  const isSelected = snapshot.id === activeSnapshotId;
 
                   return (
                     <div
@@ -206,7 +201,7 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
                 </button>
               </p>
             </div>
-          ) || null}
+          )}
         </div>
       </Card>
 

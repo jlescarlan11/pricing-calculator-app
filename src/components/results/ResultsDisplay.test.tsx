@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { ResultsDisplay } from './ResultsDisplay';
 import { ToastProvider } from '../shared/Toast';
 import type { CalculationResult, CalculationInput, PricingConfig } from '../../types/calculator';
@@ -101,7 +102,11 @@ describe('ResultsDisplay', () => {
   });
 
   const renderWithProviders = (ui: React.ReactElement) => {
-    return render(<ToastProvider>{ui}</ToastProvider>);
+    return render(
+      <MemoryRouter>
+        <ToastProvider>{ui}</ToastProvider>
+      </MemoryRouter>
+    );
   };
 
   it('renders placeholder when results are null', () => {
@@ -120,6 +125,8 @@ describe('ResultsDisplay', () => {
         input={mockInput}
         config={mockConfig}
         onEdit={() => {}}
+        userId="test-user"
+        presetId="test-preset"
       />
     );
 
@@ -130,13 +137,45 @@ describe('ResultsDisplay', () => {
     expect(screen.getByText(/Cost Analysis/i)).toBeInTheDocument();
   });
 
-  it('renders AnalyzePriceCard when results are provided', () => {
+  it('does not render AnalyzePriceCard when presetId is missing', () => {
+    renderWithProviders(
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        userId="test-user"
+        presetId={null}
+      />
+    );
+
+    expect(screen.queryByText(/Unlock Deeper Insights/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Want a deeper look\?/i)).not.toBeInTheDocument();
+  });
+
+  it('does not render AnalyzePriceCard when userId is missing', () => {
+    renderWithProviders(
+      <ResultsDisplay
+        results={mockResults}
+        input={mockInput}
+        config={mockConfig}
+        userId={null}
+        presetId="some-preset"
+      />
+    );
+
+    expect(screen.queryByText(/Unlock Deeper Insights/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Want a deeper look\?/i)).not.toBeInTheDocument();
+  });
+
+  it('renders AnalyzePriceCard when results are provided and not locked', () => {
     renderWithProviders(
       <ResultsDisplay
         results={mockResults}
         input={mockInput}
         config={mockConfig}
         onEdit={() => {}}
+        userId="test-user"
+        presetId="test-preset"
       />
     );
 
@@ -301,7 +340,7 @@ describe('ResultsDisplay', () => {
       addPreset: vi.fn(),
       updatePreset: vi.fn(),
       deletePreset: vi.fn(),
-    } as any);
+    } as unknown as ReturnType<typeof usePresets>);
 
     renderWithProviders(
       <ResultsDisplay
@@ -326,7 +365,7 @@ describe('ResultsDisplay', () => {
       addPreset: vi.fn(),
       updatePreset: vi.fn(),
       deletePreset: vi.fn(),
-    } as any);
+    } as unknown as ReturnType<typeof usePresets>);
 
     renderWithProviders(
       <ResultsDisplay
@@ -354,7 +393,7 @@ describe('ResultsDisplay', () => {
       addPreset: vi.fn(),
       updatePreset: vi.fn(),
       deletePreset: vi.fn(),
-    } as any);
+    } as unknown as ReturnType<typeof usePresets>);
 
     renderWithProviders(
       <ResultsDisplay

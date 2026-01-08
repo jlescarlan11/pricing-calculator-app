@@ -8,10 +8,63 @@ import {
   calculateProfitMargin,
   performFullCalculation,
   calculateMarketPosition,
+  getCompatibleUnits,
+  calculateIngredientCostFromPurchase,
 } from './calculations';
 import type { Ingredient } from '../types/calculator';
 
 describe('Calculation Utils', () => {
+  describe('calculateIngredientCostFromPurchase', () => {
+    it('calculates cost correctly within same category (weight)', () => {
+      // 1kg for 100, use 250g -> (100 / 1000) * 250 = 25
+      expect(calculateIngredientCostFromPurchase(1, 'kg', 100, 250, 'g')).toBe(25);
+    });
+
+    it('calculates cost correctly within same category (volume)', () => {
+      // 1L for 100, use 100ml -> (100 / 1000) * 100 = 10
+      expect(calculateIngredientCostFromPurchase(1, 'l', 100, 100, 'ml')).toBe(10);
+    });
+
+    it('returns null for incompatible categories', () => {
+      // kg to L
+      expect(calculateIngredientCostFromPurchase(1, 'kg', 100, 1, 'l')).toBeNull();
+    });
+
+    it('handles same unit conversion', () => {
+      expect(calculateIngredientCostFromPurchase(10, 'piece', 100, 2, 'piece')).toBe(20);
+    });
+  });
+
+  describe('getCompatibleUnits', () => {
+    it('returns only weight units for a weight unit', () => {
+      const units = getCompatibleUnits('kg');
+      const values = units.map((u) => u.value);
+      expect(values).toContain('g');
+      expect(values).toContain('kg');
+      expect(values).toContain('oz');
+      expect(values).toContain('lb');
+      expect(values).not.toContain('ml');
+      expect(values).not.toContain('piece');
+    });
+
+    it('returns only volume units for a volume unit', () => {
+      const units = getCompatibleUnits('ml');
+      const values = units.map((u) => u.value);
+      expect(values).toContain('ml');
+      expect(values).toContain('l');
+      expect(values).toContain('tsp');
+      expect(values).toContain('tbsp');
+      expect(values).toContain('cup');
+      expect(values).toContain('fl_oz');
+      expect(values).not.toContain('kg');
+    });
+
+    it('returns all units for invalid or empty input', () => {
+      const units = getCompatibleUnits('');
+      expect(units.length).toBeGreaterThan(10);
+    });
+  });
+
   describe('calculateMarketPosition', () => {
     it('returns error if fewer than 2 competitors', () => {
       expect(calculateMarketPosition(100, [])).toEqual({ error: 'NEEDS_TWO_COMPETITORS' });

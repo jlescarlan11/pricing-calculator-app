@@ -15,15 +15,20 @@ export const checkRateLimit = (): { allowed: boolean; remaining: number } => {
     return { allowed: true, remaining: DAILY_LIMIT };
   }
 
-  const data: UsageData = JSON.parse(stored);
-  if (data.lastReset !== today) {
+  try {
+    const data: UsageData = JSON.parse(stored);
+    if (data.lastReset !== today) {
+      return { allowed: true, remaining: DAILY_LIMIT };
+    }
+
+    return {
+      allowed: data.count < DAILY_LIMIT,
+      remaining: Math.max(0, DAILY_LIMIT - data.count),
+    };
+  } catch (e) {
+    console.warn('[RateLimit] Failed to parse usage data, resetting.', e);
     return { allowed: true, remaining: DAILY_LIMIT };
   }
-
-  return {
-    allowed: data.count < DAILY_LIMIT,
-    remaining: Math.max(0, DAILY_LIMIT - data.count),
-  };
 };
 
 export const incrementUsage = (): void => {
@@ -34,9 +39,13 @@ export const incrementUsage = (): void => {
   let data: UsageData = { count: 1, lastReset: today };
 
   if (stored) {
-    const existing: UsageData = JSON.parse(stored);
-    if (existing.lastReset === today) {
-      data = { count: existing.count + 1, lastReset: today };
+    try {
+      const existing: UsageData = JSON.parse(stored);
+      if (existing.lastReset === today) {
+        data = { count: existing.count + 1, lastReset: today };
+      }
+    } catch (e) {
+      console.warn('[RateLimit] Failed to parse usage data during increment, resetting.', e);
     }
   }
 

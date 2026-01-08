@@ -29,6 +29,14 @@ describe('aiAnalysis', () => {
       const result = calculateRiskScore(PROFIT_MARGIN_THRESHOLDS.GOOD + 0.1);
       expect(result).toBe('low');
     });
+
+    it('should return "high" for zero margin', () => {
+      expect(calculateRiskScore(0)).toBe('high');
+    });
+
+    it('should return "high" for negative margin', () => {
+      expect(calculateRiskScore(-5)).toBe('high');
+    });
   });
 
   describe('generateStaticRecommendations', () => {

@@ -231,21 +231,26 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Historical Price Tracker**: Developed a comprehensive price history system featuring `PriceHistory` for milestone management, `SnapshotComparisonCard` for delta analysis, and `PriceTrendChart` (using Recharts) for visualizing cost and price trends over time. Includes empty states, smart tip banners, and deep integration with the calculation engine. (Added 2026-01-08)
 - [x] **Sticky Summary Fix**: Added `ResizeObserver` to `StickySummary` to ensure it dynamically recalculates its position relative to the footer when page content expands (e.g., opening accordions), preventing it from floating incorrectly. (Added 2026-01-07)
 - [x] **AI Analysis Utility**: Created `src/utils/aiAnalysis.ts` with `calculateRiskScore` and `generateStaticRecommendations`. logic is deterministic and aligned with `PROFIT_MARGIN_THRESHOLDS` (Low < 15%, Good > 25%). Includes comprehensive tests. (Added 2026-01-08)
+- [x] **Analyze Pricing Visibility**: Aligned the visibility logic of the "Want a deeper look?" card with Price Trends and History. The card is now hidden by default and only rendered once prerequisites (saving the product and logging in) are met, eliminating misleading CTAs. (Added 2026-01-08)
 - [x] **Database Schema Fix**: Created migration `20260108130000_fix_presets_schema.sql` to ensure `base_recipe`, `variants`, and `pricing_config` columns exist in the `presets` table. This resolves the "Could not find the base_recipe column" sync error. (Added 2026-01-08)
 - [x] **Constraint Fix**: Created migration `20260108140000_fix_preset_type_constraint.sql` to update the `presets_preset_type_check` constraint, allowing both 'default' and 'variant' values. This resolves the "violates check constraint" error when saving presets. (Added 2026-01-08)
 - [x] **Sticky Summary Fix**: Added `ResizeObserver` to `StickySummary` to ensure it dynamically recalculates its position relative to the footer when page content expands (e.g., opening accordions), preventing it from floating incorrectly. (Added 2026-01-07)
+- [x] **End-to-End Integration Tests**: Implemented critical flow validations including History pinning (`HistoryFlow.integration.test.tsx`), Competitor limits (`CompetitorValidation.test.tsx`), and Analytics referential integrity (`SimpleGateCheck.test.ts`). (Added 2026-01-08)
+- [x] **Edge Case Audit**: Validated AI rate-limiting persistence/restoration, handled malformed storage data, and verified competitor positioning logic across all boundary conditions (0, 1, 2, 5 competitors). (Added 2026-01-08)
 
 ### Migration & Final Polish (Added 2026-01-05)
 
 - [x] **Migration Strategy**: Implemented `migrateGuestPresets` in `src/utils/migration.ts` to automatically assign anonymous local presets to the user upon login. Integrated into `AuthContext` to trigger on `SIGNED_IN` event.
 - [x] **Data Portability**: Implemented full Export/Import functionality with JSON schema validation, versioning, and "Merge/Replace" strategies in `src/utils/export.ts` and `src/utils/import.ts`. Added `ExportButton` and `ImportButton` to Account Page.
 - [x] **Mobile UI Polish**: Redesigned `SampleDemo` to be compact on mobile. Optimized `IngredientRow` grid layout. Fixed `StickySummary` safe-area. **Header Layout**: Restructured `CalculatorForm` header into a clean vertical stack (Title -> Status -> Action Toolbar) with fully visible labels for better usability and alignment with the user's requested flow. (Updated 2026-01-06)
+- [x] **Price History Sync Fix**: Refactored `PriceHistory` to be a pure component receiving snapshots via props, eliminating stale state issues. Implemented "Version 1 Fallback" in `CalculatorPage` to treat the saved preset as the first milestone if no explicit snapshots exist, ensuring trends render immediately. Updated tests to cover these flows. (Added 2026-01-08)
 - [x] **Design System Consistency**: Verified all new components (DangerZone, AccountPage) adhere to the design tokens (colors, typography). Fixed `DangerZone` button variant to use `danger` (mapped to `rust` color).
 - [x] **Build & Verification**: Fixed all TypeScript build errors (type-only imports, unused variables, tsconfig exclusions) and verified that all 300 tests pass (`npm test`). Confirmed production build success (`npm run build`).
 
 ## 7. Build Fixes & Configuration (Added 2026-01-03)
 
-- **Vite/Vitest Config**: Changed `vite.config.ts` to import `defineConfig` from `vitest/config` instead of `vite`. This ensures proper typing for the `test` configuration object.
+- [x] **Snapshot Versioning Update**: Modified `createSnapshot` in `src/services/presetService.ts` to prevent multiple pins per day. It now updates the existing snapshot if one exists for the current day, reusing the ID and version number while updating the content and timestamp. Added best-effort cleanup for old competitors to prevent orphans during updates. Verified with new test cases. (Added 2026-01-08)
+- [x] **Vite/Vitest Config**: Changed `vite.config.ts` to import `defineConfig` from `vitest/config` instead of `vite`. This ensures proper typing for the `test` configuration object.
 - **Tooltip Component**:
   - Replaced `NodeJS.Timeout` with `ReturnType<typeof setTimeout>` to avoid namespace issues in browser environments.
   - Cast props in `React.cloneElement` to `any` (e.g., `{ 'aria-describedby': tooltipId } as any`) to resolve strict type checking errors with `aria-describedby` on generic `ReactElement`.

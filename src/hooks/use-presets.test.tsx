@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePresets } from './use-presets';
+import { PresetsProvider } from '../context/PresetsContext';
 import { presetService } from '../services/presetService';
 import { useAuth } from '../context/AuthContext';
 import type { Preset } from '../types';
@@ -20,12 +21,18 @@ const mockPreset: Preset = {
   userId: 'user-1',
 };
 
+// Wrapper with provider
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <PresetsProvider>{children}</PresetsProvider>
+);
+
 describe('usePresets', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (useAuth as Mock).mockReturnValue({ user: { id: 'user-1' } });
     (presetService.fetchPresets as Mock).mockResolvedValue([]);
     (presetService.savePreset as Mock).mockImplementation(async (p) => p);
+    (presetService.createSnapshot as Mock).mockResolvedValue(null);
     (presetService.deletePreset as Mock).mockResolvedValue(undefined);
     (presetService.syncPendingItems as Mock).mockResolvedValue(undefined);
     // Mock navigator.onLine
@@ -39,7 +46,7 @@ describe('usePresets', () => {
   it('should fetch presets on mount', async () => {
     (presetService.fetchPresets as Mock).mockResolvedValue([mockPreset]);
 
-    const { result } = renderHook(() => usePresets());
+    const { result } = renderHook(() => usePresets(), { wrapper });
 
     // Initial state might be syncing or synced depending on how fast the promise resolves or if we check immediately
     // In strict mode, effects run twice.
@@ -53,7 +60,7 @@ describe('usePresets', () => {
   });
 
   it('should add a preset optimistically', async () => {
-    const { result } = renderHook(() => usePresets());
+    const { result } = renderHook(() => usePresets(), { wrapper });
 
     await waitFor(() => expect(result.current.syncStatus).toBe('synced'));
 
@@ -82,9 +89,40 @@ describe('usePresets', () => {
     expect(result.current.syncStatus).toBe('synced');
   });
 
+  it('should automatically create a version 1 snapshot when adding a new preset', async () => {
+    (presetService.createSnapshot as Mock).mockImplementation(async (id) => ({
+      ...mockPreset,
+      id: 'snap-1',
+      isSnapshot: true,
+      snapshotMetadata: {
+        versionNumber: 1,
+        parentPresetId: id,
+        isTrackedVersion: true,
+        snapshotDate: new Date().toISOString(),
+      },
+    }));
+
+    const { result } = renderHook(() => usePresets(), { wrapper });
+
+    await waitFor(() => expect(result.current.syncStatus).toBe('synced'));
+
+    await act(async () => {
+      await result.current.addPreset({
+        name: 'New Preset',
+        baseRecipe: mockPreset.baseRecipe,
+        pricingConfig: mockPreset.pricingConfig,
+        presetType: 'default',
+        variants: [],
+      });
+    });
+
+    expect(presetService.savePreset).toHaveBeenCalled();
+    expect(presetService.createSnapshot).toHaveBeenCalled();
+  });
+
   it('should delete a preset optimistically', async () => {
     (presetService.fetchPresets as Mock).mockResolvedValue([mockPreset]);
-    const { result } = renderHook(() => usePresets());
+    const { result } = renderHook(() => usePresets(), { wrapper });
 
     await waitFor(() => expect(result.current.presets).toHaveLength(1));
 
@@ -102,7 +140,7 @@ describe('usePresets', () => {
   it('should handle offline status', async () => {
     Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
 
-    const { result } = renderHook(() => usePresets());
+    const { result } = renderHook(() => usePresets(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.syncStatus).toBe('offline');

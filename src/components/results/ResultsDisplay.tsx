@@ -73,7 +73,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     try {
       // Competitors already have IDs or will be handled by updatePreset -> service
       await updatePreset(presetId, {
-        competitors: updatedCompetitors,
+        competitors: updatedCompetitors as any,
       });
       addToast('✓ Competitors updated.', 'success');
     } catch (err) {
@@ -163,6 +163,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   const hasVariants = results.variantResults && results.variantResults.length > 0;
 
+  // Analysis Visibility logic (Advanced features require saved product + user)
+  const isLocked = !presetId || !userId;
+
   return (
     <div className="space-y-2xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
       {/* Print-only Header */}
@@ -212,15 +215,24 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           )}
         </div>
 
-        {/* Analyze Pricing CTA */}
-        <div className="print:hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-          <AnalyzePriceCard
-            onAnalyze={handleAnalyze}
-            isAnalyzed={isAnalyzed}
-            recommendations={recommendations}
-            isLoading={isAnalyzing}
-          />
-        </div>
+        {/* 
+          Analyze Pricing CTA (Advanced Feature)
+          Visible only when:
+          1. Results are calculated
+          2. Product is saved (presetId exists)
+          3. User is logged in (userId exists)
+          This aligns with other advanced features that require persistent data.
+        */}
+        {!isLocked && (
+          <div className="print:hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+            <AnalyzePriceCard
+              onAnalyze={handleAnalyze}
+              isAnalyzed={isAnalyzed}
+              recommendations={recommendations}
+              isLoading={isAnalyzing}
+            />
+          </div>
+        )}
 
         {/* Priority 2: Price Comparison (Single Only) - De-emphasized */}
         {!hasVariants && (

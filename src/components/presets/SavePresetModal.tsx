@@ -63,7 +63,10 @@ export const SavePresetModal: React.FC<SavePresetModalProps> = ({
       return;
     }
 
-    const isDuplicate = presets.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase());
+    // Only compare with non-snapshots to prevent reserved name issues
+    const isDuplicate = presets
+      .filter(p => !p.isSnapshot)
+      .some((p) => p.name.toLowerCase() === trimmedName.toLowerCase());
 
     if (isDuplicate) {
       setError('You already have a product with this name.');

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '../shared/Card';
 import { Button } from '../shared/Button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Lock } from 'lucide-react';
 import { checkRateLimit } from '../../utils/analysisRateLimit';
 
 interface AnalyzePriceCardProps {
@@ -47,9 +47,11 @@ export const AnalyzePriceCard: React.FC<AnalyzePriceCardProps> = ({
     >
       <div className="flex flex-col sm:flex-row items-center justify-between gap-lg">
         <div className="text-center sm:text-left">
-          <h3 className="font-serif text-xl font-semibold text-ink-900 mb-xs">
-            {isAnalyzed ? 'Analysis Complete' : 'Want a deeper look?'}
-          </h3>
+          <div className="flex items-center justify-center sm:justify-start gap-sm mb-xs">
+            <h3 className="font-serif text-xl font-semibold text-ink-900">
+              {isAnalyzed ? 'Analysis Complete' : 'Want a deeper look?'}
+            </h3>
+          </div>
           <p className="text-ink-500 text-sm max-w-sm leading-relaxed">
             {isAnalyzed
               ? 'Based on your current margins, here are some points to consider:'
@@ -63,6 +65,7 @@ export const AnalyzePriceCard: React.FC<AnalyzePriceCardProps> = ({
             </p>
           )}
         </div>
+
         {!isAnalyzed && (
           <Button
             onClick={handleAnalyzeClick}
@@ -104,8 +107,7 @@ export const AnalyzePriceCard: React.FC<AnalyzePriceCardProps> = ({
       )}
 
       <p className="mt-lg pt-md border-t border-border-subtle/50 text-[10px] text-ink-300 leading-relaxed italic">
-        We collect usage data to improve the tool. Data is automatically deleted if the product or
-        account is removed.
+        We collect usage data to improve the tool. Data is automatically deleted if the product or account is removed.
       </p>
     </Card>
   );

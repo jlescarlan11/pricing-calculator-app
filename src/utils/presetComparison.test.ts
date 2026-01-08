@@ -75,4 +75,44 @@ describe('compareTotals', () => {
     expect(result.suggestedPrice).toBe(20);
     expect(result.profitMargin).toBe(50);
   });
+
+  it('handles large numbers correctly', () => {
+    const previous: ComparisonInput = {
+      totalCost: 1000000,
+      suggestedPrice: 1500000,
+      profitMargin: 33.33,
+    };
+
+    const current: ComparisonInput = {
+      totalCost: 2000000,
+      suggestedPrice: 3000000,
+      profitMargin: 33.33,
+    };
+
+    const result = compareTotals(current, previous);
+
+    expect(result.totalCost).toBe(1000000);
+    expect(result.suggestedPrice).toBe(1500000);
+    expect(result.profitMargin).toBe(0);
+  });
+
+  it('handles small floating point differences', () => {
+    const previous: ComparisonInput = {
+      totalCost: 100.001,
+      suggestedPrice: 150.001,
+      profitMargin: 33.333,
+    };
+
+    const current: ComparisonInput = {
+      totalCost: 100.002,
+      suggestedPrice: 150.002,
+      profitMargin: 33.334,
+    };
+
+    const result = compareTotals(current, previous);
+
+    expect(result.totalCost).toBeCloseTo(0.001, 5);
+    expect(result.suggestedPrice).toBeCloseTo(0.001, 5);
+    expect(result.profitMargin).toBeCloseTo(0.001, 5);
+  });
 });

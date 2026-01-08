@@ -101,7 +101,7 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, cla
                   marginBottom: '8px',
                   fontWeight: 700,
                 }}
-                formatter={(value: number) => [formatCurrency(value), '']}
+                formatter={(value: any) => [formatCurrency(Number(value)), '']}
               />
               <Legend
                 verticalAlign="top"

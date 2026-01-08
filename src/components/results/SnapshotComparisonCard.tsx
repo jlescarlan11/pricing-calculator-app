@@ -11,6 +11,7 @@ interface SnapshotComparisonCardProps {
   lastRecommendedPrice: number;
   lastMargin: number;
   lastSnapshotDate: string;
+  versionNumber?: number;
 }
 
 export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
@@ -21,6 +22,7 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
   lastRecommendedPrice,
   lastMargin,
   lastSnapshotDate,
+  versionNumber,
 }) => {
   const costDelta = currentTotalCost - lastTotalCost;
   const priceDelta = currentRecommendedPrice - lastRecommendedPrice;
@@ -59,7 +61,9 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
       <div className="space-y-md">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-lg font-serif text-ink-900">Comparison with Last Milestone</h3>
+            <h3 className="text-lg font-serif text-ink-900">
+              {versionNumber ? `Comparison with Version ${versionNumber}` : 'Comparison with Milestone'}
+            </h3>
             <p className="text-sm text-ink-500">Since {formatDate(lastSnapshotDate)}</p>
           </div>
         </div>

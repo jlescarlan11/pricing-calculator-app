@@ -372,16 +372,23 @@ export const calculateMarketPosition = (
 
 // --- Unit Conversion Logic ---
 
+/**
+ * Unit compatibility is determined by category.
+ * Conversions are only possible within the same category:
+ * - weight: g, kg, oz, lb
+ * - volume: ml, L, tsp, tbsp, cup, fl oz
+ * - count: pcs, doz
+ */
 export type UnitCategory = 'weight' | 'volume' | 'count';
 
-interface UnitDefinition {
+export interface UnitDefinition {
   value: string;
   label: string;
   category: UnitCategory;
   toBase: number; // Factor to convert to base unit (g, ml, piece)
 }
 
-const UNITS: Record<string, UnitDefinition> = {
+export const UNITS: Record<string, UnitDefinition> = {
   // Weight (Base: g)
   g: { value: 'g', label: 'g', category: 'weight', toBase: 1 },
   kg: { value: 'kg', label: 'kg', category: 'weight', toBase: 1000 },
@@ -405,6 +412,22 @@ export const UNIT_OPTIONS = Object.values(UNITS).map((u) => ({
   label: u.label,
   value: u.value,
 }));
+
+/**
+ * Returns a list of units that are compatible with the given unit.
+ * Compatible units belong to the same category (e.g., weight, volume).
+ */
+export const getCompatibleUnits = (unitValue: string): typeof UNIT_OPTIONS => {
+  const unit = UNITS[unitValue];
+  if (!unit) return UNIT_OPTIONS;
+
+  return Object.values(UNITS)
+    .filter((u) => u.category === unit.category)
+    .map((u) => ({
+      label: u.label,
+      value: u.value,
+    }));
+};
 
 /**
  * Calculates the cost of the used ingredient portion based on purchase details.

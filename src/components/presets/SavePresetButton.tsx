@@ -38,6 +38,10 @@ interface SavePresetButtonProps {
    * @default 'default'
    */
   mobileLabelLayout?: 'default' | 'hidden' | 'vertical';
+  /**
+   * Optional custom label for the button. Defaults to 'Save'.
+   */
+  label?: string;
 }
 
 /**
@@ -52,6 +56,7 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
   variant = 'secondary',
   size = 'md',
   mobileLabelLayout = 'default',
+  label = 'Save',
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -91,10 +96,10 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
           disabled={disabled}
           className={`flex items-center ${containerClasses} ${className}`}
           type="button"
-          aria-label="Save current calculation as preset"
+          aria-label={label === 'Save' ? 'Save current calculation as preset' : label}
         >
           <Save className="w-4 h-4" />
-          <span className={labelClasses}>Save</span>
+          <span className={labelClasses}>{label}</span>
         </Button>
       </Tooltip>
 

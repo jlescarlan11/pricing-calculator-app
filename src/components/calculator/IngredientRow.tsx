@@ -5,7 +5,12 @@ import { Input } from '../shared/Input';
 import { Select } from '../shared/Select';
 import { Modal } from '../shared/Modal';
 import { Switch } from '../shared/Switch';
-import { calculateIngredientCostFromPurchase, UNIT_OPTIONS } from '../../utils/calculations';
+import {
+  calculateIngredientCostFromPurchase,
+  UNIT_OPTIONS,
+  getCompatibleUnits,
+  UNITS,
+} from '../../utils/calculations';
 import { triggerHapticFeedback } from '../../utils/haptics';
 import type { Ingredient } from '../../types/calculator';
 
@@ -38,6 +43,7 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [activeUnitField, setActiveUnitField] = useState<'purchase' | 'recipe' | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -74,6 +80,27 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
 
     // Merge with existing ingredient props to get the full picture for calculation
     const updatedIngredient = { ...ingredient, [field]: value };
+
+    // Handle unit compatibility and auto-correction
+    if (field === 'purchaseUnit') {
+      const pUnit = UNITS[value as string];
+      const rUnit = UNITS[updatedIngredient.recipeUnit || ''];
+
+      // If categories mismatch, or recipeUnit is not yet set, default recipeUnit to purchaseUnit
+      if (pUnit && (!rUnit || pUnit.category !== rUnit.category)) {
+        onUpdate(ingredient.id, 'recipeUnit', value);
+        updatedIngredient.recipeUnit = String(value);
+      }
+    } else if (field === 'recipeUnit') {
+      const rUnit = UNITS[value as string];
+      const pUnit = UNITS[updatedIngredient.purchaseUnit || ''];
+
+      // If categories mismatch, or purchaseUnit is not yet set, default purchaseUnit to recipeUnit
+      if (rUnit && (!pUnit || rUnit.category !== pUnit.category)) {
+        onUpdate(ingredient.id, 'purchaseUnit', value);
+        updatedIngredient.purchaseUnit = String(value);
+      }
+    }
 
     // If useFullQuantity is on, sync recipe fields when purchase fields change
     if (updatedIngredient.useFullQuantity) {
@@ -145,6 +172,13 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
     }
   };
 
+  const purchaseUnitOptions =
+    activeUnitField === 'purchase'
+      ? UNIT_OPTIONS
+      : getCompatibleUnits(ingredient.recipeUnit || '');
+  const recipeUnitOptions =
+    activeUnitField === 'recipe' ? UNIT_OPTIONS : getCompatibleUnits(ingredient.purchaseUnit || '');
+
   return (
     <div
       className={`
@@ -215,9 +249,11 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
               <Select
                 label="Unit"
                 hideLabel
-                options={UNIT_OPTIONS}
+                options={purchaseUnitOptions}
                 value={ingredient.purchaseUnit || ''}
                 onChange={(e) => handleChange('purchaseUnit', e.target.value)}
+                onFocus={() => setActiveUnitField('purchase')}
+                onBlur={() => setActiveUnitField(null)}
                 placeholder="Unit"
                 className="text-sm"
               />
@@ -275,9 +311,11 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
               <Select
                 label="Unit"
                 hideLabel
-                options={UNIT_OPTIONS}
+                options={recipeUnitOptions}
                 value={ingredient.recipeUnit || ''}
                 onChange={(e) => handleChange('recipeUnit', e.target.value)}
+                onFocus={() => setActiveUnitField('recipe')}
+                onBlur={() => setActiveUnitField(null)}
                 placeholder="Unit"
                 className="text-sm"
                 disabled={ingredient.useFullQuantity}

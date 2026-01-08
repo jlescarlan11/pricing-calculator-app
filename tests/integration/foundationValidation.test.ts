@@ -122,6 +122,10 @@ describe('Foundation Validation Integration Tests', () => {
   });
 
   it('should auto-increment snapshot version numbers', async () => {
+    vi.useFakeTimers();
+    const today = new Date('2026-01-08T12:00:00Z');
+    vi.setSystemTime(today);
+
     const baseId = 'base-inc';
     const basePreset = createBasePreset(baseId, 'Product Inc');
     await presetService.savePreset(basePreset);
@@ -135,6 +139,10 @@ describe('Foundation Validation Integration Tests', () => {
     expect(snap1?.snapshotMetadata?.versionNumber).toBe(1);
 
     // --- Create 2nd Snapshot ---
+    // Move to tomorrow to ensure it doesn't just update the first one
+    const tomorrow = new Date('2026-01-09T12:00:00Z');
+    vi.setSystemTime(tomorrow);
+
     // Mock DB returning version 1 exist
     chain.limit.mockResolvedValueOnce({
       data: [{ version_number: 1 }],
@@ -149,28 +157,34 @@ describe('Foundation Validation Integration Tests', () => {
     const snapshots = stored.filter((p) => p.snapshotMetadata?.parentPresetId === baseId);
     expect(snapshots).toHaveLength(2);
     expect(snapshots.map((s) => s.snapshotMetadata?.versionNumber).sort()).toEqual([1, 2]);
+
+    vi.useRealTimers();
   });
 
   it('should retrieve snapshots by parent_preset_id', async () => {
+    vi.useFakeTimers();
+    const day1 = new Date('2026-01-08T12:00:00Z');
+    vi.setSystemTime(day1);
+
     const baseId = 'base-retrieve';
     const basePreset = createBasePreset(baseId, 'Product Retrieve');
     await presetService.savePreset(basePreset);
-
-    // Manually inject snapshots into Local Storage to verify `getSnapshots`
-    // We do this to ensure `getSnapshots` works even if createSnapshot fails (isolation)
-    // But better to use the service methods to populate.
 
     // Create mocks for creation
     const chain = mockSupabaseClient.from();
     chain.limit.mockResolvedValue({ data: [] }); // Always say 0 exists remotely for creation flow in this test
 
     const s1 = await presetService.createSnapshot(baseId);
-    // Force version 2 locally
-    // (createSnapshot logic reads local to increment, so calling it again works)
+    
+    // Move to next day for second snapshot
+    const day2 = new Date('2026-01-09T12:00:00Z');
+    vi.setSystemTime(day2);
+
     const s2 = await presetService.createSnapshot(baseId);
 
     expect(s1).toBeDefined();
     expect(s2).toBeDefined();
+    expect(s1?.id).not.toBe(s2?.id); // Should be different IDs now
 
     // Now test retrieval
     // Mock Supabase returning these snapshots (simulating sync)
@@ -207,5 +221,7 @@ describe('Foundation Validation Integration Tests', () => {
     // Verify sorting (service sorts by version)
     expect(retrieved[0].snapshotMetadata?.versionNumber).toBe(1);
     expect(retrieved[1].snapshotMetadata?.versionNumber).toBe(2);
+    
+    vi.useRealTimers();
   });
 });

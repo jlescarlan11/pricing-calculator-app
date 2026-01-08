@@ -169,4 +169,76 @@ describe('IngredientRow', () => {
     expect(screen.getByText('Name required')).toBeInTheDocument();
     expect(screen.getByText('Invalid qty')).toBeInTheDocument();
   });
+
+  describe('Unit Compatibility', () => {
+    it('filters recipe unit options based on purchase unit', () => {
+      renderComponent({
+        ingredient: { ...mockIngredient, purchaseUnit: 'kg', recipeUnit: 'g' },
+      });
+
+      const selects = screen.getAllByRole('combobox');
+      const recipeUnitSelect = selects[1];
+
+      // Helper to check options within a specific select
+      const getOptions = (select: HTMLElement) => 
+        Array.from(select.querySelectorAll('option')).map(opt => opt.textContent);
+
+      const options = getOptions(recipeUnitSelect);
+
+      // Weight units should be present
+      expect(options).toContain('g');
+      expect(options).toContain('kg');
+      expect(options).toContain('oz');
+      expect(options).toContain('lb');
+
+      // Volume units should NOT be present in recipe unit options
+      expect(options).not.toContain('L');
+    });
+
+    it('auto-updates recipe unit if purchase unit category changes', () => {
+      renderComponent({
+        ingredient: { ...mockIngredient, purchaseUnit: 'kg', recipeUnit: 'g' },
+      });
+
+      const selects = screen.getAllByRole('combobox');
+      const purchaseUnitSelect = selects[0];
+
+      act(() => {
+        fireEvent.focus(purchaseUnitSelect);
+      });
+      act(() => {
+        fireEvent.change(purchaseUnitSelect, { target: { value: 'l' } });
+      });
+      act(() => {
+        fireEvent.blur(purchaseUnitSelect);
+      });
+
+      // Should update both purchaseUnit and recipeUnit because they were incompatible
+      expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'purchaseUnit', 'l');
+      expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'recipeUnit', 'l');
+    });
+
+    it('ensures bidirectional consistency via auto-sync when recipe unit is changed', () => {
+      renderComponent({
+        ingredient: { ...mockIngredient, purchaseUnit: 'kg', recipeUnit: 'g' },
+      });
+
+      const selects = screen.getAllByRole('combobox');
+      const recipeUnitSelect = selects[1];
+
+      act(() => {
+        fireEvent.focus(recipeUnitSelect);
+      });
+      act(() => {
+        fireEvent.change(recipeUnitSelect, { target: { value: 'ml' } });
+      });
+      act(() => {
+        fireEvent.blur(recipeUnitSelect);
+      });
+
+      // Should update both because purchaseUnit (kg) is weight and recipeUnit (ml) is volume
+      expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'recipeUnit', 'ml');
+      expect(mockHandlers.onUpdate).toHaveBeenCalledWith('123', 'purchaseUnit', 'ml');
+    });
+  });
 });

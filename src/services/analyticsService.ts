@@ -14,21 +14,23 @@ export const analyticsService = {
   ): Promise<void> {
     if (!navigator.onLine || !userId) return;
 
-    // We don't await this to keep it non-blocking for the UI
-    supabase
-      .from('analytics')
-      .insert({
-        user_id: userId,
-        preset_id: presetId,
-        event_type: eventType,
-        metadata,
-      })
-      .then(({ error }) => {
-        if (error) {
-          // Silent fail for analytics to not disturb user flow
-          console.debug('[Analytics] Failed to track event:', error.message);
-        }
-      });
+    try {
+      const { error } = await supabase
+        .from('analytics')
+        .insert({
+          user_id: userId,
+          preset_id: presetId,
+          event_type: eventType,
+          metadata,
+        });
+
+      if (error) {
+        // Silent fail for analytics to not disturb user flow
+        console.debug('[Analytics] Failed to track event:', error.message);
+      }
+    } catch (e) {
+      console.debug('[Analytics] Unexpected error tracking event:', e);
+    }
   },
 
   /**

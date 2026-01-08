@@ -24,6 +24,9 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
   const filteredPresets = useMemo(() => {
     return presets
       .filter((preset) => {
+        // Only show active presets (not snapshots) in the main list
+        if (preset.isSnapshot) return false;
+
         const search = searchQuery.toLowerCase();
         return (
           preset.name.toLowerCase().includes(search) ||
@@ -126,16 +129,27 @@ export const PresetsList: React.FC<PresetsListProps> = ({ onLoad, onEdit }) => {
               : 'flex flex-col gap-sm w-full'
           }
         >
-          {filteredPresets.map((preset) => (
-            <PresetListItem
-              key={preset.id}
-              preset={preset}
-              onLoad={onLoad}
-              onEdit={onEdit}
-              onDelete={(p) => deletePreset(p.id)}
-              viewMode={viewMode}
-            />
-          ))}
+          {filteredPresets.map((preset) => {
+            const snapshots = presets
+              .filter(
+                (p) => p.isSnapshot && p.snapshotMetadata?.parentPresetId === preset.id
+              )
+              .sort(
+                (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+              );
+
+            return (
+              <PresetListItem
+                key={preset.id}
+                preset={preset}
+                snapshots={snapshots}
+                onLoad={onLoad}
+                onEdit={onEdit}
+                onDelete={(p) => deletePreset(p.id)}
+                viewMode={viewMode}
+              />
+            );
+          })}
         </div>
       )}
 
