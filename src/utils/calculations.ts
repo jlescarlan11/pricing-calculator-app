@@ -416,13 +416,17 @@ export const UNIT_OPTIONS = Object.values(UNITS).map((u) => ({
 /**
  * Returns a list of units that are compatible with the given unit.
  * Compatible units belong to the same category (e.g., weight, volume).
+ * Optionally excludes a specific unit (e.g., to hide the already selected unit).
  */
-export const getCompatibleUnits = (unitValue: string): typeof UNIT_OPTIONS => {
+export const getCompatibleUnits = (
+  unitValue: string,
+  excludeValue?: string
+): typeof UNIT_OPTIONS => {
   const unit = UNITS[unitValue];
   if (!unit) return UNIT_OPTIONS;
 
   return Object.values(UNITS)
-    .filter((u) => u.category === unit.category)
+    .filter((u) => u.category === unit.category && u.value !== excludeValue)
     .map((u) => ({
       label: u.label,
       value: u.value,

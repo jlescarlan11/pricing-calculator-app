@@ -185,9 +185,9 @@ describe('IngredientRow', () => {
 
       const options = getOptions(recipeUnitSelect);
 
-      // Weight units should be present
+      // Weight units should be present, but 'kg' (the purchase unit) should be hidden
       expect(options).toContain('g');
-      expect(options).toContain('kg');
+      expect(options).not.toContain('kg');
       expect(options).toContain('oz');
       expect(options).toContain('lb');
 

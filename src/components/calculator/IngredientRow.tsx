@@ -175,9 +175,11 @@ export const IngredientRow: React.FC<IngredientRowProps> = ({
   const purchaseUnitOptions =
     activeUnitField === 'purchase'
       ? UNIT_OPTIONS
-      : getCompatibleUnits(ingredient.recipeUnit || '');
+      : getCompatibleUnits(ingredient.recipeUnit || '', ingredient.recipeUnit);
   const recipeUnitOptions =
-    activeUnitField === 'recipe' ? UNIT_OPTIONS : getCompatibleUnits(ingredient.purchaseUnit || '');
+    activeUnitField === 'recipe'
+      ? UNIT_OPTIONS
+      : getCompatibleUnits(ingredient.purchaseUnit || '', ingredient.purchaseUnit);
 
   return (
     <div

@@ -47,7 +47,7 @@ describe('Calculation Utils', () => {
       expect(values).not.toContain('piece');
     });
 
-    it('returns only volume units for a volume unit', () => {
+    it('returns volume units for a volume unit', () => {
       const units = getCompatibleUnits('ml');
       const values = units.map((u) => u.value);
       expect(values).toContain('ml');
@@ -56,6 +56,13 @@ describe('Calculation Utils', () => {
       expect(values).toContain('tbsp');
       expect(values).toContain('cup');
       expect(values).toContain('fl_oz');
+      expect(values).not.toContain('kg');
+    });
+
+    it('excludes the specific unit if excludeValue is provided', () => {
+      const units = getCompatibleUnits('kg', 'kg');
+      const values = units.map((u) => u.value);
+      expect(values).toContain('g');
       expect(values).not.toContain('kg');
     });
 
