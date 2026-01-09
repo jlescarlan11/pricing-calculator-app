@@ -11,12 +11,48 @@ export async function analyzeWithGemini(
   data: AnalyzePricingRequest,
   apiKey: string
 ): Promise<GeminiResponse> {
-  const { input, results } = data;
+  const { input, results, competitors = [] } = data;
   const total = results.totalCost || 1; // Avoid division by zero
 
   const ingredientsPct = ((results.breakdown.ingredients / total) * 100).toFixed(1);
   const laborPct = ((results.breakdown.labor / total) * 100).toFixed(1);
   const overheadPct = ((results.breakdown.overhead / total) * 100).toFixed(1);
+
+  // --- Market Position Logic ---
+  const hasEnoughCompetitors = competitors.length >= 2;
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+
+  // Check if ANY data is stale (older than 30 days or missing date)
+  const hasStaleData = competitors.some((c) => {
+    if (!c.updatedAt) return true; // Treat missing date as stale
+    return new Date(c.updatedAt).getTime() < thirtyDaysAgo;
+  });
+
+  let marketSection = '';
+  let strategyInstruction = '';
+
+  if (hasEnoughCompetitors) {
+    const competitorList = competitors
+      .map((c) => `- ${c.competitorName}: ₱${c.competitorPrice.toFixed(2)}`)
+      .join('\n');
+
+    marketSection = `
+    Market Position Data (Competitors):
+    ${competitorList}
+    `;
+
+    if (hasStaleData) {
+      marketSection +=
+        '\n    IMPORTANT: Data Age Warning - Some market data is older than 30 days. Verify market relevance before recommending aggressive price changes.';
+    }
+
+    strategyInstruction =
+      "Consider the product's market position relative to competitors (Budget, Mid-range, or Premium) when making recommendations.";
+  } else {
+    // Cost-Only Variant
+    strategyInstruction =
+      'Strictly focus on internal cost efficiency, waste reduction, and operational improvements. Do NOT reference market position or external pricing as insufficient competitor data is available.';
+  }
 
   const prompt = `
     As a pricing expert for small food businesses, analyze this product data and provide exactly 3 concise, actionable recommendations (max 20 words each) to improve profit margins or optimize costs.
@@ -25,16 +61,25 @@ export async function analyzeWithGemini(
     Batch Size: ${input.batchSize}
     Total Cost per Unit: ₱${results.costPerUnit.toFixed(2)}
     Recommended Selling Price: ₱${results.recommendedPrice.toFixed(2)}
-    Current Selling Price: ${input.currentSellingPrice ? `₱${input.currentSellingPrice.toFixed(2)}` : 'Not set'}
+    Current Selling Price: ${
+      input.currentSellingPrice ? `₱${input.currentSellingPrice.toFixed(2)}` : 'Not set'
+    }
     Target Profit Margin: ${results.profitMarginPercent}%
 
     Cost Breakdown (Total Batch: ₱${results.totalCost.toFixed(2)}):
     - Ingredients: ₱${results.breakdown.ingredients.toFixed(2)} (${ingredientsPct}%)
     - Labor: ₱${results.breakdown.labor.toFixed(2)} (${laborPct}%)
     - Overhead: ₱${results.breakdown.overhead.toFixed(2)} (${overheadPct}%)
+    ${marketSection}
 
+    Strategy: ${strategyInstruction}
     Focus on identifying high-cost areas or pricing opportunities based on the breakdown.
-    Return your response as a raw JSON array of strings. Do not include markdown formatting like \`\`\`json.
+    Return your response as a raw JSON object with the following schema:
+    {
+      "recommendations": ["string", "string", "string"],
+      "suggestedMarginValue": number
+    }
+    Do not include markdown formatting like \`\`\`json.
   `;
 
   const response = await fetchWithBackoff(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -77,13 +122,25 @@ export async function analyzeWithGemini(
       .replace(/^```json\n?/, '')
       .replace(/\n?```$/, '')
       .trim();
-    const recommendations = JSON.parse(cleanText);
+    const parsedData = JSON.parse(cleanText);
 
-    if (!Array.isArray(recommendations)) {
-      throw new Error('Gemini response is not an array');
+    if (!parsedData.recommendations || !Array.isArray(parsedData.recommendations)) {
+      throw new Error('Gemini response missing recommendations array');
     }
 
-    return { recommendations: recommendations.slice(0, 3) };
+    // Enforce numeric type for suggestedMarginValue, fallback to current margin if missing/invalid
+    let suggestedMarginValue = results.profitMarginPercent;
+    if (parsedData.suggestedMarginValue !== undefined) {
+      const parsed = Number(parsedData.suggestedMarginValue);
+      if (!isNaN(parsed)) {
+        suggestedMarginValue = parsed;
+      }
+    }
+
+    return {
+      recommendations: parsedData.recommendations.slice(0, 3),
+      suggestedMarginValue,
+    };
   } catch (err) {
     console.error('Failed to parse Gemini response:', err);
     throw new Error('Invalid response format from AI');

@@ -29,8 +29,14 @@ export interface CalculationResult {
 export interface AnalyzePricingRequest {
   input: CalculationInput;
   results: CalculationResult;
+  competitors?: {
+    competitorName: string;
+    competitorPrice: number;
+    updatedAt?: string;
+  }[];
 }
 
 export interface GeminiResponse {
   recommendations: string[];
+  suggestedMarginValue: number;
 }
