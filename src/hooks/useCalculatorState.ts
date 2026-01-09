@@ -68,10 +68,12 @@ export interface CalculatorState {
   results: CalculationResult | null;
   liveResult: CalculationResult;
   isDirty: boolean;
+  isPreviewMode: boolean;
   errors: Record<string, string>;
   isCalculating: boolean;
   presets: Preset[];
   currentPresetId: string | null;
+  originalConfig: PricingConfig | null;
 
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
@@ -80,6 +82,9 @@ export interface CalculatorState {
   removeIngredient: (id: string) => void;
   updateConfig: (updates: Partial<PricingConfig>) => void;
   calculate: () => Promise<CalculationResult | null>;
+  applyStrategy: (margin: number) => void;
+  discardPreview: () => void;
+  commitPreview: () => void;
   reset: () => void;
 
   // Variant Actions
@@ -136,6 +141,10 @@ export function useCalculatorState(initialValues?: {
   const [competitors, setCompetitors] = useState<DraftCompetitor[]>(draft.competitors || []);
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [currentPresetId, setCurrentPresetId] = useState<string | null>(null);
+
+  // Soft-Apply / Preview Mode State
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [originalConfig, setOriginalConfig] = useState<PricingConfig | null>(null);
 
   // Track the input/config state used for the last successful calculation
   const [lastCalculatedState, setLastCalculatedState] = useState<{
@@ -212,6 +221,36 @@ export function useCalculatorState(initialValues?: {
 
   const updateConfig = useCallback((updates: Partial<PricingConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
+  }, []);
+
+  const applyStrategy = useCallback(
+    (margin: number) => {
+      // Store current config before applying strategy
+      if (!isPreviewMode) {
+        setOriginalConfig({ ...config });
+      }
+      setConfig({
+        strategy: 'margin',
+        value: margin,
+      });
+      setIsPreviewMode(true);
+    },
+    [config, isPreviewMode]
+  );
+
+  const discardPreview = useCallback(() => {
+    if (originalConfig) {
+      setConfig(originalConfig);
+      setOriginalConfig(null);
+    }
+    setIsPreviewMode(false);
+  }, [originalConfig]);
+
+  const commitPreview = useCallback(() => {
+    setOriginalConfig(null);
+    setIsPreviewMode(false);
+    // After committing, the user might want to save the preset. 
+    // We don't auto-save here to follow the "explicit confirmation" mandate.
   }, []);
 
   // Variant Actions
@@ -434,6 +473,8 @@ export function useCalculatorState(initialValues?: {
     setResults(null);
     setCurrentPresetId(null);
     setLastCalculatedState(null);
+    setIsPreviewMode(false);
+    setOriginalConfig(null);
     setErrors({});
     window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
   }, []);
@@ -459,6 +500,8 @@ export function useCalculatorState(initialValues?: {
     setInput(sanitizedInput);
     setConfig(preset.pricingConfig);
     setCurrentPresetId(preset.id);
+    setIsPreviewMode(false);
+    setOriginalConfig(null);
 
     // Load competitors
     if (preset.competitors) {
@@ -541,6 +584,8 @@ export function useCalculatorState(initialValues?: {
       });
 
       setCurrentPresetId(newPreset.id);
+      setIsPreviewMode(false);
+      setOriginalConfig(null);
       return newPreset;
     },
     [addPreset, input, config, competitors]
@@ -560,16 +605,21 @@ export function useCalculatorState(initialValues?: {
     results,
     liveResult,
     isDirty,
+    isPreviewMode,
     errors,
     isCalculating,
     presets,
     currentPresetId,
+    originalConfig,
     updateInput,
     updateIngredient,
     addIngredient,
     removeIngredient,
     updateConfig,
     calculate,
+    applyStrategy,
+    discardPreview,
+    commitPreview,
     reset,
     loadPreset,
     saveAsPreset,

@@ -1,7 +1,8 @@
 import type React from 'react';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 import { formatCurrency, formatPercent, formatDate } from '../../utils/formatters';
 import { Card } from '../shared/Card';
+import type { MarketDataContext } from './AnalyzePriceCard';
 
 interface SnapshotComparisonCardProps {
   currentTotalCost: number;
@@ -12,6 +13,8 @@ interface SnapshotComparisonCardProps {
   lastMargin: number;
   lastSnapshotDate: string;
   versionNumber?: number;
+  variantName?: string;
+  marketData?: MarketDataContext;
 }
 
 export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
@@ -23,6 +26,8 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
   lastMargin,
   lastSnapshotDate,
   versionNumber,
+  variantName,
+  marketData,
 }) => {
   const costDelta = currentTotalCost - lastTotalCost;
   const priceDelta = currentRecommendedPrice - lastRecommendedPrice;
@@ -56,6 +61,23 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
     );
   };
 
+  const getMarketContextMessage = () => {
+    if (!marketData) return null;
+    const { status, oldestCompetitorDate } = marketData;
+
+    if (status === 'missing') return 'Based on internal cost efficiency.';
+    
+    if (status === 'insufficient') {
+      return 'Based on limited market data (less than 2 competitors).';
+    }
+
+    if (oldestCompetitorDate) {
+      return `Based on market data from ${formatDate(oldestCompetitorDate)}.`;
+    }
+    
+    return 'Based on recent market analysis.';
+  };
+
   return (
     <Card className="bg-surface/50 border-dashed">
       <div className="space-y-md">
@@ -64,8 +86,21 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
             <h3 className="text-lg font-serif text-ink-900">
               {versionNumber ? `Comparison with Version ${versionNumber}` : 'Comparison with Milestone'}
             </h3>
-            <p className="text-sm text-ink-500">Since {formatDate(lastSnapshotDate)}</p>
+            <p className="text-sm text-ink-500">
+              {variantName ? (
+                <span>
+                  Applying to <span className="font-bold text-ink-700">'{variantName}'</span>
+                </span>
+              ) : (
+                `Since ${formatDate(lastSnapshotDate)}`
+              )}
+            </p>
           </div>
+          {variantName && (
+            <p className="text-[10px] text-ink-300 font-bold uppercase tracking-widest">
+              Since {formatDate(lastSnapshotDate)}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
@@ -99,6 +134,13 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
             </div>
           </div>
         </div>
+
+        {marketData && (
+          <div className="flex items-center gap-xs text-[10px] text-ink-300 font-medium uppercase tracking-wider pt-sm border-t border-border-subtle/30">
+            <Info className="w-3 h-3" />
+            {getMarketContextMessage()}
+          </div>
+        )}
       </div>
     </Card>
   );

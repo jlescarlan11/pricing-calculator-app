@@ -9,8 +9,9 @@ import { PricingRecommendations } from './PricingRecommendations';
 import { CostBreakdown } from './CostBreakdown';
 import { PriceComparison } from './PriceComparison';
 import { VariantResultsTable } from './VariantResultsTable';
+import { ImpactSummaryView } from './ImpactSummaryView';
 import { ShareResults } from './ShareResults';
-import { AnalyzePriceCard } from './AnalyzePriceCard';
+import { AnalyzePriceCard, type MarketDataContext } from './AnalyzePriceCard';
 import { Button } from '../shared/Button';
 import { useToast } from '../shared/Toast';
 import { SavePresetButton } from '../presets/SavePresetButton';
@@ -32,8 +33,14 @@ interface ResultsDisplayProps {
   input: CalculationInput;
   config: PricingConfig;
   onEdit?: () => void;
+  onApplyStrategy?: (margin: number) => void;
+  onDiscard?: () => void;
+  onConfirm?: () => void;
   presetId?: string | null;
   userId?: string | null;
+  marketDataContext?: MarketDataContext;
+  isPreviewMode?: boolean;
+  originalConfig?: PricingConfig | null;
 }
 
 /**
@@ -46,15 +53,32 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   input,
   config,
   onEdit,
+  onApplyStrategy,
+  onDiscard,
+  onConfirm,
   presetId,
   userId,
+  marketDataContext,
+  isPreviewMode = false,
+  originalConfig,
 }) => {
   const { addToast } = useToast();
   const { getPreset, updatePreset } = usePresets();
   const [isAnalyzed, setIsAnalyzed] = React.useState(false);
   const [recommendations, setRecommendations] = React.useState<string[]>([]);
+  const [suggestedMargin, setSuggestedMargin] = React.useState<number | undefined>(undefined);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [isCompetitorModalOpen, setIsCompetitorModalOpen] = useState(false);
+  const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
+
+  // Update selected variants when results change
+  React.useEffect(() => {
+    if (results?.variantResults) {
+      setSelectedVariantIds(results.variantResults.map((v) => v.id));
+    } else {
+      setSelectedVariantIds([]);
+    }
+  }, [results?.variantResults]);
 
   // Get current preset and its competitors
   const currentPreset = presetId ? getPreset(presetId) : null;
@@ -63,7 +87,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const marketPosition = results
     ? calculateMarketPosition(results.recommendedPrice, competitors)
     : null;
-
+    
   const handleSaveCompetitors = async (updatedCompetitors: DraftCompetitor[]) => {
     if (!presetId) {
       addToast('Please save this product first to track competitors.', 'info');
@@ -103,11 +127,24 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       const isLLMEnabled = await shouldEnableLLM();
 
       if (isLLMEnabled) {
+        // Filter results to include only selected variants
+        const filteredResults = {
+          ...results,
+          variantResults: results?.variantResults?.filter((v) =>
+            selectedVariantIds.includes(v.id)
+          ),
+        };
+
         // Advanced AI Analysis via Supabase Edge Function
         const { data, error } = await supabase.functions.invoke('analyze-pricing', {
           body: {
-            results,
+            results: filteredResults,
             input,
+            competitors: competitors.map((c) => ({
+              competitorName: c.competitorName,
+              competitorPrice: c.competitorPrice,
+              updatedAt: c.updatedAt,
+            })),
           },
         });
 
@@ -117,6 +154,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         }
 
         setRecommendations(data.recommendations);
+        setSuggestedMargin(data.suggestedMarginValue);
       } else {
         // Fallback to Rules-Based MVP
         // Artificial delay for UX
@@ -127,6 +165,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         const recs = generateStaticRecommendations(margin, risk);
 
         setRecommendations(recs);
+        setSuggestedMargin(undefined); // No explicit suggestion in fallback yet
       }
 
       // Successfully performed analysis (either LLM or fallback)
@@ -168,6 +207,36 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   return (
     <div className="space-y-2xl animate-in fade-in slide-in-from-bottom-lg duration-1000 ease-out">
+      {/* Soft-Apply / Preview Mode Banner */}
+      {isPreviewMode && (
+        <div className="sticky top-0 z-30 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-sakura/20 backdrop-blur-md border-b border-sakura flex flex-col sm:flex-row items-center justify-between gap-md animate-in slide-in-from-top-full duration-500">
+          <div className="flex items-center gap-sm">
+            <div className="w-2 h-2 rounded-full bg-rust animate-pulse" />
+            <p className="text-sm font-bold text-rust uppercase tracking-widest">
+              Preview Mode: AI Strategy Experiment
+            </p>
+          </div>
+          <div className="flex items-center gap-sm w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onDiscard}
+              className="flex-1 sm:flex-none border-rust/30 text-rust hover:bg-rust/5"
+            >
+              Discard experiment
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onConfirm}
+              className="flex-1 sm:flex-none bg-rust text-white hover:bg-rust/90 border-none"
+            >
+              Keep Changes
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Print-only Header */}
       <div className="hidden print:block border-b border-ink-900 pb-xl mb-3xl">
         <div className="flex justify-between items-start">
@@ -200,6 +269,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             variant="primary"
             size="sm"
             className="flex-1 sm:flex-none"
+            disabled={isPreviewMode}
+            tooltip={isPreviewMode ? 'Confirm or discard the AI strategy preview before saving.' : undefined}
           />
           <ShareResults results={results} input={input} />
         </div>
@@ -209,7 +280,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         {/* Priority 1: Results Table (Variants) or Recommendations (Single) */}
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
           {hasVariants ? (
-            <VariantResultsTable results={results} />
+            results.variantResults!.length > 3 && (isPreviewMode || (isAnalyzed && suggestedMargin !== undefined)) ? (
+              <ImpactSummaryView 
+                results={results}
+                previousConfig={isPreviewMode ? originalConfig : null}
+                suggestedMargin={isAnalyzed ? suggestedMargin : undefined}
+              />
+            ) : (
+              <VariantResultsTable results={results} />
+            )
           ) : (
             <PricingRecommendations results={results} />
           )}
@@ -227,9 +306,20 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="print:hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
             <AnalyzePriceCard
               onAnalyze={handleAnalyze}
+              onApplyStrategy={onApplyStrategy}
               isAnalyzed={isAnalyzed}
               recommendations={recommendations}
+              suggestedMarginValue={suggestedMargin}
               isLoading={isAnalyzing}
+              marketData={marketDataContext}
+              variants={
+                hasVariants
+                  ? results.variantResults!.map((v) => ({ id: v.id, name: v.name }))
+                  : []
+              }
+              selectedVariantIds={selectedVariantIds}
+              onVariantSelectionChange={setSelectedVariantIds}
+              isPreviewMode={isPreviewMode}
             />
           </div>
         )}

@@ -297,6 +297,22 @@ describe('ResultsDisplay', () => {
       error: null,
     } as { data: { recommendations: string[] }; error: null });
 
+    // Mock competitors for this specific test
+    const mockCompetitors = [
+      { id: 'c1', competitorName: 'Comp 1', competitorPrice: 10, updatedAt: '2023-01-01' },
+    ];
+    vi.mocked(usePresets).mockReturnValue({
+      presets: [],
+      getPreset: vi.fn().mockReturnValue({
+        id: 'test-preset',
+        name: 'Test',
+        competitors: mockCompetitors,
+      }),
+      addPreset: vi.fn(),
+      updatePreset: vi.fn(),
+      deletePreset: vi.fn(),
+    } as unknown as ReturnType<typeof usePresets>);
+
     renderWithProviders(
       <ResultsDisplay
         results={mockResults}
@@ -312,7 +328,19 @@ describe('ResultsDisplay', () => {
 
     await screen.findByRole('heading', { name: /Analysis Complete/i });
 
-    expect(supabase.functions.invoke).toHaveBeenCalledWith('analyze-pricing', expect.any(Object));
+    expect(supabase.functions.invoke).toHaveBeenCalledWith('analyze-pricing', {
+      body: {
+        results: { ...mockResults, variantResults: undefined },
+        input: mockInput,
+        competitors: [
+          {
+            competitorName: 'Comp 1',
+            competitorPrice: 10,
+            updatedAt: '2023-01-01',
+          },
+        ],
+      },
+    });
     expect(screen.getByText(/LLM Rec 1/i)).toBeInTheDocument();
   });
 

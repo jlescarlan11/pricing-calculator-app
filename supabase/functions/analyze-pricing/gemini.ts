@@ -54,6 +54,24 @@ export async function analyzeWithGemini(
       'Strictly focus on internal cost efficiency, waste reduction, and operational improvements. Do NOT reference market position or external pricing as insufficient competitor data is available.';
   }
 
+  let variantsSection = '';
+  if (results.variantResults && results.variantResults.length > 0) {
+    const variantsList = results.variantResults
+      .map(
+        (v: any) =>
+          `- ${v.name}: Cost ₱${v.costPerUnit.toFixed(2)}, Price ₱${v.recommendedPrice.toFixed(2)}, Margin ${v.profitMarginPercent.toFixed(1)}%`
+      )
+      .join('\n');
+
+    variantsSection = `
+    Variants Data (Selected for Analysis):
+    ${variantsList}
+    `;
+    
+    // Update strategy to explicitly consider variants if they exist
+    strategyInstruction += " For the selected variants, look for specific pricing inconsistencies or margin opportunities.";
+  }
+
   const prompt = `
     As a pricing expert for small food businesses, analyze this product data and provide exactly 3 concise, actionable recommendations (max 20 words each) to improve profit margins or optimize costs.
 
@@ -71,6 +89,7 @@ export async function analyzeWithGemini(
     - Labor: ₱${results.breakdown.labor.toFixed(2)} (${laborPct}%)
     - Overhead: ₱${results.breakdown.overhead.toFixed(2)} (${overheadPct}%)
     ${marketSection}
+    ${variantsSection}
 
     Strategy: ${strategyInstruction}
     Focus on identifying high-cost areas or pricing opportunities based on the breakdown.

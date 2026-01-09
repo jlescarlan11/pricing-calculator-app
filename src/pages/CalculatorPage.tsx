@@ -5,10 +5,11 @@ import { ResultsDisplay, StickySummary, PriceTrendChart } from '../components/re
 import { PresetsList } from '../components/presets';
 import { Modal, useToast } from '../components/shared';
 import { COOKIE_SAMPLE } from '../constants';
-import { useCalculatorState } from '../hooks';
+import { useCalculatorState, usePresets } from '../hooks';
 import { useAuth } from '../context/AuthContext';
 import { triggerHapticFeedback } from '../utils/haptics';
 import type { Preset } from '../types';
+import type { MarketDataContext } from '../components/results/AnalyzePriceCard';
 
 export const CalculatorPage: React.FC = () => {
   const { addToast } = useToast();
@@ -19,16 +20,21 @@ export const CalculatorPage: React.FC = () => {
     results,
     liveResult,
     isDirty,
+    isPreviewMode,
     errors,
     isCalculating,
     presets,
     currentPresetId,
+    originalConfig,
     updateInput,
     updateIngredient,
     addIngredient,
     removeIngredient,
     updateConfig,
     calculate,
+    applyStrategy,
+    discardPreview,
+    commitPreview,
     reset,
     loadPreset,
     setHasVariants,
@@ -41,12 +47,71 @@ export const CalculatorPage: React.FC = () => {
     createSnapshot,
   } = useCalculatorState();
 
+  const { setIsSyncBlocked, updatePreset } = usePresets();
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
   const [showStickySummary, setShowStickySummary] = useState(false);
+  const [historyVariantId, setHistoryVariantId] = useState<string>('base');
   const formRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const showResults = !!results;
+
+  // Sync isPreviewMode with PresetsContext to block cloud sync
+  useEffect(() => {
+    setIsSyncBlocked(isPreviewMode);
+  }, [isPreviewMode, setIsSyncBlocked]);
+
+  // Derive market data context (shared with ResultsDisplay logic)
+  const marketDataContext = useMemo((): MarketDataContext => {
+    const currentPreset = currentPresetId ? presets.find(p => p.id === currentPresetId) : null;
+    const competitors = currentPreset?.competitors || [];
+
+    if (competitors.length === 0) {
+      return { status: 'missing', competitorCount: 0 };
+    }
+
+    const sortedByDate = [...competitors].sort(
+      (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+    );
+    const oldestDate = sortedByDate[0]?.updatedAt;
+    
+    // Check if stale (> 30 days)
+    const isStale = oldestDate 
+      ? (Date.now() - new Date(oldestDate).getTime()) > (30 * 24 * 60 * 60 * 1000)
+      : false;
+
+    if (competitors.length < 2) {
+       return { 
+         status: 'insufficient', 
+         competitorCount: competitors.length, 
+         oldestCompetitorDate: oldestDate 
+       };
+    }
+
+    if (isStale) {
+      return { 
+        status: 'stale', 
+        competitorCount: competitors.length, 
+        oldestCompetitorDate: oldestDate 
+      };
+    }
+
+    return { 
+      status: 'fresh', 
+      competitorCount: competitors.length, 
+      oldestCompetitorDate: oldestDate 
+    };
+  }, [currentPresetId, presets]);
+
+  // Reset history variant selection if the variant is removed
+  useEffect(() => {
+    if (historyVariantId !== 'base' && results?.variantResults) {
+      const exists = results.variantResults.some((v) => v.id === historyVariantId);
+      if (!exists) {
+        setHistoryVariantId('base');
+      }
+    }
+  }, [results?.variantResults, historyVariantId]);
 
   // Derive snapshots for the current preset (including fallback for v1)
   const historySnapshots = useMemo(() => {
@@ -119,6 +184,40 @@ export const CalculatorPage: React.FC = () => {
       addToast('✓ Calculation complete', 'success');
       // Scroll to results at the top
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleApplyStrategy = (margin: number) => {
+    applyStrategy(margin);
+    addToast('Previewing AI suggested strategy.', 'info');
+    // Scroll to top to see effects in ResultsDisplay
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDiscardPreview = () => {
+    discardPreview();
+    addToast('Strategy discarded.', 'info');
+  };
+
+  const handleCommitPreview = async () => {
+    const targetConfig = { ...config };
+    commitPreview();
+    
+    if (currentPresetId) {
+      try {
+        await updatePreset(currentPresetId, {
+          pricingConfig: targetConfig,
+        });
+        addToast('✓ Strategy applied and saved.', 'success');
+        
+        // Optionally auto-pin milestone on commitment of AI strategy
+        await handlePinVersion();
+      } catch (err) {
+        console.error('Failed to save committed strategy:', err);
+        addToast('Strategy applied locally, but failed to sync.', 'warning');
+      }
+    } else {
+      addToast('✓ Strategy applied to current calculation.', 'success');
     }
   };
 
@@ -213,8 +312,14 @@ export const CalculatorPage: React.FC = () => {
               input={input}
               config={config}
               onEdit={handleScrollToForm}
+              onApplyStrategy={handleApplyStrategy}
+              onDiscard={handleDiscardPreview}
+              onConfirm={handleCommitPreview}
               presetId={currentPresetId}
               userId={user?.id}
+              marketDataContext={marketDataContext}
+              isPreviewMode={isPreviewMode}
+              originalConfig={originalConfig}
             />
 
             {/* Price History & Milestones (Only for saved products) */}
@@ -222,14 +327,18 @@ export const CalculatorPage: React.FC = () => {
               <div className="mt-4xl space-y-4xl animate-in fade-in duration-1000 delay-300">
                 <PriceTrendChart
                   snapshots={historySnapshots}
+                  selectedVariantId={historyVariantId}
                 />
                 <PriceHistory
                   presetId={currentPresetId}
                   currentResult={results}
-                  isUnsaved={isDirty}
+                  isUnsaved={isDirty || isPreviewMode}
                   onRestore={handleLoadPreset}
                   snapshots={historySnapshots}
                   onPin={handlePinVersion}
+                  selectedVariantId={historyVariantId}
+                  onVariantSelect={setHistoryVariantId}
+                  marketData={marketDataContext}
                 />
               </div>
             )}
@@ -261,6 +370,7 @@ export const CalculatorPage: React.FC = () => {
             onRemoveVariantIngredient={removeVariantIngredient}
             onOpenPresets={() => setIsPresetsModalOpen(true)}
             onLoadSample={handleLoadSample}
+            isPreviewMode={isPreviewMode}
           />
         </div>
       </div>
@@ -273,7 +383,11 @@ export const CalculatorPage: React.FC = () => {
         onCalculate={handleCalculate}
         isCalculating={isCalculating}
         isVisible={showStickySummary}
+        isPreviewMode={isPreviewMode}
+        onDiscard={handleDiscardPreview}
+        onConfirm={handleCommitPreview}
       />
+
 
       {/* Presets Modal */}
       <Modal

@@ -215,7 +215,16 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Responsive Adaptation**: Configured mobile spacing with 32px section gaps, 16-24px padding, and 16px minimum edge margins.
 - [x] **Vertical Rhythm**: Enhanced `CalculatorForm` with explicit separators and consistent vertical spacing (space-y-xl) to improve visual flow and reduce cognitive load. Fixed "Monthly Utilities" label in Overhead Calculator and restored Grid view in Presets List.
 
-### UI & Layout Restructuring (Added 2026-01-03)
+### Phase 3: Market Intelligence & Analysis (Completed 2026-01-08)
+
+- [x] **AI Pricing Assistant**: Integrated Gemini 1.5 Flash via Supabase Edge Functions with a deterministic rules-based fallback.
+- [x] **Historical Price Tracker**: Implemented a pull-based milestone system with snapshot versioning and Recharts-powered trend visualization.
+- [x] **Competitive Benchmarking**: Developed a competitor management system (max 5) with staleness detection and a market positioning spectrum.
+- [x] **Data Foundation**: Verified relational integrity for presets, snapshots, and competitors in Supabase.
+- [x] **Integration Tests**: Achieved high coverage for all Phase 3 flows (AI analysis, history pinning, competitor limits).
+
+### Project Documentation
+- [x] **Detailed Project Brief**: Created a comprehensive brief in `PROJECT_BRIEF.md` covering all features from Phase 1 through Phase 3.
 
 - [x] **Copy Refinement**: Audited and refined all button labels, helper text, and error messages. Implemented a gentle, supportive, and concise tone ("Explore", "Save", "Calculate", "Oops") consistent with the Japanese aesthetic. Replaced all aggressive phrasing and ensured labels are 1-2 words.
 - [x] **Saved Products Modal**: Replaced the persistent sidebar with a cleaner Modal interface for managing presets.
@@ -257,3 +266,23 @@ A web-based pricing calculator designed for small food businesses in the Philipp
   - Implemented Portal-based rendering and manual position calculation to resolve clipping issues at card boundaries. (Updated 2026-01-03)
 - **Modal Component Test**:
   - Fixed a timeout issue in `Modal.test.tsx` ("restores body scroll when closed") by removing `waitFor` (which conflicts with `vi.useFakeTimers` in this context) and using direct assertions after manually advancing timers with `vi.advanceTimersByTime`.
+
+### Phase 3.2: AI & Market Logic Refinement (Added 2026-01-09)
+
+- [x] **Conditional Prompt Logic**: Implemented smart prompt construction in `analyze-pricing` Edge Function.
+  - **Market Context**: Only injected when 2+ competitors exist.
+  - **Data Freshness**: Checks if competitor data is < 30 days old. Appends "Data Age Warning" if mixed/stale data is used.
+  - **Cost-Only Mode**: Falls back to internal efficiency focus when insufficient market data (< 2 competitors) is available.
+- [x] **Client Integration**: Updated `ResultsDisplay` to pass competitor data to the AI service.
+- [x] **Verification**: Verified logic with updated integration tests and successfully built the project.
+- [x] **AI Variant Targeting**: Implemented variant selection UI in `AnalyzePriceCard` and updated `ResultsDisplay` to filter and pass selected variants to the `analyze-pricing` edge function. Updated `gemini.ts` to include variant data in the prompt for scoped analysis. Verified with updated tests.
+- [x] **Intelligence Feedback UI**: Implemented "Partial Analysis" badge and "Market Data Age" indicator in `AnalyzePriceCard`.
+  - **Context-Aware**: Detects missing (< 2 competitors), stale (> 30 days), or fresh market data.
+  - **Visual Feedback**: Displays warning badge for partial data and explicit date context for transparency.
+  - **Tests**: Added comprehensive unit tests for all data states.
+- [x] **Soft-Apply & Persistence Logic**: Implemented de-coupled persistence for AI pricing experiments.
+  - **Volatile State**: Introduced `isPreviewMode` to allow local experimentation with AI strategy without auto-syncing to cloud.
+  - **Sync Safeguards**: Integrated `isSyncBlocked` in `PresetsContext` to explicitly block database updates during preview.
+  - **Review UI**: Added a Sakura-themed preview banner and updated `StickySummary` with "Confirm" and "Discard" actions.
+  - **Milestone Integration**: Committing a strategy now automatically syncs the preset and pins a historical milestone.
+  - **Verification**: Verified with new unit tests for `useCalculatorState` and `PresetsContext`.

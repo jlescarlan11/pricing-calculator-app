@@ -77,4 +77,78 @@ describe('AnalyzePriceCard', () => {
     const { container } = render(<AnalyzePriceCard />);
     expect(container.firstChild).toHaveClass('print:hidden');
   });
+
+  describe('Intelligence Feedback', () => {
+    const mockRecommendations = ['Recommendation 1'];
+
+    it('shows Partial Analysis badge when market data is stale', () => {
+      render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          recommendations={mockRecommendations}
+          marketData={{ status: 'stale', competitorCount: 2 }}
+        />
+      );
+      expect(screen.getByText('Partial Analysis')).toBeInTheDocument();
+    });
+
+    it('shows Partial Analysis badge when market data is insufficient', () => {
+      render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          recommendations={mockRecommendations}
+          marketData={{ status: 'insufficient', competitorCount: 1 }}
+        />
+      );
+      expect(screen.getByText('Partial Analysis')).toBeInTheDocument();
+    });
+
+    it('does NOT show badge when market data is fresh', () => {
+      render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          recommendations={mockRecommendations}
+          marketData={{ status: 'fresh', competitorCount: 3 }}
+        />
+      );
+      expect(screen.queryByText('Partial Analysis')).not.toBeInTheDocument();
+    });
+
+    it('displays correct market data age context for fresh data', () => {
+      render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          recommendations={mockRecommendations}
+          marketData={{ 
+            status: 'fresh', 
+            competitorCount: 3,
+            oldestCompetitorDate: '2025-01-01T00:00:00Z'
+          }}
+        />
+      );
+      expect(screen.getByText(/Based on market data from Jan 01, 2025/i)).toBeInTheDocument();
+    });
+
+    it('displays context for insufficient data', () => {
+      render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          recommendations={mockRecommendations}
+          marketData={{ status: 'insufficient', competitorCount: 1 }}
+        />
+      );
+      expect(screen.getByText(/Based on limited market data/i)).toBeInTheDocument();
+    });
+
+    it('displays context for missing data', () => {
+      render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          recommendations={mockRecommendations}
+          marketData={{ status: 'missing', competitorCount: 0 }}
+        />
+      );
+      expect(screen.getByText(/Based on internal cost efficiency/i)).toBeInTheDocument();
+    });
+  });
 });

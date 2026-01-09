@@ -16,6 +16,7 @@ import type { Preset } from '../../types';
 
 interface PriceTrendChartProps {
   snapshots: Preset[];
+  selectedVariantId?: string;
   className?: string;
 }
 
@@ -23,7 +24,11 @@ interface PriceTrendChartProps {
  * PriceTrendChart component visualizes the history of product costs and suggested prices.
  * It uses snapshots of calculation data to show trends over time.
  */
-export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, className = '' }) => {
+export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({
+  snapshots,
+  selectedVariantId,
+  className = '',
+}) => {
   // Process snapshots into chart data
   const chartData = [...snapshots]
     .sort(
@@ -33,13 +38,33 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, cla
     )
     .map((s) => {
       const result = performFullCalculation(s.baseRecipe, s.pricingConfig);
+      let cost = result.costPerUnit;
+      let price = result.recommendedPrice;
+
+      if (selectedVariantId && selectedVariantId !== 'base' && result.variantResults) {
+        const variant = result.variantResults.find((v) => v.id === selectedVariantId);
+        if (variant) {
+          cost = variant.costPerUnit;
+          price = variant.recommendedPrice;
+        } else {
+          // Variant didn't exist in this snapshot
+          // We return null to indicate a gap in the line
+          return {
+            date: s.snapshotMetadata?.snapshotDate || s.createdAt,
+            formattedDate: formatDate(s.snapshotMetadata?.snapshotDate || s.createdAt),
+            totalCost: null,
+            suggestedPrice: null,
+          };
+        }
+      }
+
       return {
         date: s.snapshotMetadata?.snapshotDate || s.createdAt,
         formattedDate: formatDate(s.snapshotMetadata?.snapshotDate || s.createdAt),
         // We use costPerUnit for "totalCost" in the chart to keep it on the same scale as suggestedPrice.
         // In the context of pricing trends, users often refer to the per-unit cost as their "total cost".
-        totalCost: result.costPerUnit,
-        suggestedPrice: result.recommendedPrice,
+        totalCost: cost,
+        suggestedPrice: price,
       };
     });
 
@@ -101,7 +126,9 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, cla
                   marginBottom: '8px',
                   fontWeight: 700,
                 }}
-                formatter={(value: any) => [formatCurrency(Number(value)), '']}
+                formatter={(value: any) =>
+                  value !== null ? [formatCurrency(Number(value)), ''] : ['-', '']
+                }
               />
               <Legend
                 verticalAlign="top"
@@ -126,6 +153,7 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, cla
                 dot={{ r: 4, fill: '#B85C38', strokeWidth: 0 }}
                 activeDot={{ r: 6, fill: '#B85C38', strokeWidth: 0 }}
                 animationDuration={1500}
+                connectNulls // Allows connecting lines over gaps if desired, or remove to show gaps
               />
               <Line
                 type="monotone"
@@ -136,6 +164,7 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({ snapshots, cla
                 dot={{ r: 4, fill: '#7A8B73', strokeWidth: 0 }}
                 activeDot={{ r: 6, fill: '#7A8B73', strokeWidth: 0 }}
                 animationDuration={1500}
+                connectNulls
               />
             </LineChart>
           </ResponsiveContainer>

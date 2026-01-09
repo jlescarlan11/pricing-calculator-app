@@ -34,6 +34,7 @@ interface CalculatorFormProps {
   onReset: () => void;
   onOpenPresets: () => void;
   onLoadSample?: () => void;
+  isPreviewMode?: boolean;
 
   // Variant Actions
   onSetHasVariants: (enabled: boolean) => void;
@@ -46,8 +47,8 @@ interface CalculatorFormProps {
     field: keyof Ingredient,
     value: string | number | boolean
   ) => void;
-  onAddVariantIngredient: (variantId: string) => void;
-  onRemoveVariantIngredient: (variantId: string, ingredientId: string) => void;
+  addVariantIngredient: (variantId: string) => void;
+  removeVariantIngredient: (variantId: string, ingredientId: string) => void;
 }
 
 export const CalculatorForm: React.FC<CalculatorFormProps> = ({
@@ -64,6 +65,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   onReset,
   onOpenPresets,
   onLoadSample,
+  isPreviewMode = false,
   onSetHasVariants,
   onAddVariant,
   onRemoveVariant,
@@ -192,7 +194,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               <SavePresetButton
                 input={input}
                 config={config}
-                disabled={!isFormValid}
+                disabled={!isFormValid || isPreviewMode}
+                tooltip={isPreviewMode ? 'Confirm or discard the AI strategy preview before saving.' : undefined}
                 variant="ghost"
                 className="w-full justify-center"
                 mobileLabelLayout="vertical"
@@ -204,6 +207,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             <Button
               variant="ghost"
               onClick={onReset}
+              disabled={isPreviewMode}
               className="flex-1 md:flex-none h-auto py-1 md:h-9 md:py-0 px-1 md:px-3 text-ink-700 hover:text-rust hover:bg-rust/5 min-w-0 flex flex-col md:flex-row gap-0.5 md:gap-2 items-center justify-center"
               title="Reset Form"
             >
@@ -215,6 +219,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           </div>
         </div>
       </div>
+
 
       <div className="flex flex-col space-y-md">
         {isEmpty && onLoadSample && (

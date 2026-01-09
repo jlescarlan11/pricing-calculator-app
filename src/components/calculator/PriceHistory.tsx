@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { History, Plus, AlertCircle, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { performFullCalculation } from '../../utils/calculations';
 import { Button } from '../shared/Button';
 import { Card } from '../shared/Card';
 import { Badge } from '../shared/Badge';
+import { Select } from '../shared/Select';
 import { SnapshotComparisonCard } from '../results/SnapshotComparisonCard';
+import type { MarketDataContext } from '../results/AnalyzePriceCard';
 import type { CalculationResult, Preset } from '../../types';
 
 interface PriceHistoryProps {
@@ -15,6 +17,9 @@ interface PriceHistoryProps {
   onRestore?: (snapshot: Preset) => void;
   snapshots: Preset[];
   onPin: () => void;
+  selectedVariantId?: string;
+  onVariantSelect?: (variantId: string) => void;
+  marketData?: MarketDataContext;
 }
 
 export const PriceHistory: React.FC<PriceHistoryProps> = ({
@@ -23,6 +28,9 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
   onRestore,
   snapshots,
   onPin,
+  selectedVariantId = 'base',
+  onVariantSelect,
+  marketData,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<string | null>(null);
@@ -55,6 +63,50 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
       onRestore(snapshot);
     }
   };
+
+  // Helper to extract relevant stats based on selected context (Base vs Variant)
+  const getDisplayValues = (res: CalculationResult | null, variantId: string) => {
+    if (!res) return { totalCost: 0, recommendedPrice: 0, margin: 0, name: '' };
+
+    if (variantId !== 'base' && res.variantResults) {
+      const variant = res.variantResults.find((v) => v.id === variantId);
+      if (variant) {
+        return {
+          totalCost: variant.totalCost,
+          recommendedPrice: variant.recommendedPrice,
+          margin: variant.profitMarginPercent,
+          name: variant.name,
+        };
+      }
+      // If variant doesn't exist in this result (e.g. comparing vs old snapshot where variant didn't exist)
+      // We return 0s to indicate "New" or "Missing"
+      return { totalCost: 0, recommendedPrice: 0, margin: 0, name: '' };
+    }
+
+    // Default to Base/Batch
+    return {
+      totalCost: res.totalCost,
+      recommendedPrice: res.recommendedPrice,
+      margin: res.profitMarginPercent,
+      name: '',
+    };
+  };
+
+  const currentStats = getDisplayValues(currentResult, selectedVariantId);
+  const comparisonStats = getDisplayValues(comparisonResult, selectedVariantId);
+
+  const hasVariants =
+    currentResult.variantResults && currentResult.variantResults.length > 0;
+
+  const variantOptions = useMemo(() => {
+    const opts = [{ label: 'Total Batch / Base Product', value: 'base' }];
+    if (currentResult.variantResults) {
+      currentResult.variantResults.forEach((v) => {
+        opts.push({ label: v.name, value: v.id });
+      });
+    }
+    return opts;
+  }, [currentResult.variantResults]);
 
   return (
     <div className="space-y-xl">
@@ -104,6 +156,17 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
         }
       >
         <div className="space-y-lg">
+          {hasVariants && (
+            <div className="max-w-xs">
+              <Select
+                label="Compare Context"
+                value={selectedVariantId}
+                onChange={(e) => onVariantSelect?.(e.target.value)}
+                options={variantOptions}
+              />
+            </div>
+          )}
+
           {snapshots.length === 0 ? (
             <div className="text-center py-xl bg-surface/30 rounded-lg border border-dashed border-border-base">
               <p className="text-ink-500 max-sm mx-auto">
@@ -127,6 +190,9 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
                     snapshot.pricingConfig
                   );
                   const isSelected = snapshot.id === activeSnapshotId;
+                  
+                  // Get stats for this snapshot based on selected variant
+                  const stats = getDisplayValues(result, selectedVariantId);
 
                   return (
                     <div
@@ -167,7 +233,7 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
                       <div className="flex items-center gap-xl">
                         <div className="text-right">
                           <p className="text-sm font-semibold text-ink-900">
-                            {formatCurrency(result.totalCost)}
+                            {formatCurrency(stats.totalCost)}
                           </p>
                           <p className="text-xs text-ink-500">Total Cost</p>
                         </div>
@@ -207,14 +273,16 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({
 
       {comparisonResult && selectedSnapshot && (
         <SnapshotComparisonCard
-          currentTotalCost={currentResult.totalCost}
-          currentRecommendedPrice={currentResult.recommendedPrice}
-          currentMargin={currentResult.profitMarginPercent}
-          lastTotalCost={comparisonResult.totalCost}
-          lastRecommendedPrice={comparisonResult.recommendedPrice}
-          lastMargin={comparisonResult.profitMarginPercent}
+          currentTotalCost={currentStats.totalCost}
+          currentRecommendedPrice={currentStats.recommendedPrice}
+          currentMargin={currentStats.margin}
+          lastTotalCost={comparisonStats.totalCost}
+          lastRecommendedPrice={comparisonStats.recommendedPrice}
+          lastMargin={comparisonStats.margin}
           lastSnapshotDate={selectedSnapshot.snapshotMetadata!.snapshotDate}
           versionNumber={selectedSnapshot.snapshotMetadata?.versionNumber}
+          variantName={selectedVariantId !== 'base' ? currentStats.name : undefined}
+          marketData={marketData}
         />
       )}
     </div>

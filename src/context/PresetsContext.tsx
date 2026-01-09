@@ -27,6 +27,8 @@ interface PresetsContextType {
   createSnapshot: (presetId: string) => Promise<Preset | null>;
   getSnapshots: (presetId: string) => Promise<Preset[]>;
   syncStatus: SyncStatus;
+  isSyncBlocked: boolean;
+  setIsSyncBlocked: (blocked: boolean) => void;
   error: string | null;
   refresh: () => Promise<void>;
 }
@@ -37,6 +39,7 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
   const { user } = useAuth();
   const [presets, setPresets] = useState<Preset[]>([]);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('syncing');
+  const [isSyncBlocked, setIsSyncBlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadPresets = useCallback(async () => {
@@ -76,6 +79,9 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
   // Sync listeners
   useEffect(() => {
     const handleOnline = () => {
+      // Don't sync pending if blocked
+      if (isSyncBlocked) return;
+      
       setSyncStatus('syncing');
       presetService
         .syncPendingItems()
@@ -91,7 +97,7 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [loadPresets]);
+  }, [loadPresets, isSyncBlocked]);
 
   const addPreset = useCallback(
     async (
@@ -129,6 +135,13 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
 
       // Optimistic update
       setPresets((prev) => [...prev, newPreset]);
+      
+      // If sync is blocked, we just keep it locally
+      if (isSyncBlocked) {
+        setSyncStatus('offline'); // Or a new status 'experimenting'?
+        return newPreset;
+      }
+
       setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
 
       try {
@@ -152,7 +165,7 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
         throw err;
       }
     },
-    [user]
+    [user, isSyncBlocked]
   );
 
   const updatePreset = useCallback(async (id: string, updates: Partial<Preset>) => {
@@ -167,24 +180,34 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
         updatedAt: new Date().toISOString(),
       } as Preset;
 
-      // Trigger save (fire and forget for UI responsiveness)
-      presetService
-        .savePreset(newPreset)
-        .then(() => setSyncStatus(navigator.onLine ? 'synced' : 'offline'))
-        .catch(() => setSyncStatus('error'));
+      // Only sync if not blocked
+      if (!isSyncBlocked) {
+        presetService
+          .savePreset(newPreset)
+          .then(() => setSyncStatus(navigator.onLine ? 'synced' : 'offline'))
+          .catch(() => setSyncStatus('error'));
+        setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
+      } else {
+        // Keep it local-only
+        setSyncStatus('offline');
+      }
 
       const newArr = [...prev];
       newArr[index] = newPreset;
       return newArr;
     });
-
-    setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
-  }, []);
+  }, [isSyncBlocked]);
 
   const deletePreset = useCallback(
     async (id: string) => {
       // Optimistic update
       setPresets((prev) => prev.filter((p) => p.id !== id));
+      
+      if (isSyncBlocked) {
+        setSyncStatus('offline');
+        return;
+      }
+
       setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
 
       try {
@@ -195,7 +218,7 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
         setSyncStatus('error');
       }
     },
-    [user]
+    [user, isSyncBlocked]
   );
 
   const getPreset = useCallback(
@@ -210,6 +233,10 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
   }, [presets]);
 
   const createSnapshot = useCallback(async (presetId: string) => {
+    if (isSyncBlocked) {
+      throw new Error('Cannot create version snapshots while experimenting in Soft-Apply mode.');
+    }
+
     setSyncStatus(navigator.onLine ? 'syncing' : 'offline');
     try {
       const snapshot = await presetService.createSnapshot(presetId);
@@ -223,7 +250,7 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
       setSyncStatus('error');
       throw err;
     }
-  }, []);
+  }, [isSyncBlocked]);
 
   const getSnapshots = useCallback(async (presetId: string) => {
     try {
@@ -244,6 +271,8 @@ export const PresetsProvider: React.FC<{ children: ReactNode }> = ({ children })
     createSnapshot,
     getSnapshots,
     syncStatus,
+    isSyncBlocked,
+    setIsSyncBlocked,
     error,
     refresh: loadPresets,
   };

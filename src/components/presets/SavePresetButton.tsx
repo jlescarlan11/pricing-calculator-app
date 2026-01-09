@@ -19,6 +19,10 @@ interface SavePresetButtonProps {
    */
   disabled?: boolean;
   /**
+   * Optional custom tooltip content
+   */
+  tooltip?: string;
+  /**
    * Optional custom className for the button
    */
   className?: string;
@@ -52,6 +56,7 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
   input,
   config,
   disabled = false,
+  tooltip,
   className = '',
   variant = 'secondary',
   size = 'md',
@@ -70,9 +75,11 @@ export const SavePresetButton: React.FC<SavePresetButtonProps> = ({
     setIsModalOpen(false);
   };
 
-  const tooltipContent = disabled
+  const defaultTooltip = disabled
     ? 'Please complete the details above to save your progress.'
     : 'Keep this calculation for your future records.';
+
+  const tooltipContent = tooltip || defaultTooltip;
 
   const containerClasses =
     mobileLabelLayout === 'vertical'

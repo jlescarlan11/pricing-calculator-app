@@ -12,6 +12,9 @@ interface StickySummaryProps {
   onCalculate: () => void;
   isCalculating: boolean;
   isVisible: boolean;
+  isPreviewMode?: boolean;
+  onDiscard?: () => void;
+  onConfirm?: () => void;
 }
 
 export const StickySummary: React.FC<StickySummaryProps> = ({
@@ -22,14 +25,17 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
   onCalculate,
   isCalculating,
   isVisible,
+  isPreviewMode = false,
+  onDiscard,
+  onConfirm,
 }) => {
   const hasVariants = results?.variantResults && results.variantResults.length > 0;
 
-  const containerClasses = `fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-border-subtle pb-[env(safe-area-inset-bottom)] sm:hidden transition-opacity duration-300 ${
+  const containerClasses = `fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] sm:hidden transition-all duration-300 ${
     isVisible
-      ? 'opacity-100 border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]'
-      : 'opacity-0 pointer-events-none border-t-transparent shadow-none'
-  }`;
+      ? 'opacity-100 border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] translate-y-0'
+      : 'opacity-0 pointer-events-none translate-y-4 shadow-none'
+  } ${isPreviewMode ? 'border-t-2 border-sakura shadow-lg shadow-sakura/10' : 'border-border-subtle'}`;
 
   // Placeholder content when no results exist
   if (!results) {
@@ -49,6 +55,43 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
           >
             Calculate
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isPreviewMode) {
+    return (
+      <div className={containerClasses}>
+        <div className="flex items-center gap-md p-md h-[72px]">
+          <div className="flex-1 min-w-0">
+             <div className="flex flex-col">
+                <span className="text-[10px] text-rust font-bold uppercase tracking-widest leading-none mb-1">
+                  Previewing AI Strategy
+                </span>
+                <span className="text-lg font-serif font-bold text-ink-900 leading-none">
+                  {formatCurrency(results.recommendedPrice)}
+                </span>
+             </div>
+          </div>
+          <div className="flex gap-sm">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onDiscard}
+              className="px-4 rounded-full border-sakura text-rust hover:bg-sakura/10"
+            >
+              Discard
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onConfirm}
+              className="px-4 rounded-full bg-clay text-white"
+            >
+              Confirm
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -158,3 +201,4 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
     </div>
   );
 };
+
