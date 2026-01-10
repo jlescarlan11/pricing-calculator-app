@@ -27,6 +27,7 @@ export const MESSAGES = {
     MARKUP_STRATEGY: 'Markup is what you add to your cost to reach a selling price.',
     MARGIN_STRATEGY: 'Margin is the share of your selling price that remains as profit.',
     BATCH_SIZE: 'How many units do you make in one go?',
+    YIELD_PERCENTAGE: 'Percentage of sellable units from your batch (e.g. 90% if some items break).',
     OVERHEAD_COSTS: 'Daily costs like rent or packaging that support your business.',
   },
 } as const;

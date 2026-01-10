@@ -127,7 +127,7 @@ export const PriceTrendChart: React.FC<PriceTrendChartProps> = ({
                   fontWeight: 700,
                 }}
                 formatter={(value: any) =>
-                  value !== null ? [formatCurrency(Number(value)), ''] : ['-', '']
+                  value !== null && value !== undefined ? [formatCurrency(Number(value)), ''] : ['-', '']
                 }
               />
               <Legend

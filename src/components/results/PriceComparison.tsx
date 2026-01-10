@@ -5,8 +5,11 @@ import { formatCurrency } from '../../utils/formatters';
 interface PriceComparisonProps {
   currentPrice: number | undefined;
   recommendedPrice: number;
+  recommendedPriceInclTax: number;
   costPerUnit: number;
   batchSize: number;
+  includeTax?: boolean;
+  taxRate?: number;
   className?: string;
 }
 
@@ -17,8 +20,11 @@ interface PriceComparisonProps {
 export const PriceComparison: React.FC<PriceComparisonProps> = ({
   currentPrice,
   recommendedPrice,
+  recommendedPriceInclTax,
   costPerUnit,
   batchSize,
+  includeTax = false,
+  taxRate = 12,
   className = '',
 }) => {
   // Only render if a valid current selling price is provided
@@ -26,12 +32,18 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
     return null;
   }
 
-  const diff = currentPrice - recommendedPrice;
+  // If tax is included, we assume the user's current price also includes tax.
+  // For comparison, we compare tax-inclusive recommended price with current price.
+  const targetComparisonPrice = includeTax ? recommendedPriceInclTax : recommendedPrice;
+
+  const diff = currentPrice - targetComparisonPrice;
   const absDiff = Math.abs(diff);
   const isHigher = diff > 0.01; // Using a small epsilon for float comparison
   const isLower = diff < -0.01;
 
-  const currentProfitPerUnit = currentPrice - costPerUnit;
+  // Profit should be calculated on the pre-tax amount
+  const preTaxCurrentPrice = includeTax ? currentPrice / (1 + taxRate / 100) : currentPrice;
+  const currentProfitPerUnit = preTaxCurrentPrice - costPerUnit;
   const currentProfitPerBatch = currentProfitPerUnit * batchSize;
 
   let statusMessage = '';
@@ -61,11 +73,16 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-lg p-xl bg-surface rounded-xl border border-border-subtle">
           <div className="text-center sm:text-left flex-1">
             <p className="text-xs font-medium text-ink-500 uppercase tracking-widest mb-xs">
-              Current Price
+              Current Price {includeTax && '(Incl. Tax)'}
             </p>
             <p className="text-3xl font-bold text-ink-900 tracking-tight tabular-nums">
               {formatCurrency(currentPrice)}
             </p>
+            {includeTax && (
+              <p className="text-[10px] text-ink-500 font-medium mt-1">
+                Pre-tax: {formatCurrency(preTaxCurrentPrice)}
+              </p>
+            )}
           </div>
 
           <div className="hidden sm:flex items-center justify-center">
@@ -74,11 +91,16 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({
 
           <div className="text-center sm:text-right flex-1">
             <p className="text-xs font-medium text-ink-500 uppercase tracking-widest mb-xs">
-              Recommended
+              Recommended {includeTax && '(Incl. Tax)'}
             </p>
             <p className="text-3xl font-bold text-clay tracking-tight tabular-nums">
-              {formatCurrency(recommendedPrice)}
+              {formatCurrency(targetComparisonPrice)}
             </p>
+            {includeTax && (
+              <p className="text-[10px] text-ink-500 font-medium mt-1">
+                Pre-tax: {formatCurrency(recommendedPrice)}
+              </p>
+            )}
           </div>
         </div>
 

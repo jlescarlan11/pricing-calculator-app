@@ -4,6 +4,7 @@ import React from 'react';
 import { PresetsProvider, usePresetsContext } from './PresetsContext';
 import { presetService } from '../services/presetService';
 import { AuthProvider } from './AuthContext';
+import type { CalculationInput, PricingConfig, Preset } from '../types/calculator';
 
 vi.mock('../services/presetService');
 vi.mock('../lib/supabase', () => ({
@@ -23,7 +24,14 @@ const TestComponent = () => {
       <button onClick={() => setIsSyncBlocked(true)}>Block</button>
       <button onClick={() => setIsSyncBlocked(false)}>Unblock</button>
       <button onClick={() => updatePreset('1', { name: 'Updated' })}>Update</button>
-      <button onClick={() => addPreset({ name: 'New', baseRecipe: {} as any, pricingConfig: {} as any, presetType: 'default', variants: [], competitors: [] })}>Add</button>
+      <button onClick={() => addPreset({ 
+        name: 'New', 
+        baseRecipe: {} as CalculationInput, 
+        pricingConfig: {} as PricingConfig, 
+        presetType: 'default', 
+        variants: [], 
+        competitors: [] 
+      })}>Add</button>
       <div data-testid="presets-count">{presets.length}</div>
     </div>
   );
@@ -32,10 +40,10 @@ const TestComponent = () => {
 describe('PresetsContext Sync Blocking', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(presetService.fetchPresets).mockResolvedValue([{ id: '1', name: 'Original' } as any]);
-    vi.mocked(presetService.syncPendingItems).mockResolvedValue(undefined as any);
-    vi.mocked(presetService.savePreset).mockResolvedValue(undefined as any);
-    vi.mocked(presetService.createSnapshot).mockResolvedValue({ id: 's1' } as any);
+    vi.mocked(presetService.fetchPresets).mockResolvedValue([{ id: '1', name: 'Original' } as Preset]);
+    vi.mocked(presetService.syncPendingItems).mockResolvedValue(undefined as void);
+    vi.mocked(presetService.savePreset).mockResolvedValue(undefined as void);
+    vi.mocked(presetService.createSnapshot).mockResolvedValue({ id: 's1' } as Preset);
   });
 
   it('should block sync when isSyncBlocked is true', async () => {

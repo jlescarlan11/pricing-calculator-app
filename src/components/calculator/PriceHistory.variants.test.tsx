@@ -1,14 +1,15 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { PriceHistory } from './PriceHistory';
 import type { CalculationResult, Preset } from '../../types';
 
 // Mock calculations
 vi.mock('../../utils/calculations', () => ({
-  performFullCalculation: vi.fn((base, config) => ({
+  performFullCalculation: vi.fn(() => ({
     totalCost: 100,
     costPerUnit: 10,
     recommendedPrice: 20,
+    recommendedPriceInclTax: 20,
     profitMarginPercent: 50,
     variantResults: [
       {
@@ -17,7 +18,10 @@ vi.mock('../../utils/calculations', () => ({
         totalCost: 50, // Batch cost
         costPerUnit: 15,
         recommendedPrice: 30,
+        recommendedPriceInclTax: 30,
         profitMarginPercent: 50,
+        breakEvenPrice: 15,
+        profitPerUnit: 15,
       },
       {
         id: 'var-2',
@@ -25,7 +29,10 @@ vi.mock('../../utils/calculations', () => ({
         totalCost: 60,
         costPerUnit: 12,
         recommendedPrice: 24,
+        recommendedPriceInclTax: 24,
         profitMarginPercent: 50,
+        breakEvenPrice: 12,
+        profitPerUnit: 12,
       },
     ],
   })),
@@ -59,6 +66,7 @@ const mockCurrentResult: CalculationResult = {
   totalCost: 200,
   costPerUnit: 20,
   recommendedPrice: 40,
+  recommendedPriceInclTax: 40,
   profitMarginPercent: 50,
   breakEvenPrice: 20,
   profitPerBatch: 200,
@@ -71,6 +79,7 @@ const mockCurrentResult: CalculationResult = {
       totalCost: 100,
       costPerUnit: 25,
       recommendedPrice: 50,
+      recommendedPriceInclTax: 50,
       profitMarginPercent: 50,
       breakEvenPrice: 25,
       profitPerUnit: 25,
@@ -82,6 +91,7 @@ const mockCurrentResult: CalculationResult = {
       totalCost: 120,
       costPerUnit: 30,
       recommendedPrice: 60,
+      recommendedPriceInclTax: 60,
       profitMarginPercent: 50,
       breakEvenPrice: 30,
       profitPerUnit: 30,

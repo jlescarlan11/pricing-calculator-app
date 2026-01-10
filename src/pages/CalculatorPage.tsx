@@ -63,6 +63,8 @@ export const CalculatorPage: React.FC = () => {
     setIsSyncBlocked(isPreviewMode);
   }, [isPreviewMode, setIsSyncBlocked]);
 
+  const [renderTimestamp] = useState(() => Date.now());
+
   // Derive market data context (shared with ResultsDisplay logic)
   const marketDataContext = useMemo((): MarketDataContext => {
     const currentPreset = currentPresetId ? presets.find(p => p.id === currentPresetId) : null;
@@ -79,7 +81,7 @@ export const CalculatorPage: React.FC = () => {
     
     // Check if stale (> 30 days)
     const isStale = oldestDate 
-      ? (Date.now() - new Date(oldestDate).getTime()) > (30 * 24 * 60 * 60 * 1000)
+      ? (renderTimestamp - new Date(oldestDate).getTime()) > (30 * 24 * 60 * 60 * 1000)
       : false;
 
     if (competitors.length < 2) {
@@ -103,17 +105,15 @@ export const CalculatorPage: React.FC = () => {
       competitorCount: competitors.length, 
       oldestCompetitorDate: oldestDate 
     };
-  }, [currentPresetId, presets]);
+  }, [currentPresetId, presets, renderTimestamp]);
 
   // Reset history variant selection if the variant is removed
-  useEffect(() => {
-    if (historyVariantId !== 'base' && results?.variantResults) {
-      const exists = results.variantResults.some((v) => v.id === historyVariantId);
-      if (!exists) {
-        setHistoryVariantId('base');
-      }
+  if (historyVariantId !== 'base' && results?.variantResults) {
+    const exists = results.variantResults.some((v) => v.id === historyVariantId);
+    if (!exists) {
+      setHistoryVariantId('base');
     }
-  }, [results?.variantResults, historyVariantId]);
+  }
 
   // Derive snapshots for the current preset (including fallback for v1)
   const historySnapshots = useMemo(() => {

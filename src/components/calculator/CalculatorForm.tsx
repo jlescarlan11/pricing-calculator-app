@@ -123,7 +123,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
   };
 
   const handleProductInfoChange = (
-    field: 'productName' | 'batchSize' | 'businessName',
+    field: 'productName' | 'batchSize' | 'businessName' | 'yieldPercentage',
     value: string | number
   ) => {
     onUpdateInput({ [field]: value });
@@ -139,6 +139,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
   const handlePricingChange = (strategy: PricingConfig['strategy'], value: number) => {
     onUpdateConfig({ strategy, value });
+  };
+
+  const handleTaxChange = (includeTax: boolean, taxRate: number) => {
+    onUpdateConfig({ includeTax, taxRate });
   };
 
   const handleCurrentPriceChange = (value?: number) => {
@@ -241,11 +245,13 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
               businessName={input?.businessName}
               productName={input?.productName || ''}
               batchSize={input?.batchSize || 0}
+              yieldPercentage={input?.yieldPercentage || 100}
               onChange={handleProductInfoChange}
               errors={{
                 businessName: errors.businessName,
                 productName: errors.productName,
                 batchSize: errors.batchSize,
+                yieldPercentage: errors.yieldPercentage,
               }}
             />
             <div className="flex justify-end">
@@ -385,8 +391,11 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             <PricingStrategy
               strategy={config.strategy}
               value={config.value}
+              includeTax={config.includeTax}
+              taxRate={config.taxRate}
               costPerUnit={calculationResult?.costPerUnit || 0}
               onChange={handlePricingChange}
+              onTaxChange={handleTaxChange}
             />
 
             <div className="h-px bg-border-subtle" role="separator" />

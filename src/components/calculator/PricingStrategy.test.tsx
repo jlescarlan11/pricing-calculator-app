@@ -39,7 +39,7 @@ describe('PricingStrategy', () => {
     ).toBeInTheDocument();
   });
 
-  it('switches strategy when button clicked', () => {
+  it('converts value correctly when switching strategy to maintain stable price', () => {
     render(
       <PricingStrategy strategy="markup" value={25} costPerUnit={100} onChange={mockOnChange} />
     );
@@ -47,7 +47,22 @@ describe('PricingStrategy', () => {
     const marginBtn = screen.getByText(/Margin/i, { selector: 'button' });
     fireEvent.click(marginBtn);
 
-    expect(mockOnChange).toHaveBeenCalledWith('margin', 25);
+    // 25% Markup on 100 cost = 125 price
+    // Equivalent Margin = (125-100)/125 = 20%
+    expect(mockOnChange).toHaveBeenCalledWith('margin', 20);
+  });
+
+  it('converts value correctly when switching from margin to markup', () => {
+    render(
+      <PricingStrategy strategy="margin" value={20} costPerUnit={100} onChange={mockOnChange} />
+    );
+
+    const markupBtn = screen.getByText(/Markup/i, { selector: 'button' });
+    fireEvent.click(markupBtn);
+
+    // 20% Margin on 100 cost = 125 price
+    // Equivalent Markup = (125-100)/100 = 25%
+    expect(mockOnChange).toHaveBeenCalledWith('markup', 25);
   });
 
   it('calls onChange when text input changes', () => {

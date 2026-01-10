@@ -10,10 +10,51 @@ import {
   calculateMarketPosition,
   getCompatibleUnits,
   calculateIngredientCostFromPurchase,
+  calculateEquivalentMarkup,
+  calculateEquivalentMargin,
 } from './calculations';
 import type { Ingredient } from '../types/calculator';
 
 describe('Calculation Utils', () => {
+  describe('calculateEquivalentMarkup', () => {
+    it('correctly converts common margin values to markup', () => {
+      expect(calculateEquivalentMarkup(0)).toBe(0);
+      expect(calculateEquivalentMarkup(20)).toBe(25);
+      expect(calculateEquivalentMarkup(50)).toBe(100);
+      expect(calculateEquivalentMarkup(75)).toBe(300);
+    });
+
+    it('returns 0 for invalid margins', () => {
+      expect(calculateEquivalentMarkup(-10)).toBe(0);
+      expect(calculateEquivalentMarkup(100)).toBe(0);
+      expect(calculateEquivalentMarkup(110)).toBe(0);
+    });
+
+    it('handles decimal values accurately', () => {
+      // 25% margin -> 33.33% markup
+      expect(calculateEquivalentMarkup(25)).toBe(33.33);
+    });
+  });
+
+  describe('calculateEquivalentMargin', () => {
+    it('correctly converts common markup values to margin', () => {
+      expect(calculateEquivalentMargin(0)).toBe(0);
+      expect(calculateEquivalentMargin(25)).toBe(20);
+      expect(calculateEquivalentMargin(100)).toBe(50);
+      expect(calculateEquivalentMargin(300)).toBe(75);
+    });
+
+    it('returns 0 for invalid markups', () => {
+      expect(calculateEquivalentMargin(-10)).toBe(0);
+    });
+
+    it('handles decimal values accurately', () => {
+      // 33.33% markup -> 24.998...% margin -> 25.0%
+      // 1 / 3 markup -> 25% margin
+      expect(calculateEquivalentMargin(33.333333)).toBe(25);
+    });
+  });
+
   describe('calculateIngredientCostFromPurchase', () => {
     it('calculates cost correctly within same category (weight)', () => {
       // 1kg for 100, use 250g -> (100 / 1000) * 250 = 25
@@ -184,8 +225,20 @@ describe('Calculation Utils', () => {
       expect(calculateCostPerUnit(50.55, 5)).toBe(10.11);
     });
 
+    it('should adjust cost per unit based on yield percentage', () => {
+      // 100 cost, 10 units, 50% yield -> (100/10) / 0.5 = 10 / 0.5 = 20
+      expect(calculateCostPerUnit(100, 10, 50)).toBe(20);
+      // 100 cost, 10 units, 80% yield -> 10 / 0.8 = 12.5
+      expect(calculateCostPerUnit(100, 10, 80)).toBe(12.5);
+    });
+
     it('should return 0 when batch size is 0', () => {
       expect(calculateCostPerUnit(100, 0)).toBe(0);
+    });
+
+    it('should return 0 for 0 or negative yield', () => {
+      expect(calculateCostPerUnit(100, 10, 0)).toBe(0);
+      expect(calculateCostPerUnit(100, 10, -10)).toBe(0);
     });
 
     it('should return 0 when batch size is negative', () => {
@@ -273,7 +326,28 @@ describe('Calculation Utils', () => {
       overhead: 0,
       hasVariants: false,
       variants: [],
+      yieldPercentage: 100,
     };
+
+    it('performs full calculation and accounts for yieldPercentage', () => {
+      const result = performFullCalculation(
+        {
+          ...baseInput,
+          yieldPercentage: 80,
+        },
+        { strategy: 'markup', value: 50 }
+      );
+
+      // Total Ing Cost = 100, Batch = 100.
+      // Raw unit cost = 1.
+      // Yield 80% -> 1 / 0.8 = 1.25.
+      // Recommended Price (Markup 50%) = 1.25 * 1.5 = 1.875 -> 1.88.
+      // Profit per unit = 1.88 - 1.25 = 0.63.
+      // Sellable units = 100 * 0.8 = 80.
+      // Profit per batch = 80 * 0.63 = 50.4.
+      expect(result.costPerUnit).toBe(1.25);
+      expect(result.profitPerBatch).toBe(50.4);
+    });
 
     it('performs full calculation with variants and calculates current price comparison', () => {
       const result = performFullCalculation(
@@ -330,6 +404,7 @@ describe('Calculation Utils', () => {
               laborCost: 5,
               overhead: 5,
               pricingConfig: { strategy: 'markup', value: 50 },
+              yieldPercentage: 100,
             },
           ],
         },
@@ -348,6 +423,40 @@ describe('Calculation Utils', () => {
       expect(base?.breakdown).toBeDefined();
       expect(base?.breakdown?.baseAllocation).toBe(60); // 12 * 5 remaining
       expect(base?.breakdown?.specificIngredients).toBe(0);
+    });
+
+    it('accounts for variant-specific yield percentage', () => {
+      const result = performFullCalculation(
+        {
+          ...baseInput,
+          batchSize: 10,
+          ingredients: [{ id: '1', name: 'Ing 1', amount: 10, cost: 100 }], // Cost per unit = 10
+          yieldPercentage: 100,
+          hasVariants: true,
+          variants: [
+            {
+              id: 'v1',
+              name: 'Variant 1',
+              batchSize: 5,
+              ingredients: [],
+              laborCost: 0,
+              overhead: 0,
+              yieldPercentage: 50, // 50% yield for variant
+              pricingConfig: { strategy: 'markup', value: 0 },
+            },
+          ],
+        },
+        { strategy: 'markup', value: 0 }
+      );
+
+      const v1 = result.variantResults?.find((v) => v.id === 'v1');
+      // Base cost per unit = 10.
+      // Allocated base cost = 10 * 5 = 50.
+      // Variant specific ingredients/labor/overhead = 0.
+      // Variant total cost = 50.
+      // Variant batch size = 5.
+      // Yield 50% -> (50 / 5) / 0.5 = 10 / 0.5 = 20.
+      expect(v1?.costPerUnit).toBe(20);
     });
   });
 });

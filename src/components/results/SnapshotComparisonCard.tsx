@@ -89,7 +89,7 @@ export const SnapshotComparisonCard: React.FC<SnapshotComparisonCardProps> = ({
             <p className="text-sm text-ink-500">
               {variantName ? (
                 <span>
-                  Applying to <span className="font-bold text-ink-700">'{variantName}'</span>
+                  Applying to <span className="font-bold text-ink-700">&apos;{variantName}&apos;</span>
                 </span>
               ) : (
                 `Since ${formatDate(lastSnapshotDate)}`

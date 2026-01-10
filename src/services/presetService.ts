@@ -57,6 +57,8 @@ function sanitizePreset(preset: Partial<Preset> | null | undefined): Preset | nu
     pricingConfig: {
       strategy: (pricingConfig?.strategy || 'markup') as 'markup' | 'margin',
       value: typeof pricingConfig?.value === 'number' ? pricingConfig.value : 50,
+      taxRate: typeof pricingConfig?.taxRate === 'number' ? pricingConfig.taxRate : 12,
+      includeTax: typeof pricingConfig?.includeTax === 'boolean' ? pricingConfig.includeTax : false,
     },
     createdAt: preset.createdAt || new Date().toISOString(),
     updatedAt: preset.updatedAt || new Date().toISOString(),

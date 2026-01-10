@@ -18,6 +18,7 @@ export interface CalculationResult {
   totalCost: number;
   costPerUnit: number;
   recommendedPrice: number;
+  recommendedPriceInclTax: number;
   profitMarginPercent: number;
   breakdown: {
     ingredients: number;
@@ -33,6 +34,7 @@ export interface VariantResult {
   totalCost: number;
   costPerUnit: number;
   recommendedPrice: number;
+  recommendedPriceInclTax: number;
   profitMarginPercent: number;
   batchSize: number;
   currentSellingPrice?: number;

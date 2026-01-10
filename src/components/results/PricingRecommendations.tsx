@@ -2,11 +2,12 @@ import React from 'react';
 import { CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
 import { Badge } from '../shared/Badge';
 import type { BadgeVariant } from '../shared/Badge';
-import type { CalculationResult } from '../../types/calculator';
+import type { CalculationResult, PricingConfig } from '../../types/calculator';
 import { formatCurrency, formatPercent, getMarginColor } from '../../utils/formatters';
 
 interface PricingRecommendationsProps {
   results: CalculationResult;
+  config?: PricingConfig;
   className?: string;
 }
 
@@ -16,10 +17,20 @@ interface PricingRecommendationsProps {
  */
 export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
   results,
+  config,
   className = '',
 }) => {
-  const { breakEvenPrice, recommendedPrice, profitPerUnit, profitPerBatch, profitMarginPercent } =
-    results;
+  const {
+    breakEvenPrice,
+    recommendedPrice,
+    recommendedPriceInclTax,
+    profitPerUnit,
+    profitPerBatch,
+    profitMarginPercent,
+  } = results;
+
+  const includeTax = config?.includeTax ?? false;
+  const displayPrice = includeTax ? recommendedPriceInclTax : recommendedPrice;
 
   const getMarginBadge = (
     margin: number
@@ -55,14 +66,21 @@ export const PricingRecommendations: React.FC<PricingRecommendationsProps> = ({
       <div className="flex flex-col items-center px-2xl py-3xl bg-surface rounded-2xl border border-border-subtle shadow-sm relative overflow-hidden group">
         <div className="relative z-10 w-full text-center">
           <p className="text-sm font-semibold text-ink-500 uppercase tracking-widest mb-sm">
-            Recommended Selling Price
+            Recommended Selling Price {includeTax && '(Incl. Tax)'}
           </p>
           <p
-            key={recommendedPrice}
+            key={displayPrice}
             className="font-serif text-6xl sm:text-7xl text-ink-900 tracking-tighter transition-transform duration-700 group-hover:scale-105 animate-pulse-once"
           >
-            {formatCurrency(recommendedPrice)}
+            {formatCurrency(displayPrice)}
           </p>
+
+          {includeTax && (
+            <p className="text-xs text-ink-500 mt-2 font-medium">
+              Base Price: {formatCurrency(recommendedPrice)} + Tax: {formatCurrency(recommendedPriceInclTax - recommendedPrice)}
+            </p>
+          )}
+
           <div className="flex justify-center mt-xl">
             <Badge
               variant={badgeDetails.variant}

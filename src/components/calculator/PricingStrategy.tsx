@@ -2,16 +2,24 @@ import React, { useState } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { Card } from '../shared/Card';
 import { Input } from '../shared/Input';
+import { Switch } from '../shared/Switch';
 import { PricingExplainerModal } from '../help';
 import { formatCurrency } from '../../utils/formatters';
-import { calculateRecommendedPrice } from '../../utils/calculations';
+import {
+  calculateRecommendedPrice,
+  calculateEquivalentMargin,
+  calculateEquivalentMarkup,
+} from '../../utils/calculations';
 import type { PricingStrategy as StrategyType } from '../../types/calculator';
 
 interface PricingStrategyProps {
   strategy: StrategyType;
   value: number;
   costPerUnit: number;
+  includeTax?: boolean;
+  taxRate?: number;
   onChange: (strategy: StrategyType, value: number) => void;
+  onTaxChange?: (includeTax: boolean, taxRate: number) => void;
   embedded?: boolean;
 }
 
@@ -19,17 +27,24 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
   strategy,
   value,
   costPerUnit,
+  includeTax = false,
+  taxRate = 12,
   onChange,
+  onTaxChange,
   embedded = false,
 }) => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const handleStrategyChange = (newStrategy: StrategyType) => {
-    // When switching to margin, ensure value is within valid range (0-99.9)
-    let newValue = value;
-    if (newStrategy === 'margin' && value >= 100) {
-      newValue = 25; // Default sensible margin
+    if (newStrategy === strategy) return;
+
+    let newValue: number;
+    if (newStrategy === 'margin') {
+      newValue = calculateEquivalentMargin(value);
+    } else {
+      newValue = calculateEquivalentMarkup(value);
     }
+
     onChange(newStrategy, newValue);
   };
 
@@ -43,12 +58,25 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
     onChange(strategy, parseFloat(e.target.value));
   };
 
+  const handleTaxToggle = (checked: boolean) => {
+    onTaxChange?.(checked, taxRate);
+  };
+
+  const handleTaxRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newRate = parseFloat(e.target.value) || 0;
+    onTaxChange?.(includeTax, newRate);
+  };
+
   const recommendedPrice = calculateRecommendedPrice(costPerUnit, strategy, value);
+  const recommendedPriceInclTax = includeTax
+    ? recommendedPrice * (1 + taxRate / 100)
+    : recommendedPrice;
   const profit = recommendedPrice - costPerUnit;
 
   // Static example to help visualize
   const exampleCost = 100;
   const examplePrice = calculateRecommendedPrice(exampleCost, strategy, value);
+  const examplePriceInclTax = includeTax ? examplePrice * (1 + taxRate / 100) : examplePrice;
   const exampleProfit = examplePrice - exampleCost;
 
   const content = (
@@ -79,7 +107,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         </button>
       </div>
 
-      {/* Visual Explanation - Hide in embedded mode if it's too much, or keep it. Keeping for now but maybe simplified. */}
+      {/* Visual Explanation */}
       {!embedded && (
         <div className="bg-surface border border-border-subtle rounded-md p-lg transition-all duration-500">
           {strategy === 'markup' ? (
@@ -89,7 +117,8 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
                 If your cost is {formatCurrency(exampleCost)}, adding {value}% markup results in a
-                price of {formatCurrency(examplePrice)}(
+                price of {formatCurrency(examplePrice)}
+                {includeTax && ` (${formatCurrency(examplePriceInclTax)} incl. tax)`}(
                 <span className="text-moss font-semibold">
                   {formatCurrency(exampleProfit)} profit
                 </span>
@@ -104,7 +133,8 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
                 To earn a {value}% margin on a {formatCurrency(exampleCost)} cost, your price should
-                be {formatCurrency(examplePrice)}(
+                be {formatCurrency(examplePrice)}
+                {includeTax && ` (${formatCurrency(examplePriceInclTax)} incl. tax)`}(
                 <span className="text-moss font-semibold">
                   {formatCurrency(exampleProfit)} profit
                 </span>
@@ -145,17 +175,48 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
         </div>
       </div>
 
+      {/* Tax Settings */}
+      <div className="pt-lg border-t border-border-subtle space-y-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-0.5">
+            <h4 className="text-sm font-medium text-ink-900">Tax Settings</h4>
+            <p className="text-xs text-ink-500">Include VAT/Sales Tax in final price</p>
+          </div>
+          <Switch checked={includeTax} onChange={handleTaxToggle} />
+        </div>
+
+        {includeTax && (
+          <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+            <Input
+              label="Tax Rate"
+              type="number"
+              value={taxRate}
+              onChange={handleTaxRateChange}
+              suffix="%"
+              min={0}
+              max={100}
+              step="0.1"
+            />
+          </div>
+        )}
+      </div>
+
       {/* Real-time Result - Hide if no cost per unit calculated */}
       {(!embedded || costPerUnit > 0) && (
         <div className="pt-lg border-t border-border-subtle">
           <div className="flex justify-between items-end">
             <div>
               <p className="text-[10px] text-ink-500 uppercase tracking-widest font-bold mb-xs">
-                Recommended Price
+                Recommended Price {includeTax && '(Incl. Tax)'}
               </p>
               <p className="text-3xl font-bold text-ink-900 tracking-tight">
-                {formatCurrency(recommendedPrice)}
+                {formatCurrency(includeTax ? recommendedPriceInclTax : recommendedPrice)}
               </p>
+              {includeTax && (
+                <p className="text-xs text-ink-500 mt-1">
+                  Base: {formatCurrency(recommendedPrice)} + Tax: {formatCurrency(recommendedPriceInclTax - recommendedPrice)}
+                </p>
+              )}
             </div>
             <div className="text-right">
               <p className="text-xs text-ink-500 font-medium mb-xs">Profit per Unit</p>

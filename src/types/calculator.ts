@@ -21,6 +21,7 @@ export interface Variant {
   overhead: number;
   pricingConfig: PricingConfig;
   currentSellingPrice?: number;
+  yieldPercentage: number;
 }
 
 export interface CalculationInput {
@@ -33,6 +34,7 @@ export interface CalculationInput {
   currentSellingPrice?: number;
   hasVariants?: boolean;
   variants?: Variant[];
+  yieldPercentage: number;
 }
 
 export type PricingStrategy = 'markup' | 'margin';
@@ -40,6 +42,8 @@ export type PricingStrategy = 'markup' | 'margin';
 export interface PricingConfig {
   strategy: PricingStrategy;
   value: number;
+  taxRate?: number;
+  includeTax?: boolean;
 }
 
 export interface VariantResult {
@@ -48,6 +52,9 @@ export interface VariantResult {
   totalCost: number;
   costPerUnit: number;
   recommendedPrice: number;
+  recommendedPriceInclTax: number;
+  includeTax?: boolean;
+  taxRate?: number;
   profitPerUnit: number;
   profitMarginPercent: number;
   breakEvenPrice: number;
@@ -68,6 +75,9 @@ export interface CalculationResult {
   costPerUnit: number;
   breakEvenPrice: number;
   recommendedPrice: number;
+  recommendedPriceInclTax: number;
+  includeTax?: boolean;
+  taxRate?: number;
   profitPerBatch: number;
   profitPerUnit: number;
   profitMarginPercent: number;

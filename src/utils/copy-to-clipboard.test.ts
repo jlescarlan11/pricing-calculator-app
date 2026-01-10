@@ -17,6 +17,7 @@ describe('copy-to-clipboard utility', () => {
     costPerUnit: 12.5,
     breakEvenPrice: 12.5,
     recommendedPrice: 25,
+    recommendedPriceInclTax: 25,
     profitPerBatch: 150,
     profitPerUnit: 12.5,
     profitMarginPercent: 50,

@@ -2,6 +2,7 @@ import React from 'react';
 import { Trash2, Plus } from 'lucide-react';
 import { Card, Button, Input } from '../shared';
 import { IngredientRow, LaborCost, OverheadCost, PricingStrategy, CurrentPrice } from './index';
+import { TOOLTIPS } from '../../constants/tooltips';
 import type { Variant, Ingredient } from '../../types/calculator';
 
 interface VariantBlockProps {
@@ -78,7 +79,7 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
     >
       <div className="space-y-lg">
         {/* Allocation */}
-        <div className="bg-surface-hover p-md rounded-lg border border-border-subtle">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg bg-surface-hover p-md rounded-lg border border-border-subtle">
           <Input
             label={`Batch Allocation (Max: ${maxBatchSize})`}
             type="number"
@@ -90,6 +91,21 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
             error={errors[`variants.${variant.id}.batchSize`]}
             suffix="units"
             helperText="from base batch"
+          />
+          <Input
+            label="Variant Yield %"
+            type="number"
+            value={variant.yieldPercentage || ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              onUpdate(variant.id, { yieldPercentage: val === '' ? 0 : Number(val) });
+            }}
+            className="w-full"
+            min={1}
+            max={100}
+            error={errors[`variants.${variant.id}.yieldPercentage`]}
+            tooltip={TOOLTIPS.YIELD_PERCENTAGE}
+            suffix="%"
           />
         </div>
 
@@ -163,9 +179,14 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
         <PricingStrategy
           strategy={variant.pricingConfig.strategy}
           value={variant.pricingConfig.value}
+          includeTax={variant.pricingConfig.includeTax}
+          taxRate={variant.pricingConfig.taxRate}
           costPerUnit={costPerUnit}
           onChange={(strategy, value) =>
-            onUpdate(variant.id, { pricingConfig: { strategy, value } })
+            onUpdate(variant.id, { pricingConfig: { ...variant.pricingConfig, strategy, value } })
+          }
+          onTaxChange={(includeTax, taxRate) =>
+            onUpdate(variant.id, { pricingConfig: { ...variant.pricingConfig, includeTax, taxRate } })
           }
           embedded
         />

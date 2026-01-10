@@ -50,15 +50,16 @@ const mockResults: CalculationResult = {
   costPerUnit: 1,
   breakEvenPrice: 1,
   recommendedPrice: 2,
+  recommendedPriceInclTax: 2,
   profitPerBatch: 100,
   profitPerUnit: 1,
   profitMarginPercent: 50,
   breakdown: { ingredients: 100, labor: 0, overhead: 0 },
   variantResults: [
-    { id: '1', name: 'V1', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
-    { id: '2', name: 'V2', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
-    { id: '3', name: 'V3', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
-    { id: '4', name: 'V4', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
+    { id: '1', name: 'V1', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, recommendedPriceInclTax: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
+    { id: '2', name: 'V2', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, recommendedPriceInclTax: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
+    { id: '3', name: 'V3', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, recommendedPriceInclTax: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
+    { id: '4', name: 'V4', totalCost: 25, costPerUnit: 1, recommendedPrice: 2, recommendedPriceInclTax: 2, profitPerUnit: 1, profitMarginPercent: 50, breakEvenPrice: 1, batchSize: 25 },
   ],
 };
 

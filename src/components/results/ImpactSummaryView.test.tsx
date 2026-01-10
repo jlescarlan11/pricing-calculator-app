@@ -8,6 +8,7 @@ const mockResults: CalculationResult = {
   costPerUnit: 10,
   breakEvenPrice: 10,
   recommendedPrice: 20,
+  recommendedPriceInclTax: 20,
   profitPerBatch: 1000,
   profitPerUnit: 10,
   profitMarginPercent: 50,
@@ -19,6 +20,7 @@ const mockResults: CalculationResult = {
       totalCost: 200,
       costPerUnit: 10,
       recommendedPrice: 20, // 50% margin
+      recommendedPriceInclTax: 20,
       profitPerUnit: 10,
       profitMarginPercent: 50,
       breakEvenPrice: 10,
@@ -31,6 +33,7 @@ const mockResults: CalculationResult = {
       totalCost: 300,
       costPerUnit: 15,
       recommendedPrice: 30, // 50% margin
+      recommendedPriceInclTax: 30,
       profitPerUnit: 15,
       profitMarginPercent: 50,
       breakEvenPrice: 15,
@@ -43,6 +46,7 @@ const mockResults: CalculationResult = {
       totalCost: 400,
       costPerUnit: 20,
       recommendedPrice: 40, // 50% margin
+      recommendedPriceInclTax: 40,
       profitPerUnit: 20,
       profitMarginPercent: 50,
       breakEvenPrice: 20,
@@ -55,6 +59,7 @@ const mockResults: CalculationResult = {
       totalCost: 500,
       costPerUnit: 25,
       recommendedPrice: 50, // 50% margin
+      recommendedPriceInclTax: 50,
       profitPerUnit: 25,
       profitMarginPercent: 50,
       breakEvenPrice: 25,

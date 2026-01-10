@@ -36,21 +36,28 @@ export const calculateTotalIngredientCost = (ingredients: Ingredient[]): number 
 };
 
 /**
- * Calculates the cost per unit by dividing total cost by batch size.
- * Handles division by zero and negative batch sizes.
+ * Calculates the cost per unit by dividing total cost by batch size and adjusting for yield.
+ * Formula: Effective Unit Cost = (Total Batch Cost / Batch Size) / (Yield % / 100)
  *
  * @param totalCost - The total cost of production
  * @param batchSize - The number of units in the batch
+ * @param yieldPercentage - Percentage of usable product from the batch (default 100)
  * @returns Cost per unit, rounded to 2 decimals
  */
-export const calculateCostPerUnit = (totalCost: number, batchSize: number): number => {
-  if (batchSize <= 0) {
-    return 0; // Avoid division by zero or negative batch size
+export const calculateCostPerUnit = (
+  totalCost: number,
+  batchSize: number,
+  yieldPercentage: number = 100
+): number => {
+  if (batchSize <= 0 || yieldPercentage <= 0) {
+    return 0; // Avoid division by zero or negative batch size/yield
   }
   if (totalCost < 0) {
     return 0;
   }
-  return round(totalCost / batchSize);
+  const rawUnitCost = totalCost / batchSize;
+  const effectiveYield = yieldPercentage / 100;
+  return round(rawUnitCost / effectiveYield);
 };
 
 /**
@@ -110,6 +117,22 @@ export const calculateRecommendedPrice = (
 };
 
 /**
+ * Calculates a price inclusive of tax.
+ * Formula: Price * (1 + TaxRate / 100)
+ *
+ * @param price - The base price
+ * @param taxRate - The tax rate percentage
+ * @returns Price with tax, rounded to 2 decimals
+ */
+export const calculatePriceWithTax = (price: number, taxRate: number): number => {
+  if (price < 0 || taxRate < 0) {
+    return price > 0 ? price : 0;
+  }
+  const priceWithTax = price * (1 + taxRate / 100);
+  return round(priceWithTax);
+};
+
+/**
  * Calculates the actual profit margin percentage given a cost and selling price.
  * Formula: ((Selling Price - Cost) / Selling Price) * 100
  *
@@ -141,7 +164,7 @@ export const performFullCalculation = (
   const totalCost = round(ingredientCost + input.laborCost + input.overhead);
 
   // Base Cost Per Unit (Assuming entire batch is base product)
-  const baseCostPerUnit = calculateCostPerUnit(totalCost, input.batchSize);
+  const baseCostPerUnit = calculateCostPerUnit(totalCost, input.batchSize, input.yieldPercentage);
 
   // Base Recommendation (for reference or if no variants)
   const baseRecommendedPrice = calculateRecommendedPrice(
@@ -150,17 +173,25 @@ export const performFullCalculation = (
     config.value
   );
 
+  const baseRecommendedPriceInclTax = config.includeTax && config.taxRate
+    ? calculatePriceWithTax(baseRecommendedPrice, config.taxRate)
+    : baseRecommendedPrice;
+
   const baseProfitPerUnit = round(baseRecommendedPrice - baseCostPerUnit);
   const baseProfitMarginPercent = calculateProfitMargin(baseCostPerUnit, baseRecommendedPrice);
 
   // If no variants, return standard result
   if (!input.hasVariants || !input.variants || input.variants.length === 0) {
-    const profitPerBatch = round(baseProfitPerUnit * input.batchSize);
+    const sellableUnits = input.batchSize * (input.yieldPercentage / 100);
+    const profitPerBatch = round(baseProfitPerUnit * sellableUnits);
     return {
       totalCost,
       costPerUnit: baseCostPerUnit,
       breakEvenPrice: baseCostPerUnit,
       recommendedPrice: baseRecommendedPrice,
+      recommendedPriceInclTax: baseRecommendedPriceInclTax,
+      includeTax: config.includeTax,
+      taxRate: config.taxRate,
       profitPerBatch,
       profitPerUnit: baseProfitPerUnit,
       profitMarginPercent: baseProfitMarginPercent,
@@ -195,7 +226,11 @@ export const performFullCalculation = (
       (variant.overhead || 0);
 
     // Variant Unit Cost
-    const variantCostPerUnit = calculateCostPerUnit(variantTotalCost, variant.batchSize);
+    const variantCostPerUnit = calculateCostPerUnit(
+      variantTotalCost,
+      variant.batchSize,
+      variant.yieldPercentage
+    );
 
     // Variant Price Recommendation
     const variantRecPrice = calculateRecommendedPrice(
@@ -204,8 +239,13 @@ export const performFullCalculation = (
       variant.pricingConfig.value
     );
 
+    const variantRecPriceInclTax = variant.pricingConfig.includeTax && variant.pricingConfig.taxRate
+      ? calculatePriceWithTax(variantRecPrice, variant.pricingConfig.taxRate)
+      : variantRecPrice;
+
     const variantProfitPerUnit = round(variantRecPrice - variantCostPerUnit);
-    const variantProfitTotal = round(variantProfitPerUnit * variant.batchSize);
+    const sellableVariantUnits = variant.batchSize * (variant.yieldPercentage / 100);
+    const variantProfitTotal = round(variantProfitPerUnit * sellableVariantUnits);
     const variantMargin = calculateProfitMargin(variantCostPerUnit, variantRecPrice);
 
     let currentProfitPerUnit: number | undefined;
@@ -224,6 +264,9 @@ export const performFullCalculation = (
       totalCost: round(variantTotalCost),
       costPerUnit: variantCostPerUnit,
       recommendedPrice: variantRecPrice,
+      recommendedPriceInclTax: variantRecPriceInclTax,
+      includeTax: variant.pricingConfig.includeTax,
+      taxRate: variant.pricingConfig.taxRate,
       profitPerUnit: variantProfitPerUnit,
       profitMarginPercent: variantMargin,
       breakEvenPrice: variantCostPerUnit,
@@ -244,7 +287,8 @@ export const performFullCalculation = (
   const remainingBatch = input.batchSize - totalVariantBatchSize;
 
   if (remainingBatch > 0) {
-    const leftoverProfitTotal = round(baseProfitPerUnit * remainingBatch);
+    const sellableLeftovers = remainingBatch * (input.yieldPercentage / 100);
+    const leftoverProfitTotal = round(baseProfitPerUnit * sellableLeftovers);
     totalProfit += leftoverProfitTotal;
 
     let baseCurrentProfitPerUnit: number | undefined;
@@ -262,6 +306,9 @@ export const performFullCalculation = (
       totalCost: round(baseCostPerUnit * remainingBatch),
       costPerUnit: baseCostPerUnit,
       recommendedPrice: baseRecommendedPrice,
+      recommendedPriceInclTax: baseRecommendedPriceInclTax,
+      includeTax: config.includeTax,
+      taxRate: config.taxRate,
       profitPerUnit: baseProfitPerUnit,
       profitMarginPercent: baseProfitMarginPercent,
       breakEvenPrice: baseCostPerUnit,
@@ -283,6 +330,9 @@ export const performFullCalculation = (
     costPerUnit: baseCostPerUnit, // Base unit cost reference
     breakEvenPrice: baseCostPerUnit, // Base break even reference
     recommendedPrice: baseRecommendedPrice, // Base recommendation reference
+    recommendedPriceInclTax: baseRecommendedPriceInclTax,
+    includeTax: config.includeTax,
+    taxRate: config.taxRate,
     profitPerBatch: round(totalProfit), // Sum of all variant profits
     profitPerUnit: baseProfitPerUnit, // Base profit ref
     profitMarginPercent: baseProfitMarginPercent, // Base margin ref
@@ -293,6 +343,36 @@ export const performFullCalculation = (
     },
     variantResults,
   };
+};
+
+/**
+ * Calculates the markup percentage equivalent to a given profit margin percentage.
+ * Formula: Markup = Margin / (1 - Margin)
+ *
+ * @param marginPercent - The profit margin percentage (0-100)
+ * @returns The equivalent markup percentage, rounded to 2 decimals
+ */
+export const calculateEquivalentMarkup = (marginPercent: number): number => {
+  if (marginPercent < 0 || marginPercent >= 100) {
+    return 0;
+  }
+  const markup = (marginPercent / 100) / (1 - marginPercent / 100) * 100;
+  return round(markup);
+};
+
+/**
+ * Calculates the profit margin percentage equivalent to a given markup percentage.
+ * Formula: Margin = Markup / (1 + Markup)
+ *
+ * @param markupPercent - The markup percentage (>= 0)
+ * @returns The equivalent profit margin percentage, rounded to 2 decimals
+ */
+export const calculateEquivalentMargin = (markupPercent: number): number => {
+  if (markupPercent < 0) {
+    return 0;
+  }
+  const margin = (markupPercent / 100) / (1 + markupPercent / 100) * 100;
+  return round(margin);
 };
 
 /**

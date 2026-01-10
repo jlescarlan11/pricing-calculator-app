@@ -9,6 +9,7 @@ describe('PricingRecommendations', () => {
     costPerUnit: 10,
     breakEvenPrice: 10,
     recommendedPrice: 15,
+    recommendedPriceInclTax: 15,
     profitPerBatch: 50,
     profitPerUnit: 5,
     profitMarginPercent: 33.33,

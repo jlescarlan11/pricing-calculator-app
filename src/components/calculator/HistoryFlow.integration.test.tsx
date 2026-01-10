@@ -10,12 +10,14 @@ describe('HistoryFlow Integration', () => {
   const mockPresetId = 'preset-123';
   const mockCurrentResult: CalculationResult = {
     totalCost: 120, // Current total cost
+    costPerUnit: 12,
     recommendedPrice: 180,
+    recommendedPriceInclTax: 180,
     profitMarginPercent: 33.33,
     breakEvenPrice: 120,
     profitPerBatch: 60,
     profitPerUnit: 6,
-    costBreakdown: { ingredients: 100, labor: 10, overhead: 10 },
+    breakdown: { ingredients: 100, labor: 10, overhead: 10 },
   };
 
   const initialPreset: Preset = {

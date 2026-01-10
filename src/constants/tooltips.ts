@@ -1,6 +1,8 @@
 export const TOOLTIPS = {
   BATCH_SIZE:
     'The number of items you make at one time. For example, if you bake 24 cookies at once, your batch size is 24.',
+  YIELD_PERCENTAGE:
+    'The percentage of items from your batch that are sellable. A lower yield increases your effective cost per unit because costs are spread across fewer final products.',
   INGREDIENTS: 'Everything used to make your product. Include things like flour, sugar, and oil.',
   LABOR_COST: 'The money you pay yourself or your helpers for the time spent making the product.',
   OVERHEAD_COST:

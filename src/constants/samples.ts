@@ -89,9 +89,12 @@ export const COOKIE_SAMPLE: { input: CalculationInput; config: PricingConfig } =
     laborCost: 150, // 2 hours of work
     overhead: 50, // Electricity and packaging
     currentSellingPrice: 15,
+    yieldPercentage: 100,
   },
   config: {
     strategy: 'margin',
     value: 30, // 30% profit margin
+    taxRate: 12,
+    includeTax: false,
   },
 };

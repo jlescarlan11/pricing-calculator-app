@@ -5,7 +5,6 @@ import type {
   PricingConfig,
   DraftCompetitor,
   VariantRecommendation,
-  AIAnalysisResult,
 } from '../../types/calculator';
 import { PricingRecommendations } from './PricingRecommendations';
 import { CostBreakdown } from './CostBreakdown';
@@ -310,7 +309,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               <VariantResultsTable results={results} />
             )
           ) : (
-            <PricingRecommendations results={results} />
+            <PricingRecommendations results={results} config={config} />
           )}
         </div>
 
@@ -359,8 +358,11 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <PriceComparison
               currentPrice={input.currentSellingPrice}
               recommendedPrice={results.recommendedPrice}
+              recommendedPriceInclTax={results.recommendedPriceInclTax}
               costPerUnit={results.costPerUnit}
               batchSize={input.batchSize}
+              includeTax={config.includeTax}
+              taxRate={config.taxRate}
             />
           </div>
         )}

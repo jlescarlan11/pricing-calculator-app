@@ -58,7 +58,7 @@ export async function analyzeWithGemini(
   if (results.variantResults && results.variantResults.length > 0) {
     const variantsList = results.variantResults
       .map(
-        (v: any) =>
+        (v: VariantResult) =>
           `- ${v.name}: Cost ₱${v.costPerUnit.toFixed(2)}, Price ₱${v.recommendedPrice.toFixed(2)}, Margin ${v.profitMarginPercent.toFixed(1)}%`
       )
       .join('\n');

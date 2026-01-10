@@ -1,16 +1,22 @@
 import React from 'react';
 import { Input } from '../shared/Input';
 import { MESSAGES } from '../../constants/app';
+import { TOOLTIPS } from '../../constants/tooltips';
 
 interface ProductInfoProps {
   businessName?: string;
   productName: string;
   batchSize: number;
-  onChange: (field: 'productName' | 'batchSize' | 'businessName', value: string | number) => void;
+  yieldPercentage: number;
+  onChange: (
+    field: 'productName' | 'batchSize' | 'businessName' | 'yieldPercentage',
+    value: string | number
+  ) => void;
   errors?: {
     productName?: string;
     batchSize?: string;
     businessName?: string;
+    yieldPercentage?: string;
   };
 }
 
@@ -18,11 +24,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   businessName = '',
   productName,
   batchSize,
+  yieldPercentage,
   onChange,
   errors = {},
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-xl">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-xl">
       <Input
         label="Business Name (Optional)"
         value={businessName}
@@ -53,6 +60,22 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         helperText={MESSAGES.HELP_TEXT.BATCH_SIZE}
         required
         min={1}
+      />
+      {/* Yield / Wastage Input: Impacts effective unit cost by spreading total batch costs over sellable items */}
+      <Input
+        label="Yield %"
+        type="number"
+        value={yieldPercentage || ''}
+        onChange={(e) => {
+          const val = e.target.value;
+          onChange('yieldPercentage', val === '' ? 0 : Number(val));
+        }}
+        placeholder="100"
+        error={errors.yieldPercentage}
+        tooltip={TOOLTIPS.YIELD_PERCENTAGE}
+        suffix="%"
+        min={1}
+        max={100}
       />
     </div>
   );

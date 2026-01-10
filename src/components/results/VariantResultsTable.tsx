@@ -25,7 +25,9 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
             <tr>
               <th className="px-md py-sm font-medium">Variant</th>
               <th className="px-md py-sm font-medium text-right">Cost/Unit</th>
-              <th className="px-md py-sm font-medium text-right">Rec. Price</th>
+              <th className="px-md py-sm font-medium text-right">
+                Rec. Price
+              </th>
               <th className="px-md py-sm font-medium text-right">Target Margin</th>
               <th className="px-md py-sm font-medium text-right border-l border-border-subtle">
                 Current Price
@@ -37,6 +39,8 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
             {results.variantResults.map((variant) => {
               const hasCurrentPrice =
                 variant.currentSellingPrice !== undefined && variant.currentSellingPrice > 0;
+              const showTax = variant.includeTax && variant.taxRate;
+              const displayPrice = showTax ? variant.recommendedPriceInclTax : variant.recommendedPrice;
 
               return (
                 <tr key={variant.id} className="hover:bg-surface-hover transition-colors">
@@ -45,7 +49,14 @@ export const VariantResultsTable: React.FC<VariantResultsTableProps> = ({ result
                     {formatCurrency(variant.costPerUnit)}
                   </td>
                   <td className="px-md py-md text-right tabular-nums font-semibold text-ink-900">
-                    {formatCurrency(variant.recommendedPrice)}
+                    <div className="flex flex-col items-end">
+                      <span>{formatCurrency(displayPrice)}</span>
+                      {showTax && (
+                        <span className="text-[10px] text-ink-500 font-normal">
+                          Incl. {variant.taxRate}% tax
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td
                     className={`px-md py-md text-right tabular-nums font-semibold text-${getMarginColor(variant.profitMarginPercent)}`}

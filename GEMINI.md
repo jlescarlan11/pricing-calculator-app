@@ -246,6 +246,7 @@ A web-based pricing calculator designed for small food businesses in the Philipp
 - [x] **Sticky Summary Fix**: Added `ResizeObserver` to `StickySummary` to ensure it dynamically recalculates its position relative to the footer when page content expands (e.g., opening accordions), preventing it from floating incorrectly. (Added 2026-01-07)
 - [x] **End-to-End Integration Tests**: Implemented critical flow validations including History pinning (`HistoryFlow.integration.test.tsx`), Competitor limits (`CompetitorValidation.test.tsx`), and Analytics referential integrity (`SimpleGateCheck.test.ts`). (Added 2026-01-08)
 - [x] **Edge Case Audit**: Validated AI rate-limiting persistence/restoration, handled malformed storage data, and verified competitor positioning logic across all boundary conditions (0, 1, 2, 5 competitors). (Added 2026-01-08)
+- [x] **Yield-Aware Calculations**: Integrated yield percentage into the core calculation engine. Updated `calculateCostPerUnit` to reflect effective output loss and adjusted `profitPerBatch` to use sellable units. Added UI inputs for yield in `ProductInfo` and `VariantBlock` with accompanying tooltips. (Added 2026-01-10)
 
 ### Migration & Final Polish (Added 2026-01-05)
 

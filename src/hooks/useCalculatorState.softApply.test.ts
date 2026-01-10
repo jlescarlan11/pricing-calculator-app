@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCalculatorState } from './useCalculatorState';
 import { usePresets } from './use-presets';
+import type { Preset } from '../types/calculator';
 
 vi.mock('./use-presets');
 
@@ -20,7 +21,7 @@ describe('useCalculatorState Soft-Apply', () => {
       setIsSyncBlocked: vi.fn(),
       error: null,
       refresh: vi.fn(),
-    } as any);
+    } as ReturnType<typeof usePresets>);
   });
 
   it('should enter preview mode when applying strategy', () => {
@@ -112,7 +113,7 @@ describe('useCalculatorState Soft-Apply', () => {
       baseRecipe: { productName: 'Product', batchSize: 1, ingredients: [], laborCost: 0, overhead: 0 },
       pricingConfig: { strategy: 'markup', value: 40 },
       updatedAt: new Date().toISOString(),
-    } as any;
+    } as Preset;
 
     act(() => {
       result.current.loadPreset(mockPreset);

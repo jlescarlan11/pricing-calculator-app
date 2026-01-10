@@ -10,6 +10,7 @@ const mockCurrentResult: CalculationResult = {
   costPerUnit: 10,
   breakEvenPrice: 10,
   recommendedPrice: 20,
+  recommendedPriceInclTax: 20,
   profitPerBatch: 100,
   profitPerUnit: 10,
   profitMarginPercent: 50,

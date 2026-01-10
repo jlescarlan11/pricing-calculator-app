@@ -38,26 +38,37 @@ const initialInput: CalculationInput = {
   overhead: 0,
   hasVariants: false,
   variants: [],
+  yieldPercentage: 100,
 };
 
-const initialConfig: PricingConfig = {
+const DEFAULT_CONFIG: PricingConfig = {
   strategy: 'markup',
   value: 50,
+  taxRate: 12,
+  includeTax: false,
 };
 
 /**
  * Safely merges partial or corrupted input with default values.
  */
 const sanitizeInput = (input: Partial<CalculationInput>): CalculationInput => {
+  const sanitizedVariants = Array.isArray(input.variants)
+    ? input.variants.map((v) => ({
+        ...v,
+        yieldPercentage: typeof v.yieldPercentage === 'number' ? v.yieldPercentage : 100,
+      }))
+    : initialInput.variants;
+
   return {
     ...initialInput,
     ...input,
     productName: input.productName || initialInput.productName,
     ingredients: Array.isArray(input.ingredients) ? input.ingredients : initialInput.ingredients,
-    variants: Array.isArray(input.variants) ? input.variants : initialInput.variants,
+    variants: sanitizedVariants,
     batchSize: typeof input.batchSize === 'number' ? input.batchSize : initialInput.batchSize,
     laborCost: typeof input.laborCost === 'number' ? input.laborCost : initialInput.laborCost,
     overhead: typeof input.overhead === 'number' ? input.overhead : initialInput.overhead,
+    yieldPercentage: typeof input.yieldPercentage === 'number' ? input.yieldPercentage : initialInput.yieldPercentage,
   };
 };
 
@@ -137,7 +148,7 @@ export function useCalculatorState(initialValues?: {
     variantOverrides?: Record<string, number>;
   }>(SESSION_STORAGE_KEY, {
     input: initialValues?.input || initialInput,
-    config: initialValues?.config || initialConfig,
+    config: initialValues?.config || DEFAULT_CONFIG,
     competitors: [],
     isPreviewMode: false,
     originalConfig: null,
@@ -359,6 +370,7 @@ export function useCalculatorState(initialValues?: {
         laborCost: 0,
         overhead: 0,
         pricingConfig: { ...config },
+        yieldPercentage: 100,
       };
 
       return {
@@ -547,7 +559,7 @@ export function useCalculatorState(initialValues?: {
 
   const reset = useCallback(() => {
     setInput(initialInput);
-    setConfig(initialConfig);
+    setConfig(DEFAULT_CONFIG);
     setCompetitors([]);
     setResults(null);
     setCurrentPresetId(null);

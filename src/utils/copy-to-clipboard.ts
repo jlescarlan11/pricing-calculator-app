@@ -14,27 +14,41 @@ export const formatCalculationSummary = (
   result: CalculationResult
 ): string => {
   const { productName, batchSize, businessName } = input;
-  const { costPerUnit, recommendedPrice, profitPerUnit, profitMarginPercent, profitPerBatch } =
-    result;
+  const {
+    costPerUnit,
+    recommendedPrice,
+    recommendedPriceInclTax,
+    includeTax,
+    taxRate,
+    profitPerUnit,
+    profitMarginPercent,
+    profitPerBatch,
+  } = result;
 
   const nameLabel = productName || 'Unnamed Product';
   const header = businessName
     ? `${businessName}\nPRICING SUMMARY: ${nameLabel}`
     : `PRICING SUMMARY: ${nameLabel}`;
 
-  return [
+  const lines = [
     header,
     '----------------------------------------',
     `Batch Size: ${batchSize} unit${batchSize === 1 ? '' : 's'}`,
     `Cost per Unit: ${formatCurrency(costPerUnit)}`,
     `Recommended Price: ${formatCurrency(recommendedPrice)}`,
-    `Profit per Unit: ${formatCurrency(profitPerUnit)} (${formatPercent(profitMarginPercent)})`,
-    `Total Batch Profit: ${formatCurrency(profitPerBatch)}`,
-    '----------------------------------------',
-    `Generated on ${getPrintDate()}`,
-  ]
-    .join('\n')
-    .trim();
+  ];
+
+  if (includeTax && taxRate) {
+    lines.push(`Tax Rate: ${taxRate}%`);
+    lines.push(`Price (Incl. Tax): ${formatCurrency(recommendedPriceInclTax)}`);
+  }
+
+  lines.push(`Profit per Unit: ${formatCurrency(profitPerUnit)} (${formatPercent(profitMarginPercent)})`);
+  lines.push(`Total Batch Profit: ${formatCurrency(profitPerBatch)}`);
+  lines.push('----------------------------------------');
+  lines.push(`Generated on ${getPrintDate()}`);
+
+  return lines.join('\n').trim();
 };
 
 /**

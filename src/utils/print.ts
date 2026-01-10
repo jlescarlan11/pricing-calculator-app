@@ -40,9 +40,12 @@ export const preparePrintSummary = (
     date: getPrintDate(),
     strategy: config.strategy === 'markup' ? 'Markup' : 'Profit Margin',
     strategyValue: `${config.value}%`,
+    includeTax: config.includeTax,
+    taxRate: config.taxRate,
     batchSize: input.batchSize,
     costPerUnit: results.costPerUnit,
     recommendedPrice: results.recommendedPrice,
+    recommendedPriceInclTax: results.recommendedPriceInclTax,
     profitPerUnit: results.profitPerUnit,
     margin: results.profitMarginPercent,
   };
