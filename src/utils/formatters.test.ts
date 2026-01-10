@@ -114,10 +114,10 @@ describe('formatters', () => {
       expect(getMarginColor(-5)).toBe('rust');
     });
 
-    it('should return clay for margin between 15 and 25', () => {
-      expect(getMarginColor(15)).toBe('clay');
-      expect(getMarginColor(20)).toBe('clay');
-      expect(getMarginColor(25)).toBe('clay');
+    it('should return sakura for margin between 15 and 25', () => {
+      expect(getMarginColor(15)).toBe('sakura');
+      expect(getMarginColor(20)).toBe('sakura');
+      expect(getMarginColor(25)).toBe('sakura');
     });
 
     it('should return moss for margin > 25', () => {

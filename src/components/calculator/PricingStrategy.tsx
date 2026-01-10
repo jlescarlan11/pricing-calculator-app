@@ -4,21 +4,27 @@ import { Card } from '../shared/Card';
 import { Input } from '../shared/Input';
 import { Switch } from '../shared/Switch';
 import { PricingExplainerModal } from '../help';
-import { formatCurrency } from '../../utils/formatters';
+import { formatCurrency, getMarginColor } from '../../utils/formatters';
 import {
   calculateRecommendedPrice,
   calculateEquivalentMargin,
   calculateEquivalentMarkup,
+  calculateProfitFromPercentage,
+  calculateMarginFromProfit,
+  calculateMarkupFromProfit,
+  getMarginFromStrategyValue,
 } from '../../utils/calculations';
 import type { PricingStrategy as StrategyType } from '../../types/calculator';
 
 interface PricingStrategyProps {
   strategy: StrategyType;
   value: number;
+  inputMode?: 'percentage' | 'profit';
   costPerUnit: number;
   includeTax?: boolean;
   taxRate?: number;
   onChange: (strategy: StrategyType, value: number) => void;
+  onInputModeChange?: (mode: 'percentage' | 'profit') => void;
   onTaxChange?: (includeTax: boolean, taxRate: number) => void;
   embedded?: boolean;
 }
@@ -26,10 +32,12 @@ interface PricingStrategyProps {
 export const PricingStrategy: React.FC<PricingStrategyProps> = ({
   strategy,
   value,
+  inputMode = 'percentage',
   costPerUnit,
   includeTax = false,
   taxRate = 12,
   onChange,
+  onInputModeChange,
   onTaxChange,
   embedded = false,
 }) => {
@@ -54,6 +62,17 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
     onChange(strategy, validatedValue);
   };
 
+  const handleProfitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const targetProfit = parseFloat(e.target.value) || 0;
+    let newPercentage: number;
+    if (strategy === 'margin') {
+      newPercentage = calculateMarginFromProfit(costPerUnit, targetProfit);
+    } else {
+      newPercentage = calculateMarkupFromProfit(costPerUnit, targetProfit);
+    }
+    onChange(strategy, newPercentage);
+  };
+
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(strategy, parseFloat(e.target.value));
   };
@@ -72,39 +91,90 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
     ? recommendedPrice * (1 + taxRate / 100)
     : recommendedPrice;
   const profit = recommendedPrice - costPerUnit;
+  const currentMargin = getMarginFromStrategyValue(strategy, value);
+  const healthColor = getMarginColor(currentMargin);
 
-  // Static example to help visualize
-  const exampleCost = 100;
-  const examplePrice = calculateRecommendedPrice(exampleCost, strategy, value);
+  // Health Zone Slider Gradient Calculation
+  const maxSliderValue = strategy === 'margin' ? 95 : 300;
+  let stop1: number;
+  let stop2: number;
+
+  if (strategy === 'margin') {
+    stop1 = (15 / maxSliderValue) * 100;
+    stop2 = (25 / maxSliderValue) * 100;
+  } else {
+    // For markup: 15% margin = 17.65% markup, 25% margin = 33.33% markup
+    stop1 = (calculateEquivalentMarkup(15) / maxSliderValue) * 100;
+    stop2 = (calculateEquivalentMarkup(25) / maxSliderValue) * 100;
+  }
+
+  const sliderBackground = `linear-gradient(to right, 
+    #B85C38 0%, #B85C38 ${stop1}%, 
+    #E8C5C0 ${stop1}%, #E8C5C0 ${stop2}%, 
+    #7A8B73 ${stop2}%, #7A8B73 100%)`;
+
+  // Real-money visualization
+  const hasValidCost = costPerUnit > 0;
+  const displayCost = hasValidCost ? costPerUnit : 100;
+  const examplePrice = calculateRecommendedPrice(displayCost, strategy, value);
   const examplePriceInclTax = includeTax ? examplePrice * (1 + taxRate / 100) : examplePrice;
-  const exampleProfit = examplePrice - exampleCost;
+  const exampleProfit = examplePrice - displayCost;
+  const exampleMargin = getMarginFromStrategyValue(strategy, value);
+  const exampleHealthColor = getMarginColor(exampleMargin);
 
   const content = (
     <div className="space-y-xl">
-      {/* Strategy Selection - Tabs style */}
-      <div className="flex p-xs bg-surface rounded-md border border-border-subtle">
-        <button
-          type="button"
-          onClick={() => handleStrategyChange('markup')}
-          className={`flex-1 py-sm text-sm font-medium rounded-md transition-all cursor-pointer ${
-            strategy === 'markup'
-              ? 'bg-clay text-white shadow-level-1'
-              : 'text-ink-500 hover:text-ink-900'
-          }`}
-        >
-          Markup
-        </button>
-        <button
-          type="button"
-          onClick={() => handleStrategyChange('margin')}
-          className={`flex-1 py-sm text-sm font-medium rounded-md transition-all cursor-pointer ${
-            strategy === 'margin'
-              ? 'bg-clay text-white shadow-level-1'
-              : 'text-ink-500 hover:text-ink-900'
-          }`}
-        >
-          Margin
-        </button>
+      {/* Strategy and Mode Selection */}
+      <div className="space-y-sm">
+        <div className="flex p-xs bg-surface rounded-md border border-border-subtle">
+          <button
+            type="button"
+            onClick={() => handleStrategyChange('markup')}
+            className={`flex-1 py-sm text-sm font-medium rounded-md transition-all cursor-pointer ${
+              strategy === 'markup'
+                ? 'bg-clay text-white shadow-level-1'
+                : 'text-ink-500 hover:text-ink-900'
+            }`}
+          >
+            Markup
+          </button>
+          <button
+            type="button"
+            onClick={() => handleStrategyChange('margin')}
+            className={`flex-1 py-sm text-sm font-medium rounded-md transition-all cursor-pointer ${
+              strategy === 'margin'
+                ? 'bg-clay text-white shadow-level-1'
+                : 'text-ink-500 hover:text-ink-900'
+            }`}
+          >
+            Margin
+          </button>
+        </div>
+
+        <div className="flex p-xs bg-surface-hover/50 rounded-md border border-border-subtle">
+          <button
+            type="button"
+            onClick={() => onInputModeChange?.('percentage')}
+            className={`flex-1 py-1.5 text-xs font-medium rounded transition-all cursor-pointer ${
+              inputMode === 'percentage'
+                ? 'bg-white text-ink-900 shadow-sm'
+                : 'text-ink-500 hover:text-ink-900'
+            }`}
+          >
+            Percentage
+          </button>
+          <button
+            type="button"
+            onClick={() => onInputModeChange?.('profit')}
+            className={`flex-1 py-1.5 text-xs font-medium rounded transition-all cursor-pointer ${
+              inputMode === 'profit'
+                ? 'bg-white text-ink-900 shadow-sm'
+                : 'text-ink-500 hover:text-ink-900'
+            }`}
+          >
+            Profit Goal
+          </button>
+        </div>
       </div>
 
       {/* Visual Explanation */}
@@ -116,10 +186,11 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
                 Add <span className="text-clay font-bold">{value}%</span> of the cost to your price.
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
-                If your cost is {formatCurrency(exampleCost)}, adding {value}% markup results in a
-                price of {formatCurrency(examplePrice)}
-                {includeTax && ` (${formatCurrency(examplePriceInclTax)} incl. tax)`}(
-                <span className="text-moss font-semibold">
+                {hasValidCost ? 'With your cost of' : 'Example: If your cost is'}{' '}
+                {formatCurrency(displayCost)}, adding {value}% markup results in a price of{' '}
+                {formatCurrency(examplePrice)}
+                {includeTax && ` (${formatCurrency(examplePriceInclTax)} incl. tax)`} (
+                <span className={`font-semibold text-${exampleHealthColor}`}>
                   {formatCurrency(exampleProfit)} profit
                 </span>
                 ).
@@ -132,10 +203,11 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
                 profit.
               </p>
               <p className="text-xs text-ink-500 leading-relaxed">
-                To earn a {value}% margin on a {formatCurrency(exampleCost)} cost, your price should
-                be {formatCurrency(examplePrice)}
-                {includeTax && ` (${formatCurrency(examplePriceInclTax)} incl. tax)`}(
-                <span className="text-moss font-semibold">
+                {hasValidCost ? 'With your cost of' : 'Example: If your cost is'}{' '}
+                {formatCurrency(displayCost)}, to earn a {value}% margin your price should be{' '}
+                {formatCurrency(examplePrice)}
+                {includeTax && ` (${formatCurrency(examplePriceInclTax)} incl. tax)`} (
+                <span className={`font-semibold text-${exampleHealthColor}`}>
                   {formatCurrency(exampleProfit)} profit
                 </span>
                 ).
@@ -147,30 +219,45 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
 
       {/* Value Inputs */}
       <div className="space-y-lg">
-        <Input
-          label={`${strategy === 'markup' ? 'Markup' : 'Margin'} Percentage`}
-          type="number"
-          value={value}
-          onChange={handleValueChange}
-          suffix="%"
-          min={0}
-          max={strategy === 'margin' ? 99.9 : undefined}
-          step="0.1"
-        />
+        {inputMode === 'percentage' ? (
+          <Input
+            label={`${strategy === 'markup' ? 'Markup' : 'Margin'} Percentage`}
+            type="number"
+            value={value}
+            onChange={handleValueChange}
+            suffix="%"
+            min={0}
+            max={strategy === 'margin' ? 99.9 : undefined}
+            step="0.1"
+            className={`text-${healthColor} font-bold`}
+          />
+        ) : (
+          <Input
+            label="Target Profit (per unit)"
+            type="number"
+            value={calculateProfitFromPercentage(costPerUnit, strategy, value)}
+            onChange={handleProfitChange}
+            prefix="₱"
+            min={0}
+            step="0.01"
+            className={`text-${healthColor} font-bold`}
+          />
+        )}
 
         <div className="space-y-sm px-xs">
           <input
             type="range"
             min="0"
-            max={strategy === 'margin' ? '95' : '300'}
+            max={maxSliderValue}
             step="1"
             value={value}
             onChange={handleSliderChange}
-            className="w-full h-1.5 bg-border-subtle rounded-xs appearance-none cursor-pointer accent-clay"
+            className="w-full h-1.5 rounded-xs appearance-none cursor-pointer accent-clay"
+            style={{ background: sliderBackground }}
           />
           <div className="flex justify-between text-[10px] text-ink-500 font-bold uppercase tracking-widest">
             <span>0%</span>
-            <span>{strategy === 'margin' ? '95%' : '300%'}</span>
+            <span>{maxSliderValue}%</span>
           </div>
         </div>
       </div>
@@ -209,7 +296,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
               <p className="text-[10px] text-ink-500 uppercase tracking-widest font-bold mb-xs">
                 Recommended Price {includeTax && '(Incl. Tax)'}
               </p>
-              <p className="text-3xl font-bold text-ink-900 tracking-tight">
+              <p className={`text-3xl font-bold tracking-tight text-${healthColor}`}>
                 {formatCurrency(includeTax ? recommendedPriceInclTax : recommendedPrice)}
               </p>
               {includeTax && (
@@ -220,7 +307,7 @@ export const PricingStrategy: React.FC<PricingStrategyProps> = ({
             </div>
             <div className="text-right">
               <p className="text-xs text-ink-500 font-medium mb-xs">Profit per Unit</p>
-              <p className="text-lg font-bold text-moss">+{formatCurrency(profit)}</p>
+              <p className={`text-lg font-bold text-${healthColor}`}>+{formatCurrency(profit)}</p>
             </div>
           </div>
         </div>

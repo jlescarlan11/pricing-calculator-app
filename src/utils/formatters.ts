@@ -129,7 +129,7 @@ export const formatTimeAgo = (date: Date | number | string): string => {
  *
  * Thresholds:
  * - Below 15%: 'rust' (Red)
- * - 15% to 25%: 'clay' (Orange)
+ * - 15% to 25%: 'sakura' (Soft Pink/Warning)
  * - Above 25%: 'moss' (Green)
  *
  * @param margin - The profit margin percentage.
@@ -137,6 +137,6 @@ export const formatTimeAgo = (date: Date | number | string): string => {
  */
 export const getMarginColor = (margin: number): string => {
   if (margin < 15) return 'rust';
-  if (margin <= 25) return 'clay';
+  if (margin <= 25) return 'sakura';
   return 'moss';
 };

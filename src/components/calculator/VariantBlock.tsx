@@ -179,11 +179,15 @@ export const VariantBlock: React.FC<VariantBlockProps> = ({
         <PricingStrategy
           strategy={variant.pricingConfig.strategy}
           value={variant.pricingConfig.value}
+          inputMode={variant.pricingConfig.inputMode}
           includeTax={variant.pricingConfig.includeTax}
           taxRate={variant.pricingConfig.taxRate}
           costPerUnit={costPerUnit}
           onChange={(strategy, value) =>
             onUpdate(variant.id, { pricingConfig: { ...variant.pricingConfig, strategy, value } })
+          }
+          onInputModeChange={(inputMode) =>
+            onUpdate(variant.id, { pricingConfig: { ...variant.pricingConfig, inputMode } })
           }
           onTaxChange={(includeTax, taxRate) =>
             onUpdate(variant.id, { pricingConfig: { ...variant.pricingConfig, includeTax, taxRate } })

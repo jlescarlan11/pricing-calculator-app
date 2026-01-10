@@ -113,19 +113,36 @@ describe('PricingStrategy', () => {
 
   it('calculates real-time example correctly', () => {
     render(
-      <PricingStrategy strategy="markup" value={10} costPerUnit={100} onChange={mockOnChange} />
+      <PricingStrategy strategy="markup" value={50} costPerUnit={100} onChange={mockOnChange} />
     );
 
-    // Recommended Price: 100 + 10% = 110
+    // Recommended Price: 100 + 50% = 150
     const priceDisplay = screen
       .getByText(/Recommended Price/i)
       .parentElement?.querySelector('.text-3xl');
-    expect(priceDisplay).toHaveTextContent('₱110.00');
+    expect(priceDisplay).toHaveTextContent('₱150.00');
 
-    // Profit per unit: 10
+    // Profit per unit: 50
+    // Margin for 50% markup is 33.33%, which is > 25% (moss)
     const profitDisplay = screen
       .getByText(/Profit per Unit/i)
       .parentElement?.querySelector('.text-moss');
-    expect(profitDisplay).toHaveTextContent('+₱10.00');
+    expect(profitDisplay).toHaveTextContent('+₱50.00');
+  });
+
+  it('updates visual explanation text dynamically when cost is provided', () => {
+    const { rerender } = render(
+      <PricingStrategy strategy="markup" value={25} costPerUnit={0} onChange={mockOnChange} />
+    );
+
+    // Initial state: no cost provided (uses fallback example)
+    expect(screen.getByText(/Example: If your cost is ₱100.00/i)).toBeInTheDocument();
+
+    // Rerender with valid cost
+    rerender(
+      <PricingStrategy strategy="markup" value={25} costPerUnit={200} onChange={mockOnChange} />
+    );
+
+    expect(screen.getByText(/With your cost of ₱200.00/i)).toBeInTheDocument();
   });
 });

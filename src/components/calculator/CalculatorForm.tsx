@@ -141,6 +141,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
     onUpdateConfig({ strategy, value });
   };
 
+  const handleInputModeChange = (inputMode: PricingConfig['inputMode']) => {
+    onUpdateConfig({ inputMode });
+  };
+
   const handleTaxChange = (includeTax: boolean, taxRate: number) => {
     onUpdateConfig({ includeTax, taxRate });
   };
@@ -391,10 +395,12 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             <PricingStrategy
               strategy={config.strategy}
               value={config.value}
+              inputMode={config.inputMode}
               includeTax={config.includeTax}
               taxRate={config.taxRate}
               costPerUnit={calculationResult?.costPerUnit || 0}
               onChange={handlePricingChange}
+              onInputModeChange={handleInputModeChange}
               onTaxChange={handleTaxChange}
             />
 

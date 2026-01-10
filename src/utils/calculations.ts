@@ -376,6 +376,93 @@ export const calculateEquivalentMargin = (markupPercent: number): number => {
 };
 
 /**
+ * Converts a strategy value (either markup or margin) to a margin percentage.
+ *
+ * @param strategy - The pricing strategy ('markup' or 'margin')
+ * @param value - The percentage value for the strategy
+ * @returns The margin percentage
+ */
+export const getMarginFromStrategyValue = (strategy: PricingStrategy, value: number): number => {
+  if (strategy === 'margin') return value;
+  return calculateEquivalentMargin(value);
+};
+
+/**
+ * Returns the hex color code associated with a profit margin percentage.
+ *
+ * Thresholds:
+ * - Below 15%: Rust (#B85C38)
+ * - 15% to 25%: Sakura (#E8C5C0)
+ * - Above 25%: Moss (#7A8B73)
+ *
+ * @param margin - The profit margin percentage
+ * @returns The hex color string
+ */
+export const getHealthColor = (margin: number): string => {
+  if (margin < 15) return '#B85C38'; // Rust
+  if (margin <= 25) return '#E8C5C0'; // Sakura
+  return '#7A8B73'; // Moss
+};
+
+/**
+ * Calculates the profit margin percentage derived from a target profit.
+ * Formula: Margin = (Target Profit / (Cost + Target Profit)) * 100
+ *
+ * @param cost - The cost to produce the unit(s)
+ * @param targetProfit - The desired profit amount
+ * @returns Profit margin percentage, rounded to 2 decimals
+ */
+export const calculateMarginFromProfit = (cost: number, targetProfit: number): number => {
+  const denominator = cost + targetProfit;
+  if (denominator <= 0 || targetProfit < 0 || cost < 0) {
+    return 0;
+  }
+  const margin = (targetProfit / denominator) * 100;
+  return round(margin);
+};
+
+/**
+ * Calculates the markup percentage derived from a target profit.
+ * Formula: Markup = (Target Profit / Cost) * 100
+ *
+ * @param cost - The cost to produce the unit(s)
+ * @param targetProfit - The desired profit amount
+ * @returns Markup percentage, rounded to 2 decimals
+ */
+export const calculateMarkupFromProfit = (cost: number, targetProfit: number): number => {
+  if (cost <= 0 || targetProfit < 0) {
+    return 0;
+  }
+  const markup = (targetProfit / cost) * 100;
+  return round(markup);
+};
+
+/**
+ * Calculates the profit amount derived from a given percentage and strategy.
+ *
+ * @param cost - The cost to produce the unit(s)
+ * @param strategy - The pricing strategy ('markup' or 'margin')
+ * @param value - The percentage value for the strategy
+ * @returns Profit amount, rounded to 2 decimals
+ */
+export const calculateProfitFromPercentage = (
+  cost: number,
+  strategy: PricingStrategy,
+  value: number
+): number => {
+  if (cost < 0 || value < 0) {
+    return 0;
+  }
+  const recommendedPrice = calculateRecommendedPrice(cost, strategy, value);
+  // If margin is 100% or more, recommendedPrice is 0 which would lead to negative profit calculation
+  if (recommendedPrice === 0 && value > 0 && strategy === 'margin' && value >= 100) {
+    return 0;
+  }
+  const profit = recommendedPrice - cost;
+  return round(profit);
+};
+
+/**
  * Market positioning types and calculation.
  */
 export type MarketPosition = 'budget' | 'mid' | 'premium';

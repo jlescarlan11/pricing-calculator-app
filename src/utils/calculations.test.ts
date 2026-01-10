@@ -12,6 +12,9 @@ import {
   calculateIngredientCostFromPurchase,
   calculateEquivalentMarkup,
   calculateEquivalentMargin,
+  calculateMarginFromProfit,
+  calculateMarkupFromProfit,
+  calculateProfitFromPercentage,
 } from './calculations';
 import type { Ingredient } from '../types/calculator';
 
@@ -52,6 +55,85 @@ describe('Calculation Utils', () => {
       // 33.33% markup -> 24.998...% margin -> 25.0%
       // 1 / 3 markup -> 25% margin
       expect(calculateEquivalentMargin(33.333333)).toBe(25);
+    });
+  });
+
+  describe('calculateMarginFromProfit', () => {
+    it('calculates margin correctly for standard inputs', () => {
+      // Cost 75, Profit 25 -> Price 100 -> Margin = 25 / 100 = 25%
+      expect(calculateMarginFromProfit(75, 25)).toBe(25);
+      // Cost 50, Profit 50 -> Price 100 -> Margin = 50 / 100 = 50%
+      expect(calculateMarginFromProfit(50, 50)).toBe(50);
+    });
+
+    it('returns 0 for zero or negative denominators', () => {
+      expect(calculateMarginFromProfit(0, 0)).toBe(0);
+      expect(calculateMarginFromProfit(-10, 5)).toBe(0);
+      expect(calculateMarginFromProfit(5, -10)).toBe(0);
+    });
+
+    it('handles large costs and profits', () => {
+      expect(calculateMarginFromProfit(1000000, 1000000)).toBe(50);
+    });
+
+    it('rounds to 2 decimal places', () => {
+      // Cost 10, Profit 5 -> Price 15 -> Margin = 5 / 15 = 33.333...%
+      expect(calculateMarginFromProfit(10, 5)).toBe(33.33);
+    });
+  });
+
+  describe('calculateMarkupFromProfit', () => {
+    it('calculates markup correctly for standard inputs', () => {
+      // Cost 100, Profit 50 -> Markup = 50 / 100 = 50%
+      expect(calculateMarkupFromProfit(100, 50)).toBe(50);
+      // Cost 50, Profit 50 -> Markup = 50 / 50 = 100%
+      expect(calculateMarkupFromProfit(50, 50)).toBe(100);
+    });
+
+    it('returns 0 for zero or negative cost', () => {
+      expect(calculateMarkupFromProfit(0, 50)).toBe(0);
+      expect(calculateMarkupFromProfit(-10, 50)).toBe(0);
+    });
+
+    it('returns 0 for negative profit', () => {
+      expect(calculateMarkupFromProfit(100, -10)).toBe(0);
+    });
+
+    it('rounds to 2 decimal places', () => {
+      // Cost 3, Profit 1 -> Markup = 1 / 3 = 33.333...%
+      expect(calculateMarkupFromProfit(3, 1)).toBe(33.33);
+    });
+  });
+
+  describe('calculateProfitFromPercentage', () => {
+    it('calculates profit correctly for markup strategy', () => {
+      // Cost 100, Markup 50% -> Price 150 -> Profit 50
+      expect(calculateProfitFromPercentage(100, 'markup', 50)).toBe(50);
+    });
+
+    it('calculates profit correctly for margin strategy', () => {
+      // Cost 75, Margin 25% -> Price 100 -> Profit 25
+      expect(calculateProfitFromPercentage(75, 'margin', 25)).toBe(25);
+    });
+
+    it('returns 0 for negative cost or percentage', () => {
+      expect(calculateProfitFromPercentage(-100, 'markup', 50)).toBe(0);
+      expect(calculateProfitFromPercentage(100, 'markup', -50)).toBe(0);
+    });
+
+    it('returns 0 if margin is 100% or more', () => {
+      expect(calculateProfitFromPercentage(100, 'margin', 100)).toBe(0);
+      expect(calculateProfitFromPercentage(100, 'margin', 150)).toBe(0);
+    });
+
+    it('returns 0 if value is 0', () => {
+      expect(calculateProfitFromPercentage(100, 'markup', 0)).toBe(0);
+      expect(calculateProfitFromPercentage(100, 'margin', 0)).toBe(0);
+    });
+
+    it('rounds to 2 decimal places', () => {
+      // Cost 10, Markup 33.33% -> Price 13.333 -> Round 13.33 -> Profit 3.33
+      expect(calculateProfitFromPercentage(10, 'markup', 33.33)).toBe(3.33);
     });
   });
 

@@ -44,6 +44,7 @@ const initialInput: CalculationInput = {
 const DEFAULT_CONFIG: PricingConfig = {
   strategy: 'markup',
   value: 50,
+  inputMode: 'percentage',
   taxRate: 12,
   includeTax: false,
 };
@@ -127,6 +128,14 @@ export interface CalculatorState {
   createSnapshot: (presetId: string) => Promise<Preset | null>;
 }
 
+const sanitizeConfig = (config: Partial<PricingConfig>): PricingConfig => {
+  return {
+    ...DEFAULT_CONFIG,
+    ...config,
+    inputMode: config.inputMode || DEFAULT_CONFIG.inputMode,
+  };
+};
+
 /**
  * Global calculator state hook.
  * Centralizes management of form state, calculation results, and presets.
@@ -159,7 +168,9 @@ export function useCalculatorState(initialValues?: {
   const [input, setInput] = useState<CalculationInput>(
     sanitizeInput(initialValues?.input || draft.input)
   );
-  const [config, setConfig] = useState<PricingConfig>(initialValues?.config || draft.config);
+  const [config, setConfig] = useState<PricingConfig>(
+    sanitizeConfig(initialValues?.config || draft.config)
+  );
   const [competitors, setCompetitors] = useState<DraftCompetitor[]>(draft.competitors || []);
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [currentPresetId, setCurrentPresetId] = useState<string | null>(null);
@@ -255,10 +266,11 @@ export function useCalculatorState(initialValues?: {
         setOriginalVariants(input.variants ? [...input.variants] : null);
       }
 
-      setConfig({
+      setConfig((prev) => ({
+        ...prev,
         strategy: 'margin',
         value: margin,
-      });
+      }));
 
       if (variantMargins && Object.keys(variantMargins).length > 0) {
         setInput(prev => ({
@@ -268,6 +280,7 @@ export function useCalculatorState(initialValues?: {
               return {
                 ...v,
                 pricingConfig: {
+                  ...v.pricingConfig,
                   strategy: 'margin',
                   value: variantMargins[v.id]
                 }
@@ -591,7 +604,7 @@ export function useCalculatorState(initialValues?: {
     });
 
     setInput(sanitizedInput);
-    setConfig(preset.pricingConfig);
+    setConfig(sanitizeConfig(preset.pricingConfig));
     setCurrentPresetId(preset.id);
     setIsPreviewMode(false);
     setOriginalConfig(null);

@@ -42,6 +42,7 @@ export type PricingStrategy = 'markup' | 'margin';
 export interface PricingConfig {
   strategy: PricingStrategy;
   value: number;
+  inputMode: 'percentage' | 'profit';
   taxRate?: number;
   includeTax?: boolean;
 }
