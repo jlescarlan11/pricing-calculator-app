@@ -151,4 +151,52 @@ describe('AnalyzePriceCard', () => {
       expect(screen.getByText(/Based on internal cost efficiency/i)).toBeInTheDocument();
     });
   });
+
+  describe('Manual Margin Adjustment', () => {
+    it('calls onSuggestedMarginChange when increment/decrement buttons are clicked', () => {
+      const onSuggestedMarginChange = vi.fn();
+      render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          suggestedMarginValue={25}
+          onSuggestedMarginChange={onSuggestedMarginChange}
+        />
+      );
+
+      const decreaseBtn = screen.getByRole('button', { name: /decrease margin/i });
+      const increaseBtn = screen.getByRole('button', { name: /increase margin/i });
+
+      fireEvent.click(decreaseBtn);
+      expect(onSuggestedMarginChange).toHaveBeenCalledWith(24);
+
+      fireEvent.click(increaseBtn);
+      expect(onSuggestedMarginChange).toHaveBeenCalledWith(26);
+    });
+
+    it('respects the 0-100% boundary for manual adjustments', () => {
+      const onSuggestedMarginChange = vi.fn();
+      
+      // Test lower boundary
+      const { rerender } = render(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          suggestedMarginValue={0}
+          onSuggestedMarginChange={onSuggestedMarginChange}
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: /decrease margin/i }));
+      expect(onSuggestedMarginChange).toHaveBeenCalledWith(0);
+
+      // Test upper boundary
+      rerender(
+        <AnalyzePriceCard
+          isAnalyzed={true}
+          suggestedMarginValue={100}
+          onSuggestedMarginChange={onSuggestedMarginChange}
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: /increase margin/i }));
+      expect(onSuggestedMarginChange).toHaveBeenCalledWith(100);
+    });
+  });
 });

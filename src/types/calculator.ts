@@ -51,6 +51,7 @@ export interface VariantResult {
   profitPerUnit: number;
   profitMarginPercent: number;
   breakEvenPrice: number;
+  batchSize: number;
   currentSellingPrice?: number;
   currentProfitPerUnit?: number;
   currentProfitMargin?: number;
@@ -101,6 +102,17 @@ export type DraftCompetitor = Omit<Competitor, 'id' | 'presetId' | 'createdAt' |
   createdAt?: string;
   updatedAt?: string;
 };
+
+export interface VariantRecommendation {
+  variantId: string;
+  suggestedMarginValue: number;
+}
+
+export interface AIAnalysisResult {
+  recommendations: string[];
+  suggestedMarginValue: number;
+  variantRecommendations?: VariantRecommendation[];
+}
 
 interface PresetBase {
   id: string;

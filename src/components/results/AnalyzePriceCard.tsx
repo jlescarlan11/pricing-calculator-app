@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '../shared/Card';
 import { Button } from '../shared/Button';
 import { Badge } from '../shared/Badge';
-import { Sparkles, AlertTriangle, Info, Check } from 'lucide-react';
+import { Sparkles, AlertTriangle, Info, Check, TrendingUp, Minus, Plus } from 'lucide-react';
 import { checkRateLimit } from '../../utils/analysisRateLimit';
 import { formatDate } from '../../utils/formatters';
 
@@ -14,11 +14,13 @@ export interface MarketDataContext {
 
 interface AnalyzePriceCardProps {
   onAnalyze?: () => void;
-  onApplyStrategy?: (margin: number) => void;
+  onApplyStrategy?: (margin: number, variantMargins?: Record<string, number>) => void;
+  onSuggestedMarginChange?: (margin: number) => void;
   isLoading?: boolean;
   className?: string;
   recommendations?: string[];
   suggestedMarginValue?: number;
+  variantRecommendations?: Record<string, number>;
   isAnalyzed?: boolean;
   marketData?: MarketDataContext;
   variants?: { id: string; name: string }[];
@@ -35,10 +37,12 @@ interface AnalyzePriceCardProps {
 export const AnalyzePriceCard: React.FC<AnalyzePriceCardProps> = ({
   onAnalyze,
   onApplyStrategy,
+  onSuggestedMarginChange,
   isLoading = false,
   className = '',
   recommendations = [],
   suggestedMarginValue,
+  variantRecommendations = {},
   isAnalyzed = false,
   marketData,
   variants = [],
@@ -192,11 +196,32 @@ export const AnalyzePriceCard: React.FC<AnalyzePriceCardProps> = ({
 
         {isAnalyzed && suggestedMarginValue !== undefined && !isPreviewMode && (
           <div className="w-full sm:w-auto flex flex-col items-center sm:items-end gap-sm">
-             <p className="text-[10px] text-ink-400 font-bold uppercase tracking-wider">
-               AI Suggestion: {suggestedMarginValue.toFixed(1)}% Margin
-             </p>
+             <div className="flex flex-col items-center sm:items-end gap-xs">
+               <p className="text-[10px] text-ink-400 font-bold uppercase tracking-wider">
+                 AI Suggestion
+               </p>
+               <div className="flex items-center gap-2 bg-white/50 border border-border-subtle rounded-lg p-1.5 shadow-sm">
+                 <button
+                   onClick={() => onSuggestedMarginChange?.(Math.max(0, suggestedMarginValue - 1))}
+                   className="p-1 hover:bg-clay/10 rounded-md text-clay transition-colors active:scale-90"
+                   aria-label="Decrease margin"
+                 >
+                   <Minus className="w-4 h-4" />
+                 </button>
+                 <span className="text-sm font-bold text-ink-900 min-w-[3.5ch] text-center tabular-nums">
+                   {suggestedMarginValue.toFixed(1)}%
+                 </span>
+                 <button
+                   onClick={() => onSuggestedMarginChange?.(Math.min(100, suggestedMarginValue + 1))}
+                   className="p-1 hover:bg-clay/10 rounded-md text-clay transition-colors active:scale-90"
+                   aria-label="Increase margin"
+                 >
+                   <Plus className="w-4 h-4" />
+                 </button>
+               </div>
+             </div>
              <Button
-               onClick={() => onApplyStrategy?.(suggestedMarginValue)}
+               onClick={() => onApplyStrategy?.(suggestedMarginValue, variantRecommendations)}
                variant="primary"
                className="gap-sm shadow-clay/10 shadow-lg hover:shadow-clay/20 transition-all active:scale-95 whitespace-nowrap w-full sm:w-auto justify-center"
              >

@@ -74,6 +74,8 @@ export interface CalculatorState {
   presets: Preset[];
   currentPresetId: string | null;
   originalConfig: PricingConfig | null;
+  originalVariants: Variant[] | null;
+  variantOverrides: Record<string, number>;
 
   // Actions
   updateInput: (updates: Partial<CalculationInput>) => void;
@@ -82,7 +84,8 @@ export interface CalculatorState {
   removeIngredient: (id: string) => void;
   updateConfig: (updates: Partial<PricingConfig>) => void;
   calculate: () => Promise<CalculationResult | null>;
-  applyStrategy: (margin: number) => void;
+  applyStrategy: (margin: number, variantMargins?: Record<string, number>) => void;
+  updateVariantOverride: (id: string, price: number) => void;
   discardPreview: () => void;
   commitPreview: () => void;
   reset: () => void;
@@ -128,10 +131,18 @@ export function useCalculatorState(initialValues?: {
     input: CalculationInput;
     config: PricingConfig;
     competitors?: DraftCompetitor[];
+    isPreviewMode?: boolean;
+    originalConfig?: PricingConfig | null;
+    originalVariants?: Variant[] | null;
+    variantOverrides?: Record<string, number>;
   }>(SESSION_STORAGE_KEY, {
     input: initialValues?.input || initialInput,
     config: initialValues?.config || initialConfig,
     competitors: [],
+    isPreviewMode: false,
+    originalConfig: null,
+    originalVariants: null,
+    variantOverrides: {},
   });
 
   const [input, setInput] = useState<CalculationInput>(
@@ -143,8 +154,10 @@ export function useCalculatorState(initialValues?: {
   const [currentPresetId, setCurrentPresetId] = useState<string | null>(null);
 
   // Soft-Apply / Preview Mode State
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [originalConfig, setOriginalConfig] = useState<PricingConfig | null>(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(draft.isPreviewMode || false);
+  const [originalConfig, setOriginalConfig] = useState<PricingConfig | null>(draft.originalConfig || null);
+  const [originalVariants, setOriginalVariants] = useState<Variant[] | null>(draft.originalVariants || null);
+  const [variantOverrides, setVariantOverrides] = useState<Record<string, number>>(draft.variantOverrides || {});
 
   // Track the input/config state used for the last successful calculation
   const [lastCalculatedState, setLastCalculatedState] = useState<{
@@ -158,10 +171,10 @@ export function useCalculatorState(initialValues?: {
   // Auto-save to sessionStorage
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setDraft({ input, config, competitors });
+      setDraft({ input, config, competitors, isPreviewMode, originalConfig, originalVariants, variantOverrides });
     }, 1000);
     return () => clearTimeout(timeoutId);
-  }, [input, config, competitors, setDraft]);
+  }, [input, config, competitors, isPreviewMode, originalConfig, originalVariants, variantOverrides, setDraft]);
 
   // Determine if current form state differs from the last calculated state
   const isDirty = React.useMemo(() => {
@@ -224,34 +237,100 @@ export function useCalculatorState(initialValues?: {
   }, []);
 
   const applyStrategy = useCallback(
-    (margin: number) => {
-      // Store current config before applying strategy
+    (margin: number, variantMargins?: Record<string, number>) => {
+      // Store current config and variants before applying strategy
       if (!isPreviewMode) {
         setOriginalConfig({ ...config });
+        setOriginalVariants(input.variants ? [...input.variants] : null);
       }
+
       setConfig({
         strategy: 'margin',
         value: margin,
       });
+
+      if (variantMargins && Object.keys(variantMargins).length > 0) {
+        setInput(prev => ({
+          ...prev,
+          variants: prev.variants?.map(v => {
+            if (variantMargins[v.id] !== undefined) {
+              return {
+                ...v,
+                pricingConfig: {
+                  strategy: 'margin',
+                  value: variantMargins[v.id]
+                }
+              };
+            }
+            // If it's the base-original, we already updated root config
+            return v;
+          })
+        }));
+      }
+
+      setVariantOverrides({}); // Clear any previous overrides
       setIsPreviewMode(true);
     },
-    [config, isPreviewMode]
+    [config, input.variants, isPreviewMode]
   );
+
+  const updateVariantOverride = useCallback((id: string, price: number) => {
+    setVariantOverrides((prev) => {
+      const next = { ...prev, [id]: price };
+      // If we are making an override, ensure we are in preview mode
+      if (!isPreviewMode) {
+        setOriginalConfig({ ...config });
+        setIsPreviewMode(true);
+      }
+      return next;
+    });
+  }, [config, isPreviewMode]);
 
   const discardPreview = useCallback(() => {
     if (originalConfig) {
       setConfig(originalConfig);
       setOriginalConfig(null);
     }
+    if (originalVariants) {
+      setInput(prev => ({ ...prev, variants: originalVariants }));
+      setOriginalVariants(null);
+    }
+    setVariantOverrides({});
     setIsPreviewMode(false);
-  }, [originalConfig]);
+  }, [originalConfig, originalVariants]);
 
   const commitPreview = useCallback(() => {
+    // If there are overrides, we might want to apply them to currentSellingPrice
+    // But for now, we follow the existing pattern where commit just ends preview mode.
+    // Actually, the user wants "Psychological Rounding" to have "immediate effect".
+    // If we commit, we should probably update the input's currentSellingPrice.
+    
+    setInput(prev => {
+      const next = { ...prev };
+      
+      // Update base current price if overridden (id 'base-original' is used in results)
+      if (variantOverrides['base-original'] !== undefined) {
+        next.currentSellingPrice = variantOverrides['base-original'];
+      }
+
+      // Update variants
+      if (next.variants) {
+        next.variants = next.variants.map(v => {
+          if (variantOverrides[v.id] !== undefined) {
+            return { ...v, currentSellingPrice: variantOverrides[v.id] };
+          }
+          return v;
+        });
+      }
+
+      return next;
+    });
+
     setOriginalConfig(null);
+    setOriginalVariants(null);
+    setVariantOverrides({});
     setIsPreviewMode(false);
-    // After committing, the user might want to save the preset. 
-    // We don't auto-save here to follow the "explicit confirmation" mandate.
-  }, []);
+  }, [variantOverrides]);
 
   // Variant Actions
   const setHasVariants = useCallback(
@@ -475,6 +554,8 @@ export function useCalculatorState(initialValues?: {
     setLastCalculatedState(null);
     setIsPreviewMode(false);
     setOriginalConfig(null);
+    setOriginalVariants(null);
+    setVariantOverrides({});
     setErrors({});
     window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
   }, []);
@@ -502,6 +583,8 @@ export function useCalculatorState(initialValues?: {
     setCurrentPresetId(preset.id);
     setIsPreviewMode(false);
     setOriginalConfig(null);
+    setOriginalVariants(null);
+    setVariantOverrides({});
 
     // Load competitors
     if (preset.competitors) {
@@ -611,6 +694,8 @@ export function useCalculatorState(initialValues?: {
     presets,
     currentPresetId,
     originalConfig,
+    originalVariants,
+    variantOverrides,
     updateInput,
     updateIngredient,
     addIngredient,
@@ -618,6 +703,7 @@ export function useCalculatorState(initialValues?: {
     updateConfig,
     calculate,
     applyStrategy,
+    updateVariantOverride,
     discardPreview,
     commitPreview,
     reset,

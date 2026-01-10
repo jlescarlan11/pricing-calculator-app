@@ -81,7 +81,7 @@ export const StickySummary: React.FC<StickySummaryProps> = ({
               onClick={onDiscard}
               className="px-4 rounded-full border-sakura text-rust hover:bg-sakura/10"
             >
-              Discard
+              Discard AI Preview
             </Button>
             <Button
               variant="primary"

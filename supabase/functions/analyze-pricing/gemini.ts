@@ -68,8 +68,7 @@ export async function analyzeWithGemini(
     ${variantsList}
     `;
     
-    // Update strategy to explicitly consider variants if they exist
-    strategyInstruction += " For the selected variants, look for specific pricing inconsistencies or margin opportunities.";
+    strategyInstruction += " For each of the selected variants, provide a specific suggested margin if it should differ from the base product. Identify any variants that are underperforming compared to others.";
   }
 
   const prompt = `
@@ -96,8 +95,13 @@ export async function analyzeWithGemini(
     Return your response as a raw JSON object with the following schema:
     {
       "recommendations": ["string", "string", "string"],
-      "suggestedMarginValue": number
+      "suggestedMarginValue": number,
+      "variantRecommendations": [
+        { "variantId": "string", "suggestedMarginValue": number }
+      ]
     }
+    The "suggestedMarginValue" should be your primary recommendation for the base product. 
+    The "variantRecommendations" array should contain a suggested margin for EACH variant listed in the Variants Data above.
     Do not include markdown formatting like \`\`\`json.
   `;
 
@@ -159,6 +163,7 @@ export async function analyzeWithGemini(
     return {
       recommendations: parsedData.recommendations.slice(0, 3),
       suggestedMarginValue,
+      variantRecommendations: parsedData.variantRecommendations || [],
     };
   } catch (err) {
     console.error('Failed to parse Gemini response:', err);

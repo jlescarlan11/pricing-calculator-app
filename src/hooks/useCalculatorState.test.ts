@@ -202,4 +202,75 @@ describe('useCalculatorState', () => {
     expect(result.current.input.productName).toBe('');
     expect(result.current.errors).toEqual({});
   });
+
+  it('should persist and discard AI preview state', async () => {
+    // 1. Initial render
+    const { result, unmount } = renderHook(() => useCalculatorState());
+
+    // 2. Apply strategy (AI preview)
+    act(() => {
+      result.current.applyStrategy(25);
+    });
+
+    expect(result.current.isPreviewMode).toBe(true);
+    expect(result.current.config.value).toBe(25);
+    expect(result.current.originalConfig?.value).toBe(50); // initial default is 50
+
+    // 3. Fast-forward to ensure auto-save to sessionStorage
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    // 4. "Refresh" (unmount and re-render)
+    unmount();
+    const { result: result2 } = renderHook(() => useCalculatorState());
+
+    // 5. Verify state is persisted
+    expect(result2.current.isPreviewMode).toBe(true);
+    expect(result2.current.originalConfig?.value).toBe(50);
+    expect(result2.current.config.value).toBe(25);
+
+    // 6. Discard preview
+    act(() => {
+      result2.current.discardPreview();
+    });
+
+    expect(result2.current.isPreviewMode).toBe(false);
+    expect(result2.current.config.value).toBe(50);
+    expect(result2.current.originalConfig).toBeNull();
+  });
+
+  it('should apply variant-specific margins in applyStrategy', () => {
+    const { result } = renderHook(() => useCalculatorState());
+
+    // 1. Setup variants
+    act(() => {
+      result.current.setHasVariants(true);
+      result.current.addVariant();
+    });
+    
+    const variantId = result.current.input.variants![0].id;
+    const initialVariantMargin = result.current.input.variants![0].pricingConfig.value;
+
+    // 2. Apply strategy with variant margin
+    act(() => {
+      result.current.applyStrategy(30, { [variantId]: 45 });
+    });
+
+    expect(result.current.isPreviewMode).toBe(true);
+    expect(result.current.config.value).toBe(30);
+    expect(result.current.input.variants![0].pricingConfig.value).toBe(45);
+    expect(result.current.originalVariants).not.toBeNull();
+    expect(result.current.originalVariants![0].pricingConfig.value).toBe(initialVariantMargin);
+
+    // 3. Discard preview
+    act(() => {
+      result.current.discardPreview();
+    });
+
+    expect(result.current.isPreviewMode).toBe(false);
+    expect(result.current.config.value).toBe(50); // back to default
+    expect(result.current.input.variants![0].pricingConfig.value).toBe(initialVariantMargin);
+    expect(result.current.originalVariants).toBeNull();
+  });
 });

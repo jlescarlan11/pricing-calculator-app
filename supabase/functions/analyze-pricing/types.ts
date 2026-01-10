@@ -24,6 +24,18 @@ export interface CalculationResult {
     labor: number;
     overhead: number;
   };
+  variantResults?: VariantResult[];
+}
+
+export interface VariantResult {
+  id: string;
+  name: string;
+  totalCost: number;
+  costPerUnit: number;
+  recommendedPrice: number;
+  profitMarginPercent: number;
+  batchSize: number;
+  currentSellingPrice?: number;
 }
 
 export interface AnalyzePricingRequest {
@@ -36,7 +48,13 @@ export interface AnalyzePricingRequest {
   }[];
 }
 
+export interface VariantRecommendation {
+  variantId: string;
+  suggestedMarginValue: number;
+}
+
 export interface GeminiResponse {
   recommendations: string[];
   suggestedMarginValue: number;
+  variantRecommendations?: VariantRecommendation[];
 }

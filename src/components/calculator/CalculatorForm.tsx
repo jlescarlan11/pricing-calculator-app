@@ -47,8 +47,8 @@ interface CalculatorFormProps {
     field: keyof Ingredient,
     value: string | number | boolean
   ) => void;
-  addVariantIngredient: (variantId: string) => void;
-  removeVariantIngredient: (variantId: string, ingredientId: string) => void;
+  onAddVariantIngredient: (variantId: string) => void;
+  onRemoveVariantIngredient: (variantId: string, ingredientId: string) => void;
 }
 
 export const CalculatorForm: React.FC<CalculatorFormProps> = ({

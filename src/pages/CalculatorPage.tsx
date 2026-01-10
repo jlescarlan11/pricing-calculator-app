@@ -45,6 +45,8 @@ export const CalculatorPage: React.FC = () => {
     addVariantIngredient,
     removeVariantIngredient,
     createSnapshot,
+    variantOverrides,
+    updateVariantOverride,
   } = useCalculatorState();
 
   const { setIsSyncBlocked, updatePreset } = usePresets();
@@ -187,8 +189,8 @@ export const CalculatorPage: React.FC = () => {
     }
   };
 
-  const handleApplyStrategy = (margin: number) => {
-    applyStrategy(margin);
+  const handleApplyStrategy = (margin: number, variantMargins?: Record<string, number>) => {
+    applyStrategy(margin, variantMargins);
     addToast('Previewing AI suggested strategy.', 'info');
     // Scroll to top to see effects in ResultsDisplay
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -196,7 +198,7 @@ export const CalculatorPage: React.FC = () => {
 
   const handleDiscardPreview = () => {
     discardPreview();
-    addToast('Strategy discarded.', 'info');
+    addToast('AI pricing discarded. Your manual cost updates were kept.', 'success');
   };
 
   const handleCommitPreview = async () => {
@@ -320,6 +322,8 @@ export const CalculatorPage: React.FC = () => {
               marketDataContext={marketDataContext}
               isPreviewMode={isPreviewMode}
               originalConfig={originalConfig}
+              variantOverrides={variantOverrides}
+              onUpdateVariantOverride={updateVariantOverride}
             />
 
             {/* Price History & Milestones (Only for saved products) */}

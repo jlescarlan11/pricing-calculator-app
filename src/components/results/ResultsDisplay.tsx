@@ -4,6 +4,8 @@ import type {
   CalculationInput,
   PricingConfig,
   DraftCompetitor,
+  VariantRecommendation,
+  AIAnalysisResult,
 } from '../../types/calculator';
 import { PricingRecommendations } from './PricingRecommendations';
 import { CostBreakdown } from './CostBreakdown';
@@ -33,7 +35,7 @@ interface ResultsDisplayProps {
   input: CalculationInput;
   config: PricingConfig;
   onEdit?: () => void;
-  onApplyStrategy?: (margin: number) => void;
+  onApplyStrategy?: (margin: number, variantMargins?: Record<string, number>) => void;
   onDiscard?: () => void;
   onConfirm?: () => void;
   presetId?: string | null;
@@ -41,6 +43,8 @@ interface ResultsDisplayProps {
   marketDataContext?: MarketDataContext;
   isPreviewMode?: boolean;
   originalConfig?: PricingConfig | null;
+  variantOverrides?: Record<string, number>;
+  onUpdateVariantOverride?: (id: string, price: number) => void;
 }
 
 /**
@@ -61,12 +65,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   marketDataContext,
   isPreviewMode = false,
   originalConfig,
+  variantOverrides = {},
+  onUpdateVariantOverride,
 }) => {
   const { addToast } = useToast();
   const { getPreset, updatePreset } = usePresets();
   const [isAnalyzed, setIsAnalyzed] = React.useState(false);
   const [recommendations, setRecommendations] = React.useState<string[]>([]);
   const [suggestedMargin, setSuggestedMargin] = React.useState<number | undefined>(undefined);
+  const [variantRecommendations, setVariantRecommendations] = React.useState<Record<string, number>>({});
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [isCompetitorModalOpen, setIsCompetitorModalOpen] = useState(false);
   const [selectedVariantIds, setSelectedVariantIds] = useState<string[]>([]);
@@ -155,6 +162,17 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
         setRecommendations(data.recommendations);
         setSuggestedMargin(data.suggestedMarginValue);
+        
+        // Store variant-specific recommendations if they exist
+        if (data.variantRecommendations) {
+          const vRecs: Record<string, number> = {};
+          data.variantRecommendations.forEach((vr: VariantRecommendation) => {
+            vRecs[vr.variantId] = vr.suggestedMarginValue;
+          });
+          setVariantRecommendations(vRecs);
+        } else {
+          setVariantRecommendations({});
+        }
       } else {
         // Fallback to Rules-Based MVP
         // Artificial delay for UX
@@ -280,11 +298,13 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         {/* Priority 1: Results Table (Variants) or Recommendations (Single) */}
         <div className="print:break-inside-avoid animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
           {hasVariants ? (
-            results.variantResults!.length > 3 && (isPreviewMode || (isAnalyzed && suggestedMargin !== undefined)) ? (
+            results.variantResults!.length > 3 ? (
               <ImpactSummaryView 
                 results={results}
                 previousConfig={isPreviewMode ? originalConfig : null}
                 suggestedMargin={isAnalyzed ? suggestedMargin : undefined}
+                overrides={variantOverrides}
+                onOverrideChange={onUpdateVariantOverride}
               />
             ) : (
               <VariantResultsTable results={results} />
@@ -307,9 +327,11 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <AnalyzePriceCard
               onAnalyze={handleAnalyze}
               onApplyStrategy={onApplyStrategy}
+              onSuggestedMarginChange={setSuggestedMargin}
               isAnalyzed={isAnalyzed}
               recommendations={recommendations}
               suggestedMarginValue={suggestedMargin}
+              variantRecommendations={variantRecommendations}
               isLoading={isAnalyzing}
               marketData={marketDataContext}
               variants={

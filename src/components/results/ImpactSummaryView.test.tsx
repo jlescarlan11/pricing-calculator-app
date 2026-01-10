@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import { ImpactSummaryView } from './ImpactSummaryView';
 import type { CalculationResult, PricingConfig } from '../../types/calculator';
 
@@ -23,6 +23,7 @@ const mockResults: CalculationResult = {
       profitMarginPercent: 50,
       breakEvenPrice: 10,
       batchSize: 20,
+      currentSellingPrice: 15,
     },
     {
       id: '2',
@@ -34,6 +35,7 @@ const mockResults: CalculationResult = {
       profitMarginPercent: 50,
       breakEvenPrice: 15,
       batchSize: 20,
+      currentSellingPrice: 25,
     },
     {
       id: '3',
@@ -45,6 +47,7 @@ const mockResults: CalculationResult = {
       profitMarginPercent: 50,
       breakEvenPrice: 20,
       batchSize: 20,
+      currentSellingPrice: 35,
     },
     {
       id: '4',
@@ -56,6 +59,7 @@ const mockResults: CalculationResult = {
       profitMarginPercent: 50,
       breakEvenPrice: 25,
       batchSize: 20,
+      currentSellingPrice: 45,
     },
   ],
 };
@@ -85,8 +89,6 @@ describe('ImpactSummaryView', () => {
     // Total Delta = 3.33 + 5 + 6.67 + 8.33 = 23.33
     // Avg Delta = 23.33 / 4 = 5.83
 
-    // Check if average change is displayed (formatted currency)
-    // We expect something around 5.83
     expect(screen.getByText(/\+?₱\s?5\.83/)).toBeInTheDocument();
   });
 
@@ -98,31 +100,64 @@ describe('ImpactSummaryView', () => {
       />
     );
 
-    // Most impacted is Variant 4 (highest absolute delta/percent shift)
-    // Actually all have same percent shift (40% to 50% margin is ~20% price increase)
-    // 16.67 -> 20 (+20%), 25 -> 30 (+20%), etc.
-    // So any could be "most impacted" if they have same percent. 
-    // In our code, it's the first one in the sorted list.
-    // Due to 2-decimal rounding in calculation results, Variant 3 
-    // actually has a slightly higher calculated percent shift.
+    // All variants have roughly the same percent shift. Variant 3 or 4 should be identified.
+    // Given the sort order and rounding, Variant 3 matches in previous test.
     expect(screen.getByText(/Variant 3/i)).toBeInTheDocument();
   });
 
-  it('renders impact for suggested margin', () => {
+  it('toggles the expanded grid view', () => {
     render(
       <ImpactSummaryView 
         results={mockResults} 
-        suggestedMargin={60} // Suggesting 60% margin
+        previousConfig={mockPreviousConfig} 
       />
     );
 
-    // Current is 50%. Suggesting 60%.
-    // V1: Price 20 (50%). NewPrice(60%) = 10 / 0.4 = 25. Delta = 5.
-    // V2: Price 30 (50%). NewPrice(60%) = 15 / 0.4 = 37.5. Delta = 7.5.
-    // V3: Price 40 (50%). NewPrice(60%) = 20 / 0.4 = 50. Delta = 10.
-    // V4: Price 50 (50%). NewPrice(60%) = 25 / 0.4 = 62.5. Delta = 12.5.
-    // Avg Delta = (5+7.5+10+12.5)/4 = 8.75.
+    const toggleButton = screen.getByText(/View All Impacts/i);
+    fireEvent.click(toggleButton);
 
-    expect(screen.getByText(/\+?₱\s?8\.75/)).toBeInTheDocument();
+    expect(screen.getByText(/Psychological Rounding Editor/i)).toBeInTheDocument();
+    expect(screen.getByText(/Hide All Impacts/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText(/Hide All Impacts/i));
+    expect(screen.queryByText(/Psychological Rounding Editor/i)).not.toBeInTheDocument();
+  });
+
+  it('calls onOverrideChange when manual price is edited', () => {
+    const onOverrideChange = vi.fn();
+    render(
+      <ImpactSummaryView 
+        results={mockResults} 
+        previousConfig={mockPreviousConfig} 
+        onOverrideChange={onOverrideChange}
+      />
+    );
+
+    fireEvent.click(screen.getByText(/View All Impacts/i));
+
+    const inputs = screen.getAllByRole('spinbutton');
+    fireEvent.change(inputs[0], { target: { value: '19.99' } });
+
+    expect(onOverrideChange).toHaveBeenCalledWith('1', 19.99);
+  });
+
+  it('updates summary calculations based on overrides', () => {
+    // We pass overrides as props now
+    const overrides = { '1': 25 }; // Override Variant 1 to 25 (from 20)
+    
+    render(
+      <ImpactSummaryView 
+        results={mockResults} 
+        previousConfig={mockPreviousConfig} 
+        overrides={overrides}
+      />
+    );
+
+    // V1 oldPrice = 16.67. NewPrice was 20 (delta 3.33). Now 25 (delta 8.33).
+    // Total Delta change = +5.
+    // New Total Delta = 23.33 + 5 = 28.33.
+    // New Avg Delta = 28.33 / 4 = 7.08.
+
+    expect(screen.getByText(/\+?₱\s?7\.08/)).toBeInTheDocument();
   });
 });

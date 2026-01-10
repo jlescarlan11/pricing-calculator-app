@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ResultsDisplay } from './ResultsDisplay';
 import { ToastProvider } from '../shared/Toast';
@@ -98,7 +98,7 @@ describe('ResultsDisplay Impact Summary Integration', () => {
     expect(screen.getByText(/Impact Summary/i)).toBeInTheDocument();
   });
 
-  it('shows VariantResultsTable when more than 3 variants exist but NOT in preview/analysis mode', () => {
+  it('shows ImpactSummaryView when more than 3 variants exist even if NOT in preview/analysis mode', () => {
     renderWithProviders(
       <ResultsDisplay 
         results={mockResults} 
@@ -108,7 +108,27 @@ describe('ResultsDisplay Impact Summary Integration', () => {
       />
     );
 
-    expect(screen.getByText(/Variant Performance/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Impact Summary/i)).not.toBeInTheDocument();
+    // Now it should show Impact Summary, not Variant Performance
+    expect(screen.queryByText(/Variant Performance/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Impact Summary/i)).toBeInTheDocument();
+  });
+
+  it('passes variantOverrides to ImpactSummaryView', () => {
+    const variantOverrides = { '1': 10 };
+    renderWithProviders(
+      <ResultsDisplay 
+        results={mockResults} 
+        input={mockInput} 
+        config={mockConfig} 
+        isPreviewMode={true}
+        variantOverrides={variantOverrides}
+      />
+    );
+
+    fireEvent.click(screen.getByText(/View All Impacts/i));
+    
+    // Check if the input reflects the override
+    const inputs = screen.getAllByRole('spinbutton');
+    expect(inputs[0]).toHaveValue(10);
   });
 });
